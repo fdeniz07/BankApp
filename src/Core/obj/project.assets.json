@@ -8,7 +8,7 @@
     "net10.0": []
   },
   "packageFolders": {
-    "C:\\Users\\PRODOC\\AppData\\Local\\Temp\\cursor-sandbox-cache\\065f613c927b4203eeee7eaa6107c2cf\\nuget": {},
+    "C:\\Users\\PRODOC\\AppData\\Local\\Temp\\cursor-sandbox-cache\\f23805de2566a0a769f49b10e5b1567d\\nuget": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
@@ -18,7 +18,7 @@
       "projectUniqueName": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
       "projectName": "Core",
       "projectPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
-      "packagesPath": "C:\\Users\\PRODOC\\AppData\\Local\\Temp\\cursor-sandbox-cache\\065f613c927b4203eeee7eaa6107c2cf\\nuget",
+      "packagesPath": "C:\\Users\\PRODOC\\AppData\\Local\\Temp\\cursor-sandbox-cache\\f23805de2566a0a769f49b10e5b1567d\\nuget",
       "outputPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [

@@ -13,3 +13,4 @@ C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Domain\obj\D
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Domain\obj\Debug\net10.0\refint\Domain.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Domain\obj\Debug\net10.0\Domain.pdb
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Domain\obj\Debug\net10.0\ref\Domain.dll
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Domain\obj\Debug\net10.0\Domain.sourcelink.json
