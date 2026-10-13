@@ -6,6 +6,7 @@ public abstract class Entity
     public DateTimeOffset CreatedDate { get; set; }
     public DateTimeOffset? UpdatedDate { get; set; }
     public DateTimeOffset? DeletedDate { get; set; }
+    public bool IsDeleted { get; set; }
 
     public Entity()
     {

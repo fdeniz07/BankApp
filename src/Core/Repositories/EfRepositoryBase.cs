@@ -43,7 +43,7 @@ public class EfRepositoryBase<TEntity, TContext> : IAsyncRepository<TEntity>
         IQueryable<TEntity> query = Query();
 
         if (!withDeleted)
-            query = query.Where(e => !e.DeletedDate.HasValue);
+            query = query.Where(e => !e.IsDeleted);
 
         if (predicate is not null)
             query = query.Where(predicate);
@@ -87,7 +87,7 @@ public class EfRepositoryBase<TEntity, TContext> : IAsyncRepository<TEntity>
             query = include(query);
 
         if (!withDeleted)
-            query = query.Where(e => !e.DeletedDate.HasValue);
+            query = query.Where(e => !e.IsDeleted);
 
         return await query.FirstOrDefaultAsync(predicate, cancellationToken);
     }
@@ -111,7 +111,7 @@ public class EfRepositoryBase<TEntity, TContext> : IAsyncRepository<TEntity>
             query = include(query);
 
         if (!withDeleted)
-            query = query.Where(e => !e.DeletedDate.HasValue);
+            query = query.Where(e => !e.IsDeleted);
 
         if (predicate is not null)
             query = query.Where(predicate);
@@ -152,6 +152,7 @@ public class EfRepositoryBase<TEntity, TContext> : IAsyncRepository<TEntity>
         if (!permanent)
         {
             entity.DeletedDate = DateTimeOffset.UtcNow;
+            entity.IsDeleted = true;
             Context.Update(entity);
             return;
         }
@@ -168,7 +169,10 @@ public class EfRepositoryBase<TEntity, TContext> : IAsyncRepository<TEntity>
         if (!permanent)
         {
             foreach (TEntity entity in entities)
+            {
                 entity.DeletedDate = DateTimeOffset.UtcNow;
+                entity.IsDeleted = true;
+            }
 
             Context.UpdateRange(entities);
             return;
