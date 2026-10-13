@@ -10,4 +10,5 @@ public class GetListIndividualCustomerListItemDto
     public string LastName { get; set; } = default!;
     public string NationalId { get; set; } = default!;
     public bool IsActive { get; set; }
+    public bool IsDeleted { get; set; }
 }

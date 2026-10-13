@@ -32,7 +32,9 @@ public class DeleteIndividualCustomerRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.IndividualCustomerShouldExistWhenSelected(individualCustomer);
-        await _individualCustomerRepository.DeleteAsync(individualCustomer!, cancellationToken: cancellationToken);
+
+        individualCustomer!.IsActive = false;
+        await _individualCustomerRepository.DeleteAsync(individualCustomer, cancellationToken: cancellationToken);
 
         return _mapper.Map<DeletedIndividualCustomerResponse>(individualCustomer);
     }
