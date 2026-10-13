@@ -94,7 +94,6 @@ C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\D
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\MediatR.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\MediatR.Contracts.dll
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Scalar.AspNetCore.dll
-C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Humanizer.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.Build.Framework.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.CodeAnalysis.dll
@@ -179,3 +178,7 @@ C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\D
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\tr\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.MSBuild.resources.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Bogus.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Ardalis.SmartEnum.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Ardalis.SmartEnum.SystemTextJson.dll
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt

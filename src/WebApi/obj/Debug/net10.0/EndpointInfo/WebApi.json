@@ -13,6 +13,224 @@
     }
   ],
   "paths": {
+    "/api/CorporateCustomers": {
+      "get": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCorporateCustomerRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCorporateCustomerRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCorporateCustomerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCorporateCustomerRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCorporateCustomerRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCorporateCustomerRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CorporateCustomers/inactive": {
+      "get": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CorporateCustomers/deleted": {
+      "get": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/CorporateCustomers/{id}": {
+      "get": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "CorporateCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/IndividualCustomers": {
       "get": {
         "tags": [
@@ -111,6 +329,82 @@
         }
       }
     },
+    "/api/IndividualCustomers/inactive": {
+      "get": {
+        "tags": [
+          "IndividualCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/IndividualCustomers/deleted": {
+      "get": {
+        "tags": [
+          "IndividualCustomers"
+        ],
+        "parameters": [
+          {
+            "name": "PageIndex",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/IndividualCustomers/{id}": {
       "get": {
         "tags": [
@@ -158,6 +452,81 @@
   },
   "components": {
     "schemas": {
+      "CreateCorporateCustomerRequest": {
+        "type": "object",
+        "properties": {
+          "customerNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "taxNumber": {
+            "type": "string"
+          },
+          "taxOffice": {
+            "type": "string"
+          },
+          "companyRegistrationNumber": {
+            "type": "string"
+          },
+          "companyEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "authorizedPersonName": {
+            "type": "string"
+          },
+          "companyAddress": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companySector": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyIndustry": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companySubIndustry": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyFoundationDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "CreateIndividualCustomerRequest": {
         "type": "object",
         "properties": {
@@ -206,6 +575,88 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "UpdateCorporateCustomerRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "customerNumber": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "phoneNumber": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "taxNumber": {
+            "type": "string"
+          },
+          "taxOffice": {
+            "type": "string"
+          },
+          "companyRegistrationNumber": {
+            "type": "string"
+          },
+          "companyEmail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "authorizedPersonName": {
+            "type": "string"
+          },
+          "companyAddress": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companySector": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyIndustry": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companySubIndustry": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "companyFoundationDate": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -270,6 +721,9 @@
     }
   },
   "tags": [
+    {
+      "name": "CorporateCustomers"
+    },
     {
       "name": "IndividualCustomers"
     }

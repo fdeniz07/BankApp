@@ -1,12 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "6ECUZM/c9mA=",
+  "dgSpecHash": "0Okxae34wJs=",
   "success": true,
   "projectFilePath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\WebApi\\WebApi.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\PRODOC\\.nuget\\packages\\ardalis.smartenum\\8.2.0\\ardalis.smartenum.8.2.0.nupkg.sha512",
+    "C:\\Users\\PRODOC\\.nuget\\packages\\ardalis.smartenum.systemtextjson\\8.1.0\\ardalis.smartenum.systemtextjson.8.1.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\automapper\\15.1.3\\automapper.15.1.3.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\azure.core\\1.50.0\\azure.core.1.50.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\azure.identity\\1.17.1\\azure.identity.1.17.1.nupkg.sha512",
+    "C:\\Users\\PRODOC\\.nuget\\packages\\bogus\\35.6.5\\bogus.35.6.5.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\fluentvalidation\\11.12.0\\fluentvalidation.11.12.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\11.12.0\\fluentvalidation.dependencyinjectionextensions.11.12.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",

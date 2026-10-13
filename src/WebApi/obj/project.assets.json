@@ -2,6 +2,35 @@
   "version": 4,
   "targets": {
     "net10.0": {
+      "Ardalis.SmartEnum/8.2.0": {
+        "type": "package",
+        "compile": {
+          "lib/net8.0/Ardalis.SmartEnum.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Ardalis.SmartEnum.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Ardalis.SmartEnum.SystemTextJson/8.1.0": {
+        "type": "package",
+        "dependencies": {
+          "Ardalis.SmartEnum": "8.1.0"
+        },
+        "compile": {
+          "lib/net8.0/Ardalis.SmartEnum.SystemTextJson.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net8.0/Ardalis.SmartEnum.SystemTextJson.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "AutoMapper/15.1.3": {
         "type": "package",
         "dependencies": {
@@ -50,6 +79,19 @@
         },
         "runtime": {
           "lib/net8.0/Azure.Identity.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Bogus/35.6.5": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/Bogus.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Bogus.dll": {
             "related": ".xml"
           }
         }
@@ -1228,6 +1270,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
+          "Ardalis.SmartEnum": "8.2.0",
           "Core": "1.0.0"
         },
         "compile": {
@@ -1242,6 +1285,7 @@
         "framework": ".NETCoreApp,Version=v10.0",
         "dependencies": {
           "Application": "1.0.0",
+          "Bogus": "35.6.5",
           "Core": "1.0.0",
           "Domain": "1.0.0",
           "Microsoft.EntityFrameworkCore.SqlServer": "10.0.0"
@@ -1256,6 +1300,47 @@
     }
   },
   "libraries": {
+    "Ardalis.SmartEnum/8.2.0": {
+      "sha512": "P1CLI2okpzHjOJnZMYLnzcyu1/fUJEYK1X4JSnal2TPmovrUTtXK6Sn78D2JgKUdwjSeWddnRveMj+BEZoksvg==",
+      "type": "package",
+      "path": "ardalis.smartenum/8.2.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "README.md",
+        "ardalis.smartenum.8.2.0.nupkg.sha512",
+        "ardalis.smartenum.nuspec",
+        "icon.png",
+        "lib/net6.0/Ardalis.SmartEnum.dll",
+        "lib/net6.0/Ardalis.SmartEnum.xml",
+        "lib/net7.0/Ardalis.SmartEnum.dll",
+        "lib/net7.0/Ardalis.SmartEnum.xml",
+        "lib/net8.0/Ardalis.SmartEnum.dll",
+        "lib/net8.0/Ardalis.SmartEnum.xml",
+        "lib/netstandard2.0/Ardalis.SmartEnum.dll",
+        "lib/netstandard2.0/Ardalis.SmartEnum.xml"
+      ]
+    },
+    "Ardalis.SmartEnum.SystemTextJson/8.1.0": {
+      "sha512": "LHEnyxdffnqVw6aBDEGqjZinYdDaASOEMigiza9EeW+0q0TBufANZszt0ocu3MZzN/K3yZge4ppwFQ9/jJhm+w==",
+      "type": "package",
+      "path": "ardalis.smartenum.systemtextjson/8.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ardalis.smartenum.systemtextjson.8.1.0.nupkg.sha512",
+        "ardalis.smartenum.systemtextjson.nuspec",
+        "icon.png",
+        "lib/net6.0/Ardalis.SmartEnum.SystemTextJson.dll",
+        "lib/net6.0/Ardalis.SmartEnum.SystemTextJson.xml",
+        "lib/net7.0/Ardalis.SmartEnum.SystemTextJson.dll",
+        "lib/net7.0/Ardalis.SmartEnum.SystemTextJson.xml",
+        "lib/net8.0/Ardalis.SmartEnum.SystemTextJson.dll",
+        "lib/net8.0/Ardalis.SmartEnum.SystemTextJson.xml",
+        "lib/netstandard2.0/Ardalis.SmartEnum.SystemTextJson.dll",
+        "lib/netstandard2.0/Ardalis.SmartEnum.SystemTextJson.xml"
+      ]
+    },
     "AutoMapper/15.1.3": {
       "sha512": "PEvv0zFa2qpsCqQQt2mmjXKaKaSff70Nrdu2vo953XtMke2ZASM9KDwlrKcH9xWOUFcR0IOaLXyL/aNnuhyTFQ==",
       "type": "package",
@@ -1314,6 +1399,27 @@
         "lib/net8.0/Azure.Identity.xml",
         "lib/netstandard2.0/Azure.Identity.dll",
         "lib/netstandard2.0/Azure.Identity.xml"
+      ]
+    },
+    "Bogus/35.6.5": {
+      "sha512": "2FGZn+aAVHjmCgClgmGkTDBVZk0zkLvAKGaxEf5JL6b3i9JbHTE4wnuY4vHCuzlCmJdU6VZjgDfHwmYkQF8VAA==",
+      "type": "package",
+      "path": "bogus/35.6.5",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "LICENSE",
+        "bogus.128.png",
+        "bogus.35.6.5.nupkg.sha512",
+        "bogus.nuspec",
+        "lib/net40/Bogus.dll",
+        "lib/net40/Bogus.xml",
+        "lib/net6.0/Bogus.dll",
+        "lib/net6.0/Bogus.xml",
+        "lib/netstandard1.3/Bogus.dll",
+        "lib/netstandard1.3/Bogus.xml",
+        "lib/netstandard2.0/Bogus.dll",
+        "lib/netstandard2.0/Bogus.xml"
       ]
     },
     "FluentValidation/11.12.0": {
@@ -3460,6 +3566,7 @@
   "projectFileDependencyGroups": {
     "net10.0": [
       "Application >= 1.0.0",
+      "Ardalis.SmartEnum.SystemTextJson >= 8.1.0",
       "Core >= 1.0.0",
       "Domain >= 1.0.0",
       "Microsoft.AspNetCore.OpenApi >= 10.0.12",
@@ -3507,11 +3614,11 @@
             "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Application\\Application.csproj": {
               "projectPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Application\\Application.csproj"
             },
-            "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj": {
-              "projectPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj"
+            "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj": {
+              "projectPath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj"
             },
-            "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Domain\\Domain.csproj": {
-              "projectPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Domain\\Domain.csproj"
+            "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Domain\\Domain.csproj": {
+              "projectPath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Domain\\Domain.csproj"
             },
             "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Persistence\\Persistence.csproj": {
               "projectPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Persistence\\Persistence.csproj"
@@ -3536,6 +3643,10 @@
         "framework": "net10.0",
         "targetAlias": "net10.0",
         "dependencies": {
+          "Ardalis.SmartEnum.SystemTextJson": {
+            "target": "Package",
+            "version": "[8.1.0, )"
+          },
           "Microsoft.AspNetCore.OpenApi": {
             "target": "Package",
             "version": "[10.0.12, )"
