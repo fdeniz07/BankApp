@@ -1,0 +1,27 @@
+using Core.CrossCuttingConcerns.Exceptions.Extensions;
+using Scalar.AspNetCore;
+using WebApi.Constants;
+
+namespace WebApi.Extensions;
+
+public static class ApplicationBuilderExtensions
+{
+    public static WebApplication UseWebApiInfrastructure(this WebApplication app)
+    {
+        app.ConfigureCustomExceptionMiddleware();
+        app.UseResponseCompression();
+        app.UseHttpsRedirection();
+        app.UseCors(CorsPolicies.Default);
+        app.UseRateLimiter();
+
+        if (app.Environment.IsDevelopment())
+        {
+            app.MapOpenApi();
+            app.MapScalarApiReference();
+        }
+
+        app.MapControllers();
+
+        return app;
+    }
+}
