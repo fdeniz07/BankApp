@@ -22,6 +22,315 @@ namespace Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Domain.Entities.CreditApplication", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<DateTimeOffset>("ApplicationDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("ApplicationDate");
+
+                    b.Property<string>("ApplicationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("ApplicationNumber");
+
+                    b.Property<decimal?>("ApprovedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("ApprovedAmount");
+
+                    b.Property<decimal?>("ApprovedInterestRate")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)")
+                        .HasColumnName("ApprovedInterestRate");
+
+                    b.Property<int?>("ApprovedTermMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("ApprovedTermMonths");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<Guid>("CreditSubTypeId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CreditSubTypeId");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CustomerId");
+
+                    b.Property<string>("DecisionBy")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("DecisionBy");
+
+                    b.Property<DateTimeOffset?>("DecisionDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DecisionDate");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<decimal?>("ExistingDebtAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("ExistingDebtAmount");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<decimal?>("MonthlyIncome")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("MonthlyIncome");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("Notes");
+
+                    b.Property<string>("Purpose")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Purpose");
+
+                    b.Property<string>("RejectionReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("RejectionReason");
+
+                    b.Property<decimal>("RequestedAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("RequestedAmount");
+
+                    b.Property<int>("RequestedTermMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("RequestedTermMonths");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Status");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApplicationNumber")
+                        .IsUnique();
+
+                    b.HasIndex("CreditSubTypeId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("CreditApplications", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditSubType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Code");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<Guid>("CreditTypeId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CreditTypeId");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<decimal?>("EarlyPaymentFeeRate")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)")
+                        .HasColumnName("EarlyPaymentFeeRate");
+
+                    b.Property<int>("GracePeriodDays")
+                        .HasColumnType("int")
+                        .HasColumnName("GracePeriodDays");
+
+                    b.Property<decimal>("InterestRate")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)")
+                        .HasColumnName("InterestRate");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<decimal?>("LateFeeRate")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)")
+                        .HasColumnName("LateFeeRate");
+
+                    b.Property<decimal>("MaxAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("MaxAmount");
+
+                    b.Property<int>("MaxTermMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("MaxTermMonths");
+
+                    b.Property<decimal>("MinAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("MinAmount");
+
+                    b.Property<int>("MinTermMonths")
+                        .HasColumnType("int")
+                        .HasColumnName("MinTermMonths");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Name");
+
+                    b.Property<decimal?>("ProcessingFeeAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("ProcessingFeeAmount");
+
+                    b.Property<decimal?>("ProcessingFeeRate")
+                        .HasPrecision(9, 4)
+                        .HasColumnType("decimal(9,4)")
+                        .HasColumnName("ProcessingFeeRate");
+
+                    b.Property<bool>("RequiresCollateral")
+                        .HasColumnType("bit")
+                        .HasColumnName("RequiresCollateral");
+
+                    b.Property<bool>("RequiresIncomeDocument")
+                        .HasColumnType("bit")
+                        .HasColumnName("RequiresIncomeDocument");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.HasIndex("CreditTypeId");
+
+                    b.ToTable("CreditSubTypes", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditType", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Category");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Code");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<string>("CurrencyCode")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)")
+                        .HasColumnName("CurrencyCode");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("Description");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("Name");
+
+                    b.Property<bool>("RequiresCollateral")
+                        .HasColumnType("bit")
+                        .HasColumnName("RequiresCollateral");
+
+                    b.Property<bool>("RequiresGuarantor")
+                        .HasColumnType("bit")
+                        .HasColumnName("RequiresGuarantor");
+
+                    b.Property<string>("RiskLevel")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("RiskLevel");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("CreditTypes", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -213,6 +522,36 @@ namespace Persistence.Migrations
                     b.ToTable("IndividualCustomers", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.CreditApplication", b =>
+                {
+                    b.HasOne("Domain.Entities.CreditSubType", "CreditSubType")
+                        .WithMany("CreditApplications")
+                        .HasForeignKey("CreditSubTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Customer", "Customer")
+                        .WithMany("CreditApplications")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreditSubType");
+
+                    b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditSubType", b =>
+                {
+                    b.HasOne("Domain.Entities.CreditType", "CreditType")
+                        .WithMany("CreditSubTypes")
+                        .HasForeignKey("CreditTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("CreditType");
+                });
+
             modelBuilder.Entity("Domain.Entities.CorporateCustomer", b =>
                 {
                     b.HasOne("Domain.Entities.Customer", null)
@@ -229,6 +568,21 @@ namespace Persistence.Migrations
                         .HasForeignKey("Domain.Entities.IndividualCustomer", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditSubType", b =>
+                {
+                    b.Navigation("CreditApplications");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditType", b =>
+                {
+                    b.Navigation("CreditSubTypes");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Customer", b =>
+                {
+                    b.Navigation("CreditApplications");
                 });
 #pragma warning restore 612, 618
         }
