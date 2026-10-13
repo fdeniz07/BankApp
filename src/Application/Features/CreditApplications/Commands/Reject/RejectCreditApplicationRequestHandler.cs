@@ -1,0 +1,51 @@
+using Application.Features.CreditApplications.Rules;
+using Application.Services.Repositories;
+using AutoMapper;
+using Domain.Entities;
+using Domain.Enums;
+using MediatR;
+
+namespace Application.Features.CreditApplications.Commands.Reject;
+
+public class RejectCreditApplicationRequestHandler
+    : IRequestHandler<RejectCreditApplicationRequest, RejectedCreditApplicationResponse>
+{
+    private readonly ICreditApplicationRepository _creditApplicationRepository;
+    private readonly IMapper _mapper;
+    private readonly CreditApplicationBusinessRules _businessRules;
+
+    public RejectCreditApplicationRequestHandler(
+        ICreditApplicationRepository creditApplicationRepository,
+        IMapper mapper,
+        CreditApplicationBusinessRules businessRules)
+    {
+        _creditApplicationRepository = creditApplicationRepository;
+        _mapper = mapper;
+        _businessRules = businessRules;
+    }
+
+    public async Task<RejectedCreditApplicationResponse> Handle(
+        RejectCreditApplicationRequest request,
+        CancellationToken cancellationToken)
+    {
+        CreditApplication? creditApplication = await _creditApplicationRepository.GetAsync(
+            predicate: c => c.Id == request.Id,
+            cancellationToken: cancellationToken);
+
+        await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
+        await _businessRules.ApplicationShouldBePending(creditApplication!);
+
+        creditApplication!.Status = CreditApplicationStatus.Rejected;
+        creditApplication.RejectionReason = request.RejectionReason;
+        creditApplication.DecisionDate = DateTimeOffset.UtcNow;
+        creditApplication.DecisionBy = request.DecisionBy;
+        creditApplication.Notes = request.Notes ?? creditApplication.Notes;
+        creditApplication.ApprovedAmount = null;
+        creditApplication.ApprovedTermMonths = null;
+        creditApplication.ApprovedInterestRate = null;
+
+        await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
+
+        return _mapper.Map<RejectedCreditApplicationResponse>(creditApplication);
+    }
+}
