@@ -24,6 +24,30 @@ public class IndividualCustomersController : BaseController
         return Ok(response);
     }
 
+    [HttpGet("inactive")]
+    public async Task<IActionResult> GetInactiveList([FromQuery] PageRequest pageRequest)
+    {
+        GetListIndividualCustomerRequest request = new()
+        {
+            PageRequest = pageRequest,
+            IsActive = false
+        };
+        GetListResponse<GetListIndividualCustomerListItemDto> response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
+    [HttpGet("deleted")]
+    public async Task<IActionResult> GetDeletedList([FromQuery] PageRequest pageRequest)
+    {
+        GetListIndividualCustomerRequest request = new()
+        {
+            PageRequest = pageRequest,
+            OnlyDeleted = true
+        };
+        GetListResponse<GetListIndividualCustomerListItemDto> response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById([FromRoute] Guid id)
     {

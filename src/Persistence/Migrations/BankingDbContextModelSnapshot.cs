@@ -59,6 +59,10 @@ namespace Persistence.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsActive");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
                     b.Property<string>("PhoneNumber")
                         .IsRequired()
                         .HasMaxLength(20)

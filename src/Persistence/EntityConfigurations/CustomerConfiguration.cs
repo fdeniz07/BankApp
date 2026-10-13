@@ -17,6 +17,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(20).IsRequired();
         builder.Property(c => c.Address).HasColumnName("Address").HasMaxLength(500).IsRequired();
         builder.Property(c => c.IsActive).HasColumnName("IsActive").IsRequired();
+        builder.Property(c => c.IsDeleted).HasColumnName("IsDeleted").IsRequired();
         builder.Property(c => c.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(c => c.UpdatedDate).HasColumnName("UpdatedDate");
         builder.Property(c => c.DeletedDate).HasColumnName("DeletedDate");
