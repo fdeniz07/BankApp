@@ -1,4 +1,6 @@
 using System.Threading.RateLimiting;
+using Ardalis.SmartEnum.SystemTextJson;
+using Domain.Enums;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using WebApi.Constants;
@@ -9,7 +11,13 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddWebApiInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddControllers();
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditCategory, int>());
+                options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditRiskLevel, int>());
+                options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditApplicationStatus, int>());
+            });
         services.AddOpenApi();
         services.AddResponseCompressionConfiguration();
         services.AddCorsConfiguration(configuration);
