@@ -10,4 +10,5 @@ public class GetListCorporateCustomerListItemDto
     public string TaxNumber { get; set; } = default!;
     public string AuthorizedPersonName { get; set; } = default!;
     public bool IsActive { get; set; }
+    public bool IsDeleted { get; set; }
 }

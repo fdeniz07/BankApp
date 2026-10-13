@@ -32,7 +32,9 @@ public class DeleteCorporateCustomerRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CorporateCustomerShouldExistWhenSelected(corporateCustomer);
-        await _corporateCustomerRepository.DeleteAsync(corporateCustomer!, cancellationToken: cancellationToken);
+
+        corporateCustomer!.IsActive = false;
+        await _corporateCustomerRepository.DeleteAsync(corporateCustomer, cancellationToken: cancellationToken);
 
         return _mapper.Map<DeletedCorporateCustomerResponse>(corporateCustomer);
     }

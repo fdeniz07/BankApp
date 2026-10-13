@@ -7,4 +7,6 @@ namespace Application.Features.CorporateCustomers.Queries.GetList;
 public class GetListCorporateCustomerRequest : IRequest<GetListResponse<GetListCorporateCustomerListItemDto>>
 {
     public PageRequest PageRequest { get; set; } = new();
+    public bool? IsActive { get; set; }
+    public bool OnlyDeleted { get; set; }
 }
