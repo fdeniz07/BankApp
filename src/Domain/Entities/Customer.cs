@@ -9,4 +9,6 @@ public abstract class Customer : Entity
     public string PhoneNumber { get; set; } = default!;
     public string Address { get; set; } = default!;
     public bool IsActive { get; set; } = true;
+
+    public ICollection<CreditApplication> CreditApplications { get; set; } = [];
 }
