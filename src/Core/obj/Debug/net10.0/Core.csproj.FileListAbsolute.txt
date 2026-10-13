@@ -10,3 +10,5 @@ C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Core\obj\Deb
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Core\obj\Debug\net10.0\Core.pdb
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Core\obj\Debug\net10.0\ref\Core.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Core\obj\Debug\net10.0\Core.sourcelink.json
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Core\obj\Debug\net10.0\Core.csproj.AssemblyReference.cache
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Core\obj\Debug\net10.0\Core.csproj.Up2Date
