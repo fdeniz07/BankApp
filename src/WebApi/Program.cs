@@ -1,25 +1,18 @@
-using Core.CrossCuttingConcerns.Exceptions.Extensions;
-
-
+using Application;
+using Persistence;
+using WebApi.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddOpenApi();
-
-
-
+builder.Services.AddWebApiInfrastructure(builder.Configuration);
+builder.Services.AddApplicationServices();
+builder.Services.AddPersistenceServices(builder.Configuration);
 
 var app = builder.Build();
 
-app.ConfigureCustomExceptionMiddleware();
+app.UseWebApiInfrastructure();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
 
-app.UseHttpsRedirection();
+
 
 app.Run();
-
