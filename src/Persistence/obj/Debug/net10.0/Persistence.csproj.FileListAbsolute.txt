@@ -17,3 +17,6 @@ C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\obj\Debug\net10.0\refint\Persistence.dll
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\obj\Debug\net10.0\Persistence.pdb
 C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\obj\Debug\net10.0\ref\Persistence.dll
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\obj\Debug\net10.0\Persistence.sourcelink.json
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\bin\Debug\net10.0\Persistence.runtimeconfig.json
+C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\Persistence\obj\Debug\net10.0\Persistence.genruntimeconfig.cache
