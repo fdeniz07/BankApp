@@ -62,7 +62,9 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPost("{id}/approve")]
-    public async Task<IActionResult> Approve([FromRoute] Guid id, [FromBody] ApproveCreditApplicationRequest request)
+    public async Task<IActionResult> Approve(
+        [FromRoute] Guid id, 
+        [FromBody] ApproveCreditApplicationRequest request)
     {
         request.Id = id;
         ApprovedCreditApplicationResponse response = await Mediator.Send(request);
@@ -70,7 +72,9 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPost("{id}/reject")]
-    public async Task<IActionResult> Reject([FromRoute] Guid id, [FromBody] RejectCreditApplicationRequest request)
+    public async Task<IActionResult> Reject(
+        [FromRoute] Guid id, 
+        [FromBody] RejectCreditApplicationRequest request)
     {
         request.Id = id;
         RejectedCreditApplicationResponse response = await Mediator.Send(request);
