@@ -1,10 +1,13 @@
 using Domain.Enums;
+using Core.Application.Pipelines.Authorization;
+using Core.Security.Constants;
 using MediatR;
 
 namespace Application.Features.CreditTypes.Commands.Update;
 
-public class UpdateCreditTypeRequest : IRequest<UpdatedCreditTypeResponse>
+public class UpdateCreditTypeRequest : IRequest<UpdatedCreditTypeResponse>, ISecuredRequest
 {
+    public string[] Roles => [GeneralOperationClaims.BankStaff];
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
