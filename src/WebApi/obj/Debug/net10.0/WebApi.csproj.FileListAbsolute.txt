@@ -181,4 +181,5 @@ C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\D
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Bogus.dll
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Ardalis.SmartEnum.dll
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Ardalis.SmartEnum.SystemTextJson.dll
-C:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\obj\Debug\net10.0\staticwebassets.upToDateCheck.txt
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
