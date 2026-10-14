@@ -1,6 +1,7 @@
 using System.Threading.RateLimiting;
 using Application.Services.Auth;
 using Ardalis.SmartEnum.SystemTextJson;
+using Core.Caching;
 using Core.Security.Encryption;
 using Core.Security.JWT;
 using Domain.Enums;
@@ -28,10 +29,31 @@ public static class ServiceCollectionExtensions
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditApplicationStatus, int>());
             });
         services.AddJwtAuthentication(configuration);
+        services.AddRedisCaching(configuration);
         services.AddOpenApi();
         services.AddResponseCompressionConfiguration();
         services.AddCorsConfiguration(configuration);
         services.AddRateLimitingConfiguration(configuration);
+
+        return services;
+    }
+
+    private static IServiceCollection AddRedisCaching(this IServiceCollection services, IConfiguration configuration)
+    {
+        string redisConnection = configuration["Redis:ConnectionString"] ?? "localhost:6379";
+
+        services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = redisConnection;
+            options.InstanceName = "BankApp:";
+        });
+
+        services.AddCoreCaching(configuration, json =>
+        {
+            json.Options.Converters.Add(new SmartEnumNameConverter<CreditCategory, int>());
+            json.Options.Converters.Add(new SmartEnumNameConverter<CreditRiskLevel, int>());
+            json.Options.Converters.Add(new SmartEnumNameConverter<CreditApplicationStatus, int>());
+        });
 
         return services;
     }

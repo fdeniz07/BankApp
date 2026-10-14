@@ -183,3 +183,17 @@ c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\D
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Ardalis.SmartEnum.SystemTextJson.dll
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
 c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.Bcl.Cryptography.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.AspNetCore.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Enrichers.Environment.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Extensions.Hosting.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Extensions.Logging.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Formatting.Compact.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Settings.Configuration.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Sinks.Console.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Sinks.Debug.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Sinks.File.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Serilog.Sinks.Seq.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Microsoft.Extensions.Caching.StackExchangeRedis.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\Pipelines.Sockets.Unofficial.dll
+c:\PROJEKTE_LOKAL\BILDUNGS\Engin Demirog\CursorKurumsal\BankApp\src\WebApi\bin\Debug\net10.0\StackExchange.Redis.dll
