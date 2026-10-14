@@ -1,9 +1,12 @@
+using Core.Application.Pipelines.Authorization;
+using Core.Security.Constants;
 using MediatR;
 
 namespace Application.Features.CreditApplications.Commands.Reject;
 
-public class RejectCreditApplicationRequest : IRequest<RejectedCreditApplicationResponse>
+public class RejectCreditApplicationRequest : IRequest<RejectedCreditApplicationResponse>, ISecuredRequest
 {
+    public string[] Roles => [GeneralOperationClaims.BankStaff];
     public Guid Id { get; set; }
     public string RejectionReason { get; set; } = default!;
     public string? DecisionBy { get; set; }

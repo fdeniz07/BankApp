@@ -1,4 +1,5 @@
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -12,15 +13,18 @@ public class UpdateCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
+    private readonly ICurrentUserService _currentUserService;
 
     public UpdateCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
-        CreditApplicationBusinessRules businessRules)
+        CreditApplicationBusinessRules businessRules,
+        ICurrentUserService currentUserService)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _currentUserService = currentUserService;
     }
 
     public async Task<UpdatedCreditApplicationResponse> Handle(
@@ -32,9 +36,10 @@ public class UpdateCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        await _businessRules.ApplicationShouldBePendingForUpdate(creditApplication!);
+        _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
+        await _businessRules.ApplicationShouldBePendingForUpdate(creditApplication);
         await _businessRules.RequestShouldBeWithinCreditSubTypeLimits(
-            creditApplication!.CreditSubTypeId,
+            creditApplication.CreditSubTypeId,
             request.RequestedAmount,
             request.RequestedTermMonths);
 

@@ -1,4 +1,5 @@
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -13,15 +14,18 @@ public class DeleteCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
+    private readonly ICurrentUserService _currentUserService;
 
     public DeleteCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
-        CreditApplicationBusinessRules businessRules)
+        CreditApplicationBusinessRules businessRules,
+        ICurrentUserService currentUserService)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _currentUserService = currentUserService;
     }
 
     public async Task<DeletedCreditApplicationResponse> Handle(
@@ -33,8 +37,9 @@ public class DeleteCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
+        _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
 
-        if (creditApplication!.Status == CreditApplicationStatus.Pending)
+        if (creditApplication.Status == CreditApplicationStatus.Pending)
             creditApplication.Status = CreditApplicationStatus.Cancelled;
 
         await _creditApplicationRepository.DeleteAsync(creditApplication, cancellationToken: cancellationToken);

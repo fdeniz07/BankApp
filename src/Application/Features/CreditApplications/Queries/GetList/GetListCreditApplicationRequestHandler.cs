@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Responses;
@@ -13,19 +14,25 @@ public class GetListCreditApplicationRequestHandler
 {
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUserService;
 
     public GetListCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ICurrentUserService currentUserService)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
+        _currentUserService = currentUserService;
     }
 
     public async Task<GetListResponse<GetListCreditApplicationListItemDto>> Handle(
         GetListCreditApplicationRequest request,
         CancellationToken cancellationToken)
     {
+        if (_currentUserService.IsCustomer && !_currentUserService.IsBankStaff)
+            request.CustomerId = _currentUserService.GetRequiredCustomerId();
+
         Expression<Func<CreditApplication, bool>>? predicate = BuildPredicate(request);
 
         IPaginate<CreditApplication> creditApplications = await _creditApplicationRepository.GetListAsync(

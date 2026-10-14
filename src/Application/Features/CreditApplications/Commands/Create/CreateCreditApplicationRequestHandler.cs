@@ -1,4 +1,5 @@
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -13,21 +14,29 @@ public class CreateCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
+    private readonly ICurrentUserService _currentUserService;
 
     public CreateCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
-        CreditApplicationBusinessRules businessRules)
+        CreditApplicationBusinessRules businessRules,
+        ICurrentUserService currentUserService)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _currentUserService = currentUserService;
     }
 
     public async Task<CreatedCreditApplicationResponse> Handle(
         CreateCreditApplicationRequest request,
         CancellationToken cancellationToken)
     {
+        if (_currentUserService.IsCustomer && !_currentUserService.IsBankStaff)
+            request.CustomerId = _currentUserService.GetRequiredCustomerId();
+        else
+            _currentUserService.EnsureCanAccessCustomer(request.CustomerId);
+
         await _businessRules.CustomerShouldExistAndBeActive(request.CustomerId);
         await _businessRules.CreditSubTypeShouldExistAndBeActive(request.CreditSubTypeId);
         await _businessRules.CustomerCategoryShouldMatchCreditSubType(request.CustomerId, request.CreditSubTypeId);

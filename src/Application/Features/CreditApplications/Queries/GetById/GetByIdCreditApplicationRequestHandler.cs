@@ -1,4 +1,5 @@
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -12,15 +13,18 @@ public class GetByIdCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
+    private readonly ICurrentUserService _currentUserService;
 
     public GetByIdCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
-        CreditApplicationBusinessRules businessRules)
+        CreditApplicationBusinessRules businessRules,
+        ICurrentUserService currentUserService)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _currentUserService = currentUserService;
     }
 
     public async Task<GetByIdCreditApplicationResponse> Handle(
@@ -32,6 +36,7 @@ public class GetByIdCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
+        _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
 
         return _mapper.Map<GetByIdCreditApplicationResponse>(creditApplication);
     }
