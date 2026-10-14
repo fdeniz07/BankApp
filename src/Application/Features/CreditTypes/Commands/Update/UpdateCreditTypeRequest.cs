@@ -1,13 +1,16 @@
-using Domain.Enums;
+using Application.Features.CreditTypes.Constants;
 using Core.Application.Pipelines.Authorization;
+using Core.Application.Pipelines.Caching;
 using Core.Security.Constants;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditTypes.Commands.Update;
 
-public class UpdateCreditTypeRequest : IRequest<UpdatedCreditTypeResponse>, ISecuredRequest
+public class UpdateCreditTypeRequest : IRequest<UpdatedCreditTypeResponse>, ISecuredRequest, ICacheRemoverRequest
 {
     public string[] Roles => [GeneralOperationClaims.BankStaff];
+    public string CacheGroupKey => CreditTypeCacheGroupKeys.Group;
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;

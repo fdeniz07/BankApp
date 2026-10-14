@@ -1,12 +1,15 @@
+using Application.Features.CreditSubTypes.Constants;
 using Core.Application.Pipelines.Authorization;
+using Core.Application.Pipelines.Caching;
 using Core.Security.Constants;
 using MediatR;
 
 namespace Application.Features.CreditSubTypes.Commands.Create;
 
-public class CreateCreditSubTypeRequest : IRequest<CreatedCreditSubTypeResponse>, ISecuredRequest
+public class CreateCreditSubTypeRequest : IRequest<CreatedCreditSubTypeResponse>, ISecuredRequest, ICacheRemoverRequest
 {
     public string[] Roles => [GeneralOperationClaims.BankStaff];
+    public string CacheGroupKey => CreditSubTypeCacheGroupKeys.Group;
     public Guid CreditTypeId { get; set; }
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
