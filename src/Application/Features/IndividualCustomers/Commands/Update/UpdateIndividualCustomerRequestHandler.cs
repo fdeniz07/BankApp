@@ -1,3 +1,4 @@
+using Application.Features.Auth.Rules;
 using Application.Features.IndividualCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
@@ -11,19 +12,25 @@ public class UpdateIndividualCustomerRequestHandler
     : IRequestHandler<UpdateIndividualCustomerRequest, UpdatedIndividualCustomerResponse>
 {
     private readonly IIndividualCustomerRepository _individualCustomerRepository;
+    private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IMapper _mapper;
     private readonly IndividualCustomerBusinessRules _businessRules;
+    private readonly AuthBusinessRules _authBusinessRules;
     private readonly ICurrentUserService _currentUserService;
 
     public UpdateIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
+        IApplicationUserRepository applicationUserRepository,
         IMapper mapper,
         IndividualCustomerBusinessRules businessRules,
+        AuthBusinessRules authBusinessRules,
         ICurrentUserService currentUserService)
     {
         _individualCustomerRepository = individualCustomerRepository;
+        _applicationUserRepository = applicationUserRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _authBusinessRules = authBusinessRules;
         _currentUserService = currentUserService;
     }
 
@@ -41,6 +48,18 @@ public class UpdateIndividualCustomerRequestHandler
         await _businessRules.CustomerNumberShouldBeUnique(request.CustomerNumber, request.Id);
         await _businessRules.EmailShouldBeUnique(request.Email, request.Id);
         await _businessRules.NationalIdShouldBeUnique(request.NationalId, request.Id);
+
+        ApplicationUser? applicationUser = await _applicationUserRepository.GetAsync(
+            u => u.CustomerId == request.Id,
+            cancellationToken: cancellationToken);
+
+        if (applicationUser is not null &&
+            !string.Equals(applicationUser.Email, request.Email, StringComparison.OrdinalIgnoreCase))
+        {
+            await _authBusinessRules.EmailShouldBeUnique(request.Email, applicationUser.Id);
+            applicationUser.Email = request.Email;
+            await _applicationUserRepository.UpdateAsync(applicationUser, cancellationToken);
+        }
 
         individualCustomer = _mapper.Map(request, individualCustomer);
         await _individualCustomerRepository.UpdateAsync(individualCustomer!, cancellationToken);

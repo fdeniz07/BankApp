@@ -19,7 +19,14 @@ public class MappingProfiles : Profile
         CreateMap<IndividualCustomer, DeletedIndividualCustomerResponse>().ReverseMap();
         CreateMap<IndividualCustomer, GetByIdIndividualCustomerResponse>().ReverseMap();
         CreateMap<IndividualCustomer, GetListIndividualCustomerListItemDto>().ReverseMap();
-        CreateMap<CreateIndividualCustomerRequest, IndividualCustomer>();
+        CreateMap<CreateIndividualCustomerRequest, IndividualCustomer>()
+            .ForMember(d => d.Id, opt => opt.Ignore())
+            .ForMember(d => d.IsActive, opt => opt.Ignore())
+            .ForMember(d => d.IsDeleted, opt => opt.Ignore())
+            .ForMember(d => d.CreatedDate, opt => opt.Ignore())
+            .ForMember(d => d.UpdatedDate, opt => opt.Ignore())
+            .ForMember(d => d.DeletedDate, opt => opt.Ignore())
+            .ForMember(d => d.CreditApplications, opt => opt.Ignore());
         CreateMap<UpdateIndividualCustomerRequest, IndividualCustomer>();
         CreateMap<IPaginate<IndividualCustomer>, GetListResponse<GetListIndividualCustomerListItemDto>>();
     }

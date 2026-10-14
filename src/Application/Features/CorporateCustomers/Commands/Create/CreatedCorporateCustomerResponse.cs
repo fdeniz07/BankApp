@@ -3,6 +3,7 @@ namespace Application.Features.CorporateCustomers.Commands.Create;
 public class CreatedCorporateCustomerResponse
 {
     public Guid Id { get; set; }
+    public Guid UserId { get; set; }
     public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;

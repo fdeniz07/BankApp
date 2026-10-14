@@ -9,6 +9,7 @@ public class CreateCorporateCustomerRequest : IRequest<CreatedCorporateCustomerR
     public string[] Roles => [GeneralOperationClaims.BankStaff];
     public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;
+    public string Password { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
     public string Address { get; set; } = default!;
     public string CompanyName { get; set; } = default!;

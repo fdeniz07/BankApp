@@ -11,17 +11,20 @@ public class DeleteCorporateCustomerRequestHandler
     : IRequestHandler<DeleteCorporateCustomerRequest, DeletedCorporateCustomerResponse>
 {
     private readonly ICorporateCustomerRepository _corporateCustomerRepository;
+    private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IMapper _mapper;
     private readonly CorporateCustomerBusinessRules _businessRules;
     private readonly ICurrentUserService _currentUserService;
 
     public DeleteCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
+        IApplicationUserRepository applicationUserRepository,
         IMapper mapper,
         CorporateCustomerBusinessRules businessRules,
         ICurrentUserService currentUserService)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
+        _applicationUserRepository = applicationUserRepository;
         _mapper = mapper;
         _businessRules = businessRules;
         _currentUserService = currentUserService;
@@ -38,6 +41,16 @@ public class DeleteCorporateCustomerRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CorporateCustomerShouldExistWhenSelected(corporateCustomer);
+
+        ApplicationUser? applicationUser = await _applicationUserRepository.GetAsync(
+            u => u.CustomerId == request.Id,
+            cancellationToken: cancellationToken);
+
+        if (applicationUser is not null)
+        {
+            applicationUser.IsActive = false;
+            await _applicationUserRepository.DeleteAsync(applicationUser, cancellationToken: cancellationToken);
+        }
 
         corporateCustomer!.IsActive = false;
         await _corporateCustomerRepository.DeleteAsync(corporateCustomer, cancellationToken: cancellationToken);
