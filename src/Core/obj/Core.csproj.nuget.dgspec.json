@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj": {}
+    "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj": {}
   },
   "projects": {
-    "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj": {
+    "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
+        "projectUniqueName": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
         "projectName": "Core",
-        "projectPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
+        "projectPath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
         "packagesPath": "C:\\Users\\PRODOC\\.nuget\\packages\\",
-        "outputPath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\obj\\",
+        "outputPath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages",

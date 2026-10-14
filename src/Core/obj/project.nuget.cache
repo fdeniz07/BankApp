@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "oe1w8fTTo58=",
+  "dgSpecHash": "wQAUHVjBy+o=",
   "success": true,
-  "projectFilePath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
+  "projectFilePath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Core\\Core.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PRODOC\\.nuget\\packages\\fluentvalidation\\12.2.0\\fluentvalidation.12.2.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\mediatr\\14.2.0\\mediatr.14.2.0.nupkg.sha512",
