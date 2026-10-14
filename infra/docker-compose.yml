@@ -1,0 +1,23 @@
+# Local observability baseline (Seq).
+# Future services (sql, redis, api, otel-collector, prometheus, grafana) will join this compose / k8s manifests.
+#
+# Usage (from repo root):
+#   docker compose -f infra/docker-compose.yml up -d
+#   docker compose -f infra/docker-compose.yml down      # keeps volume
+#   docker compose -f infra/docker-compose.yml down -v  # DELETES log data
+
+services:
+  seq:
+    image: datalust/seq:2024.3
+    container_name: bankapp-seq
+    ports:
+      - "5341:80"
+    environment:
+      ACCEPT_EULA: "Y"
+    volumes:
+      - seq-data:/data
+    restart: unless-stopped
+
+volumes:
+  seq-data:
+    name: bankapp-seq-data
