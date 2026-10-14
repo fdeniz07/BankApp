@@ -19,12 +19,12 @@ public class JwtHelper : ITokenHelper
             ?? throw new InvalidOperationException("TokenOptions configuration is missing.");
     }
 
-    public AccessToken CreateToken(User user, IList<OperationClaim> operationClaims)
+    public AccessToken CreateToken(User user, IList<OperationClaim> operationClaims, Guid? customerId = null)
     {
         _accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
         SecurityKey securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
         SigningCredentials signingCredentials = SigningCredentialsHelper.CreateSigningCredentials(securityKey);
-        JwtSecurityToken jwt = CreateJwtSecurityToken(_tokenOptions, user, signingCredentials, operationClaims);
+        JwtSecurityToken jwt = CreateJwtSecurityToken(_tokenOptions, user, signingCredentials, operationClaims, customerId);
         JwtSecurityTokenHandler tokenHandler = new();
         string token = tokenHandler.WriteToken(jwt);
 
@@ -39,26 +39,27 @@ public class JwtHelper : ITokenHelper
         TokenOptions tokenOptions,
         User user,
         SigningCredentials signingCredentials,
-        IList<OperationClaim> operationClaims)
+        IList<OperationClaim> operationClaims,
+        Guid? customerId)
     {
         return new JwtSecurityToken(
             issuer: tokenOptions.Issuer,
             audience: tokenOptions.Audience,
             expires: _accessTokenExpiration,
             notBefore: DateTime.UtcNow,
-            claims: SetClaims(user, operationClaims),
+            claims: SetClaims(user, operationClaims, customerId),
             signingCredentials: signingCredentials);
     }
 
-    private static IEnumerable<Claim> SetClaims(User user, IList<OperationClaim> operationClaims)
+    private static IEnumerable<Claim> SetClaims(User user, IList<OperationClaim> operationClaims, Guid? customerId)
     {
         List<Claim> claims = [];
         claims.AddNameIdentifier(user.Id.ToString());
         claims.AddEmail(user.Email);
         claims.AddRoles(operationClaims.Select(c => c.Name).ToArray());
 
-        if (user.CustomerId.HasValue)
-            claims.AddCustomerId(user.CustomerId.Value);
+        if (customerId.HasValue)
+            claims.AddCustomerId(customerId.Value);
 
         return claims;
     }

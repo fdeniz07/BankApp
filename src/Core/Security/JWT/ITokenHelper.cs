@@ -4,5 +4,5 @@ namespace Core.Security.JWT;
 
 public interface ITokenHelper
 {
-    AccessToken CreateToken(User user, IList<OperationClaim> operationClaims);
+    AccessToken CreateToken(User user, IList<OperationClaim> operationClaims, Guid? customerId = null);
 }
