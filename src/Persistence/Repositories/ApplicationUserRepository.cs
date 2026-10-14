@@ -1,18 +1,21 @@
 using Application.Services.Repositories;
 using Core.Repositories;
 using Core.Security.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 
 namespace Persistence.Repositories;
 
-public class UserRepository : EfRepositoryBase<User, BankingDbContext>, IUserRepository
+public class ApplicationUserRepository : EfRepositoryBase<ApplicationUser, BankingDbContext>, IApplicationUserRepository
 {
-    public UserRepository(BankingDbContext context) : base(context)
+    public ApplicationUserRepository(BankingDbContext context) : base(context)
     {
     }
 
-    public async Task<List<OperationClaim>> GetClaimsAsync(User user, CancellationToken cancellationToken = default)
+    public async Task<List<OperationClaim>> GetClaimsAsync(
+        ApplicationUser user,
+        CancellationToken cancellationToken = default)
     {
         return await Context.UserOperationClaims
             .AsNoTracking()
