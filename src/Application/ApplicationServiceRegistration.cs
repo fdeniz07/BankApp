@@ -1,6 +1,8 @@
 using System.Reflection;
 using Core.Application.Pipelines;
+using Core.Application.Pipelines.Authorization;
 using Core.Application.Pipelines.Validation;
+using Core.Security.JWT;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,10 +19,12 @@ public static class ApplicationServiceRegistration
         services.AddMediatR(configuration =>
         {
             configuration.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly());
+            configuration.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             configuration.AddOpenBehavior(typeof(RequestValidationBehavior<,>));
         });
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
+        services.AddScoped<ITokenHelper, JwtHelper>();
         services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), typeof(BaseBusinessRules));
 
         return services;
