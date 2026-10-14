@@ -1,6 +1,7 @@
 using Core.Security.Constants;
 using Core.Security.Entities;
 using Core.Security.Hashing;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 
@@ -40,7 +41,7 @@ public static class IdentitySeed
         if (!await context.Users.AnyAsync(u => u.Email == "staff@bank.local"))
         {
             HashingHelper.CreatePasswordHash("Staff123!", out byte[] staffHash, out byte[] staffSalt);
-            User staff = new()
+            ApplicationUser staff = new()
             {
                 Email = "staff@bank.local",
                 PasswordHash = staffHash,
@@ -66,7 +67,7 @@ public static class IdentitySeed
                 .FirstOrDefaultAsync();
 
             HashingHelper.CreatePasswordHash("Customer123!", out byte[] customerHash, out byte[] customerSalt);
-            User customerUser = new()
+            ApplicationUser customerUser = new()
             {
                 Email = "customer@bank.local",
                 PasswordHash = customerHash,

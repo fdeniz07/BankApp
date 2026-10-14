@@ -70,13 +70,14 @@ namespace Persistence.Migrations
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
 
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("CustomerId");
-
                     b.Property<DateTimeOffset?>("DeletedDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("DeletedDate");
+
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -108,12 +109,14 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.HasIndex("Email")
                         .IsUnique();
 
                     b.ToTable("Users", (string)null);
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("User");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Core.Security.Entities.UserOperationClaim", b =>
@@ -530,6 +533,19 @@ namespace Persistence.Migrations
                     b.UseTptMappingStrategy();
                 });
 
+            modelBuilder.Entity("Domain.Entities.ApplicationUser", b =>
+                {
+                    b.HasBaseType("Core.Security.Entities.User");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CustomerId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasDiscriminator().HasValue("ApplicationUser");
+                });
+
             modelBuilder.Entity("Domain.Entities.CorporateCustomer", b =>
                 {
                     b.HasBaseType("Domain.Entities.Customer");
@@ -657,14 +673,6 @@ namespace Persistence.Migrations
                     b.ToTable("IndividualCustomers", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Security.Entities.User", b =>
-                {
-                    b.HasOne("Domain.Entities.Customer", null)
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Restrict);
-                });
-
             modelBuilder.Entity("Core.Security.Entities.UserOperationClaim", b =>
                 {
                     b.HasOne("Core.Security.Entities.OperationClaim", "OperationClaim")
@@ -712,6 +720,16 @@ namespace Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("CreditType");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ApplicationUser", b =>
+                {
+                    b.HasOne("Domain.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Domain.Entities.CorporateCustomer", b =>
