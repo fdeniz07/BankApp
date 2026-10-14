@@ -1,9 +1,15 @@
 using System.Threading.RateLimiting;
+using Application.Services.Auth;
 using Ardalis.SmartEnum.SystemTextJson;
+using Core.Security.Encryption;
+using Core.Security.JWT;
 using Domain.Enums;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.IdentityModel.Tokens;
 using WebApi.Constants;
+using WebApi.Services;
 
 namespace WebApi.Extensions;
 
@@ -11,6 +17,9 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddWebApiInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddHttpContextAccessor();
+        services.AddScoped<ICurrentUserService, CurrentUserService>();
+
         services.AddControllers()
             .AddJsonOptions(options =>
             {
@@ -18,11 +27,40 @@ public static class ServiceCollectionExtensions
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditRiskLevel, int>());
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditApplicationStatus, int>());
             });
+        services.AddJwtAuthentication(configuration);
         services.AddOpenApi();
         services.AddResponseCompressionConfiguration();
         services.AddCorsConfiguration(configuration);
         services.AddRateLimitingConfiguration(configuration);
 
+        return services;
+    }
+
+    private static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
+    {
+        TokenOptions tokenOptions = configuration.GetSection("TokenOptions").Get<TokenOptions>()
+            ?? throw new InvalidOperationException("TokenOptions configuration is missing.");
+
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            .AddJwtBearer(options =>
+            {
+                options.MapInboundClaims = false;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = tokenOptions.Issuer,
+                    ValidAudience = tokenOptions.Audience,
+                    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey),
+                    ClockSkew = TimeSpan.Zero,
+                    NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier,
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
+                };
+            });
+
+        services.AddAuthorization();
         return services;
     }
 

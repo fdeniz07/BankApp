@@ -12,6 +12,8 @@ public static class ApplicationBuilderExtensions
         app.UseResponseCompression();
         app.UseHttpsRedirection();
         app.UseCors(CorsPolicies.Default);
+        app.UseAuthentication();
+        app.UseAuthorization();
         app.UseRateLimiter();
 
         if (app.Environment.IsDevelopment())
