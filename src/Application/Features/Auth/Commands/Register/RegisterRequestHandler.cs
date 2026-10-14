@@ -4,26 +4,27 @@ using Core.Security.Constants;
 using Core.Security.Entities;
 using Core.Security.Hashing;
 using Core.Security.JWT;
+using Domain.Entities;
 using MediatR;
 
 namespace Application.Features.Auth.Commands.Register;
 
 public class RegisterRequestHandler : IRequestHandler<RegisterRequest, RegisteredResponse>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IOperationClaimRepository _operationClaimRepository;
     private readonly IUserOperationClaimRepository _userOperationClaimRepository;
     private readonly ITokenHelper _tokenHelper;
     private readonly AuthBusinessRules _businessRules;
 
     public RegisterRequestHandler(
-        IUserRepository userRepository,
+        IApplicationUserRepository applicationUserRepository,
         IOperationClaimRepository operationClaimRepository,
         IUserOperationClaimRepository userOperationClaimRepository,
         ITokenHelper tokenHelper,
         AuthBusinessRules businessRules)
     {
-        _userRepository = userRepository;
+        _applicationUserRepository = applicationUserRepository;
         _operationClaimRepository = operationClaimRepository;
         _userOperationClaimRepository = userOperationClaimRepository;
         _tokenHelper = tokenHelper;
@@ -37,7 +38,7 @@ public class RegisterRequestHandler : IRequestHandler<RegisterRequest, Registere
 
         HashingHelper.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
-        User user = new()
+        ApplicationUser user = new()
         {
             Email = request.Email,
             PasswordHash = passwordHash,
@@ -46,7 +47,7 @@ public class RegisterRequestHandler : IRequestHandler<RegisterRequest, Registere
             IsActive = true
         };
 
-        await _userRepository.AddAsync(user, cancellationToken);
+        await _applicationUserRepository.AddAsync(user, cancellationToken);
 
         OperationClaim? customerClaim = await _operationClaimRepository.GetAsync(
             c => c.Name == GeneralOperationClaims.Customer,
@@ -63,8 +64,8 @@ public class RegisterRequestHandler : IRequestHandler<RegisterRequest, Registere
             },
             cancellationToken);
 
-        IList<OperationClaim> claims = await _userRepository.GetClaimsAsync(user, cancellationToken);
-        AccessToken accessToken = _tokenHelper.CreateToken(user, claims);
+        IList<OperationClaim> claims = await _applicationUserRepository.GetClaimsAsync(user, cancellationToken);
+        AccessToken accessToken = _tokenHelper.CreateToken(user, claims, user.CustomerId);
 
         return new RegisteredResponse { AccessToken = accessToken };
     }
