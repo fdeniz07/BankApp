@@ -1,10 +1,10 @@
-# Local observability baseline (Seq).
-# Future services (sql, redis, api, otel-collector, prometheus, grafana) will join this compose / k8s manifests.
+# Local infrastructure baseline (Seq + Redis).
+# Future: sql, api, otel-collector, prometheus, grafana → same compose / later k8s.
 #
 # Usage (from repo root):
 #   docker compose -f infra/docker-compose.yml up -d
-#   docker compose -f infra/docker-compose.yml down      # keeps volume
-#   docker compose -f infra/docker-compose.yml down -v  # DELETES log data
+#   docker compose -f infra/docker-compose.yml down      # keeps volumes
+#   docker compose -f infra/docker-compose.yml down -v  # DELETES volumes
 
 services:
   seq:
@@ -18,6 +18,18 @@ services:
       - seq-data:/data
     restart: unless-stopped
 
+  redis:
+    image: redis:7.4-alpine
+    container_name: bankapp-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    restart: unless-stopped
+
 volumes:
   seq-data:
     name: bankapp-seq-data
+  redis-data:
+    name: bankapp-redis-data

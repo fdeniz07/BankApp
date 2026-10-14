@@ -1,39 +1,51 @@
 # Infrastructure (local)
 
-This folder holds runtime infrastructure for local development and is the seed for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
+Local runtime dependencies for development. Seed for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
 
-## Seq (logging UI)
-
-Shared local Seq instance with a **named Docker volume** so logs survive container restarts.
+## Start
 
 ```bash
 # from repository root
 docker compose -f infra/docker-compose.yml up -d
 ```
 
-| Item | Value |
-|------|--------|
-| UI / ingest | http://localhost:5341 |
-| Volume | `bankapp-seq-data` |
-| App setting | `Seq:ServerUrl` = `http://localhost:5341` |
+| Service | URL / port | Volume |
+|---------|------------|--------|
+| Seq | http://localhost:5341 | `bankapp-seq-data` |
+| Redis | `localhost:6379` | `bankapp-redis-data` |
 
-Stop without deleting logs:
+App settings:
+
+- `Seq:ServerUrl` = `http://localhost:5341`
+- `Redis:ConnectionString` = `localhost:6379`
+- `CacheSettings:SlidingExpirationMinutes` = `30`
+
+Stop without deleting data:
 
 ```bash
 docker compose -f infra/docker-compose.yml down
 ```
 
-Delete Seq data (destructive):
+Delete volumes (destructive):
 
 ```bash
 docker compose -f infra/docker-compose.yml down -v
 ```
 
-In Seq, filter by property `Application = BankApp` (set via Serilog properties). Other projects using Core can use the same Seq and a different `Application` name.
+## Caching (when Redis is used)
 
-## Roadmap (not in this phase)
+Only MediatR requests that implement `ICacheableRequest` read/write Redis (CreditTypes / CreditSubTypes queries).
 
-- Redis, SQL Server, WebApi containers in the same compose
+Mutating commands that implement `ICacheRemoverRequest` clear the related cache group after success.
+
+In Seq, look for:
+
+- `Returning cached response for {CacheKey}` → Redis hit
+- `Cache group invalidated: CreditTypes` → after create/update/delete
+
+## Roadmap (later phases)
+
+- SQL Server + WebApi containers in this compose
 - `.github/workflows` build/push
 - `infra/k8s` + ArgoCD
-- OpenTelemetry collector + Prometheus + Grafana
+- OpenTelemetry + Prometheus + Grafana
