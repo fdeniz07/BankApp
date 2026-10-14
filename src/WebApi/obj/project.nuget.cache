@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "yUkBOknhn+I=",
+  "dgSpecHash": "qQG7ISmBq0Y=",
   "success": true,
-  "projectFilePath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\WebApi\\WebApi.csproj",
+  "projectFilePath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\WebApi\\WebApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PRODOC\\.nuget\\packages\\ardalis.smartenum\\8.2.0\\ardalis.smartenum.8.2.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\ardalis.smartenum.systemtextjson\\8.1.0\\ardalis.smartenum.systemtextjson.8.1.0.nupkg.sha512",

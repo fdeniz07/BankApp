@@ -1272,6 +1272,12 @@
               "type": "string"
             }
           },
+          "cacheGroupKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "creditTypeId": {
             "type": "string",
             "format": "uuid"
@@ -1391,6 +1397,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "cacheGroupKey": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "name": {
             "type": "string"
@@ -1751,6 +1763,12 @@
               "type": "string"
             }
           },
+          "cacheGroupKey": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -1877,6 +1895,12 @@
             "items": {
               "type": "string"
             }
+          },
+          "cacheGroupKey": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "id": {
             "type": "string",

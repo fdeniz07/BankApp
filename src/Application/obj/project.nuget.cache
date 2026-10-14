@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fqIqDlOP3Ng=",
+  "dgSpecHash": "3tLBSwVC5J0=",
   "success": true,
-  "projectFilePath": "c:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Application\\Application.csproj",
+  "projectFilePath": "C:\\PROJEKTE_LOKAL\\BILDUNGS\\Engin Demirog\\CursorKurumsal\\BankApp\\src\\Application\\Application.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\PRODOC\\.nuget\\packages\\ardalis.smartenum\\8.2.0\\ardalis.smartenum.8.2.0.nupkg.sha512",
     "C:\\Users\\PRODOC\\.nuget\\packages\\automapper\\16.2.0\\automapper.16.2.0.nupkg.sha512",
