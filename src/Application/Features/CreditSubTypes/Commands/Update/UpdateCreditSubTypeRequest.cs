@@ -1,9 +1,12 @@
+using Core.Application.Pipelines.Authorization;
+using Core.Security.Constants;
 using MediatR;
 
 namespace Application.Features.CreditSubTypes.Commands.Update;
 
-public class UpdateCreditSubTypeRequest : IRequest<UpdatedCreditSubTypeResponse>
+public class UpdateCreditSubTypeRequest : IRequest<UpdatedCreditSubTypeResponse>, ISecuredRequest
 {
+    public string[] Roles => [GeneralOperationClaims.BankStaff];
     public Guid Id { get; set; }
     public Guid CreditTypeId { get; set; }
     public string Name { get; set; } = default!;
