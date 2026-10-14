@@ -18,6 +18,7 @@ public static class BankingDbContextSeed
         await SeedCreditTypesAsync(context);
         await SeedCreditSubTypesAsync(context);
         await SeedCreditApplicationsAsync(context);
+        await IdentitySeed.SeedAsync(context);
     }
 
     private static async Task SeedIndividualCustomersAsync(BankingDbContext context)
