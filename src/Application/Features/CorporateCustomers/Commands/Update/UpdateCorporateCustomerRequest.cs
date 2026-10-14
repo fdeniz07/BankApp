@@ -1,9 +1,12 @@
+using Core.Application.Pipelines.Authorization;
+using Core.Security.Constants;
 using MediatR;
 
 namespace Application.Features.CorporateCustomers.Commands.Update;
 
-public class UpdateCorporateCustomerRequest : IRequest<UpdatedCorporateCustomerResponse>
+public class UpdateCorporateCustomerRequest : IRequest<UpdatedCorporateCustomerResponse>, ISecuredRequest
 {
+    public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
     public Guid Id { get; set; }
     public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;

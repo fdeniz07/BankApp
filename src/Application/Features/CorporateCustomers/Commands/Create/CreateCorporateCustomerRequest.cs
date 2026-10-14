@@ -1,9 +1,12 @@
+using Core.Application.Pipelines.Authorization;
+using Core.Security.Constants;
 using MediatR;
 
 namespace Application.Features.CorporateCustomers.Commands.Create;
 
-public class CreateCorporateCustomerRequest : IRequest<CreatedCorporateCustomerResponse>
+public class CreateCorporateCustomerRequest : IRequest<CreatedCorporateCustomerResponse>, ISecuredRequest
 {
+    public string[] Roles => [GeneralOperationClaims.BankStaff];
     public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;

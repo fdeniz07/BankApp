@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Responses;
@@ -13,19 +14,25 @@ public class GetListCorporateCustomerRequestHandler
 {
     private readonly ICorporateCustomerRepository _corporateCustomerRepository;
     private readonly IMapper _mapper;
+    private readonly ICurrentUserService _currentUserService;
 
     public GetListCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ICurrentUserService currentUserService)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _mapper = mapper;
+        _currentUserService = currentUserService;
     }
 
     public async Task<GetListResponse<GetListCorporateCustomerListItemDto>> Handle(
         GetListCorporateCustomerRequest request,
         CancellationToken cancellationToken)
     {
+        if (request.OnlyDeleted || request.IsActive == false)
+            _currentUserService.EnsureBankStaff();
+
         Expression<Func<CorporateCustomer, bool>>? predicate = BuildPredicate(request);
 
         IPaginate<CorporateCustomer> corporateCustomers = await _corporateCustomerRepository.GetListAsync(
@@ -38,8 +45,14 @@ public class GetListCorporateCustomerRequestHandler
         return _mapper.Map<GetListResponse<GetListCorporateCustomerListItemDto>>(corporateCustomers);
     }
 
-    private static Expression<Func<CorporateCustomer, bool>>? BuildPredicate(GetListCorporateCustomerRequest request)
+    private Expression<Func<CorporateCustomer, bool>>? BuildPredicate(GetListCorporateCustomerRequest request)
     {
+        if (_currentUserService.IsCustomer && !_currentUserService.IsBankStaff)
+        {
+            Guid customerId = _currentUserService.GetRequiredCustomerId();
+            return c => c.Id == customerId;
+        }
+
         if (request.OnlyDeleted)
             return c => c.IsDeleted;
 
