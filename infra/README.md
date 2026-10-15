@@ -1,51 +1,97 @@
 # Infrastructure (local)
 
-Local runtime dependencies for development. Seed for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
+Local backend stack and seed for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
 
-## Start
+## Services
+
+| Service | Host URL | Notes |
+|---------|----------|--------|
+| Seq | http://localhost:5341 | volume `bankapp-seq-data` |
+| Redis | `localhost:6379` | volume `bankapp-redis-data` |
+| SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data` (same data as former `SQLServer2025`) |
+| WebApi | http://localhost:8080 | — |
+| Scalar (Dev) | http://localhost:8080/scalar/v1 | — |
+
+## Prerequisites
+
+- Docker Desktop running
+- External volume `sqlserver-2025-data` must already exist (created by the previous SQL container)
+- Port `8080` free (or set `WEBAPI_PORT` in `infra/.env`)
+
+## Quick start
 
 ```bash
 # from repository root
-docker compose -f infra/docker-compose.yml up -d
+copy infra\.env.example infra\.env    # Windows
+# cp infra/.env.example infra/.env    # Linux/macOS
+
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --build
 ```
 
-| Service | URL / port | Volume |
-|---------|------------|--------|
-| Seq | http://localhost:5341 | `bankapp-seq-data` |
-| Redis | `localhost:6379` | `bankapp-redis-data` |
-
-App settings:
-
-- `Seq:ServerUrl` = `http://localhost:5341`
-- `Redis:ConnectionString` = `localhost:6379`
-- `CacheSettings:SlidingExpirationMinutes` = `30`
-
-Stop without deleting data:
+Stop (keep volumes; SQL external volume is never removed by Compose):
 
 ```bash
-docker compose -f infra/docker-compose.yml down
+docker compose -f infra/docker-compose.yml --env-file infra/.env down
 ```
 
-Delete volumes (destructive):
+Reset Seq/Redis data only (destructive for those volumes):
 
 ```bash
-docker compose -f infra/docker-compose.yml down -v
+docker compose -f infra/docker-compose.yml --env-file infra/.env down -v
 ```
 
-## Caching (when Redis is used)
+To wipe SQL data as well (destructive):
 
-Only MediatR requests that implement `ICacheableRequest` read/write Redis (CreditTypes / CreditSubTypes queries).
+```bash
+docker volume rm sqlserver-2025-data
+```
 
-Mutating commands that implement `ICacheRemoverRequest` clear the related cache group after success.
+## Environment
 
-In Seq, look for:
+Secrets and ports live in `infra/.env` (gitignored). Template: `infra/.env.example`.
 
-- `Returning cached response for {CacheKey}` → Redis hit
-- `Cache group invalidated: CreditTypes` → after create/update/delete
+| Variable | Purpose |
+|----------|---------|
+| `MSSQL_SA_PASSWORD` | SQL SA password (must match existing DB if volume already has data) |
+| `SQL_PORT` | Host port for SQL (default 11433) |
+| `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512) |
+| `WEBAPI_PORT` | Host port for API (default 8080) |
 
-## Roadmap (later phases)
+Inside Docker network, the API uses:
 
-- SQL Server + WebApi containers in this compose
-- `.github/workflows` build/push
-- `infra/k8s` + ArgoCD
+- SQL: `sqlserver,1433`
+- Redis: `redis:6379`
+- Seq: `http://seq`
+
+## Database bootstrap
+
+On container start, WebApi applies EF migrations and runs Bogus/identity seed when:
+
+- `Database__RunMigrations=true`
+- `Database__RunSeed=true`
+
+(Local `dotnet run` with Development also migrates/seeds by default.)
+
+Seed logins:
+
+- `staff@bank.local` / `Staff123!`
+- `customer@bank.local` / `Customer123!`
+
+## Local VS debug (without containerized API)
+
+Run WebApi from Visual Studio against:
+
+- SQL on `localhost,11433` (`appsettings.Development.json`)
+- Seq/Redis from Compose (`localhost:5341`, `localhost:6379`)
+
+## Caching / logging
+
+- Cache: CreditTypes / CreditSubTypes queries (`ICacheableRequest`)
+- Logs: Seq UI → filter `Application = 'BankApp'`
+
+## Roadmap
+
+- Unit tests (next)
+- React frontend
+- GitHub Actions / ArgoCD / K8s
 - OpenTelemetry + Prometheus + Grafana
