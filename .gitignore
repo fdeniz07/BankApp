@@ -1,1 +1,14 @@
 /.vscode
+/.vs
+
+**/bin/
+**/obj/
+**/TestResults/
+
+# Local secrets for Docker Compose
+.env
+infra/.env
+
+*.user
+*.suo
+*.swp
