@@ -1,7 +1,7 @@
 using Application;
 using Core.Logging;
 using Persistence;
-using Persistence.Seed;
+using Persistence.Contexts;
 using Serilog;
 using WebApi.Extensions;
 
@@ -22,10 +22,14 @@ try
 
     var app = builder.Build();
 
-    if (app.Environment.IsDevelopment())
-    {
-        await BankingDbContextSeed.SeedAsync(app.Services);
-    }
+    bool runMigrations = app.Configuration.GetValue(
+        "Database:RunMigrations",
+        app.Environment.IsDevelopment());
+    bool runSeed = app.Configuration.GetValue(
+        "Database:RunSeed",
+        app.Environment.IsDevelopment());
+
+    await DatabaseInitializer.InitializeAsync(app.Services, runMigrations, runSeed);
 
     app.UseWebApiInfrastructure();
 

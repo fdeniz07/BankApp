@@ -1,0 +1,13 @@
+**/.git
+**/.vs
+**/.vscode
+**/bin
+**/obj
+**/node_modules
+**/*.user
+**/*.suo
+**/TestResults
+**/infra/.env
+.env
+**/agent-transcripts
+**/.cursor
