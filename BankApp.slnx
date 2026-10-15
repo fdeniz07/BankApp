@@ -6,4 +6,7 @@
     <Project Path="src/Persistence/Persistence.csproj" />
     <Project Path="src/WebApi/WebApi.csproj" />
   </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Application.UnitTests/Application.UnitTests.csproj" />
+  </Folder>
 </Solution>
