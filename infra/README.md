@@ -1,6 +1,6 @@
 # Infrastructure (local)
 
-Local backend stack and seed for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
+Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
 
 ## Services
 
@@ -8,15 +8,24 @@ Local backend stack and seed for later CI/CD (GitHub Actions → ArgoCD/Kubernet
 |---------|----------|--------|
 | Seq | http://localhost:5341 | volume `bankapp-seq-data` |
 | Redis | `localhost:6379` | volume `bankapp-redis-data` |
-| SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data` (same data as former `SQLServer2025`) |
+| SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data` |
 | WebApi | http://localhost:8080 | — |
 | Scalar (Dev) | http://localhost:8080/scalar/v1 | — |
+| Client (React) | http://localhost:3000 | nginx static build; TR/EN/DE i18n |
+
+## Demo accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Staff | `staff@bank.local` (also `.tr` / `.en` / `.de`) | `Staff123!` |
+| Manager | `manager@bank.local` | `Manager123!` |
+| Customer | `customer@bank.local` (also `.tr` / `.en` / `.de`) | `Customer123!` |
 
 ## Prerequisites
 
 - Docker Desktop running
-- External volume `sqlserver-2025-data` must already exist (created by the previous SQL container)
-- Port `8080` free (or set `WEBAPI_PORT` in `infra/.env`)
+- External volume `sqlserver-2025-data` must already exist
+- Ports `3000` / `8080` free (or set `CLIENT_PORT` / `WEBAPI_PORT`)
 
 ## Quick start
 
@@ -54,14 +63,18 @@ Secrets and ports live in `infra/.env` (gitignored). Template: `infra/.env.examp
 |----------|---------|
 | `MSSQL_SA_PASSWORD` | SQL SA password (must match existing DB if volume already has data) |
 | `SQL_PORT` | Host port for SQL (default 11433) |
-| `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512) |
 | `WEBAPI_PORT` | Host port for API (default 8080) |
+| `CLIENT_PORT` | Host port for React UI (default 3000) |
+| `VITE_API_BASE_URL` | Browser API URL baked into the client image at build time |
+| `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512) |
 
 Inside Docker network, the API uses:
 
 - SQL: `sqlserver,1433`
 - Redis: `redis:6379`
 - Seq: `http://seq`
+
+The React app runs in the browser, so it calls the host-mapped API (`VITE_API_BASE_URL`, default `http://localhost:8080`), not the Compose service name.
 
 ## Database bootstrap
 
@@ -77,12 +90,11 @@ Seed logins:
 - `staff@bank.local` / `Staff123!`
 - `customer@bank.local` / `Customer123!`
 
-## Local VS debug (without containerized API)
+## Local VS / Vite debug
 
-Run WebApi from Visual Studio against:
-
-- SQL on `localhost,11433` (`appsettings.Development.json`)
-- Seq/Redis from Compose (`localhost:5341`, `localhost:6379`)
+- WebApi from Visual Studio against SQL `localhost,11433`
+- Client: `cd client && npm run dev` (port 3000)
+- Seq/Redis from Compose
 
 ## Caching / logging
 
@@ -91,7 +103,5 @@ Run WebApi from Visual Studio against:
 
 ## Roadmap
 
-- Unit tests (next)
-- React frontend
 - GitHub Actions / ArgoCD / K8s
 - OpenTelemetry + Prometheus + Grafana
