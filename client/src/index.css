@@ -8,6 +8,8 @@
   --accent-ink: #ffffff;
   --danger: #a12626;
   --ok: #0d6b3f;
+  --success: #1a7a45;
+  --reject: #b33a2e;
   --shadow: 0 10px 30px rgba(20, 32, 51, 0.08);
   font-family: "Segoe UI", "Helvetica Neue", sans-serif;
   line-height: 1.5;
@@ -314,6 +316,26 @@ a.btn:hover {
 
 .btn.danger:hover:not(:disabled) {
   box-shadow: 0 5px 16px rgba(161, 38, 38, 0.4);
+}
+
+.btn.success {
+  background: linear-gradient(180deg, #2a9d5c 0%, var(--success) 55%, #0e4f2c 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(26, 122, 69, 0.28);
+}
+
+.btn.success:hover:not(:disabled) {
+  box-shadow: 0 5px 16px rgba(26, 122, 69, 0.4);
+}
+
+.btn.reject {
+  background: linear-gradient(180deg, #d95a4a 0%, var(--reject) 55%, #6e2219 100%);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(179, 58, 46, 0.28);
+}
+
+.btn.reject:hover:not(:disabled) {
+  box-shadow: 0 5px 16px rgba(179, 58, 46, 0.4);
 }
 
 .btn.ghost {

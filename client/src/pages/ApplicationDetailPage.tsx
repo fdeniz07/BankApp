@@ -369,7 +369,7 @@ export function ApplicationDetailPage() {
               {t('applications.notes')}
               <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
             </label>
-            <button type="submit" className="btn primary decision-btn" disabled={busy}>
+            <button type="submit" className="btn success decision-btn" disabled={busy}>
               {t('applications.approve')}
             </button>
           </form>
@@ -389,7 +389,7 @@ export function ApplicationDetailPage() {
               {t('applications.notes')}
               <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
             </label>
-            <button type="submit" className="btn danger decision-btn" disabled={busy}>
+            <button type="submit" className="btn reject decision-btn" disabled={busy}>
               {t('applications.reject')}
             </button>
           </form>

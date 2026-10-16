@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import {
+  approveApplication,
   cancelApplication,
   createApplication,
   getApplications,
   getPaymentPlan,
+  rejectApplication,
 } from '../api/applicationsApi'
 import { getCreditSubTypes } from '../api/creditSubTypesApi'
 import { getDashboardSummary } from '../api/dashboardApi'
@@ -47,6 +49,8 @@ export function ApplicationsPage() {
   const [subTypes, setSubTypes] = useState<CreditSubTypeListItem[]>([])
   const [creating, setCreating] = useState(false)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
+  const [decidingId, setDecidingId] = useState<string | null>(null)
+  const [decidingAction, setDecidingAction] = useState<'approve' | 'reject' | null>(null)
   const [paymentPlan, setPaymentPlan] = useState<PaymentPlanResponse | null>(null)
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null)
   const [form, setForm] = useState({
@@ -243,6 +247,67 @@ export function ApplicationsPage() {
       toast.error(message)
     } finally {
       setCancellingId(null)
+    }
+  }
+
+  async function onQuickApprove(item: CreditApplicationListItem) {
+    if (!window.confirm(t('applications.confirmQuickApprove'))) return
+    setDecidingId(item.id)
+    setDecidingAction('approve')
+    setError(null)
+    setSuccess(null)
+    try {
+      await approveApplication(item.id, {
+        approvedAmount: item.requestedAmount,
+        approvedTermMonths: item.requestedTermMonths,
+        approvedInterestRate: item.interestRate,
+        decisionBy: user?.email,
+      })
+      const ok = t('applications.approveSuccess')
+      setSuccess(ok)
+      toast.success(ok)
+      await loadList()
+      await loadDashboard()
+    } catch (err: unknown) {
+      const message = mapApiError(err, t)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setDecidingId(null)
+      setDecidingAction(null)
+    }
+  }
+
+  async function onQuickReject(item: CreditApplicationListItem) {
+    const reason = window.prompt(t('applications.promptRejectReason'))
+    if (reason == null) return
+    const trimmed = reason.trim()
+    if (!trimmed) {
+      toast.error(t('applications.rejectReasonRequired'))
+      return
+    }
+    if (!window.confirm(t('applications.confirmReject'))) return
+    setDecidingId(item.id)
+    setDecidingAction('reject')
+    setError(null)
+    setSuccess(null)
+    try {
+      await rejectApplication(item.id, {
+        rejectionReason: trimmed,
+        decisionBy: user?.email,
+      })
+      const ok = t('applications.rejectSuccess')
+      setSuccess(ok)
+      toast.success(ok)
+      await loadList()
+      await loadDashboard()
+    } catch (err: unknown) {
+      const message = mapApiError(err, t)
+      setError(message)
+      toast.error(message)
+    } finally {
+      setDecidingId(null)
+      setDecidingAction(null)
     }
   }
 
@@ -539,6 +604,31 @@ export function ApplicationsPage() {
                       <Link to={`/applications/${item.id}`} className="btn primary">
                         {t('common.details')}
                       </Link>
+                      {isStaff && item.status === 'Pending' && (
+                        <>
+                          <button
+                            type="button"
+                            className="btn success"
+                            disabled={decidingId === item.id}
+                            title={t('applications.quickApproveHint')}
+                            onClick={() => onQuickApprove(item)}
+                          >
+                            {decidingId === item.id && decidingAction === 'approve'
+                              ? t('common.loading')
+                              : t('applications.approve')}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn reject"
+                            disabled={decidingId === item.id}
+                            onClick={() => onQuickReject(item)}
+                          >
+                            {decidingId === item.id && decidingAction === 'reject'
+                              ? t('common.loading')
+                              : t('applications.reject')}
+                          </button>
+                        </>
+                      )}
                       {!isStaff && item.status === 'Pending' && (
                         <button
                           type="button"
