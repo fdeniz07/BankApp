@@ -14,6 +14,8 @@ public class CreditTypeConfiguration : IEntityTypeConfiguration<CreditType>
         builder.Property(c => c.Id).HasColumnName("Id").IsRequired();
         builder.Property(c => c.Name).HasColumnName("Name").HasMaxLength(100).IsRequired();
         builder.Property(c => c.Code).HasColumnName("Code").HasMaxLength(50).IsRequired();
+        builder.Property(c => c.Locale).HasColumnName("Locale").HasMaxLength(5).IsRequired();
+        builder.HasIndex(c => c.Locale);
         builder.Property(c => c.Category)
             .HasColumnName("Category")
             .HasMaxLength(50)
