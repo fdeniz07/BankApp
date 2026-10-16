@@ -7,6 +7,7 @@ public class CreditType : Entity
 {
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
+    public string Locale { get; set; } = "tr";
     public CreditCategory Category { get; set; } = CreditCategory.Individual;
     public string? Description { get; set; }
     public string CurrencyCode { get; set; } = "TRY";
