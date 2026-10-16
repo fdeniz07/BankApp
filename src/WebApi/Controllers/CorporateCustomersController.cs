@@ -17,9 +17,15 @@ namespace WebApi.Controllers;
 public class CorporateCustomersController : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] PageRequest pageRequest)
+    public async Task<IActionResult> GetList(
+        [FromQuery] PageRequest pageRequest,
+        [FromQuery] bool? isActive = null)
     {
-        GetListCorporateCustomerRequest request = new() { PageRequest = pageRequest };
+        GetListCorporateCustomerRequest request = new()
+        {
+            PageRequest = pageRequest,
+            IsActive = isActive
+        };
         GetListResponse<GetListCorporateCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);
     }
