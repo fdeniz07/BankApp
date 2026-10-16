@@ -17,9 +17,19 @@ namespace WebApi.Controllers;
 public class CreditTypesController : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] PageRequest pageRequest)
+    public async Task<IActionResult> GetList(
+        [FromQuery] PageRequest pageRequest,
+        [FromQuery] string? locale,
+        [FromQuery] string? sortBy,
+        [FromQuery] bool sortDesc = false)
     {
-        GetListCreditTypeRequest request = new() { PageRequest = pageRequest };
+        GetListCreditTypeRequest request = new()
+        {
+            PageRequest = pageRequest,
+            Locale = locale,
+            SortBy = sortBy,
+            SortDesc = sortDesc
+        };
         GetListResponse<GetListCreditTypeListItemDto> response = await Mediator.Send(request);
         return Ok(response);
     }
