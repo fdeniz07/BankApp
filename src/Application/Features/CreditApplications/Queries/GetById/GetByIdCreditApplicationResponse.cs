@@ -7,7 +7,11 @@ public class GetByIdCreditApplicationResponse
     public Guid Id { get; set; }
     public string ApplicationNumber { get; set; } = default!;
     public Guid CustomerId { get; set; }
+    public string CustomerName { get; set; } = default!;
+    public CreditCategory? CustomerCategory { get; set; }
     public Guid CreditSubTypeId { get; set; }
+    public string CreditSubTypeName { get; set; } = default!;
+    public string CurrencyCode { get; set; } = "USD";
     public decimal RequestedAmount { get; set; }
     public int RequestedTermMonths { get; set; }
     public decimal? MonthlyIncome { get; set; }

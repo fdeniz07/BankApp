@@ -6,7 +6,7 @@ public class CreateCreditApplicationRequestValidator : AbstractValidator<CreateC
 {
     public CreateCreditApplicationRequestValidator()
     {
-        RuleFor(c => c.CustomerId).NotEmpty();
+        // CustomerId may be empty for customers; the handler fills it from the current user.
         RuleFor(c => c.CreditSubTypeId).NotEmpty();
         RuleFor(c => c.RequestedAmount).GreaterThan(0);
         RuleFor(c => c.RequestedTermMonths).GreaterThan(0);

@@ -2,6 +2,7 @@ using Application.Features.CreditApplications.Constants;
 using Application.Services.Repositories;
 using Core.Application.Pipelines;
 using Core.CrossCuttingConcerns.Exceptions.Types;
+using Domain.CreditPackaging;
 using Domain.Entities;
 using Domain.Enums;
 
@@ -94,8 +95,24 @@ public class CreditApplicationBusinessRules : BaseBusinessRules
         if (requestedAmount < creditSubType.MinAmount || requestedAmount > creditSubType.MaxAmount)
             throw new BusinessException(CreditApplicationMessages.AmountOutOfRange);
 
+        CreditType? creditType = await _creditTypeRepository.GetAsync(c => c.Id == creditSubType.CreditTypeId);
+        string currency = creditType?.CurrencyCode ?? "USD";
+
+        if (!CreditPackageConstraints.IsAllowedAmount(
+                requestedAmount,
+                creditSubType.MinAmount,
+                creditSubType.MaxAmount,
+                currency))
+            throw new BusinessException(CreditApplicationMessages.AmountNotOnPackageGrid);
+
         if (requestedTermMonths < creditSubType.MinTermMonths || requestedTermMonths > creditSubType.MaxTermMonths)
             throw new BusinessException(CreditApplicationMessages.TermOutOfRange);
+
+        if (!CreditPackageConstraints.IsAllowedTerm(
+                requestedTermMonths,
+                creditSubType.MinTermMonths,
+                creditSubType.MaxTermMonths))
+            throw new BusinessException(CreditApplicationMessages.TermNotAllowed);
     }
 
     public async Task ApplicationNumberShouldBeUnique(string applicationNumber, Guid? excludeId = null)
@@ -119,6 +136,14 @@ public class CreditApplicationBusinessRules : BaseBusinessRules
     {
         if (creditApplication.Status != CreditApplicationStatus.Pending)
             throw new BusinessException(CreditApplicationMessages.OnlyPendingCanBeUpdated);
+
+        return Task.CompletedTask;
+    }
+
+    public Task ApplicationShouldBePendingForCancel(CreditApplication creditApplication)
+    {
+        if (creditApplication.Status != CreditApplicationStatus.Pending)
+            throw new BusinessException(CreditApplicationMessages.OnlyPendingCanBeCancelled);
 
         return Task.CompletedTask;
     }

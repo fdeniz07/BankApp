@@ -9,8 +9,11 @@ public static class CreditApplicationMessages
     public const string CustomerNotActive = "Customer is not active.";
     public const string CategoryMismatch = "Customer type does not match credit category.";
     public const string AmountOutOfRange = "Requested amount is out of allowed range.";
+    public const string AmountNotOnPackageGrid = "Requested amount must match the package amount steps.";
     public const string TermOutOfRange = "Requested term is out of allowed range.";
+    public const string TermNotAllowed = "Requested term must be one of the allowed package terms.";
     public const string ApplicationNumberAlreadyExists = "Application number already exists.";
     public const string OnlyPendingCanBeDecided = "Only pending applications can be approved or rejected.";
     public const string OnlyPendingCanBeUpdated = "Only pending applications can be updated.";
+    public const string OnlyPendingCanBeCancelled = "Only pending applications can be cancelled.";
 }

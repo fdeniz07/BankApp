@@ -13,4 +13,6 @@ public class GetListCreditApplicationRequest : IRequest<GetListResponse<GetListC
     public PageRequest PageRequest { get; set; } = new();
     public Guid? CustomerId { get; set; }
     public CreditApplicationStatus? Status { get; set; }
+    public string? SortBy { get; set; }
+    public bool SortDesc { get; set; }
 }

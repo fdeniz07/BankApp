@@ -3,6 +3,7 @@ using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditApplications.Queries.GetById;
@@ -11,17 +12,26 @@ public class GetByIdCreditApplicationRequestHandler
     : IRequestHandler<GetByIdCreditApplicationRequest, GetByIdCreditApplicationResponse>
 {
     private readonly ICreditApplicationRepository _creditApplicationRepository;
+    private readonly ICustomerRepository _customerRepository;
+    private readonly ICreditSubTypeRepository _creditSubTypeRepository;
+    private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
     private readonly ICurrentUserService _currentUserService;
 
     public GetByIdCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
+        ICustomerRepository customerRepository,
+        ICreditSubTypeRepository creditSubTypeRepository,
+        ICreditTypeRepository creditTypeRepository,
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
         ICurrentUserService currentUserService)
     {
         _creditApplicationRepository = creditApplicationRepository;
+        _customerRepository = customerRepository;
+        _creditSubTypeRepository = creditSubTypeRepository;
+        _creditTypeRepository = creditTypeRepository;
         _mapper = mapper;
         _businessRules = businessRules;
         _currentUserService = currentUserService;
@@ -38,6 +48,49 @@ public class GetByIdCreditApplicationRequestHandler
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
         _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
 
-        return _mapper.Map<GetByIdCreditApplicationResponse>(creditApplication);
+        GetByIdCreditApplicationResponse response = _mapper.Map<GetByIdCreditApplicationResponse>(creditApplication);
+
+        Customer? customer = await _customerRepository.GetAsync(
+            c => c.Id == creditApplication.CustomerId,
+            cancellationToken: cancellationToken);
+
+        response.CustomerName = ResolveCustomerDisplayName(customer);
+        response.CustomerCategory = ResolveCustomerCategory(customer);
+
+        CreditSubType? subType = await _creditSubTypeRepository.GetAsync(
+            c => c.Id == creditApplication.CreditSubTypeId,
+            cancellationToken: cancellationToken);
+        response.CreditSubTypeName = subType?.Name ?? string.Empty;
+        response.CurrencyCode = await ResolveCurrencyCodeAsync(subType, cancellationToken);
+        return response;
     }
+
+    private async Task<string> ResolveCurrencyCodeAsync(CreditSubType? subType, CancellationToken cancellationToken)
+    {
+        if (subType is null)
+            return "USD";
+
+        CreditType? creditType = await _creditTypeRepository.GetAsync(
+            c => c.Id == subType.CreditTypeId,
+            cancellationToken: cancellationToken);
+
+        return string.IsNullOrWhiteSpace(creditType?.CurrencyCode) ? "USD" : creditType.CurrencyCode;
+    }
+
+    private static string ResolveCustomerDisplayName(Customer? customer) =>
+        customer switch
+        {
+            IndividualCustomer individual => $"{individual.FirstName} {individual.LastName}".Trim(),
+            CorporateCustomer corporate => corporate.CompanyName,
+            not null => customer.CustomerNumber,
+            _ => string.Empty
+        };
+
+    private static CreditCategory? ResolveCustomerCategory(Customer? customer) =>
+        customer switch
+        {
+            IndividualCustomer => CreditCategory.Individual,
+            CorporateCustomer => CreditCategory.Corporate,
+            _ => null
+        };
 }
