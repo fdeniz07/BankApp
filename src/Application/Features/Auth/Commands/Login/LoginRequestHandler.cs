@@ -10,15 +10,21 @@ namespace Application.Features.Auth.Commands.Login;
 public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
 {
     private readonly IApplicationUserRepository _applicationUserRepository;
+    private readonly IIndividualCustomerRepository _individualCustomerRepository;
+    private readonly ICorporateCustomerRepository _corporateCustomerRepository;
     private readonly ITokenHelper _tokenHelper;
     private readonly AuthBusinessRules _businessRules;
 
     public LoginRequestHandler(
         IApplicationUserRepository applicationUserRepository,
+        IIndividualCustomerRepository individualCustomerRepository,
+        ICorporateCustomerRepository corporateCustomerRepository,
         ITokenHelper tokenHelper,
         AuthBusinessRules businessRules)
     {
         _applicationUserRepository = applicationUserRepository;
+        _individualCustomerRepository = individualCustomerRepository;
+        _corporateCustomerRepository = corporateCustomerRepository;
         _tokenHelper = tokenHelper;
         _businessRules = businessRules;
     }
@@ -33,9 +39,49 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
         await _businessRules.UserShouldBeActive(user!);
         await _businessRules.PasswordShouldBeCorrect(request.Password, user!.PasswordHash, user.PasswordSalt);
 
+        (string? displayName, string? customerCategory) = await ResolveProfileAsync(user, cancellationToken);
         IList<OperationClaim> claims = await _applicationUserRepository.GetClaimsAsync(user, cancellationToken);
-        AccessToken accessToken = _tokenHelper.CreateToken(user, claims, user.CustomerId);
+        AccessToken accessToken = _tokenHelper.CreateToken(
+            user, claims, user.CustomerId, displayName, customerCategory);
 
-        return new LoggedResponse { AccessToken = accessToken };
+        return new LoggedResponse
+        {
+            AccessToken = accessToken,
+            DisplayName = displayName,
+            CustomerCategory = customerCategory
+        };
     }
+
+    private async Task<(string? DisplayName, string? CustomerCategory)> ResolveProfileAsync(
+        ApplicationUser user,
+        CancellationToken cancellationToken)
+    {
+        if (!user.CustomerId.HasValue)
+            return (ResolveStaffDisplayName(user.Email), null);
+
+        IndividualCustomer? individual = await _individualCustomerRepository.GetAsync(
+            c => c.Id == user.CustomerId.Value,
+            cancellationToken: cancellationToken);
+        if (individual is not null)
+            return ($"{individual.FirstName} {individual.LastName}".Trim(), "Individual");
+
+        CorporateCustomer? corporate = await _corporateCustomerRepository.GetAsync(
+            c => c.Id == user.CustomerId.Value,
+            cancellationToken: cancellationToken);
+        if (corporate is not null)
+            return (corporate.CompanyName, "Corporate");
+
+        return (user.Email.Split('@')[0], null);
+    }
+
+    private static string ResolveStaffDisplayName(string email) =>
+        email.Trim().ToLowerInvariant() switch
+        {
+            "staff.tr@bank.local" => "Ayşe Yılmaz",
+            "staff.en@bank.local" => "Jane Smith",
+            "staff.de@bank.local" => "Anna Müller",
+            "staff@bank.local" => "Bank Staff",
+            "manager@bank.local" => "Bank Manager",
+            _ => email.Contains('@') ? email.Split('@')[0] : email
+        };
 }
