@@ -19,12 +19,16 @@ public class CreditSubTypesController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
-        [FromQuery] Guid? creditTypeId)
+        [FromQuery] Guid? creditTypeId,
+        [FromQuery] string? locale,
+        [FromQuery] string? category)
     {
         GetListCreditSubTypeRequest request = new()
         {
             PageRequest = pageRequest,
-            CreditTypeId = creditTypeId
+            CreditTypeId = creditTypeId,
+            Locale = locale,
+            Category = category
         };
         GetListResponse<GetListCreditSubTypeListItemDto> response = await Mediator.Send(request);
         return Ok(response);
