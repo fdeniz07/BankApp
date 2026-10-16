@@ -1,4 +1,5 @@
 using Application.Features.CorporateCustomers.Rules;
+using Application.Features.Customers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
@@ -14,6 +15,7 @@ public class DeleteCorporateCustomerRequestHandler
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IMapper _mapper;
     private readonly CorporateCustomerBusinessRules _businessRules;
+    private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly ICurrentUserService _currentUserService;
 
     public DeleteCorporateCustomerRequestHandler(
@@ -21,12 +23,14 @@ public class DeleteCorporateCustomerRequestHandler
         IApplicationUserRepository applicationUserRepository,
         IMapper mapper,
         CorporateCustomerBusinessRules businessRules,
+        CustomerLifecycleBusinessRules lifecycleRules,
         ICurrentUserService currentUserService)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _lifecycleRules = lifecycleRules;
         _currentUserService = currentUserService;
     }
 
@@ -34,13 +38,15 @@ public class DeleteCorporateCustomerRequestHandler
         DeleteCorporateCustomerRequest request,
         CancellationToken cancellationToken)
     {
-        _currentUserService.EnsureCanAccessCustomer(request.Id);
+        _currentUserService.EnsureBankStaff();
 
         CorporateCustomer? corporateCustomer = await _corporateCustomerRepository.GetAsync(
             predicate: c => c.Id == request.Id,
             cancellationToken: cancellationToken);
 
         await _businessRules.CorporateCustomerShouldExistWhenSelected(corporateCustomer);
+        await _lifecycleRules.CustomerShouldBeInactiveBeforeDelete(corporateCustomer!);
+        await _lifecycleRules.CustomerShouldNotHaveOpenCreditApplications(corporateCustomer!.Id);
 
         ApplicationUser? applicationUser = await _applicationUserRepository.GetAsync(
             u => u.CustomerId == request.Id,
@@ -52,7 +58,7 @@ public class DeleteCorporateCustomerRequestHandler
             await _applicationUserRepository.DeleteAsync(applicationUser, cancellationToken: cancellationToken);
         }
 
-        corporateCustomer!.IsActive = false;
+        corporateCustomer.IsActive = false;
         await _corporateCustomerRepository.DeleteAsync(corporateCustomer, cancellationToken: cancellationToken);
 
         return _mapper.Map<DeletedCorporateCustomerResponse>(corporateCustomer);

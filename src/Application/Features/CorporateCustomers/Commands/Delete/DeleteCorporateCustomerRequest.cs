@@ -6,6 +6,6 @@ namespace Application.Features.CorporateCustomers.Commands.Delete;
 
 public class DeleteCorporateCustomerRequest : IRequest<DeletedCorporateCustomerResponse>, ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
+    public string[] Roles => [GeneralOperationClaims.BankManager];
     public Guid Id { get; set; }
 }

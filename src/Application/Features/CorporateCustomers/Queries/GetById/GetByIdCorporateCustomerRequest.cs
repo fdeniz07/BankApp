@@ -6,6 +6,7 @@ namespace Application.Features.CorporateCustomers.Queries.GetById;
 
 public class GetByIdCorporateCustomerRequest : IRequest<GetByIdCorporateCustomerResponse>, ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
+    public string[] Roles =>
+        [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager];
     public Guid Id { get; set; }
 }
