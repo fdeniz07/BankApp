@@ -13,6 +13,7 @@ public class CreateCreditTypeRequest : IRequest<CreatedCreditTypeResponse>, ISec
     public string CacheGroupKey => CreditTypeCacheGroupKeys.Group;
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
+    public string Locale { get; set; } = "tr";
     public CreditCategory Category { get; set; }
     public string? Description { get; set; }
     public string CurrencyCode { get; set; } = "TRY";

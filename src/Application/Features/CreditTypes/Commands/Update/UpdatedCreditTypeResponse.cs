@@ -7,6 +7,7 @@ public class UpdatedCreditTypeResponse
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
+    public string Locale { get; set; } = "tr";
     public CreditCategory Category { get; set; }
     public string? Description { get; set; }
     public string CurrencyCode { get; set; } = default!;

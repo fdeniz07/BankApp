@@ -16,6 +16,7 @@ public class UpdateCreditTypeRequest : IRequest<UpdatedCreditTypeResponse>, ISec
     public string Code { get; set; } = default!;
     public CreditCategory Category { get; set; }
     public string? Description { get; set; }
+    public string Locale { get; set; } = "tr";
     public string CurrencyCode { get; set; } = "TRY";
     public CreditRiskLevel RiskLevel { get; set; }
     public bool RequiresCollateral { get; set; }
