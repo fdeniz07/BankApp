@@ -51,6 +51,22 @@ public class EfRepositoryBase<TEntity, TContext> : IAsyncRepository<TEntity>
         return await query.AnyAsync(cancellationToken);
     }
 
+    public async Task<int> CountAsync(
+        Expression<Func<TEntity, bool>>? predicate = null,
+        bool withDeleted = false,
+        CancellationToken cancellationToken = default)
+    {
+        IQueryable<TEntity> query = Query();
+
+        if (!withDeleted)
+            query = query.Where(e => !e.IsDeleted);
+
+        if (predicate is not null)
+            query = query.Where(predicate);
+
+        return await query.CountAsync(cancellationToken);
+    }
+
     public async Task<TEntity> DeleteAsync(
         TEntity entity,
         bool permanent = false,
