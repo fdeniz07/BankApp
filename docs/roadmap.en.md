@@ -27,10 +27,10 @@
 - [x] BankManager role; customer delete rules (inactive + no open credit)
 - [x] Gender allow-list; public individual register; staff customer UI
 - [x] Role-based dashboard summary + stats strip on all pages
+- [x] Inline approve / reject shortcuts on staff list
 
 ## Todo
 
-- [ ] Inline approve / reject shortcuts on staff list
 - [ ] Staff management UI
 - [ ] API integration / e2e tests
 - [ ] CI (GitHub Actions) basic pipeline
@@ -43,3 +43,5 @@
 - [ ] Kubernetes / ArgoCD deployment
 - [ ] OpenTelemetry + Grafana / Prometheus
 - [ ] Production hardening (secrets, rate-limit policies)
+- [ ] OAuth (social sign-up / login)
+- [ ] Keycloak support

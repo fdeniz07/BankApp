@@ -27,10 +27,10 @@
 - [x] BankManager rolü; müşteri silme kuralları (pasif + açık kredi yok)
 - [x] Gender allow-list; kamu bireysel kayıt; personel müşteri UI
 - [x] Rol bazlı dashboard özeti + tüm sayfalarda istatistik şeridi
+- [x] Personel listesinde satır içi hızlı onay / red kısayolları
 
 ## Yapılacak
 
-- [ ] Personel listesinde satır içi hızlı onay / red kısayolları
 - [ ] Personel yönetimi UI
 - [ ] API entegrasyon / e2e testleri
 - [ ] CI (GitHub Actions) ve temel pipeline
@@ -43,3 +43,5 @@
 - [ ] Kubernetes / ArgoCD dağıtımı
 - [ ] OpenTelemetry + Grafana / Prometheus
 - [ ] Üretim güvenlik sertleştirme (secret yönetimi, rate limit politikaları)
+- [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
+- [ ] Keycloak desteği

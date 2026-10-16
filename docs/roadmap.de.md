@@ -27,10 +27,10 @@
 - [x] BankManager-Rolle; Kunden-Löschregeln (inaktiv + keine offenen Kredite)
 - [x] Gender-Allow-List; öffentliche Privatkunden-Registrierung; Mitarbeiter-Kunden-UI
 - [x] Rollenbasiertes Dashboard + Statistikleiste auf allen Seiten
+- [x] Inline Genehmigen / Ablehnen in der Mitarbeiterliste
 
 ## Offen
 
-- [ ] Inline Genehmigen / Ablehnen in der Mitarbeiterliste
 - [ ] Personalverwaltung-UI
 - [ ] API-Integrations- / E2E-Tests
 - [ ] CI (GitHub Actions) Basis-Pipeline
@@ -43,3 +43,5 @@
 - [ ] Kubernetes / ArgoCD Deployment
 - [ ] OpenTelemetry + Grafana / Prometheus
 - [ ] Produktions-Härtung (Secrets, Rate-Limit-Policies)
+- [ ] OAuth (Registrierung / Login über soziale Netzwerke)
+- [ ] Keycloak-Unterstützung
