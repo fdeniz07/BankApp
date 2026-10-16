@@ -5,34 +5,59 @@ namespace Persistence.Seed;
 
 public static class CorporateCustomerSeed
 {
-    public const int Count = 20;
+    public const int CountPerLocale = 10;
+    public static readonly string[] Locales = ["tr", "en", "de"];
+    public static int Count => CountPerLocale * Locales.Length;
 
-    public static List<CorporateCustomer> Generate(int count, int startIndex = 0)
+    public static List<CorporateCustomer> GenerateForLocale(string locale, int count, int startSequence)
     {
         if (count <= 0)
             return [];
 
-        int sequence = startIndex;
+        List<CorporateCustomer> items = [];
+        for (int i = 0; i < count; i++)
+            items.Add(CreateOne(locale, startSequence + i));
+        return items;
+    }
 
-        Faker<CorporateCustomer> faker = new Faker<CorporateCustomer>("tr")
-            .RuleFor(c => c.CompanyName, f => f.Company.CompanyName())
-            .RuleFor(c => c.CustomerNumber, _ => $"CORP-{(++sequence):D6}")
-            .RuleFor(c => c.Email, f => $"corp{startIndex + f.IndexFaker}@corporate.local")
-            .RuleFor(c => c.PhoneNumber, f => f.Phone.PhoneNumber("05#########"))
-            .RuleFor(c => c.Address, f => f.Address.FullAddress())
-            .RuleFor(c => c.IsActive, f => f.Random.Bool(0.9f))
-            .RuleFor(c => c.TaxNumber, f => (2000000000L + startIndex + f.IndexFaker).ToString())
-            .RuleFor(c => c.TaxOffice, f => f.Address.City() + " Vergi Dairesi")
-            .RuleFor(c => c.CompanyRegistrationNumber, f => $"CRN-{(startIndex + f.IndexFaker + 1):D8}")
-            .RuleFor(c => c.CompanyEmail, f => $"info{startIndex + f.IndexFaker}@company.local")
-            .RuleFor(c => c.AuthorizedPersonName, f => f.Name.FullName())
-            .RuleFor(c => c.CompanyAddress, f => f.Address.FullAddress())
-            .RuleFor(c => c.CompanyType, f => f.PickRandom("A.Ş.", "Ltd. Şti.", "Kooperatif"))
-            .RuleFor(c => c.CompanySector, f => f.Commerce.Department())
-            .RuleFor(c => c.CompanyIndustry, f => f.Commerce.Categories(1)[0])
-            .RuleFor(c => c.CompanySubIndustry, f => f.Commerce.ProductAdjective())
-            .RuleFor(c => c.CompanyFoundationDate, f => f.Date.Past(30));
+    private static CorporateCustomer CreateOne(string locale, int sequence)
+    {
+        Faker faker = new(locale);
 
-        return faker.Generate(count);
+        return new CorporateCustomer
+        {
+            CompanyName = faker.Company.CompanyName(),
+            CustomerNumber = $"CORP-{locale.ToUpperInvariant()}-{(sequence + 1):D4}",
+            Email = $"corp{sequence}@corporate.{locale}.local",
+            PhoneNumber = locale switch
+            {
+                "de" => faker.Phone.PhoneNumber("+49 3## #######"),
+                "en" => faker.Phone.PhoneNumber("+1 ###-###-####"),
+                _ => faker.Phone.PhoneNumber("05#########")
+            },
+            Address = faker.Address.FullAddress(),
+            IsActive = faker.Random.Bool(0.9f),
+            TaxNumber = (2000000000L + sequence).ToString(),
+            TaxOffice = locale switch
+            {
+                "de" => faker.Address.City() + " Finanzamt",
+                "en" => faker.Address.City() + " Tax Office",
+                _ => faker.Address.City() + " Vergi Dairesi"
+            },
+            CompanyRegistrationNumber = $"CRN-{(sequence + 1):D8}",
+            CompanyEmail = $"info{sequence}@company.{locale}.local",
+            AuthorizedPersonName = faker.Name.FullName(),
+            CompanyAddress = faker.Address.FullAddress(),
+            CompanyType = locale switch
+            {
+                "de" => faker.PickRandom("GmbH", "AG", "UG"),
+                "en" => faker.PickRandom("LLC", "Inc.", "Ltd."),
+                _ => faker.PickRandom("A.Ş.", "Ltd. Şti.", "Kooperatif")
+            },
+            CompanySector = faker.Commerce.Department(),
+            CompanyIndustry = faker.Commerce.Categories(1)[0],
+            CompanySubIndustry = faker.Commerce.ProductAdjective(),
+            CompanyFoundationDate = faker.Date.Past(30)
+        };
     }
 }
