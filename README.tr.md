@@ -1,8 +1,12 @@
 # BankApp
 
-[English README](README.md)
+[English README](README.md) · [Deutsche README](README.de.md)
 
 BankApp, **Clean Architecture** ve **CQRS** ile geliştirilmiş bir **.NET 10** bankacılık API’sidir. Bireysel/kurumsal müşteri yönetimi ile kredi ürün kataloğu ve başvuru süreçlerini (tip, alt tip, başvuru, onay/red, soft delete, validasyon, Development ortamında Bogus seed) kapsar.
+
+**Proje dokümanları:** [Yol haritası](docs/roadmap.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md)
+
+**Demo girişler:** `staff@bank.local` / `Staff123!`, `customer@bank.local` / `Customer123!` (ayrıca `staff.{tr|en|de}@bank.local`, `customer.{tr|en|de}@bank.local`)
 
 ---
 

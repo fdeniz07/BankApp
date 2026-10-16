@@ -1,8 +1,12 @@
 # BankApp
 
-[Türkçe README](README.tr.md)
+[Türkçe README](README.tr.md) · [Deutsche README](README.de.md)
 
 BankApp is a **.NET 10** banking API built with **Clean Architecture** and **CQRS**. It manages individual/corporate customers and a full credit-lending flow: credit types, sub-types, applications, approve/reject decisions, soft delete, validation, and development-time Bogus seeding.
+
+**Project docs:** [Roadmap](docs/roadmap.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md)
+
+**Demo logins:** `staff@bank.local` / `Staff123!`, `customer@bank.local` / `Customer123!` (also `staff.{tr|en|de}@bank.local`, `customer.{tr|en|de}@bank.local`)
 
 ---
 

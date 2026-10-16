@@ -1,5 +1,6 @@
 /.vscode
 /.vs
+/.cursor
 
 **/bin/
 **/obj/
@@ -12,3 +13,8 @@ infra/.env
 *.user
 *.suo
 *.swp
+
+# Frontend
+client/node_modules/
+client/dist/
+client/.env

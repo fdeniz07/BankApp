@@ -1,0 +1,45 @@
+# Değişiklik günlüğü
+
+[English](changelog.en.md) · [Deutsch](changelog.de.md)
+
+## 2026-10-16 — Dashboard istatistikleri (tüm roller)
+
+- `GET /api/Dashboard/summary`: personel için aktif/pasif müşteri + başvuru kırılımı; müşteri için kendi başvuru sayıları.
+- Tüm sayfalarda üst istatistik şeridi (müşteri sayısı personelde, başvuru/bekleyen herkese).
+- Başvurular sayfasında rol bazlı dashboard paneli; sayılar API’den (sayfa verisi değil).
+
+## 2026-10-16 — Müşteri yönetimi, BankManager, bireysel kayıt
+
+- `BankManager` claim + demo `manager@bank.local` / `Manager123!` (BankStaff + BankManager).
+- Soft-delete yalnızca BankManager; müşteri önce pasif olmalı ve Pending/Approved başvurusu olmamalı.
+- `Gender` allow-list (`Female` / `Male` / `PreferNotToSay`); create / update / kayıt doğrulaması.
+- Public `POST /api/Auth/register-individual` + `/register` sayfası.
+- Personel `/customers` listesi (aktif / pasif / silinmiş, bireysel / kurumsal), oluşturma formu ve detay (IsActive, silme).
+
+## 2026-10-16 — UX bugfix (boşluk, dil, kategori, toast)
+
+- Kredi türleri Ad/Kod sütun boşluğu güçlendirildi.
+- Login `displayName` / `customerCategory` artık JWT decode’a güvenmeden local override ile yazılıyor (Türkçe karakterler).
+- Seed aylık gelir talep tutarına oranlandı (abartılı gelir azaltıldı).
+- Müşteri başvuru formu yalnızca kendi kategorisindeki (bireysel/kurumsal) ürünleri listeler; API `category` filtresi.
+- Create validasyonunda boş `CustomerId` engeli kaldırıldı; `react-toastify` + dil bazlı hata mesajları.
+
+## 2026-10-16 — UX düzeltmeleri, profil, JWT UTF-8
+
+- Kredi türleri listesinde sütun sıralama (`SortBy` / `SortDesc`) ve Ad/Kod sütun boşlukları.
+- Başvuru detayında onaylanan vade; ödeme planı etkin tutar/vadeyi açıkça gösterir (Pending önizleme / Approved onay değerleri).
+- Seed’de onay vadesi talep vadesini aşmaz; sıkça eşit seçilir.
+- JWT `displayName` UTF-8 güvenli decode; `customerCategory` claim; personel için anlamlı displayName.
+- `/profile` sayfası: müşteri ad/iletişim düzenleme; header’da müşteri türü.
+- Roadmap İleride: e-posta doğrulama (RabbitMQ/Kafka), Elasticsearch, Tailwind admin dashboard.
+
+## 2026-10-16 — Locale katalog, paket kısıtları, ödeme planı
+
+- `CreditType.Locale` eklendi; TR→TRY, EN→USD, DE→EUR katalogları yeniden seed edildi.
+- Müşteri UI diline göre yalnızca ilgili locale ürünlerini görür; tutar/vade paket seçeneklerinden gelir.
+- Personel kredi türleri sayfasında TR/EN/DE filtresi.
+- Sunucu tarafı paket doğrulaması (tutar adımı + izinli vadeler 3…60).
+- Amortisman ödeme planı API + UI önizlemesi.
+- Girişte `displayName` (ad soyad / firma); dil bazlı demo hesaplar.
+- SQL volume + Redis sıfırlandı (temiz seed).
+- Dokümanlar: changelog, test notları, roadmap/history güncellemesi.
