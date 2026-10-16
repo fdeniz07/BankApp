@@ -17,9 +17,15 @@ namespace WebApi.Controllers;
 public class IndividualCustomersController : BaseController
 {
     [HttpGet]
-    public async Task<IActionResult> GetList([FromQuery] PageRequest pageRequest)
+    public async Task<IActionResult> GetList(
+        [FromQuery] PageRequest pageRequest,
+        [FromQuery] bool? isActive = null)
     {
-        GetListIndividualCustomerRequest request = new() { PageRequest = pageRequest };
+        GetListIndividualCustomerRequest request = new()
+        {
+            PageRequest = pageRequest,
+            IsActive = isActive
+        };
         GetListResponse<GetListIndividualCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);
     }
