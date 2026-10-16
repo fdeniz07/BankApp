@@ -25,4 +25,16 @@ public static class ClaimExtensions
     {
         claims.Add(new Claim(Constants.CustomClaimTypes.CustomerId, customerId.ToString()));
     }
+
+    public static void AddDisplayName(this ICollection<Claim> claims, string displayName)
+    {
+        if (!string.IsNullOrWhiteSpace(displayName))
+            claims.Add(new Claim(Constants.CustomClaimTypes.DisplayName, displayName));
+    }
+
+    public static void AddCustomerCategory(this ICollection<Claim> claims, string customerCategory)
+    {
+        if (!string.IsNullOrWhiteSpace(customerCategory))
+            claims.Add(new Claim(Constants.CustomClaimTypes.CustomerCategory, customerCategory));
+    }
 }
