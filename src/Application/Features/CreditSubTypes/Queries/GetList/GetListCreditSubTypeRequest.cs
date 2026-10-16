@@ -16,10 +16,18 @@ public class GetListCreditSubTypeRequest
     public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
     public PageRequest PageRequest { get; set; } = new();
     public Guid? CreditTypeId { get; set; }
+    public string? Locale { get; set; }
+    public string? Category { get; set; }
 
     public string CacheKey =>
-        $"CreditSubTypeList({PageRequest.PageIndex},{PageRequest.PageSize},{CreditTypeId})";
+        $"CreditSubTypeList({PageRequest.PageIndex},{PageRequest.PageSize},{CreditTypeId},{NormalizeLocale(Locale)},{NormalizeCategory(Category)})";
 
     public string? CacheGroupKey => CreditSubTypeCacheGroupKeys.Group;
     public TimeSpan? SlidingExpiration => null;
+
+    private static string NormalizeLocale(string? locale) =>
+        string.IsNullOrWhiteSpace(locale) ? "all" : locale.Trim().ToLowerInvariant();
+
+    private static string NormalizeCategory(string? category) =>
+        string.IsNullOrWhiteSpace(category) ? "all" : category.Trim().ToLowerInvariant();
 }
