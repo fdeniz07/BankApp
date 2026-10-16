@@ -18,6 +18,8 @@ public class LoginRequestHandlerTests
 {
     private readonly Mock<IApplicationUserRepository> _applicationUserRepository = new();
     private readonly Mock<ICustomerRepository> _customerRepository = new();
+    private readonly Mock<IIndividualCustomerRepository> _individualCustomerRepository = new();
+    private readonly Mock<ICorporateCustomerRepository> _corporateCustomerRepository = new();
     private readonly Mock<ITokenHelper> _tokenHelper = new();
     private readonly LoginRequestHandler _sut;
 
@@ -29,6 +31,8 @@ public class LoginRequestHandlerTests
 
         _sut = new LoginRequestHandler(
             _applicationUserRepository.Object,
+            _individualCustomerRepository.Object,
+            _corporateCustomerRepository.Object,
             _tokenHelper.Object,
             businessRules);
     }
@@ -88,7 +92,8 @@ public class LoginRequestHandlerTests
             .Setup(r => r.GetClaimsAsync(user, It.IsAny<CancellationToken>()))
             .ReturnsAsync(claims);
         _tokenHelper
-            .Setup(t => t.CreateToken(user, claims, user.CustomerId))
+            .Setup(t => t.CreateToken(
+                user, claims, user.CustomerId, It.IsAny<string?>(), It.IsAny<string?>()))
             .Returns(accessToken);
 
         LoginRequest request = new()
@@ -101,7 +106,10 @@ public class LoginRequestHandlerTests
 
         response.AccessToken.Should().NotBeNull();
         response.AccessToken.Token.Should().Be("jwt-token");
-        _tokenHelper.Verify(t => t.CreateToken(user, claims, user.CustomerId), Times.Once);
+        response.DisplayName.Should().Be("Bank Staff");
+        _tokenHelper.Verify(
+            t => t.CreateToken(user, claims, user.CustomerId, "Bank Staff", null),
+            Times.Once);
     }
 
     private void SetupGetUser(ApplicationUser? user)

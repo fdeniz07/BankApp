@@ -157,6 +157,7 @@ public class CreditApplicationBusinessRulesTests
         int minTerm,
         int maxTerm)
     {
+        Guid creditTypeId = Guid.NewGuid();
         _creditSubTypeRepository
             .Setup(r => r.GetAsync(
                 It.IsAny<Expression<Func<CreditSubType, bool>>>(),
@@ -167,11 +168,27 @@ public class CreditApplicationBusinessRulesTests
             .ReturnsAsync(new CreditSubType
             {
                 Id = subTypeId,
+                CreditTypeId = creditTypeId,
                 MinAmount = minAmount,
                 MaxAmount = maxAmount,
                 MinTermMonths = minTerm,
                 MaxTermMonths = maxTerm,
                 IsActive = true
             });
+
+        _creditTypeRepository
+            .Setup(r => r.GetAsync(
+                It.IsAny<Expression<Func<CreditType, bool>>>(),
+                It.IsAny<Func<IQueryable<CreditType>, IIncludableQueryable<CreditType, object>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new CreditType
+            {
+                Id = creditTypeId,
+                CurrencyCode = "USD",
+                Locale = "en"
+            });
     }
 }
+
