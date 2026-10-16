@@ -19,12 +19,24 @@ public class JwtHelper : ITokenHelper
             ?? throw new InvalidOperationException("TokenOptions configuration is missing.");
     }
 
-    public AccessToken CreateToken(User user, IList<OperationClaim> operationClaims, Guid? customerId = null)
+    public AccessToken CreateToken(
+        User user,
+        IList<OperationClaim> operationClaims,
+        Guid? customerId = null,
+        string? displayName = null,
+        string? customerCategory = null)
     {
         _accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
         SecurityKey securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
         SigningCredentials signingCredentials = SigningCredentialsHelper.CreateSigningCredentials(securityKey);
-        JwtSecurityToken jwt = CreateJwtSecurityToken(_tokenOptions, user, signingCredentials, operationClaims, customerId);
+        JwtSecurityToken jwt = CreateJwtSecurityToken(
+            _tokenOptions,
+            user,
+            signingCredentials,
+            operationClaims,
+            customerId,
+            displayName,
+            customerCategory);
         JwtSecurityTokenHandler tokenHandler = new();
         string token = tokenHandler.WriteToken(jwt);
 
@@ -40,18 +52,25 @@ public class JwtHelper : ITokenHelper
         User user,
         SigningCredentials signingCredentials,
         IList<OperationClaim> operationClaims,
-        Guid? customerId)
+        Guid? customerId,
+        string? displayName,
+        string? customerCategory)
     {
         return new JwtSecurityToken(
             issuer: tokenOptions.Issuer,
             audience: tokenOptions.Audience,
             expires: _accessTokenExpiration,
             notBefore: DateTime.UtcNow,
-            claims: SetClaims(user, operationClaims, customerId),
+            claims: SetClaims(user, operationClaims, customerId, displayName, customerCategory),
             signingCredentials: signingCredentials);
     }
 
-    private static IEnumerable<Claim> SetClaims(User user, IList<OperationClaim> operationClaims, Guid? customerId)
+    private static IEnumerable<Claim> SetClaims(
+        User user,
+        IList<OperationClaim> operationClaims,
+        Guid? customerId,
+        string? displayName,
+        string? customerCategory)
     {
         List<Claim> claims = [];
         claims.AddNameIdentifier(user.Id.ToString());
@@ -60,6 +79,12 @@ public class JwtHelper : ITokenHelper
 
         if (customerId.HasValue)
             claims.AddCustomerId(customerId.Value);
+
+        if (!string.IsNullOrWhiteSpace(displayName))
+            claims.AddDisplayName(displayName);
+
+        if (!string.IsNullOrWhiteSpace(customerCategory))
+            claims.AddCustomerCategory(customerCategory);
 
         return claims;
     }
