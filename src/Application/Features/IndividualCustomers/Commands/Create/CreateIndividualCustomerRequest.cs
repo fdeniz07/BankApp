@@ -6,7 +6,7 @@ namespace Application.Features.IndividualCustomers.Commands.Create;
 
 public class CreateIndividualCustomerRequest : IRequest<CreatedIndividualCustomerResponse>, ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.BankStaff];
+    public string[] Roles => [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager];
     public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string Password { get; set; } = default!;

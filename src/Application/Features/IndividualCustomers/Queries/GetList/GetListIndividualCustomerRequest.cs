@@ -8,7 +8,8 @@ namespace Application.Features.IndividualCustomers.Queries.GetList;
 
 public class GetListIndividualCustomerRequest : IRequest<GetListResponse<GetListIndividualCustomerListItemDto>>, ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
+    public string[] Roles =>
+        [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager];
     public PageRequest PageRequest { get; set; } = new();
     public bool? IsActive { get; set; }
     public bool OnlyDeleted { get; set; }

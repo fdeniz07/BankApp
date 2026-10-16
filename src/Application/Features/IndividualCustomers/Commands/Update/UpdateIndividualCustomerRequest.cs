@@ -6,7 +6,8 @@ namespace Application.Features.IndividualCustomers.Commands.Update;
 
 public class UpdateIndividualCustomerRequest : IRequest<UpdatedIndividualCustomerResponse>, ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
+    public string[] Roles =>
+        [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager];
     public Guid Id { get; set; }
     public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;

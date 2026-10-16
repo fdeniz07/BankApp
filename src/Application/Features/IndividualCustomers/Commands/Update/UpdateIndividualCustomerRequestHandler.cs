@@ -1,9 +1,11 @@
 using Application.Features.Auth.Rules;
+using Application.Features.Customers.Rules;
 using Application.Features.IndividualCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.IndividualCustomers.Commands.Update;
@@ -16,6 +18,7 @@ public class UpdateIndividualCustomerRequestHandler
     private readonly IMapper _mapper;
     private readonly IndividualCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
+    private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly ICurrentUserService _currentUserService;
 
     public UpdateIndividualCustomerRequestHandler(
@@ -24,6 +27,7 @@ public class UpdateIndividualCustomerRequestHandler
         IMapper mapper,
         IndividualCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
+        CustomerLifecycleBusinessRules lifecycleRules,
         ICurrentUserService currentUserService)
     {
         _individualCustomerRepository = individualCustomerRepository;
@@ -31,6 +35,7 @@ public class UpdateIndividualCustomerRequestHandler
         _mapper = mapper;
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
+        _lifecycleRules = lifecycleRules;
         _currentUserService = currentUserService;
     }
 
@@ -48,6 +53,9 @@ public class UpdateIndividualCustomerRequestHandler
         await _businessRules.CustomerNumberShouldBeUnique(request.CustomerNumber, request.Id);
         await _businessRules.EmailShouldBeUnique(request.Email, request.Id);
         await _businessRules.NationalIdShouldBeUnique(request.NationalId, request.Id);
+        await _lifecycleRules.GenderShouldBeValidWhenProvided(request.Gender);
+        if (!string.IsNullOrWhiteSpace(request.Gender))
+            request.Gender = Gender.Normalize(request.Gender);
 
         ApplicationUser? applicationUser = await _applicationUserRepository.GetAsync(
             u => u.CustomerId == request.Id,

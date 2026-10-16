@@ -1,3 +1,5 @@
+using Application.Features.Customers.Constants;
+using Domain.Enums;
 using FluentValidation;
 
 namespace Application.Features.IndividualCustomers.Commands.Update;
@@ -14,5 +16,8 @@ public class UpdateIndividualCustomerRequestValidator : AbstractValidator<Update
         RuleFor(c => c.FirstName).NotEmpty().MaximumLength(50);
         RuleFor(c => c.LastName).NotEmpty().MaximumLength(50);
         RuleFor(c => c.NationalId).NotEmpty().Length(11);
+        RuleFor(c => c.Gender)
+            .Must(g => string.IsNullOrWhiteSpace(g) || Gender.IsValidName(g))
+            .WithMessage(CustomerLifecycleMessages.InvalidGender);
     }
 }

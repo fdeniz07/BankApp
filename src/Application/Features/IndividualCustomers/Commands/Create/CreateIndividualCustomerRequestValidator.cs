@@ -1,3 +1,5 @@
+using Application.Features.Customers.Constants;
+using Domain.Enums;
 using FluentValidation;
 
 namespace Application.Features.IndividualCustomers.Commands.Create;
@@ -14,5 +16,9 @@ public class CreateIndividualCustomerRequestValidator : AbstractValidator<Create
         RuleFor(c => c.FirstName).NotEmpty().MaximumLength(50);
         RuleFor(c => c.LastName).NotEmpty().MaximumLength(50);
         RuleFor(c => c.NationalId).NotEmpty().Length(11);
+        RuleFor(c => c.Gender)
+            .NotEmpty()
+            .Must(Gender.IsValidName)
+            .WithMessage(CustomerLifecycleMessages.InvalidGender);
     }
 }
