@@ -1,5 +1,6 @@
 using Application.Features.CreditTypes.Commands.Create;
 using Application.Features.CreditTypes.Commands.Delete;
+using Application.Features.CreditTypes.Commands.SetActive;
 using Application.Features.CreditTypes.Commands.Update;
 using Application.Features.CreditTypes.Queries.GetById;
 using Application.Features.CreditTypes.Queries.GetList;
@@ -20,6 +21,7 @@ public class CreditTypesController : BaseController
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
         [FromQuery] string? locale,
+        [FromQuery] string? category,
         [FromQuery] string? sortBy,
         [FromQuery] bool sortDesc = false)
     {
@@ -27,6 +29,7 @@ public class CreditTypesController : BaseController
         {
             PageRequest = pageRequest,
             Locale = locale,
+            Category = category,
             SortBy = sortBy,
             SortDesc = sortDesc
         };
@@ -56,6 +59,14 @@ public class CreditTypesController : BaseController
         return Ok(response);
     }
 
+    [HttpPut("{id}/active")]
+    public async Task<IActionResult> SetActive([FromRoute] Guid id, [FromBody] SetCreditTypeActiveBody body)
+    {
+        SetCreditTypeActiveResponse response = await Mediator.Send(
+            new SetCreditTypeActiveRequest { Id = id, IsActive = body.IsActive });
+        return Ok(response);
+    }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
@@ -63,4 +74,9 @@ public class CreditTypesController : BaseController
         DeletedCreditTypeResponse response = await Mediator.Send(request);
         return Ok(response);
     }
+}
+
+public sealed class SetCreditTypeActiveBody
+{
+    public bool IsActive { get; set; }
 }
