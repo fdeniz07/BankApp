@@ -2,24 +2,23 @@
 
 [Türkçe README](README.tr.md) · [Deutsche README](README.de.md)
 
-BankApp is a **.NET 10** banking API built with **Clean Architecture** and **CQRS**. It manages individual/corporate customers and a full credit-lending flow: credit types, sub-types, applications, approve/reject decisions, soft delete, validation, and development-time Bogus seeding.
+BankApp is a **full-stack educational banking sample** for **individual and corporate credit applications**.  
+Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n. Local stack: **Docker Compose** (SQL Server, Redis, Seq, WebApi, client).
 
-**Project docs:** [Roadmap](docs/roadmap.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md)
-
-**Demo logins:** `staff@bank.local` / `Staff123!`, `customer@bank.local` / `Customer123!` (also `staff.{tr|en|de}@bank.local`, `customer.{tr|en|de}@bank.local`)
+**Docs:** [Roadmap](docs/roadmap.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
 ---
 
 ## Table of contents
 
-1. [Overview](#overview)
-2. [Tech stack](#tech-stack)
-3. [Solution structure](#solution-structure)
-4. [Architecture diagrams](#architecture-diagrams)
-5. [Domain model & ER diagram](#domain-model--er-diagram)
-6. [Business rules](#business-rules)
-7. [API endpoints](#api-endpoints)
-8. [Cross-cutting concerns](#cross-cutting-concerns)
+1. [Demo logins](#demo-logins)
+2. [Features](#features)
+3. [Tech stack](#tech-stack)
+4. [Solution structure](#solution-structure)
+5. [Architecture diagrams](#architecture-diagrams)
+6. [Domain model](#domain-model)
+7. [Business rules](#business-rules)
+8. [API overview](#api-overview)
 9. [SmartEnum](#smartenum)
 10. [Data seeding](#data-seeding)
 11. [Getting started](#getting-started)
@@ -27,42 +26,50 @@ BankApp is a **.NET 10** banking API built with **Clean Architecture** and **CQR
 
 ---
 
-## Overview
+## Demo logins
 
-| Area | What the API does |
-|------|-------------------|
-| **Individual customers** | CRUD, list active / inactive / soft-deleted |
-| **Corporate customers** | CRUD, list active / inactive / soft-deleted |
-| **Credit types** | Catalog products (Individual / Corporate category, risk level) |
-| **Credit sub-types** | Product packages (amount/term ranges, rates, fees) |
-| **Credit applications** | Create/update/list/filter, approve, reject, soft delete |
+| Role | Email | Password |
+|------|-------|----------|
+| Bank staff | `staff@bank.local` (also `staff.tr` / `.en` / `.de`) | `Staff123!` |
+| Bank manager | `manager@bank.local` | `Manager123!` |
+| Customer | `customer@bank.local` (also `customer.tr` / `.en` / `.de`) | `Customer123!` |
 
-**Key design choices**
+Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff).
 
-- Controllers stay thin and only dispatch MediatR requests.
-- Features live under `Application/Features/{Feature}/` (Commands, Queries, Rules, Validators, Profiles).
-- Persistence uses EF Core + SQL Server; inheritance for customers uses **TPT**.
-- Soft delete (`IsDeleted` + `DeletedDate`) is separate from business activity (`IsActive`).
-- Enumerations that matter in JSON/DB are **Ardalis SmartEnum** stored by **name** (e.g. `"Pending"`), not integer ordinals.
+---
+
+## Features
+
+### Backend
+
+- Individual / corporate customers (TPT), credit types & sub-types, applications
+- JWT auth + RBAC; public individual registration
+- Approve / reject / **cancel** (status change — not soft-delete for cancel)
+- Payment plan (amortization), dashboard summary, staff user management
+- Profile fields + avatar upload (≤ 2 MB), Seq audit categories
+- Credit type create / update / delete / activate-deactivate (**BankManager**)
+- Serilog → Seq, Redis cache, FluentValidation, ProblemDetails
+
+### Frontend (`client/`)
+
+- Login / register, applications list & detail, customers, credit types, staff, profile
+- Stats strip, FX ticker, accessibility panel (theme / font size / contrast)
+- Locale switcher TR / EN / DE
 
 ---
 
 ## Tech stack
 
-| Layer / concern | Technology |
-|-----------------|------------|
-| Runtime | .NET 10 (`net10.0`) |
-| API | ASP.NET Core Controllers |
-| CQRS / messaging | MediatR |
-| Validation | FluentValidation (+ `RequestValidationBehavior`) |
-| Mapping | AutoMapper |
-| ORM | Entity Framework Core 10 |
-| Database | SQL Server |
-| Domain enums | Ardalis.SmartEnum (+ System.Text.Json name converter) |
-| API docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
-| Seed data (Dev) | Bogus |
-| Errors | Custom exception middleware → RFC 7807 ProblemDetails |
-| Infra extras | CORS, response compression, fixed-window rate limiting |
+| Area | Technology |
+|------|------------|
+| API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
+| DB / cache / logs | SQL Server, Redis, Serilog + Seq |
+| Domain enums | Ardalis SmartEnum (stored/exchanged by **name**) |
+| Auth | JWT + role claims |
+| Client | React, Vite, TypeScript, react-i18next, react-router |
+| Docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
+| Seed | Bogus (+ fixed credit catalog) |
+| Infra | Docker Compose (`infra/`) |
 
 ---
 
@@ -71,25 +78,19 @@ BankApp is a **.NET 10** banking API built with **Clean Architecture** and **CQR
 ```
 BankApp/
 ├── BankApp.slnx
-├── README.md
-├── README.tr.md
+├── README.md / README.tr.md / README.de.md
+├── client/              # React SPA
+├── docs/                # roadmap, changelog, history, test notes
+├── infra/               # docker-compose, .env.example
 └── src/
-    ├── WebApi/          # HTTP host, controllers, DI wiring, Scalar
-    ├── Application/     # Features (CQRS), validators, business rules, mappings
+    ├── WebApi/          # HTTP host, controllers, DI, static uploads
+    ├── Application/     # CQRS features, validators, rules, mappings
     ├── Domain/          # Entities, SmartEnums
-    ├── Persistence/     # DbContext, configurations, repositories, migrations, seed
-    └── Core/            # Shared abstractions: Entity, repositories, paging, pipelines, exceptions
+    ├── Persistence/     # DbContext, migrations, repositories, seed
+    └── Core/            # Shared Entity, paging, security helpers, pipelines
 ```
 
-| Project | Responsibility |
-|---------|----------------|
-| **WebApi** | Controllers, middleware pipeline, CORS/rate limit/compression, OpenAPI/Scalar |
-| **Application** | Use cases via MediatR handlers; FluentValidation; AutoMapper profiles; business rules |
-| **Domain** | Entities and SmartEnums; no infrastructure dependencies (except SmartEnum package) |
-| **Persistence** | EF Core `BankingDbContext`, entity configs, repository implementations, migrations, Bogus seed |
-| **Core** | `Entity` base, generic repository contracts/base, page request/response, validation behavior, exception types & middleware |
-
-**Dependency direction:** `WebApi` → `Application` / `Persistence` → `Domain` / `Core`. Domain does not reference Persistence or WebApi.
+**Dependency direction:** `WebApi` → `Application` / `Persistence` → `Domain` / `Core`.
 
 ---
 
@@ -99,12 +100,14 @@ BankApp/
 
 ```mermaid
 flowchart TB
+    Client[React client]
     WebApi[WebApi]
     Application[Application]
     Persistence[Persistence]
     Domain[Domain]
     Core[Core]
 
+    Client --> WebApi
     WebApi --> Application
     WebApi --> Persistence
     Application --> Domain
@@ -128,7 +131,7 @@ sequenceDiagram
     participant Repo as Repository / EF Core
     participant Db as SQL Server
 
-    Client->>Controller: HTTP request
+    Client->>Controller: HTTP + JWT
     Controller->>MediatR: Send(Request)
     MediatR->>Validation: FluentValidation
     Validation->>Handler: Handle
@@ -148,8 +151,8 @@ stateDiagram-v2
     [*] --> Pending: Create
     Pending --> Approved: Approve
     Pending --> Rejected: Reject
-    Pending --> Cancelled: Soft delete (while Pending)
-    Pending --> Pending: Update (only while Pending)
+    Pending --> Cancelled: Cancel
+    Pending --> Pending: Update (Pending only)
     Approved --> [*]
     Rejected --> [*]
     Cancelled --> [*]
@@ -157,304 +160,174 @@ stateDiagram-v2
 
 ---
 
-## Domain model & ER diagram
+## Domain model
 
-### Customer hierarchy (TPT)
+### Customers (TPT)
 
-`Customer` is abstract (shared fields). `IndividualCustomer` and `CorporateCustomer` map to separate tables (Table-Per-Type).
-
-| Entity | Notable fields |
-|--------|----------------|
-| **Customer** | `CustomerNumber`, `Email`, `PhoneNumber`, `Address`, `IsActive`, audit + `IsDeleted` |
-| **IndividualCustomer** | `FirstName`, `LastName`, `NationalId`, DOB, gender, parents |
-| **CorporateCustomer** | `CompanyName`, `TaxNumber`, `TaxOffice`, registration no., authorized person, sector fields |
+| Entity | Notes |
+|--------|--------|
+| **Customer** | Shared: number, email, phone, address, `IsActive`, soft-delete |
+| **IndividualCustomer** | Name, national id, DOB, gender, … |
+| **CorporateCustomer** | Company, tax, authorized person, … |
 
 ### Credit catalog & applications
 
 | Entity | Role |
 |--------|------|
-| **CreditType** | Top-level product: `Category` (Individual/Corporate), `RiskLevel`, currency, collateral/guarantor flags |
-| **CreditSubType** | Package under a type: min/max amount & term, interest & fee rates |
-| **CreditApplication** | Customer applies for a sub-type; status + decision fields |
+| **CreditType** | Product (category, risk, currency, locale, active) |
+| **CreditSubType** | Package (amount/term ranges, rates) |
+| **CreditApplication** | Request + status + decision fields |
 
-### ER diagram
-
-```mermaid
-erDiagram
-    Customer ||--o{ CreditApplication : places
-    IndividualCustomer |o--|| Customer : inherits
-    CorporateCustomer |o--|| Customer : inherits
-    CreditType ||--o{ CreditSubType : contains
-    CreditSubType ||--o{ CreditApplication : used_by
-
-    Customer {
-        guid Id PK
-        string CustomerNumber
-        string Email
-        bool IsActive
-        bool IsDeleted
-    }
-
-    IndividualCustomer {
-        guid Id PK_FK
-        string FirstName
-        string LastName
-        string NationalId
-    }
-
-    CorporateCustomer {
-        guid Id PK_FK
-        string CompanyName
-        string TaxNumber
-    }
-
-    CreditType {
-        guid Id PK
-        string Code UK
-        string Category
-        string RiskLevel
-        bool IsActive
-    }
-
-    CreditSubType {
-        guid Id PK
-        guid CreditTypeId FK
-        string Code UK
-        decimal MinAmount
-        decimal MaxAmount
-        int MinTermMonths
-        int MaxTermMonths
-    }
-
-    CreditApplication {
-        guid Id PK
-        string ApplicationNumber UK
-        guid CustomerId FK
-        guid CreditSubTypeId FK
-        string Status
-        decimal RequestedAmount
-        int RequestedTermMonths
-    }
-```
-
-### Soft delete vs active flag
+### Soft delete vs active
 
 | Flag | Meaning |
 |------|---------|
-| **`IsActive`** | Business: customer/product can be used in new operations |
-| **`IsDeleted`** | Technical soft delete; record kept with `DeletedDate` |
+| **`IsActive`** | Business: usable for new operations |
+| **`IsDeleted`** | Technical soft delete (`DeletedDate`) |
 
-Deleting a customer or credit entity typically soft-deletes and may also set `IsActive = false`. Dedicated list endpoints expose inactive and deleted customers.
+Application **cancel** sets status to `Cancelled` via dedicated command (not soft-delete).
 
 ---
 
 ## Business rules
 
-Implemented mainly under `Application/Features/*/Rules`.
-
 ### Customers
 
-- Unique `NationalId` / `TaxNumber` / `CompanyRegistrationNumber` / `CustomerNumber` / `Email` (per feature rules).
-- Soft delete keeps history; inactive/deleted lists for customers.
+- Unique national id / tax / registration / customer number / email (per rules).
+- Soft delete of customers: **BankManager** only; customer must be inactive and have no open Pending/Approved applications.
 
 ### Credit types & sub-types
 
-- Unique `Code`.
-- Sub-type amount range: `MinAmount` ≤ `MaxAmount`.
-- Sub-type term range: `MinTermMonths` ≤ `MaxTermMonths`.
-- Sub-type must reference an existing credit type.
+- Unique codes; amount/term range consistency.
+- New applications require **active** parent credit type and sub-type.
+- Category match: individual ↔ Individual, corporate ↔ Corporate.
+- Manager-only mutating APIs for credit types (create / update / delete / set active).
 
 ### Credit applications
 
-- Customer must exist and be **active**.
-- Credit sub-type must exist and be **active**.
-- **Category match:** individual customer → `CreditCategory.Individual`; corporate → `Corporate`.
-- Requested amount/term must fall within the sub-type’s min/max.
-- Unique `ApplicationNumber`.
-- Only **Pending** applications can be updated or approved/rejected.
-- Soft delete of a pending application sets status to **Cancelled**.
+- Amount/term within sub-type package (and packaging constraints where applied).
+- Only **Pending** can be updated, approved, rejected, or cancelled.
 
 ---
 
-## API endpoints
+## API overview
 
-Base URL (Dev): `https://localhost:7152` or `http://localhost:5086`  
-Interactive docs (Dev): [Scalar](https://localhost:7152/scalar/v1)
+| Base (Docker Dev) | URL |
+|-------------------|-----|
+| WebApi | http://localhost:8080 |
+| Scalar | http://localhost:8080/scalar/v1 |
+| Client | http://localhost:3000 |
+| Seq | http://localhost:5341 |
 
-All controllers use `api/[controller]` and fixed-window rate limiting.
+Most endpoints require JWT (`Authorization: Bearer …`) except login / public register.
 
-### IndividualCustomers — `api/IndividualCustomers`
+| Controller | Highlights |
+|------------|------------|
+| **Auth** | `POST login`, `register`, `register-individual` |
+| **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted lists |
+| **CreditTypes** | List/get; mutate + `PUT {id}/active` (manager) |
+| **CreditSubTypes** | CRUD |
+| **CreditApplications** | CRUD-ish; `approve` / `reject` / **`cancel`**; `payment-plan` |
+| **Dashboard** | `GET summary` |
+| **StaffUsers** | List / create / update (manager) |
+| **Profile** | Get mine; update staff profile; upload avatar |
 
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Paged active list |
-| GET | `/inactive` | Paged inactive |
-| GET | `/deleted` | Paged soft-deleted |
-| GET | `/{id}` | By id |
-| POST | `/` | Create |
-| PUT | `/` | Update |
-| DELETE | `/{id}` | Soft delete |
-
-### CorporateCustomers — `api/CorporateCustomers`
-
-Same shape as individual customers (`/`, `/inactive`, `/deleted`, `/{id}`, POST, PUT, DELETE).
-
-### CreditTypes — `api/CreditTypes`
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Paged list |
-| GET | `/{id}` | By id |
-| POST | `/` | Create |
-| PUT | `/` | Update |
-| DELETE | `/{id}` | Soft delete |
-
-### CreditSubTypes — `api/CreditSubTypes`
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Paged list (optional `creditTypeId`) |
-| GET | `/{id}` | By id |
-| POST | `/` | Create |
-| PUT | `/` | Update |
-| DELETE | `/{id}` | Soft delete |
-
-### CreditApplications — `api/CreditApplications`
-
-| Method | Path | Description |
-|--------|------|-------------|
-| GET | `/` | Paged list; query: `customerId`, `status` (name, e.g. `Pending`) |
-| GET | `/{id}` | By id |
-| POST | `/` | Create (starts as Pending) |
-| PUT | `/` | Update (Pending only) |
-| POST | `/{id}/approve` | Approve + decision fields |
-| POST | `/{id}/reject` | Reject + reason |
-| DELETE | `/{id}` | Soft delete (Pending → Cancelled) |
-
-Paging query parameters typically use `PageRequest.PageIndex` and `PageRequest.PageSize`.
-
----
-
-## Cross-cutting concerns
-
-| Concern | Behavior |
-|---------|----------|
-| **Validation** | FluentValidation runs via MediatR pipeline before the handler |
-| **Business exceptions** | `BusinessException` → ProblemDetails from exception middleware |
-| **CORS** | Policy from `Cors:AllowedOrigins` (empty = allow any in current setup) |
-| **Rate limiting** | Fixed window; defaults `PermitLimit=100`, `WindowSeconds=60` |
-| **Compression** | Brotli + Gzip |
-| **OpenAPI / Scalar** | Mapped in Development |
+Interactive details: Scalar UI.
 
 ---
 
 ## SmartEnum
 
-Stored and exchanged as **names**, not ints.
+Stored and serialized by **name** (e.g. `"Pending"`), not integer ordinals.
 
-| Type | Values |
-|------|--------|
-| `CreditCategory` | `Individual`, `Corporate` |
-| `CreditRiskLevel` | `Low`, `Medium`, `High` |
-| `CreditApplicationStatus` | `Pending`, `Approved`, `Rejected`, `Cancelled` |
-
-- **JSON:** `SmartEnumNameConverter` → `"category": "Individual"`.
-- **SQL:** `nvarchar` columns via EF `HasConversion` (Name ↔ `FromName`).
-- Migration `ConvertCreditEnumsToSmartEnumNames` converts legacy integer columns to names when upgrading.
+| Type | Values (examples) |
+|------|-------------------|
+| `CreditCategory` | Individual, Corporate |
+| `CreditRiskLevel` | Low, Medium, High |
+| `CreditApplicationStatus` | Pending, Approved, Rejected, Cancelled |
+| `Gender` | Female, Male, PreferNotToSay |
+| `PersonTitle` | Dr, Prof |
+| `StaffPosition` | CreditAnalyst, RelationshipManager, BranchOfficer, RiskOfficer, OperationsSpecialist, BranchManager |
 
 ---
 
 ## Data seeding
 
-Runs automatically in **Development** on startup (`BankingDbContextSeed.SeedAsync`).
+Runs when configured (`Database__RunSeed`, typical in Docker / Development). Top-up strategy: fill up to targets if short.
 
-Uses a **top-up** strategy: if fewer than the target count exist, only the missing rows are inserted.
-
-| Seed | Target | Notes |
-|------|--------|------|
-| Individual customers | 20 | Bogus (`tr` locale) |
-| Corporate customers | 20 | Bogus (`tr`) |
-| Credit types | 6 | Fixed catalog (3 individual + 3 corporate) |
-| Credit sub-types | 2 per type | Bogus amounts/rates/terms |
-| Credit applications | 30 | Category-matched customers ↔ sub-types; mixed statuses |
+| Seed | Approx. target |
+|------|----------------|
+| Individual customers | 30 (10 × tr/en/de) |
+| Corporate customers | 30 (10 × tr/en/de) |
+| Credit types | 16 (locale catalogs TRY/USD/EUR) |
+| Credit sub-types | Per type (packaged amounts/terms) |
+| Credit applications | 48 |
+| Identity | Demo staff / manager / customers |
 
 ---
 
 ## Getting started
 
-### Prerequisites
+### Option A — Docker (recommended)
 
-- .NET 10 SDK
-- SQL Server (local or Docker)
-- Visual Studio / VS Code / Rider (optional)
-
-### Configure connection string
-
-Edit `src/WebApi/appsettings.json` (or User Secrets / environment variables):
-
-```json
-"ConnectionStrings": {
-  "BankingConnectionString": "Data Source=...;Initial Catalog=BankAppDb;..."
-}
+```bash
+# from repo root
+copy infra\.env.example infra\.env
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --build
 ```
 
-### Migrations
+See [infra/README.md](infra/README.md) for volumes, ports, and teardown.
 
-From Package Manager Console (startup project: **WebApi**, default project: **Persistence**), or CLI:
+### Option B — API + client locally
+
+**Prerequisites:** .NET 10 SDK, SQL Server (or Docker SQL), Node.js 20+, Redis/Seq optional.
 
 ```bash
 dotnet ef database update --project src/Persistence/Persistence.csproj --startup-project src/WebApi/WebApi.csproj
-```
-
-### Run
-
-```bash
 dotnet run --project src/WebApi/WebApi.csproj
 ```
 
-- API: `https://localhost:7152`
-- Scalar UI: `https://localhost:7152/scalar/v1`
+```bash
+cd client
+copy .env.example .env
+npm install
+npm run dev
+```
 
-On first Development run, seed data is applied after the database is available.
+Configure `ConnectionStrings__BankingConnectionString` and JWT `TokenOptions__SecurityKey` via `appsettings` / User Secrets / env.
 
 ---
 
 ## Example requests
 
-### Create credit type
+### Login
 
 ```http
-POST /api/CreditTypes
+POST /api/Auth/login
 Content-Type: application/json
 
 {
-  "name": "Personal Loan",
-  "code": "CT-IND-100",
-  "category": "Individual",
-  "description": "General purpose",
-  "currencyCode": "TRY",
-  "riskLevel": "Medium",
-  "requiresCollateral": false,
-  "requiresGuarantor": false,
-  "isActive": true
+  "email": "staff@bank.local",
+  "password": "Staff123!"
 }
 ```
+
+Use returned access token as `Authorization: Bearer <token>`.
 
 ### Create credit application
 
 ```http
 POST /api/CreditApplications
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {
-  "applicationNumber": "APP-00010001",
-  "customerId": "<guid>",
   "creditSubTypeId": "<guid>",
   "requestedAmount": 50000,
   "requestedTermMonths": 24,
   "monthlyIncome": 45000,
   "existingDebtAmount": 5000,
-  "purpose": "İhtiyaç",
+  "purpose": "Personal expenses",
   "notes": null
 }
 ```
@@ -463,25 +336,30 @@ Content-Type: application/json
 
 ```http
 POST /api/CreditApplications/{id}/approve
+Authorization: Bearer <token>
 Content-Type: application/json
 
 {
   "approvedAmount": 45000,
   "approvedTermMonths": 24,
   "approvedInterestRate": 2.45,
-  "decisionBy": "Credit Officer",
   "notes": "Approved with conditions"
 }
 ```
 
-### List applications by status
+### Cancel (Pending)
 
 ```http
-GET /api/CreditApplications?PageRequest.PageIndex=0&PageRequest.PageSize=10&status=Pending
+POST /api/CreditApplications/{id}/cancel
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{}
 ```
 
 ---
 
 ## License / purpose
 
-Educational Clean Architecture sample for banking-style CRUD and credit workflow. Adapt connection strings, secrets, and hardening before any production use.
+Educational Clean Architecture + full-stack credit workflow sample.  
+Adapt connection strings, secrets, and hardening before any production use.

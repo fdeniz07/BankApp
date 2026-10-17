@@ -1,11 +1,11 @@
 # BankApp Client
 
-Vite + React + TypeScript frontend with TR / EN / DE i18n.
+Vite + React + TypeScript frontend with **TR / EN / DE** i18n.
 
 ## Prerequisites
 
 - Node.js 20+
-- Backend API running (Docker WebApi on `http://localhost:8080` or Visual Studio)
+- Backend API running (Docker WebApi on `http://localhost:8080` or local `dotnet run`)
 
 ## Setup
 
@@ -18,12 +18,17 @@ npm run dev
 
 Open http://localhost:3000
 
-## Seed logins
+## Demo logins
 
-- Staff: `staff@bank.local` / `Staff123!`
-- Customer: `customer@bank.local` / `Customer123!`
+| Role | Email | Password |
+|------|-------|----------|
+| Staff | `staff@bank.local` | `Staff123!` |
+| Manager | `manager@bank.local` | `Manager123!` |
+| Customer | `customer@bank.local` | `Customer123!` |
 
-## Docker (with full stack)
+Locale variants: `staff.{tr\|en\|de}@bank.local`, `customer.{tr\|en\|de}@bank.local`.
+
+## Docker (full stack)
 
 From repository root:
 
@@ -31,13 +36,15 @@ From repository root:
 docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --build
 ```
 
-UI: http://localhost:3000  
-API URL is baked at image build via `VITE_API_BASE_URL` (default `http://localhost:8080`).
+- UI: http://localhost:3000  
+- API base URL is baked at image build via `VITE_API_BASE_URL` (default `http://localhost:8080`)
 
-## Features (MVP)
+## Features
 
-- Login + JWT session
-- Language switcher (TR / EN / DE)
-- Credit applications list + detail
-- Staff approve / reject
-- Credit types catalog (staff)
+- Login / individual register, JWT session
+- Applications list & detail (approve / reject / cancel by role)
+- Customers, credit types (manager create / activate), staff admin
+- Profile + avatar crop, stats strip, FX ticker, accessibility toolbar
+- Language switcher TR / EN / DE
+
+See root [README.md](../README.md) for architecture and API overview.
