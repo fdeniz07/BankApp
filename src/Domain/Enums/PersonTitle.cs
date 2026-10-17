@@ -12,10 +12,7 @@ public sealed class PersonTitle : SmartEnum<PersonTitle>
     {
     }
 
-    public static bool IsValidName(string? value) =>
-        !string.IsNullOrWhiteSpace(value) &&
-        TryFromName(value.Trim(), ignoreCase: true, out _);
+    public static bool IsValidName(string? value) => !string.IsNullOrWhiteSpace(value) && TryFromName(value.Trim(), ignoreCase: true, out _);
 
-    public static string Normalize(string value) =>
-        FromName(value.Trim(), ignoreCase: true).Name;
+    public static string Normalize(string value) => FromName(value.Trim(), ignoreCase: true).Name;
 }
