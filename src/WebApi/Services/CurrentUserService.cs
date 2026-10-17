@@ -24,6 +24,9 @@ public class CurrentUserService : ICurrentUserService
     public bool IsBankStaff =>
         _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.BankStaff) == true;
 
+    public bool IsBankManager =>
+        _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.BankManager) == true;
+
     public bool IsCustomer =>
         _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.Customer) == true;
 
