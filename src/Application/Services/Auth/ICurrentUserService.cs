@@ -6,6 +6,7 @@ public interface ICurrentUserService
     Guid? CustomerId { get; }
     bool IsAuthenticated { get; }
     bool IsBankStaff { get; }
+    bool IsBankManager { get; }
     bool IsCustomer { get; }
     void EnsureCanAccessCustomer(Guid customerId);
     void EnsureBankStaff();
