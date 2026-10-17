@@ -28,10 +28,14 @@
 - [x] Gender allow-list; public individual register; staff customer UI
 - [x] Role-based dashboard summary + stats strip on all pages
 - [x] Inline approve / reject shortcuts on staff list
+- [x] Staff management UI
+- [x] Staff/customer profile fields + avatar (≤2 MB) + Seq audit categories
+- [x] BankManager credit type create / activate-deactivate
+- [x] Profile avatar crop + academic title/gender + fixed positions + header avatar
+- [x] Accessibility toolbar (theme / font size / contrast) + FX ticker band
 
 ## Todo
 
-- [ ] Staff management UI
 - [ ] API integration / e2e tests
 - [ ] CI (GitHub Actions) basic pipeline
 
@@ -45,3 +49,5 @@
 - [ ] Production hardening (secrets, rate-limit policies)
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support
+- [ ] Chatbot (customer / staff support assistant)
+- [ ] Privacy / cookie consent banner on first load (persist preference)

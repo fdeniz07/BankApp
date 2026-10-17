@@ -2,6 +2,34 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-16 — Barrierefreiheit, Wechselkurs-Ticker, Details-Button
+
+- Barrierefreiheits-Panel unten links: hell/dunkel, Schriftgröße, hoher Kontrast (`localStorage`).
+- Oben scrollende Wechselkurse (USD/TRY, EUR/TRY usw.; open.er-api mit Fallback).
+- Listen-**Details**-Button schieferblau (`btn info`); Aktionsabstand vergrößert.
+
+## 2026-10-16 — Profil-Crop, Titel/Geschlecht, feste Positionen, Header-Avatar
+
+- Avatar: im Rahmen ziehen / zoomen / zentrieren, dann hochladen.
+- Akademischer Titel (`Dr`/`Prof`) vom Geschlecht getrennt.
+- Mitarbeiterposition aus fester SmartEnum-Liste (lokalisierte Labels).
+- Runder Avatar in der Topbar; Name/Bild → `/profile`.
+
+## 2026-10-16 — Manager-Kreditartenverwaltung
+
+- Create / Update / Delete nur für `BankManager`.
+- `PUT /api/CreditTypes/{id}/active` zum Aktivieren/Deaktivieren.
+- Neue Anträge bei inaktiver übergeordneter Kreditart gesperrt.
+- UI: Manager-Anlageformular + Zeilen-Aktivierung.
+
+## 2026-10-16 — Profil, Avatar, Seq-Audit
+
+- `ApplicationUser`-Profilfelder: FirstName, LastName, PersonTitle (SmartEnum), DateOfBirth, Position, ProfileImagePath.
+- Mitarbeiter können eigenes Profil aktualisieren; Manager bearbeiten alle (E-Mail/Passwort/Status/Rolle).
+- Avatar-Upload: JPEG/PNG/WebP, max. 2 MB, Magic-Byte-Prüfung; `wwwroot/uploads/profiles`.
+- Strukturiertes Seq-Audit: Auth / Credit / Staff / Profile (`EventCategory`, `EventAction`).
+- E-Mail ohne türkische Zeichen; JWT-`nameidentifier`-Claim korrigiert (SOAP-URI).
+
 ## 2026-10-16 — Dashboard-Statistiken (alle Rollen)
 
 - `GET /api/Dashboard/summary`: Mitarbeiter sehen aktive/inaktive Kunden + Antragsaufteilung; Kunden sehen eigene Antragszahlen.

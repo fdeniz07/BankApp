@@ -28,10 +28,14 @@
 - [x] Gender allow-list; kamu bireysel kayıt; personel müşteri UI
 - [x] Rol bazlı dashboard özeti + tüm sayfalarda istatistik şeridi
 - [x] Personel listesinde satır içi hızlı onay / red kısayolları
+- [x] Personel yönetimi UI
+- [x] Personel/müşteri profil alanları + avatar (≤2 MB) + Seq audit kategorileri
+- [x] BankManager kredi türü ekleme / aktif-pasif
+- [x] Profil avatar crop + akademik ünvan/cinsiyet + sabit pozisyon + header avatar
+- [x] Erişilebilirlik paneli (tema / yazı boyutu / kontrast) + üst döviz şeridi
 
 ## Yapılacak
 
-- [ ] Personel yönetimi UI
 - [ ] API entegrasyon / e2e testleri
 - [ ] CI (GitHub Actions) ve temel pipeline
 
@@ -45,3 +49,5 @@
 - [ ] Üretim güvenlik sertleştirme (secret yönetimi, rate limit politikaları)
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
+- [ ] Sohbet robotu (müşteri / personel destek asistanı)
+- [ ] Datenschutz / çerez onayı (ilk yüklemede banner, tercih saklama)

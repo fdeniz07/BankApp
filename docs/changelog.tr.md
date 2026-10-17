@@ -2,6 +2,34 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-16 — Erişilebilirlik, döviz şeridi, Detay butonu
+
+- Sol alt erişilebilirlik paneli: açık/koyu tema, yazı boyutu, yüksek kontrast (`localStorage`).
+- Üst bantta kayan döviz pariteleri (USD/TRY, EUR/TRY vb.; open.er-api, yedek kurlar).
+- Liste **Detay** butonu slate-mavi (`btn info`); aksiyon aralığı artırıldı.
+
+## 2026-10-16 — Profil crop, ünvan/cinsiyet, sabit pozisyon, header avatar
+
+- Avatar: çerçevede sürükle / yakınlaştır / ortala, sonra yükle.
+- Akademik ünvan (`Dr`/`Prof`) ve cinsiyet (`Gender`) ayrıldı.
+- Personel pozisyonu sabit SmartEnum listesinden (dil bazlı etiket).
+- Üst bardaki kullanıcı alanında dairesel avatar; isim/resim → `/profile`.
+
+## 2026-10-16 — Manager kredi türü yönetimi
+
+- Create / Update / Delete yalnızca `BankManager`.
+- `PUT /api/CreditTypes/{id}/active` ile aktif/pasif.
+- Pasif üst kredi türünde yeni başvuru engellenir.
+- UI: Manager için oluşturma formu + satır içi aktif/pasif.
+
+## 2026-10-16 — Profil, avatar, Seq audit
+
+- `ApplicationUser` profil alanları: FirstName, LastName, PersonTitle (SmartEnum), DateOfBirth, Position, ProfileImagePath.
+- Personel kendi profilini güncelleyebilir; yönetici tüm personeli düzenler (e-posta/şifre/durum/rol dahil).
+- Avatar yükleme: JPEG/PNG/WebP, en fazla 2 MB, magic-byte doğrulama; `wwwroot/uploads/profiles`.
+- Seq’e yapılandırılmış audit: Auth / Credit / Staff / Profile (`EventCategory`, `EventAction`).
+- E-posta doğrulamasında Türkçe karakter yasağı; JWT `nameidentifier` claim düzeltmesi (SOAP URI).
+
 ## 2026-10-16 — Dashboard istatistikleri (tüm roller)
 
 - `GET /api/Dashboard/summary`: personel için aktif/pasif müşteri + başvuru kırılımı; müşteri için kendi başvuru sayıları.

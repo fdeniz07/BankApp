@@ -28,10 +28,14 @@
 - [x] Gender-Allow-List; öffentliche Privatkunden-Registrierung; Mitarbeiter-Kunden-UI
 - [x] Rollenbasiertes Dashboard + Statistikleiste auf allen Seiten
 - [x] Inline Genehmigen / Ablehnen in der Mitarbeiterliste
+- [x] Personalverwaltung-UI
+- [x] Mitarbeiter-/Kundenprofilfelder + Avatar (≤2 MB) + Seq-Audit-Kategorien
+- [x] BankManager: Kreditarten anlegen / aktivieren-deaktivieren
+- [x] Profil-Avatar-Crop + akademischer Titel/Geschlecht + feste Positionen + Header-Avatar
+- [x] Barrierefreiheits-Panel (Thema / Schriftgröße / Kontrast) + Wechselkurs-Ticker
 
 ## Offen
 
-- [ ] Personalverwaltung-UI
 - [ ] API-Integrations- / E2E-Tests
 - [ ] CI (GitHub Actions) Basis-Pipeline
 
@@ -45,3 +49,5 @@
 - [ ] Produktions-Härtung (Secrets, Rate-Limit-Policies)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung
+- [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)
+- [ ] Datenschutz- / Cookie-Einwilligungsbanner beim ersten Laden (Speichern der Wahl)
