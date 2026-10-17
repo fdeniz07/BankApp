@@ -9,7 +9,7 @@ namespace Application.Features.CreditTypes.Commands.Create;
 
 public class CreateCreditTypeRequest : IRequest<CreatedCreditTypeResponse>, ISecuredRequest, ICacheRemoverRequest
 {
-    public string[] Roles => [GeneralOperationClaims.BankStaff];
+    public string[] Roles => [GeneralOperationClaims.BankManager];
     public string CacheGroupKey => CreditTypeCacheGroupKeys.Group;
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;

@@ -6,6 +6,7 @@ public static class CreditApplicationMessages
     public const string CustomerNotExists = "Customer does not exist.";
     public const string CreditSubTypeNotExists = "Credit sub type does not exist.";
     public const string CreditSubTypeNotActive = "Credit sub type is not active.";
+    public const string CreditTypeNotActive = "Credit type is not active.";
     public const string CustomerNotActive = "Customer is not active.";
     public const string CategoryMismatch = "Customer type does not match credit category.";
     public const string AmountOutOfRange = "Requested amount is out of allowed range.";

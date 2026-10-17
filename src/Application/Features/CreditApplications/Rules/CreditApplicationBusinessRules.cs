@@ -59,6 +59,13 @@ public class CreditApplicationBusinessRules : BaseBusinessRules
 
         if (!creditSubType.IsActive)
             throw new BusinessException(CreditApplicationMessages.CreditSubTypeNotActive);
+
+        CreditType? creditType = await _creditTypeRepository.GetAsync(c => c.Id == creditSubType.CreditTypeId);
+        if (creditType is null)
+            throw new BusinessException(CreditApplicationMessages.CreditSubTypeNotExists);
+
+        if (!creditType.IsActive)
+            throw new BusinessException(CreditApplicationMessages.CreditTypeNotActive);
     }
 
     public async Task CustomerCategoryShouldMatchCreditSubType(Guid customerId, Guid creditSubTypeId)

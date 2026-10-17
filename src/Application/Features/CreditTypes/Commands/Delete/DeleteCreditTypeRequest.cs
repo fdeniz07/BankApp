@@ -8,7 +8,7 @@ namespace Application.Features.CreditTypes.Commands.Delete;
 
 public class DeleteCreditTypeRequest : IRequest<DeletedCreditTypeResponse>, ISecuredRequest, ICacheRemoverRequest
 {
-    public string[] Roles => [GeneralOperationClaims.BankStaff];
+    public string[] Roles => [GeneralOperationClaims.BankManager];
     public string CacheGroupKey => CreditTypeCacheGroupKeys.Group;
     public Guid Id { get; set; }
 }

@@ -9,6 +9,10 @@ public class GetDashboardSummaryResponse
     public int? CorporateActive { get; set; }
     public int? CustomerInactive { get; set; }
 
+    public int? CreditTypeTotal { get; set; }
+    public int? CreditTypeIndividual { get; set; }
+    public int? CreditTypeCorporate { get; set; }
+
     public int ApplicationTotal { get; set; }
     public int ApplicationPending { get; set; }
     public int ApplicationApproved { get; set; }

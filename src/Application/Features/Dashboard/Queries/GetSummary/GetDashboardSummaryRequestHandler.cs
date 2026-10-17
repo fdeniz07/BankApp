@@ -11,6 +11,7 @@ public class GetDashboardSummaryRequestHandler
     private readonly ICustomerRepository _customerRepository;
     private readonly IIndividualCustomerRepository _individualCustomerRepository;
     private readonly ICorporateCustomerRepository _corporateCustomerRepository;
+    private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly ICurrentUserService _currentUserService;
 
@@ -18,12 +19,14 @@ public class GetDashboardSummaryRequestHandler
         ICustomerRepository customerRepository,
         IIndividualCustomerRepository individualCustomerRepository,
         ICorporateCustomerRepository corporateCustomerRepository,
+        ICreditTypeRepository creditTypeRepository,
         ICreditApplicationRepository creditApplicationRepository,
         ICurrentUserService currentUserService)
     {
         _customerRepository = customerRepository;
         _individualCustomerRepository = individualCustomerRepository;
         _corporateCustomerRepository = corporateCustomerRepository;
+        _creditTypeRepository = creditTypeRepository;
         _creditApplicationRepository = creditApplicationRepository;
         _currentUserService = currentUserService;
     }
@@ -54,6 +57,16 @@ public class GetDashboardSummaryRequestHandler
             c => !c.IsActive,
             cancellationToken: cancellationToken);
 
+        int creditTypeTotal = await _creditTypeRepository.CountAsync(
+            c => c.IsActive,
+            cancellationToken: cancellationToken);
+        int creditTypeIndividual = await _creditTypeRepository.CountAsync(
+            c => c.IsActive && c.Category == CreditCategory.Individual,
+            cancellationToken: cancellationToken);
+        int creditTypeCorporate = await _creditTypeRepository.CountAsync(
+            c => c.IsActive && c.Category == CreditCategory.Corporate,
+            cancellationToken: cancellationToken);
+
         ApplicationCounts apps = await CountApplicationsAsync(customerId: null, cancellationToken);
 
         return new GetDashboardSummaryResponse
@@ -63,6 +76,9 @@ public class GetDashboardSummaryRequestHandler
             IndividualActive = individualActive,
             CorporateActive = corporateActive,
             CustomerInactive = customerInactive,
+            CreditTypeTotal = creditTypeTotal,
+            CreditTypeIndividual = creditTypeIndividual,
+            CreditTypeCorporate = creditTypeCorporate,
             ApplicationTotal = apps.Total,
             ApplicationPending = apps.Pending,
             ApplicationApproved = apps.Approved,

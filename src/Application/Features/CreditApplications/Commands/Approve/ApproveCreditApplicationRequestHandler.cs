@@ -1,4 +1,6 @@
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
+using Application.Services.Logging;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -13,15 +15,21 @@ public class ApproveCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IAuditLogger _auditLogger;
 
     public ApproveCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
-        CreditApplicationBusinessRules businessRules)
+        CreditApplicationBusinessRules businessRules,
+        ICurrentUserService currentUserService,
+        IAuditLogger auditLogger)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _currentUserService = currentUserService;
+        _auditLogger = auditLogger;
     }
 
     public async Task<ApprovedCreditApplicationResponse> Handle(
@@ -49,6 +57,20 @@ public class ApproveCreditApplicationRequestHandler
         creditApplication.RejectionReason = null;
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
+
+        _auditLogger.Log(
+            AuditEventCategories.Credit,
+            AuditEventActions.Approve,
+            "Credit application approved.",
+            actorUserId: _currentUserService.UserId,
+            targetType: nameof(CreditApplication),
+            targetId: creditApplication.Id,
+            changes: new
+            {
+                creditApplication.ApprovedAmount,
+                creditApplication.ApprovedTermMonths,
+                creditApplication.ApprovedInterestRate
+            });
 
         return _mapper.Map<ApprovedCreditApplicationResponse>(creditApplication);
     }

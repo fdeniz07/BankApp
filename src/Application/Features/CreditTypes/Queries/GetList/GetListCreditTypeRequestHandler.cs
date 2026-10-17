@@ -4,6 +4,7 @@ using AutoMapper;
 using Core.Application.Responses;
 using Core.Repositories;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditTypes.Queries.GetList;
@@ -24,12 +25,7 @@ public class GetListCreditTypeRequestHandler
         GetListCreditTypeRequest request,
         CancellationToken cancellationToken)
     {
-        Expression<Func<CreditType, bool>>? predicate = null;
-        if (!string.IsNullOrWhiteSpace(request.Locale))
-        {
-            string locale = request.Locale.Trim().ToLowerInvariant();
-            predicate = c => c.Locale == locale;
-        }
+        Expression<Func<CreditType, bool>>? predicate = BuildPredicate(request.Locale, request.Category);
 
         Func<IQueryable<CreditType>, IOrderedQueryable<CreditType>>? orderBy =
             BuildOrderBy(request.SortBy, request.SortDesc);
@@ -42,6 +38,35 @@ public class GetListCreditTypeRequestHandler
             cancellationToken: cancellationToken);
 
         return _mapper.Map<GetListResponse<GetListCreditTypeListItemDto>>(creditTypes);
+    }
+
+    private static Expression<Func<CreditType, bool>>? BuildPredicate(string? localeRaw, string? categoryRaw)
+    {
+        string? locale = string.IsNullOrWhiteSpace(localeRaw)
+            ? null
+            : localeRaw.Trim().ToLowerInvariant();
+        CreditCategory? category = TryParseCategory(categoryRaw);
+
+        if (locale is null && category is null)
+            return null;
+
+        if (locale is not null && category is not null)
+            return c => c.Locale == locale && c.Category == category;
+
+        if (locale is not null)
+            return c => c.Locale == locale;
+
+        return c => c.Category == category!;
+    }
+
+    private static CreditCategory? TryParseCategory(string? category)
+    {
+        if (string.IsNullOrWhiteSpace(category))
+            return null;
+
+        return CreditCategory.TryFromName(category.Trim(), ignoreCase: true, out CreditCategory? parsed)
+            ? parsed
+            : null;
     }
 
     private static Func<IQueryable<CreditType>, IOrderedQueryable<CreditType>>? BuildOrderBy(

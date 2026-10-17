@@ -1,4 +1,6 @@
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
+using Application.Services.Logging;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
@@ -13,15 +15,21 @@ public class RejectCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IAuditLogger _auditLogger;
 
     public RejectCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
-        CreditApplicationBusinessRules businessRules)
+        CreditApplicationBusinessRules businessRules,
+        ICurrentUserService currentUserService,
+        IAuditLogger auditLogger)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _currentUserService = currentUserService;
+        _auditLogger = auditLogger;
     }
 
     public async Task<RejectedCreditApplicationResponse> Handle(
@@ -45,6 +53,15 @@ public class RejectCreditApplicationRequestHandler
         creditApplication.ApprovedInterestRate = null;
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
+
+        _auditLogger.Log(
+            AuditEventCategories.Credit,
+            AuditEventActions.Reject,
+            "Credit application rejected.",
+            actorUserId: _currentUserService.UserId,
+            targetType: nameof(CreditApplication),
+            targetId: creditApplication.Id,
+            changes: new { creditApplication.RejectionReason });
 
         return _mapper.Map<RejectedCreditApplicationResponse>(creditApplication);
     }

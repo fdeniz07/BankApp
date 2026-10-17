@@ -1,3 +1,4 @@
+using Application.Common.Validation;
 using Application.Features.Customers.Constants;
 using Domain.Enums;
 using FluentValidation;
@@ -9,7 +10,8 @@ public class CreateIndividualCustomerRequestValidator : AbstractValidator<Create
     public CreateIndividualCustomerRequestValidator()
     {
         RuleFor(c => c.CustomerNumber).NotEmpty().MaximumLength(50);
-        RuleFor(c => c.Email).NotEmpty().EmailAddress().MaximumLength(100);
+        RuleFor(c => c.Email).NotEmpty().EmailAddress().MaximumLength(100)
+            .MustNotContainTurkishCharacters();
         RuleFor(c => c.Password).NotEmpty().MinimumLength(6).MaximumLength(100);
         RuleFor(c => c.PhoneNumber).NotEmpty().MaximumLength(20);
         RuleFor(c => c.Address).NotEmpty().MaximumLength(500);

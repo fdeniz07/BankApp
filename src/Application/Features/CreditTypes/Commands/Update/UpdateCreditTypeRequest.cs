@@ -9,7 +9,7 @@ namespace Application.Features.CreditTypes.Commands.Update;
 
 public class UpdateCreditTypeRequest : IRequest<UpdatedCreditTypeResponse>, ISecuredRequest, ICacheRemoverRequest
 {
-    public string[] Roles => [GeneralOperationClaims.BankStaff];
+    public string[] Roles => [GeneralOperationClaims.BankManager];
     public string CacheGroupKey => CreditTypeCacheGroupKeys.Group;
     public Guid Id { get; set; }
     public string Name { get; set; } = default!;
