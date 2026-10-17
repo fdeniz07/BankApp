@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using Application.Services.Auth;
+using Application.Services.ProfileImages;
 using Ardalis.SmartEnum.SystemTextJson;
 using Core.Caching;
 using Core.Security.Encryption;
@@ -20,6 +21,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IProfileImageStorage, LocalProfileImageStorage>();
 
         services.AddControllers()
             .AddJsonOptions(options =>
@@ -27,6 +29,9 @@ public static class ServiceCollectionExtensions
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditCategory, int>());
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditRiskLevel, int>());
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<CreditApplicationStatus, int>());
+                options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<PersonTitle, int>());
+                options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<Gender, int>());
+                options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<StaffPosition, int>());
             });
         services.AddJwtAuthentication(configuration);
         services.AddRedisCaching(configuration);
@@ -53,6 +58,9 @@ public static class ServiceCollectionExtensions
             json.Options.Converters.Add(new SmartEnumNameConverter<CreditCategory, int>());
             json.Options.Converters.Add(new SmartEnumNameConverter<CreditRiskLevel, int>());
             json.Options.Converters.Add(new SmartEnumNameConverter<CreditApplicationStatus, int>());
+            json.Options.Converters.Add(new SmartEnumNameConverter<PersonTitle, int>());
+            json.Options.Converters.Add(new SmartEnumNameConverter<Gender, int>());
+            json.Options.Converters.Add(new SmartEnumNameConverter<StaffPosition, int>());
         });
 
         return services;

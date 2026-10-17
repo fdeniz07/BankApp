@@ -13,6 +13,16 @@ public static class ApplicationBuilderExtensions
         app.ConfigureCustomExceptionMiddleware();
         app.UseResponseCompression();
         app.UseHttpsRedirection();
+
+        string webRoot = app.Environment.WebRootPath
+            ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
+        Directory.CreateDirectory(Path.Combine(webRoot, "uploads", "profiles"));
+        app.UseStaticFiles(new StaticFileOptions
+        {
+            FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(webRoot),
+            RequestPath = ""
+        });
+
         app.UseCors(CorsPolicies.Default);
         app.UseAuthentication();
         app.UseAuthorization();
