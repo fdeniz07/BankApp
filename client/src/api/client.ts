@@ -81,3 +81,40 @@ export async function apiRequest<T>(
 
   return (await response.json()) as T
 }
+
+/** Multipart upload — do not set Content-Type (browser sets boundary). */
+export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
+  const headers = new Headers()
+  const token = getToken()
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    method: 'POST',
+    headers,
+    body: formData,
+  })
+
+  if (response.status === 401) {
+    clearSession()
+    const currentPath = window.location.pathname
+    if (!currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
+      window.location.assign('/login')
+    }
+    throw new ApiError(401, 'Unauthorized')
+  }
+
+  if (!response.ok) {
+    let message = response.statusText
+    try {
+      const body = (await response.json()) as ProblemBody
+      message = extractErrorMessage(body, message)
+    } catch {
+      // ignore parse errors
+    }
+    throw new ApiError(response.status, message)
+  }
+
+  return (await response.json()) as T
+}

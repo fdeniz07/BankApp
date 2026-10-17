@@ -3,7 +3,9 @@ const EXP_KEY = 'bankapp.tokenExp'
 const PROFILE_OVERRIDE_KEY = 'bankapp.profileOverride'
 
 const ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
-const NAME_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/nameidentifier'
+/** .NET ClaimTypes.NameIdentifier (JWT) */
+const NAME_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'
+const NAME_CLAIM_ALT = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/nameidentifier'
 const EMAIL_CLAIM = 'email'
 const CUSTOMER_CLAIM = 'customerId'
 const DISPLAY_NAME_CLAIM = 'displayName'
@@ -15,6 +17,7 @@ export interface AuthUser {
   userId: string
   email: string
   displayName?: string
+  profileImageUrl?: string
   roles: string[]
   customerId?: string
   customerCategory?: CustomerCategory
@@ -23,6 +26,7 @@ export interface AuthUser {
 interface ProfileOverride {
   displayName?: string
   customerCategory?: CustomerCategory
+  profileImageUrl?: string
 }
 
 function decodeBase64UrlUtf8(value: string): string {
@@ -51,7 +55,7 @@ function claimValues(payload: Record<string, unknown>, key: string): string[] {
   return []
 }
 
-function readProfileOverride(): ProfileOverride | null {
+export function readProfileOverride(): ProfileOverride | null {
   try {
     const raw = localStorage.getItem(PROFILE_OVERRIDE_KEY)
     if (!raw) return null
@@ -99,7 +103,11 @@ export function getAuthUser(): AuthUser | null {
   }
 
   const email = claimValues(payload, EMAIL_CLAIM)[0] ?? ''
-  const userId = claimValues(payload, NAME_CLAIM)[0] ?? ''
+  const userId =
+    claimValues(payload, NAME_CLAIM)[0] ||
+    claimValues(payload, NAME_CLAIM_ALT)[0] ||
+    claimValues(payload, 'sub')[0] ||
+    ''
   const roles = claimValues(payload, ROLE_CLAIM)
   const customerId = claimValues(payload, CUSTOMER_CLAIM)[0]
   const displayName = claimValues(payload, DISPLAY_NAME_CLAIM)[0]
@@ -113,6 +121,7 @@ export function getAuthUser(): AuthUser | null {
     userId,
     email,
     displayName: override?.displayName || displayName || undefined,
+    profileImageUrl: override?.profileImageUrl || undefined,
     roles,
     customerId,
     customerCategory: override?.customerCategory || customerCategory,

@@ -38,10 +38,32 @@ export function StatsStrip() {
   return (
     <div className="stats-strip" aria-label={t('dashboard.statsLabel')}>
       {isStaff && (
-        <div className="stats-chip">
-          <span>{t('dashboard.customers')}</span>
-          <strong>{summary.customerTotal ?? 0}</strong>
-        </div>
+        <>
+          <div className="stats-chip">
+            <span>{t('dashboard.customers')}</span>
+            <strong>{summary.customerTotal ?? 0}</strong>
+          </div>
+          <div className="stats-chip">
+            <span>{t('dashboard.individualActive')}</span>
+            <strong>{summary.individualActive ?? 0}</strong>
+          </div>
+          <div className="stats-chip">
+            <span>{t('dashboard.corporateActive')}</span>
+            <strong>{summary.corporateActive ?? 0}</strong>
+          </div>
+          <div className="stats-chip">
+            <span>{t('dashboard.creditTypes')}</span>
+            <strong>{summary.creditTypeTotal ?? 0}</strong>
+          </div>
+          <div className="stats-chip">
+            <span>{t('dashboard.creditTypeIndividual')}</span>
+            <strong>{summary.creditTypeIndividual ?? 0}</strong>
+          </div>
+          <div className="stats-chip">
+            <span>{t('dashboard.creditTypeCorporate')}</span>
+            <strong>{summary.creditTypeCorporate ?? 0}</strong>
+          </div>
+        </>
       )}
       <div className="stats-chip">
         <span>{t('dashboard.applications')}</span>

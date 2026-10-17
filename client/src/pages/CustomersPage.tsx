@@ -159,6 +159,14 @@ export function CustomersPage() {
         </button>
       </div>
 
+      <p className="filter-count" aria-live="polite">
+        {t('customers.filteredCount', {
+          category: t(`category.${category}`),
+          scope: t(`customers.scope_${scope}`),
+          count,
+        })}
+      </p>
+
       <div className="chip-row" role="tablist" aria-label={t('customers.category')}>
         {(['Individual', 'Corporate'] as const).map((c) => (
           <button
@@ -425,7 +433,7 @@ export function CustomersPage() {
                       <td>{row.isActive ? t('common.yes') : t('common.no')}</td>
                       <td>
                         <Link
-                          className="btn ghost"
+                          className="btn info"
                           to={`/customers/individual/${row.id}`}
                         >
                           {t('common.details')}
@@ -443,7 +451,7 @@ export function CustomersPage() {
                       <td>{row.isActive ? t('common.yes') : t('common.no')}</td>
                       <td>
                         <Link
-                          className="btn ghost"
+                          className="btn info"
                           to={`/customers/corporate/${row.id}`}
                         >
                           {t('common.details')}

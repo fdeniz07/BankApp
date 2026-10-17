@@ -6,6 +6,9 @@ export interface DashboardSummary {
   individualActive?: number | null
   corporateActive?: number | null
   customerInactive?: number | null
+  creditTypeTotal?: number | null
+  creditTypeIndividual?: number | null
+  creditTypeCorporate?: number | null
   applicationTotal: number
   applicationPending: number
   applicationApproved: number
@@ -199,6 +202,25 @@ export interface CreditTypeListItem {
   isDeleted: boolean
 }
 
+export interface CreateCreditTypeRequest {
+  name: string
+  code: string
+  locale: LocaleCode | string
+  category: CreditCategory
+  description?: string | null
+  currencyCode: string
+  riskLevel: CreditRiskLevel
+  requiresCollateral: boolean
+  requiresGuarantor: boolean
+}
+
+export interface SetCreditTypeActiveResponse {
+  id: string
+  name: string
+  code: string
+  isActive: boolean
+}
+
 export interface CreditSubTypeListItem {
   id: string
   creditTypeId: string
@@ -246,6 +268,78 @@ export interface CreateApplicationRequest {
   existingDebtAmount?: number | null
   purpose?: string | null
   notes?: string | null
+}
+
+export type PersonTitle = 'Dr' | 'Prof'
+
+export type StaffPosition =
+  | 'CreditAnalyst'
+  | 'RelationshipManager'
+  | 'BranchOfficer'
+  | 'RiskOfficer'
+  | 'OperationsSpecialist'
+  | 'BranchManager'
+
+export interface StaffUserListItem {
+  id: string
+  email: string
+  isActive: boolean
+  isManager: boolean
+  firstName?: string | null
+  lastName?: string | null
+  title?: PersonTitle | null
+  gender?: Gender | null
+  dateOfBirth?: string | null
+  position?: StaffPosition | null
+  profileImageUrl?: string | null
+  roles: string[]
+  createdDate: string
+}
+
+export interface CreateStaffUserRequest {
+  email: string
+  password: string
+  isManager: boolean
+  firstName?: string | null
+  lastName?: string | null
+  title?: PersonTitle | null
+  gender?: Gender | null
+  dateOfBirth?: string | null
+  position?: StaffPosition | null
+}
+
+export interface UpdateStaffUserRequest {
+  id: string
+  email: string
+  newPassword?: string | null
+  isActive: boolean
+  isManager: boolean
+  firstName?: string | null
+  lastName?: string | null
+  title?: PersonTitle | null
+  gender?: Gender | null
+  dateOfBirth?: string | null
+  position?: StaffPosition | null
+}
+
+export interface MyProfile {
+  id: string
+  email: string
+  firstName?: string | null
+  lastName?: string | null
+  title?: PersonTitle | null
+  gender?: Gender | null
+  dateOfBirth?: string | null
+  position?: StaffPosition | null
+  profileImageUrl?: string | null
+  isActive: boolean
+  isStaff: boolean
+  roles: string[]
+}
+
+export interface UploadProfileImageResponse {
+  userId: string
+  profileImageUrl: string
 }
 
 export interface ApproveRequest {

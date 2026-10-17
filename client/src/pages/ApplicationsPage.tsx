@@ -338,6 +338,18 @@ export function ApplicationsPage() {
                   <span>{t('dashboard.customerInactive')}</span>
                   <strong>{dashboard.customerInactive ?? 0}</strong>
                 </article>
+                <article className="summary-card">
+                  <span>{t('dashboard.creditTypes')}</span>
+                  <strong>{dashboard.creditTypeTotal ?? 0}</strong>
+                </article>
+                <article className="summary-card">
+                  <span>{t('dashboard.creditTypeIndividual')}</span>
+                  <strong>{dashboard.creditTypeIndividual ?? 0}</strong>
+                </article>
+                <article className="summary-card">
+                  <span>{t('dashboard.creditTypeCorporate')}</span>
+                  <strong>{dashboard.creditTypeCorporate ?? 0}</strong>
+                </article>
               </>
             )}
             <article className="summary-card">
@@ -601,7 +613,7 @@ export function ApplicationsPage() {
                       })}
                     </td>
                     <td className="actions-cell col-actions">
-                      <Link to={`/applications/${item.id}`} className="btn primary">
+                      <Link to={`/applications/${item.id}`} className="btn info">
                         {t('common.details')}
                       </Link>
                       {isStaff && item.status === 'Pending' && (
