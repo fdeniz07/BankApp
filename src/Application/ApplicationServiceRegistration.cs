@@ -1,4 +1,5 @@
 using System.Reflection;
+using Application.Services.Logging;
 using Core.Application.Pipelines;
 using Core.Application.Pipelines.Authorization;
 using Core.Application.Pipelines.Caching;
@@ -30,6 +31,7 @@ public static class ApplicationServiceRegistration
         services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         services.AddScoped<ITokenHelper, JwtHelper>();
+        services.AddScoped<IAuditLogger, SerilogAuditLogger>();
         services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), typeof(BaseBusinessRules));
 
         return services;
