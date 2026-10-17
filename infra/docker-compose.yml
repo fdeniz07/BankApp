@@ -73,6 +73,8 @@ services:
       TokenOptions__AccessTokenExpiration: "${TOKEN_EXPIRATION_MINUTES:-60}"
       TokenOptions__SecurityKey: "${TOKEN_SECURITY_KEY}"
       CacheSettings__SlidingExpirationMinutes: "30"
+    volumes:
+      - profile-uploads:/app/wwwroot/uploads
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -100,6 +102,8 @@ volumes:
     name: bankapp-seq-data
   redis-data:
     name: bankapp-redis-data
+  profile-uploads:
+    name: bankapp-profile-uploads
   sqlserver-data:
     name: sqlserver-2025-data
     external: true
