@@ -1,6 +1,7 @@
 using Application.Features.Auth.Rules;
 using Application.Features.Customers.Rules;
 using Application.Features.IndividualCustomers.Rules;
+using Application.Services.Logging;
 using Application.Services.Repositories;
 using Core.Security.Constants;
 using Core.Security.Entities;
@@ -23,6 +24,7 @@ public class RegisterIndividualRequestHandler
     private readonly IndividualCustomerBusinessRules _individualCustomerBusinessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
+    private readonly IAuditLogger _auditLogger;
 
     public RegisterIndividualRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -32,7 +34,8 @@ public class RegisterIndividualRequestHandler
         ITokenHelper tokenHelper,
         IndividualCustomerBusinessRules individualCustomerBusinessRules,
         AuthBusinessRules authBusinessRules,
-        CustomerLifecycleBusinessRules lifecycleRules)
+        CustomerLifecycleBusinessRules lifecycleRules,
+        IAuditLogger auditLogger)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -42,6 +45,7 @@ public class RegisterIndividualRequestHandler
         _individualCustomerBusinessRules = individualCustomerBusinessRules;
         _authBusinessRules = authBusinessRules;
         _lifecycleRules = lifecycleRules;
+        _auditLogger = auditLogger;
     }
 
     public async Task<RegisteredIndividualResponse> Handle(
@@ -84,7 +88,10 @@ public class RegisterIndividualRequestHandler
             PasswordHash = passwordHash,
             PasswordSalt = passwordSalt,
             CustomerId = individualCustomer.Id,
-            IsActive = true
+            IsActive = true,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            DateOfBirth = request.DateOfBirth
         };
         await _applicationUserRepository.AddAsync(applicationUser, cancellationToken);
 
@@ -113,6 +120,15 @@ public class RegisterIndividualRequestHandler
             applicationUser.CustomerId,
             displayName,
             customerCategory);
+
+        _auditLogger.Log(
+            AuditEventCategories.Auth,
+            AuditEventActions.Register,
+            "Individual customer registered.",
+            actorUserId: applicationUser.Id,
+            actorEmail: applicationUser.Email,
+            targetType: nameof(IndividualCustomer),
+            targetId: individualCustomer.Id);
 
         return new RegisteredIndividualResponse
         {
