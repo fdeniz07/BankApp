@@ -3,6 +3,8 @@ using Application.Features.CreditApplications.Commands.Approve;
 using Application.Features.CreditApplications.Constants;
 using Application.Features.CreditApplications.Profiles;
 using Application.Features.CreditApplications.Rules;
+using Application.Services.Auth;
+using Application.Services.Logging;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.CrossCuttingConcerns.Exceptions.Types;
@@ -23,6 +25,8 @@ public class ApproveCreditApplicationRequestHandlerTests
     private readonly Mock<ICorporateCustomerRepository> _corporateCustomerRepository = new();
     private readonly Mock<ICreditSubTypeRepository> _creditSubTypeRepository = new();
     private readonly Mock<ICreditTypeRepository> _creditTypeRepository = new();
+    private readonly Mock<ICurrentUserService> _currentUserService = new();
+    private readonly Mock<IAuditLogger> _auditLogger = new();
     private readonly IMapper _mapper;
     private readonly ApproveCreditApplicationRequestHandler _sut;
 
@@ -44,7 +48,9 @@ public class ApproveCreditApplicationRequestHandlerTests
         _sut = new ApproveCreditApplicationRequestHandler(
             _creditApplicationRepository.Object,
             _mapper,
-            businessRules);
+            businessRules,
+            _currentUserService.Object,
+            _auditLogger.Object);
     }
 
     [Fact]

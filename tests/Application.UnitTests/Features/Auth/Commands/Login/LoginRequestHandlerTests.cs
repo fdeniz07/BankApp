@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.Constants;
 using Application.Features.Auth.Rules;
+using Application.Services.Logging;
 using Application.Services.Repositories;
 using Core.CrossCuttingConcerns.Exceptions.Types;
 using Core.Security.Entities;
@@ -21,6 +22,7 @@ public class LoginRequestHandlerTests
     private readonly Mock<IIndividualCustomerRepository> _individualCustomerRepository = new();
     private readonly Mock<ICorporateCustomerRepository> _corporateCustomerRepository = new();
     private readonly Mock<ITokenHelper> _tokenHelper = new();
+    private readonly Mock<IAuditLogger> _auditLogger = new();
     private readonly LoginRequestHandler _sut;
 
     public LoginRequestHandlerTests()
@@ -34,7 +36,8 @@ public class LoginRequestHandlerTests
             _individualCustomerRepository.Object,
             _corporateCustomerRepository.Object,
             _tokenHelper.Object,
-            businessRules);
+            businessRules,
+            _auditLogger.Object);
     }
 
     [Fact]
