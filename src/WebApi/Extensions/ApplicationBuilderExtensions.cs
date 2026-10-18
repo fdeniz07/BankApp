@@ -12,7 +12,8 @@ public static class ApplicationBuilderExtensions
         app.UseSerilogRequestLogging();
         app.ConfigureCustomExceptionMiddleware();
         app.UseResponseCompression();
-        app.UseHttpsRedirection();
+        if (!app.Environment.IsEnvironment("Testing"))
+            app.UseHttpsRedirection();
 
         string webRoot = app.Environment.WebRootPath
             ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
