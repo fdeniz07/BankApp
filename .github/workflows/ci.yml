@@ -1,0 +1,53 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  backend:
+    name: Backend build & tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore
+        run: dotnet restore BankApp.slnx
+
+      - name: Build
+        run: dotnet build BankApp.slnx --configuration Release --no-restore
+
+      - name: Unit tests
+        run: dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --configuration Release --no-build --verbosity normal
+
+      - name: Integration tests
+        run: dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj --configuration Release --no-build --verbosity normal
+
+  frontend:
+    name: Client build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
