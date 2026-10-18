@@ -33,11 +33,14 @@
 - [x] BankManager kredi türü ekleme / aktif-pasif
 - [x] Profil avatar crop + akademik ünvan/cinsiyet + sabit pozisyon + header avatar
 - [x] Erişilebilirlik paneli (tema / yazı boyutu / kontrast) + üst döviz şeridi
+- [x] CI (GitHub Actions): build + unit/integration tests + client build
+- [x] WebApi entegrasyon test iskeleti (login smoke)
+- [x] Entegrasyon: personel başvuru oluştur → onay akışı
+- [x] Entegrasyon: red / iptal / müşteri create+cancel (+ müşteri onaylayamaz)
 
 ## Yapılacak
 
-- [ ] API entegrasyon / e2e testleri
-- [ ] CI (GitHub Actions) ve temel pipeline
+_(Şimdilik boş — sonraki maddeler “İleride” listesinden seçilebilir.)_
 
 ## İleride
 

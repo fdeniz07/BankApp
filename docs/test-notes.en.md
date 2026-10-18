@@ -17,3 +17,6 @@ Verified in this release (after implementation):
 - [x] Welcome / top bar show `displayName` (not email)
 - [x] Demo accounts: staff/customer + `.tr` / `.en` / `.de`
 - [x] SQL wipe + empty Redis shows full list (old 6-TR cache issue fixed)
+- [x] `WebApi.IntegrationTests` login smoke (3 tests) passed
+- [x] Integration: approve / reject / cancel / customer flows (9 tests total)
+- [x] GitHub Actions CI workflow added (`.github/workflows/ci.yml`)

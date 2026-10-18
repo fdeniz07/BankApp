@@ -2,6 +2,12 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-18 — CI + entegrasyon testleri
+
+- GitHub Actions CI: `dotnet build/test` (unit + integration) ve `client` npm build.
+- `WebApi.IntegrationTests`: InMemory DB + memory cache factory; login smoke.
+- Akışlar: create→onay, create→red, staff/müşteri iptal; müşteri onaylayamaz (401); tokensız create → 401.
+
 ## 2026-10-16 — Erişilebilirlik, döviz şeridi, Detay butonu
 
 - Sol alt erişilebilirlik paneli: açık/koyu tema, yazı boyutu, yüksek kontrast (`localStorage`).

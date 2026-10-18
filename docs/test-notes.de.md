@@ -17,3 +17,6 @@ In diesem Release geprüft (nach Umsetzung):
 - [x] Welcome / Topbar zeigen `displayName` (nicht E-Mail)
 - [x] Demo-Konten: staff/customer + `.tr` / `.en` / `.de`
 - [x] SQL-Wipe + leerer Redis zeigt volle Liste (altes 6-TR-Cache-Problem behoben)
+- [x] `WebApi.IntegrationTests` Login-Smoke (3 Tests) bestanden
+- [x] Integration: Genehmigen / Ablehnen / Storno / Kunden-Flows (insgesamt 9 Tests)
+- [x] GitHub Actions CI-Workflow hinzugefügt (`.github/workflows/ci.yml`)

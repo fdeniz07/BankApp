@@ -2,6 +2,12 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-18 — CI + integration tests
+
+- GitHub Actions CI: `dotnet build/test` (unit + integration) and client npm build.
+- `WebApi.IntegrationTests`: InMemory DB + memory cache factory; login smoke.
+- Flows: create→approve, create→reject, staff/customer cancel; customer cannot approve (401); unauthenticated create → 401.
+
 ## 2026-10-16 — Accessibility, FX ticker, Details button
 
 - Bottom-left accessibility panel: light/dark theme, font size, high contrast (`localStorage`).

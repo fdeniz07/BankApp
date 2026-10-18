@@ -17,3 +17,6 @@ Bu sürümde doğrulananlar (uygulama sonrası):
 - [x] Welcome / üst bar `displayName` (e-posta değil)
 - [x] Demo hesaplar: staff/customer + `.tr` / `.en` / `.de`
 - [x] SQL wipe + Redis boş cache ile tam liste görünür (eski 6 TR cache sorunu giderildi)
+- [x] `WebApi.IntegrationTests` login smoke (3 test) geçti
+- [x] Entegrasyon: approve / reject / cancel / müşteri akışları (toplam 9 test)
+- [x] GitHub Actions CI workflow eklendi (`.github/workflows/ci.yml`)

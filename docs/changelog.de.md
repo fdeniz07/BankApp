@@ -2,6 +2,12 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-18 — CI + Integrationstests
+
+- GitHub Actions CI: `dotnet build/test` (Unit + Integration) und Client-npm-Build.
+- `WebApi.IntegrationTests`: InMemory-DB + Memory-Cache-Factory; Login-Smoke.
+- Flows: Create→Genehmigen, Create→Ablehnen, Staff/Kunden-Storno; Kunde darf nicht genehmigen (401); Create ohne Token → 401.
+
 ## 2026-10-16 — Barrierefreiheit, Wechselkurs-Ticker, Details-Button
 
 - Barrierefreiheits-Panel unten links: hell/dunkel, Schriftgröße, hoher Kontrast (`localStorage`).

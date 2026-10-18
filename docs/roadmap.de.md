@@ -33,11 +33,14 @@
 - [x] BankManager: Kreditarten anlegen / aktivieren-deaktivieren
 - [x] Profil-Avatar-Crop + akademischer Titel/Geschlecht + feste Positionen + Header-Avatar
 - [x] Barrierefreiheits-Panel (Thema / Schriftgröße / Kontrast) + Wechselkurs-Ticker
+- [x] CI (GitHub Actions): Build + Unit-/Integrationstests + Client-Build
+- [x] WebApi-Integrationstest-Skelett (Login-Smoke)
+- [x] Integration: Mitarbeiter Antrag erstellen → genehmigen
+- [x] Integration: Ablehnen / Storno / Kunde create+cancel (+ Kunde darf nicht genehmigen)
 
 ## Offen
 
-- [ ] API-Integrations- / E2E-Tests
-- [ ] CI (GitHub Actions) Basis-Pipeline
+_(Aktuell leer — nächste Punkte können aus „Später“ übernommen werden.)_
 
 ## Später
 

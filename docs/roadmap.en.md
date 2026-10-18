@@ -33,11 +33,14 @@
 - [x] BankManager credit type create / activate-deactivate
 - [x] Profile avatar crop + academic title/gender + fixed positions + header avatar
 - [x] Accessibility toolbar (theme / font size / contrast) + FX ticker band
+- [x] CI (GitHub Actions): build + unit/integration tests + client build
+- [x] WebApi integration test skeleton (login smoke)
+- [x] Integration: staff create application → approve flow
+- [x] Integration: reject / cancel / customer create+cancel (+ customer cannot approve)
 
 ## Todo
 
-- [ ] API integration / e2e tests
-- [ ] CI (GitHub Actions) basic pipeline
+_(None for now — next items can be promoted from Later.)_
 
 ## Later
 
