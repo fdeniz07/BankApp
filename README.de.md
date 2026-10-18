@@ -295,6 +295,15 @@ npm run dev
 
 Connection String und `TokenOptions__SecurityKey` über appsettings / User Secrets / Env setzen.
 
+### Tests & CI
+
+```bash
+dotnet test tests/Application.UnitTests/Application.UnitTests.csproj
+dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) führt bei Push/PR auf `main`/`master` Backend-Build, beide Testprojekte und den React-Client-Build aus.
+
 ---
 
 ## Beispielanfragen

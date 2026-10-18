@@ -296,6 +296,15 @@ npm run dev
 
 Configure `ConnectionStrings__BankingConnectionString` and JWT `TokenOptions__SecurityKey` via `appsettings` / User Secrets / env.
 
+### Tests & CI
+
+```bash
+dotnet test tests/Application.UnitTests/Application.UnitTests.csproj
+dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs backend build + both test projects and the React client build on push/PR to `main`/`master`.
+
 ---
 
 ## Example requests

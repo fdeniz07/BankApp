@@ -295,6 +295,15 @@ npm run dev
 
 Connection string ve `TokenOptions__SecurityKey` için `appsettings` / User Secrets / ortam değişkenleri kullanın.
 
+### Testler ve CI
+
+```bash
+dotnet test tests/Application.UnitTests/Application.UnitTests.csproj
+dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) `main`/`master` push/PR’da backend build + her iki test projesi ve React client build çalıştırır.
+
 ---
 
 ## Örnek istekler
