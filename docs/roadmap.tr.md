@@ -37,6 +37,8 @@
 - [x] WebApi entegrasyon test iskeleti (login smoke)
 - [x] Entegrasyon: personel başvuru oluştur → onay akışı
 - [x] Entegrasyon: red / iptal / müşteri create+cancel (+ müşteri onaylayamaz)
+- [x] Datenschutz / çerez onayı (ilk yüklemede banner, tercih saklama)
+- [x] Kayıt sonrası e-posta doğrulama (RabbitMQ kuyruk + Seq/log bağlantısı; JWT kayıtta verilmez)
 
 ## Yapılacak
 
@@ -44,7 +46,6 @@ _(Şimdilik boş — sonraki maddeler “İleride” listesinden seçilebilir.)_
 
 ## İleride
 
-- [ ] Kayıt sonrası e-posta doğrulama (RabbitMQ veya Kafka)
 - [ ] Personel GET’leri için Elasticsearch
 - [ ] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
 - [ ] Kubernetes / ArgoCD dağıtımı
@@ -53,4 +54,3 @@ _(Şimdilik boş — sonraki maddeler “İleride” listesinden seçilebilir.)_
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)
-- [ ] Datenschutz / çerez onayı (ilk yüklemede banner, tercih saklama)

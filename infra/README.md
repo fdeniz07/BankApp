@@ -8,6 +8,7 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 |---------|----------|--------|
 | Seq | http://localhost:5341 | volume `bankapp-seq-data` |
 | Redis | `localhost:6379` | volume `bankapp-redis-data` |
+| RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation queue; volume `bankapp-rabbitmq-data` |
 | SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data` |
 | WebApi | http://localhost:8080 | — |
 | Scalar (Dev) | http://localhost:8080/scalar/v1 | — |
@@ -66,6 +67,8 @@ Secrets and ports live in `infra/.env` (gitignored). Template: `infra/.env.examp
 | `WEBAPI_PORT` | Host port for API (default 8080) |
 | `CLIENT_PORT` | Host port for React UI (default 3000) |
 | `VITE_API_BASE_URL` | Browser API URL baked into the client image at build time |
+| `PUBLIC_CLIENT_BASE_URL` | Client origin used in email-confirmation links |
+| `RABBITMQ_PORT` / `RABBITMQ_MANAGEMENT_PORT` | Host ports for AMQP / management UI |
 | `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512) |
 
 Inside Docker network, the API uses:
@@ -73,6 +76,7 @@ Inside Docker network, the API uses:
 - SQL: `sqlserver,1433`
 - Redis: `redis:6379`
 - Seq: `http://seq`
+- RabbitMQ: `rabbitmq:5672`
 
 The React app runs in the browser, so it calls the host-mapped API (`VITE_API_BASE_URL`, default `http://localhost:8080`), not the Compose service name.
 

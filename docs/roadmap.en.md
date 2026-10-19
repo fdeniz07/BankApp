@@ -37,6 +37,8 @@
 - [x] WebApi integration test skeleton (login smoke)
 - [x] Integration: staff create application → approve flow
 - [x] Integration: reject / cancel / customer create+cancel (+ customer cannot approve)
+- [x] Privacy / cookie consent banner on first load (persist preference)
+- [x] Post-registration email verification (RabbitMQ queue + Seq/log link; no JWT on register)
 
 ## Todo
 
@@ -44,7 +46,6 @@ _(None for now — next items can be promoted from Later.)_
 
 ## Later
 
-- [ ] Post-registration email verification (RabbitMQ or Kafka)
 - [ ] Elasticsearch for staff GET endpoints
 - [ ] Admin welcome dashboard (Tailwind CSS + bundle compression / performance)
 - [ ] Kubernetes / ArgoCD deployment
@@ -53,4 +54,3 @@ _(None for now — next items can be promoted from Later.)_
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support
 - [ ] Chatbot (customer / staff support assistant)
-- [ ] Privacy / cookie consent banner on first load (persist preference)

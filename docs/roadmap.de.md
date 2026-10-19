@@ -37,6 +37,8 @@
 - [x] WebApi-Integrationstest-Skelett (Login-Smoke)
 - [x] Integration: Mitarbeiter Antrag erstellen → genehmigen
 - [x] Integration: Ablehnen / Storno / Kunde create+cancel (+ Kunde darf nicht genehmigen)
+- [x] Datenschutz- / Cookie-Einwilligungsbanner beim ersten Laden (Speichern der Wahl)
+- [x] E-Mail-Verifizierung nach Registrierung (RabbitMQ-Queue + Seq/Log-Link; kein JWT bei Register)
 
 ## Offen
 
@@ -44,7 +46,6 @@ _(Aktuell leer — nächste Punkte können aus „Später“ übernommen werden.
 
 ## Später
 
-- [ ] E-Mail-Verifizierung nach Registrierung (RabbitMQ oder Kafka)
 - [ ] Elasticsearch für Mitarbeiter-GET-Endpunkte
 - [ ] Admin-Welcome-Dashboard (Tailwind CSS + Bundle-Kompression / Performance)
 - [ ] Kubernetes / ArgoCD Deployment
@@ -53,4 +54,3 @@ _(Aktuell leer — nächste Punkte können aus „Später“ übernommen werden.
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung
 - [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)
-- [ ] Datenschutz- / Cookie-Einwilligungsbanner beim ersten Laden (Speichern der Wahl)

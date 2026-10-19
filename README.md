@@ -3,7 +3,7 @@
 [Türkçe README](README.tr.md) · [Deutsche README](README.de.md)
 
 BankApp is a **full-stack educational banking sample** for **individual and corporate credit applications**.  
-Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n. Local stack: **Docker Compose** (SQL Server, Redis, Seq, WebApi, client).
+Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n. Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, WebApi, client).
 
 **Docs:** [Roadmap](docs/roadmap.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
@@ -43,7 +43,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 ### Backend
 
 - Individual / corporate customers (TPT), credit types & sub-types, applications
-- JWT auth + RBAC; public individual registration
+- JWT auth + RBAC; public individual registration with email confirmation (RabbitMQ)
 - Approve / reject / **cancel** (status change — not soft-delete for cancel)
 - Payment plan (amortization), dashboard summary, staff user management
 - Profile fields + avatar upload (≤ 2 MB), Seq audit categories
@@ -219,11 +219,11 @@ Application **cancel** sets status to `Cancelled` via dedicated command (not sof
 | Client | http://localhost:3000 |
 | Seq | http://localhost:5341 |
 
-Most endpoints require JWT (`Authorization: Bearer …`) except login / public register.
+Most endpoints require JWT (`Authorization: Bearer …`) except login / public register / confirm-email.
 
 | Controller | Highlights |
 |------------|------------|
-| **Auth** | `POST login`, `register`, `register-individual` |
+| **Auth** | `POST login`, `register`, `register-individual`, `confirm-email` |
 | **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted lists |
 | **CreditTypes** | List/get; mutate + `PUT {id}/active` (manager) |
 | **CreditSubTypes** | CRUD |

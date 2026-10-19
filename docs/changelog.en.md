@@ -2,6 +2,18 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-19 — Email confirmation (RabbitMQ)
+
+- Individual register no longer returns a JWT; `EmailConfirmed` + token (24h); customer login requires confirmation.
+- `POST /api/Auth/confirm-email`; client `/confirm-email?token=…`.
+- RabbitMQ queue (Compose); if the broker is down the link is logged to Seq/console.
+- Existing / seed users are confirmed; new registrations wait for confirmation.
+
+## 2026-10-19 — Privacy / cookie consent
+
+- First-load privacy/cookie banner (Accept / Decline); preference in `localStorage` (`bankapp-consent`).
+- TR / EN / DE copy; layout clears the accessibility FAB.
+
 ## 2026-10-18 — CI + integration tests
 
 - GitHub Actions CI: `dotnet build/test` (unit + integration) and client npm build.

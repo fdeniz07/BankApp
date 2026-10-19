@@ -2,6 +2,18 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-19 — E-posta doğrulama (RabbitMQ)
+
+- Bireysel kayıt JWT vermez; `EmailConfirmed` + token (24 saat); giriş müşteri için onay ister.
+- `POST /api/Auth/confirm-email`; client `/confirm-email?token=…`.
+- RabbitMQ kuyruk (Compose); broker kapalıysa bağlantı Seq/console log’a yazılır.
+- Mevcut / seed kullanıcılar onaylı; yeni kayıtlar onay bekler.
+
+## 2026-10-19 — Datenschutz / çerez onayı
+
+- İlk yüklemede gizlilik/çerez bandı (Kabul / Reddet); tercih `localStorage` (`bankapp-consent`).
+- TR / EN / DE metinler; erişilebilirlik FAB ile çakışmayan yerleşim.
+
 ## 2026-10-18 — CI + entegrasyon testleri
 
 - GitHub Actions CI: `dotnet build/test` (unit + integration) ve `client` npm build.
