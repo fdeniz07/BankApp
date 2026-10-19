@@ -2,6 +2,11 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-19 — Angemeldet bleiben + Kundenprofil-Felder
+
+- Login: „Angemeldet bleiben“ → längeres JWT (7 Tage) + `localStorage`; unchecked → kurzes JWT + `sessionStorage`; E-Mail merken.
+- Kundenprofil: Privat (Geburtsdatum / Eltern + Nur-Lesen Nr./Ausweis), Firma (Steuer / Handelsregister).
+
 ## 2026-10-19 — E-Mail-Bestätigung (RabbitMQ)
 
 - Privatkunden-Registrierung liefert kein JWT; `EmailConfirmed` + Token (24 Std.); Kunden-Login erfordert Bestätigung.

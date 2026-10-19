@@ -2,6 +2,11 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-19 — Beni hatırla + müşteri profil alanları
+
+- Login: “Beni hatırla” → uzun JWT (7 gün) + `localStorage`; işaretsiz → kısa JWT + `sessionStorage`; e-posta hatırlama.
+- Müşteri profili: bireysel (doğum/anne/baba + salt okunur no/TCKN), kurumsal (vergi/sicil alanları).
+
 ## 2026-10-19 — E-posta doğrulama (RabbitMQ)
 
 - Bireysel kayıt JWT vermez; `EmailConfirmed` + token (24 saat); giriş müşteri için onay ister.

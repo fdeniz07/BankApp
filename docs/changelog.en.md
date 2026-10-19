@@ -2,6 +2,11 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-19 — Remember me + customer profile fields
+
+- Login: “Remember me” → longer JWT (7 days) + `localStorage`; unchecked → short JWT + `sessionStorage`; remembered email.
+- Customer profile: individual (DOB / parents + read-only number/national id), corporate (tax / registration fields).
+
 ## 2026-10-19 — Email confirmation (RabbitMQ)
 
 - Individual register no longer returns a JWT; `EmailConfirmed` + token (24h); customer login requires confirmation.
