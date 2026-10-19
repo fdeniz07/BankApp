@@ -2,11 +2,11 @@ using Application.Features.Auth.Rules;
 using Application.Features.Customers.Rules;
 using Application.Features.IndividualCustomers.Rules;
 using Application.Services.Logging;
+using Application.Services.Messaging;
 using Application.Services.Repositories;
 using Core.Security.Constants;
 using Core.Security.Entities;
 using Core.Security.Hashing;
-using Core.Security.JWT;
 using Domain.Entities;
 using Domain.Enums;
 using MediatR;
@@ -20,32 +20,32 @@ public class RegisterIndividualRequestHandler
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IOperationClaimRepository _operationClaimRepository;
     private readonly IUserOperationClaimRepository _userOperationClaimRepository;
-    private readonly ITokenHelper _tokenHelper;
     private readonly IndividualCustomerBusinessRules _individualCustomerBusinessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly IAuditLogger _auditLogger;
+    private readonly IEmailConfirmationPublisher _emailConfirmationPublisher;
 
     public RegisterIndividualRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
         IApplicationUserRepository applicationUserRepository,
         IOperationClaimRepository operationClaimRepository,
         IUserOperationClaimRepository userOperationClaimRepository,
-        ITokenHelper tokenHelper,
         IndividualCustomerBusinessRules individualCustomerBusinessRules,
         AuthBusinessRules authBusinessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IEmailConfirmationPublisher emailConfirmationPublisher)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
         _operationClaimRepository = operationClaimRepository;
         _userOperationClaimRepository = userOperationClaimRepository;
-        _tokenHelper = tokenHelper;
         _individualCustomerBusinessRules = individualCustomerBusinessRules;
         _authBusinessRules = authBusinessRules;
         _lifecycleRules = lifecycleRules;
         _auditLogger = auditLogger;
+        _emailConfirmationPublisher = emailConfirmationPublisher;
     }
 
     public async Task<RegisteredIndividualResponse> Handle(
@@ -81,6 +81,8 @@ public class RegisterIndividualRequestHandler
         await _individualCustomerRepository.AddAsync(individualCustomer, cancellationToken);
 
         HashingHelper.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+        string confirmationToken = Convert.ToHexString(Guid.NewGuid().ToByteArray())
+            + Convert.ToHexString(Guid.NewGuid().ToByteArray());
 
         ApplicationUser applicationUser = new()
         {
@@ -89,6 +91,9 @@ public class RegisterIndividualRequestHandler
             PasswordSalt = passwordSalt,
             CustomerId = individualCustomer.Id,
             IsActive = true,
+            EmailConfirmed = false,
+            EmailConfirmationToken = confirmationToken,
+            EmailConfirmationTokenExpiresAt = DateTimeOffset.UtcNow.AddHours(24),
             FirstName = request.FirstName,
             LastName = request.LastName,
             DateOfBirth = request.DateOfBirth
@@ -113,18 +118,17 @@ public class RegisterIndividualRequestHandler
         string displayName = $"{individualCustomer.FirstName} {individualCustomer.LastName}".Trim();
         const string customerCategory = "Individual";
 
-        IList<OperationClaim> claims = await _applicationUserRepository.GetClaimsAsync(applicationUser, cancellationToken);
-        AccessToken accessToken = _tokenHelper.CreateToken(
-            applicationUser,
-            claims,
-            applicationUser.CustomerId,
-            displayName,
-            customerCategory);
+        await _emailConfirmationPublisher.PublishAsync(
+            new EmailConfirmationRequested(
+                applicationUser.Id,
+                applicationUser.Email,
+                confirmationToken),
+            cancellationToken);
 
         _auditLogger.Log(
             AuditEventCategories.Auth,
             AuditEventActions.Register,
-            "Individual customer registered.",
+            "Individual customer registered; email confirmation pending.",
             actorUserId: applicationUser.Id,
             actorEmail: applicationUser.Email,
             targetType: nameof(IndividualCustomer),
@@ -132,9 +136,11 @@ public class RegisterIndividualRequestHandler
 
         return new RegisteredIndividualResponse
         {
-            AccessToken = accessToken,
+            RequiresEmailConfirmation = true,
+            Email = applicationUser.Email,
             DisplayName = displayName,
-            CustomerCategory = customerCategory
+            CustomerCategory = customerCategory,
+            Message = "Registration successful. Please confirm your email before signing in."
         };
     }
 }
