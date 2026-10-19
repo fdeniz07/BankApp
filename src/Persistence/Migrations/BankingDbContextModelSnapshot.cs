@@ -553,6 +553,19 @@ namespace Persistence.Migrations
                         .HasColumnType("date")
                         .HasColumnName("DateOfBirth");
 
+                    b.Property<string>("EmailConfirmationToken")
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)")
+                        .HasColumnName("EmailConfirmationToken");
+
+                    b.Property<DateTimeOffset?>("EmailConfirmationTokenExpiresAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("EmailConfirmationTokenExpiresAt");
+
+                    b.Property<bool>("EmailConfirmed")
+                        .HasColumnType("bit")
+                        .HasColumnName("EmailConfirmed");
+
                     b.Property<string>("FirstName")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
@@ -584,6 +597,8 @@ namespace Persistence.Migrations
                         .HasColumnName("Title");
 
                     b.HasIndex("CustomerId");
+
+                    b.HasIndex("EmailConfirmationToken");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
