@@ -98,6 +98,16 @@
     "subtitle": "Create a new individual customer account",
     "submit": "Register",
     "hasAccount": "Already have an account?",
+    "goLogin": "Sign in",
+    "checkEmailTitle": "Confirm your email",
+    "checkEmailBody": "A confirmation link was sent to {{email}}.",
+    "checkEmailHint": "Open the link, then sign in. In development the link also appears in Seq / API logs."
+  },
+  "confirmEmail": {
+    "title": "Email confirmation",
+    "pending": "Confirming your email…",
+    "success": "Your email is confirmed. You can sign in now.",
+    "missingToken": "Confirmation link is missing or invalid.",
     "goLogin": "Sign in"
   },
   "customers": {
@@ -170,6 +180,12 @@
     "label": "Exchange rates",
     "live": "Market",
     "updated": "Updated: {{time}}"
+  },
+  "consent": {
+    "title": "Privacy and cookies",
+    "body": "BankApp stores language, theme, and session preferences in your browser. By continuing you accept essential storage required for basic functionality.",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "roles": {
     "BankStaff": "Bank Staff",
@@ -318,6 +334,9 @@
     "staffCannotDemoteLastManager": "Cannot remove manager role from the last active bank manager.",
     "emailAlreadyExists": "Email already exists.",
     "emailTurkishChars": "Email must not contain Turkish characters (ı, İ, ğ, ü, ş, ö, ç).",
+    "emailNotConfirmed": "Email address is not confirmed. Please check your inbox.",
+    "confirmTokenInvalid": "Confirmation link is invalid or expired.",
+    "emailAlreadyConfirmed": "Email address is already confirmed.",
     "avatarRequired": "Profile image file is required.",
     "avatarTooLarge": "Profile image must be at most 2 MB.",
     "avatarInvalidType": "Profile image must be JPEG, PNG, or WebP.",

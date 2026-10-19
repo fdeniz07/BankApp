@@ -98,6 +98,16 @@
     "subtitle": "Yeni bireysel müşteri hesabı oluşturun",
     "submit": "Kayıt ol",
     "hasAccount": "Zaten hesabınız var mı?",
+    "goLogin": "Giriş yap",
+    "checkEmailTitle": "E-postanızı doğrulayın",
+    "checkEmailBody": "{{email}} adresine bir doğrulama bağlantısı gönderildi.",
+    "checkEmailHint": "Bağlantıya tıklayın; ardından giriş yapabilirsiniz. Geliştirmede bağlantı Seq / API loglarında da görünür."
+  },
+  "confirmEmail": {
+    "title": "E-posta doğrulama",
+    "pending": "E-posta adresiniz doğrulanıyor…",
+    "success": "E-posta adresiniz doğrulandı. Artık giriş yapabilirsiniz.",
+    "missingToken": "Doğrulama bağlantısı eksik veya geçersiz.",
     "goLogin": "Giriş yap"
   },
   "customers": {
@@ -170,6 +180,12 @@
     "label": "Döviz kurları",
     "live": "Piyasa",
     "updated": "Güncelleme: {{time}}"
+  },
+  "consent": {
+    "title": "Gizlilik ve çerezler",
+    "body": "BankApp dil, tema ve oturum tercihlerini tarayıcınızda saklar. Devam ederek temel işlevsellik için gerekli depolamayı kabul etmiş olursunuz.",
+    "accept": "Kabul et",
+    "decline": "Reddet"
   },
   "roles": {
     "BankStaff": "Banka Personeli",
@@ -318,6 +334,9 @@
     "staffCannotDemoteLastManager": "Son aktif yöneticinin rolü kaldırılamaz.",
     "emailAlreadyExists": "Bu e-posta adresi zaten kullanılıyor.",
     "emailTurkishChars": "E-posta Türkçe karakter (ı, İ, ğ, ü, ş, ö, ç) içeremez.",
+    "emailNotConfirmed": "E-posta adresiniz henüz doğrulanmadı. Lütfen gelen kutunuzu kontrol edin.",
+    "confirmTokenInvalid": "Doğrulama bağlantısı geçersiz veya süresi dolmuş.",
+    "emailAlreadyConfirmed": "E-posta adresi zaten doğrulanmış.",
     "avatarRequired": "Profil görseli zorunludur.",
     "avatarTooLarge": "Profil görseli en fazla 2 MB olabilir.",
     "avatarInvalidType": "Profil görseli JPEG, PNG veya WebP olmalıdır.",

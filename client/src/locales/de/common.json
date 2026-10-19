@@ -98,6 +98,16 @@
     "subtitle": "Neues Privatkundenkonto erstellen",
     "submit": "Registrieren",
     "hasAccount": "Bereits ein Konto?",
+    "goLogin": "Anmelden",
+    "checkEmailTitle": "E-Mail bestätigen",
+    "checkEmailBody": "Ein Bestätigungslink wurde an {{email}} gesendet.",
+    "checkEmailHint": "Link öffnen, dann anmelden. In der Entwicklung erscheint der Link auch in Seq / API-Logs."
+  },
+  "confirmEmail": {
+    "title": "E-Mail-Bestätigung",
+    "pending": "E-Mail wird bestätigt…",
+    "success": "Ihre E-Mail ist bestätigt. Sie können sich jetzt anmelden.",
+    "missingToken": "Bestätigungslink fehlt oder ist ungültig.",
     "goLogin": "Anmelden"
   },
   "customers": {
@@ -170,6 +180,12 @@
     "label": "Wechselkurse",
     "live": "Markt",
     "updated": "Aktualisiert: {{time}}"
+  },
+  "consent": {
+    "title": "Datenschutz und Cookies",
+    "body": "BankApp speichert Sprache, Theme und Sitzungspräferenzen in Ihrem Browser. Mit dem Fortfahren akzeptieren Sie die für die Grundfunktion erforderliche Speicherung.",
+    "accept": "Akzeptieren",
+    "decline": "Ablehnen"
   },
   "roles": {
     "BankStaff": "Bankmitarbeiter",
@@ -318,6 +334,9 @@
     "staffCannotDemoteLastManager": "Die Manager-Rolle des letzten aktiven Managers kann nicht entfernt werden.",
     "emailAlreadyExists": "E-Mail-Adresse wird bereits verwendet.",
     "emailTurkishChars": "E-Mail darf keine türkischen Zeichen (ı, İ, ğ, ü, ş, ö, ç) enthalten.",
+    "emailNotConfirmed": "E-Mail-Adresse ist noch nicht bestätigt. Bitte prüfen Sie Ihren Posteingang.",
+    "confirmTokenInvalid": "Bestätigungslink ist ungültig oder abgelaufen.",
+    "emailAlreadyConfirmed": "E-Mail-Adresse ist bereits bestätigt.",
     "avatarRequired": "Profilbild ist erforderlich.",
     "avatarTooLarge": "Profilbild darf höchstens 2 MB groß sein.",
     "avatarInvalidType": "Profilbild muss JPEG, PNG oder WebP sein.",
