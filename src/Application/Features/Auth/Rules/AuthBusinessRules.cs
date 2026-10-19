@@ -37,6 +37,15 @@ public class AuthBusinessRules : BaseBusinessRules
         return Task.CompletedTask;
     }
 
+    public Task EmailShouldBeConfirmed(ApplicationUser user)
+    {
+        // Staff accounts are always treated as confirmed after seed.
+        if (user.CustomerId.HasValue && !user.EmailConfirmed)
+            throw new BusinessException(AuthMessages.EmailNotConfirmed);
+
+        return Task.CompletedTask;
+    }
+
     public Task PasswordShouldBeCorrect(string password, byte[] passwordHash, byte[] passwordSalt)
     {
         if (!HashingHelper.VerifyPasswordHash(password, passwordHash, passwordSalt))
