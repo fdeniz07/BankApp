@@ -94,6 +94,7 @@ services:
       TokenOptions__Audience: "${TOKEN_AUDIENCE:-BankAppAudience}"
       TokenOptions__Issuer: "${TOKEN_ISSUER:-BankAppIssuer}"
       TokenOptions__AccessTokenExpiration: "${TOKEN_EXPIRATION_MINUTES:-60}"
+      TokenOptions__RememberMeAccessTokenExpiration: "${TOKEN_REMEMBER_ME_MINUTES:-10080}"
       TokenOptions__SecurityKey: "${TOKEN_SECURITY_KEY}"
       CacheSettings__SlidingExpirationMinutes: "30"
     volumes:
