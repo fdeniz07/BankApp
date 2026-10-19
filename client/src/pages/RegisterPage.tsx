@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
@@ -11,9 +11,9 @@ const GENDERS: Gender[] = ['Female', 'Male', 'PreferNotToSay']
 export function RegisterPage() {
   const { t } = useTranslation()
   const { registerIndividual, isAuthenticated } = useAuth()
-  const navigate = useNavigate()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [doneEmail, setDoneEmail] = useState<string | null>(null)
   const [form, setForm] = useState({
     email: '',
     password: '',
@@ -35,7 +35,7 @@ export function RegisterPage() {
     setError(null)
     setLoading(true)
     try {
-      await registerIndividual({
+      const response = await registerIndividual({
         email: form.email,
         password: form.password,
         phoneNumber: form.phoneNumber,
@@ -48,12 +48,31 @@ export function RegisterPage() {
         motherName: form.motherName || null,
         fatherName: form.fatherName || null,
       })
-      navigate('/applications', { replace: true })
+      setDoneEmail(response.email)
     } catch (err) {
       setError(mapApiError(err, t))
     } finally {
       setLoading(false)
     }
+  }
+
+  if (doneEmail) {
+    return (
+      <div className="login-page">
+        <div className="login-card">
+          <div className="login-header">
+            <h1>{t('appName')}</h1>
+            <LanguageSwitcher />
+          </div>
+          <h2>{t('register.checkEmailTitle')}</h2>
+          <p className="success-text">{t('register.checkEmailBody', { email: doneEmail })}</p>
+          <p className="muted">{t('register.checkEmailHint')}</p>
+          <p className="muted register-footer">
+            <Link to="/login">{t('register.goLogin')}</Link>
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (

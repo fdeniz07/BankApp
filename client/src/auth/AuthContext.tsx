@@ -9,7 +9,7 @@ import {
 } from 'react'
 import { login as loginApi, registerIndividual as registerIndividualApi } from '../api/authApi'
 import { getMyProfile, resolveProfileImageUrl } from '../api/profileApi'
-import type { RegisterIndividualRequest } from '../types/api'
+import type { RegisterIndividualRequest, RegisteredIndividualResponse } from '../types/api'
 import {
   clearSession,
   getAuthUser,
@@ -33,7 +33,7 @@ interface AuthContextValue {
   isStaff: boolean
   isManager: boolean
   login: (email: string, password: string) => Promise<void>
-  registerIndividual: (body: RegisterIndividualRequest) => Promise<void>
+  registerIndividual: (body: RegisterIndividualRequest) => Promise<RegisteredIndividualResponse>
   logout: () => void
   updateProfileLocal: (patch: ProfilePatch) => void
 }
@@ -103,8 +103,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerIndividual = useCallback(async (body: RegisterIndividualRequest) => {
     const response = await registerIndividualApi(body)
-    applySession(response)
-    setUser(getAuthUser())
+    // Registration no longer issues a JWT; caller shows confirm-email UX.
+    return response
   }, [])
 
   const logout = useCallback(() => {

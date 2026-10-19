@@ -1060,6 +1060,50 @@ html[data-theme="dark"] .chip-btn.active {
   }
 }
 
+.consent-banner {
+  position: fixed;
+  left: 4.75rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 35;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem 1.25rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--surface);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+}
+
+.consent-banner-copy {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.consent-banner-title {
+  margin: 0 0 0.25rem;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.consent-banner-text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.consent-banner-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
 .a11y-dock {
   position: fixed;
   left: 1rem;
@@ -1164,5 +1208,10 @@ html[data-theme="dark"] .chip-btn.active {
 
   .fx-ticker-updated {
     display: none;
+  }
+
+  .consent-banner {
+    left: 1rem;
+    bottom: 4.5rem;
   }
 }

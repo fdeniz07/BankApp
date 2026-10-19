@@ -30,6 +30,19 @@ export interface LoggedResponse {
   customerCategory?: CreditCategory | null
 }
 
+export interface RegisteredIndividualResponse {
+  requiresEmailConfirmation: boolean
+  email: string
+  displayName?: string | null
+  customerCategory?: CreditCategory | null
+  message: string
+}
+
+export interface ConfirmEmailResponse {
+  email: string
+  confirmed: boolean
+}
+
 export type Gender = 'Female' | 'Male' | 'PreferNotToSay'
 
 export interface RegisterIndividualRequest {

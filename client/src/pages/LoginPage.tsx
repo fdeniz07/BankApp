@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
-import { ApiError } from '../api/client'
+import { mapApiError } from '../utils/mapApiError'
 
 export function LoginPage() {
   const { t } = useTranslation()
@@ -24,7 +24,8 @@ export function LoginPage() {
       await login(email, password)
       navigate('/applications', { replace: true })
     } catch (err) {
-      setError(err instanceof ApiError ? t('login.error') : t('common.error'))
+      const mapped = mapApiError(err, t)
+      setError(mapped === t('common.error') ? t('login.error') : mapped)
     } finally {
       setLoading(false)
     }
