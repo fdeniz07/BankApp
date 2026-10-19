@@ -71,7 +71,8 @@ public static class IdentitySeed
                 PasswordHash = hash,
                 PasswordSalt = salt,
                 CustomerId = customerId,
-                IsActive = true
+                IsActive = true,
+                EmailConfirmed = true
             };
             await context.Users.AddAsync(user);
             await context.SaveChangesAsync();
