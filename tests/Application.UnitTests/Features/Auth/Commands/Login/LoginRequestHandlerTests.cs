@@ -11,6 +11,7 @@ using Core.Security.JWT;
 using Domain.Entities;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.Options;
 using Moq;
 
 namespace Application.UnitTests.Features.Auth.Commands.Login;
@@ -31,11 +32,21 @@ public class LoginRequestHandlerTests
             _applicationUserRepository.Object,
             _customerRepository.Object);
 
+        IOptions<TokenOptions> tokenOptions = Options.Create(new TokenOptions
+        {
+            Audience = "test",
+            Issuer = "test",
+            AccessTokenExpiration = 60,
+            RememberMeAccessTokenExpiration = 10080,
+            SecurityKey = "BankApp-Super-Secret-Security-Key-For-Jwt-Must-Be-At-Least-64-Bytes-Long-1234567890"
+        });
+
         _sut = new LoginRequestHandler(
             _applicationUserRepository.Object,
             _individualCustomerRepository.Object,
             _corporateCustomerRepository.Object,
             _tokenHelper.Object,
+            tokenOptions,
             businessRules,
             _auditLogger.Object);
     }
@@ -96,7 +107,12 @@ public class LoginRequestHandlerTests
             .ReturnsAsync(claims);
         _tokenHelper
             .Setup(t => t.CreateToken(
-                user, claims, user.CustomerId, It.IsAny<string?>(), It.IsAny<string?>()))
+                user,
+                claims,
+                user.CustomerId,
+                It.IsAny<string?>(),
+                It.IsAny<string?>(),
+                It.IsAny<int?>()))
             .Returns(accessToken);
 
         LoginRequest request = new()
@@ -111,7 +127,7 @@ public class LoginRequestHandlerTests
         response.AccessToken.Token.Should().Be("jwt-token");
         response.DisplayName.Should().Be("Bank Staff");
         _tokenHelper.Verify(
-            t => t.CreateToken(user, claims, user.CustomerId, "Bank Staff", null),
+            t => t.CreateToken(user, claims, user.CustomerId, "Bank Staff", null, null),
             Times.Once);
     }
 
