@@ -74,6 +74,7 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<TokenOptions>(configuration.GetSection("TokenOptions"));
         TokenOptions tokenOptions = configuration.GetSection("TokenOptions").Get<TokenOptions>()
             ?? throw new InvalidOperationException("TokenOptions configuration is missing.");
 

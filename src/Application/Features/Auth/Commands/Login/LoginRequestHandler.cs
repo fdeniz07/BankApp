@@ -5,6 +5,7 @@ using Core.Security.Entities;
 using Core.Security.JWT;
 using Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Auth.Commands.Login;
 
@@ -14,6 +15,7 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
     private readonly IIndividualCustomerRepository _individualCustomerRepository;
     private readonly ICorporateCustomerRepository _corporateCustomerRepository;
     private readonly ITokenHelper _tokenHelper;
+    private readonly TokenOptions _tokenOptions;
     private readonly AuthBusinessRules _businessRules;
     private readonly IAuditLogger _auditLogger;
 
@@ -22,6 +24,7 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
         IIndividualCustomerRepository individualCustomerRepository,
         ICorporateCustomerRepository corporateCustomerRepository,
         ITokenHelper tokenHelper,
+        IOptions<TokenOptions> tokenOptions,
         AuthBusinessRules businessRules,
         IAuditLogger auditLogger)
     {
@@ -29,6 +32,7 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
         _individualCustomerRepository = individualCustomerRepository;
         _corporateCustomerRepository = corporateCustomerRepository;
         _tokenHelper = tokenHelper;
+        _tokenOptions = tokenOptions.Value;
         _businessRules = businessRules;
         _auditLogger = auditLogger;
     }
@@ -58,8 +62,13 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
 
         (string? displayName, string? customerCategory) = await ResolveProfileAsync(user!, cancellationToken);
         IList<OperationClaim> claims = await _applicationUserRepository.GetClaimsAsync(user!, cancellationToken);
+        int? expirationMinutes = request.RememberMe
+            ? (_tokenOptions.RememberMeAccessTokenExpiration > 0
+                ? _tokenOptions.RememberMeAccessTokenExpiration
+                : 10080)
+            : null;
         AccessToken accessToken = _tokenHelper.CreateToken(
-            user!, claims, user!.CustomerId, displayName, customerCategory);
+            user!, claims, user!.CustomerId, displayName, customerCategory, expirationMinutes);
 
         _auditLogger.Log(
             AuditEventCategories.Auth,
