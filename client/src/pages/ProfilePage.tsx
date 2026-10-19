@@ -395,6 +395,14 @@ export function ProfilePage() {
       {!isStaff && individual && (
         <form className="form create-panel" onSubmit={onSubmitCustomer}>
           <label>
+            {t('customers.customerNumber')}
+            <input value={individual.customerNumber} readOnly disabled />
+          </label>
+          <label>
+            {t('customers.nationalId')}
+            <input value={individual.nationalId} readOnly disabled />
+          </label>
+          <label>
             {t('profile.firstName')}
             <input
               value={individual.firstName}
@@ -436,6 +444,16 @@ export function ProfilePage() {
             />
           </label>
           <label>
+            {t('customers.dateOfBirth')}
+            <input
+              type="date"
+              value={individual.dateOfBirth?.slice(0, 10) || ''}
+              onChange={(e) =>
+                setIndividual({ ...individual, dateOfBirth: e.target.value || null })
+              }
+            />
+          </label>
+          <label>
             {t('customers.gender')}
             <select
               value={individual.gender || ''}
@@ -454,6 +472,24 @@ export function ProfilePage() {
               ))}
             </select>
           </label>
+          <label>
+            {t('customers.motherName')}
+            <input
+              value={individual.motherName || ''}
+              onChange={(e) =>
+                setIndividual({ ...individual, motherName: e.target.value || null })
+              }
+            />
+          </label>
+          <label>
+            {t('customers.fatherName')}
+            <input
+              value={individual.fatherName || ''}
+              onChange={(e) =>
+                setIndividual({ ...individual, fatherName: e.target.value || null })
+              }
+            />
+          </label>
           <button type="submit" className="btn" disabled={saving}>
             {saving ? t('common.loading') : t('common.save')}
           </button>
@@ -462,6 +498,10 @@ export function ProfilePage() {
 
       {!isStaff && corporate && (
         <form className="form create-panel" onSubmit={onSubmitCustomer}>
+          <label>
+            {t('customers.customerNumber')}
+            <input value={corporate.customerNumber} readOnly disabled />
+          </label>
           <label>
             {t('profile.companyName')}
             <input
@@ -502,6 +542,32 @@ export function ProfilePage() {
             <input
               value={corporate.address}
               onChange={(e) => setCorporate({ ...corporate, address: e.target.value })}
+              required
+            />
+          </label>
+          <label>
+            {t('customers.taxNumber')}
+            <input
+              value={corporate.taxNumber}
+              onChange={(e) => setCorporate({ ...corporate, taxNumber: e.target.value })}
+              required
+            />
+          </label>
+          <label>
+            {t('customers.taxOffice')}
+            <input
+              value={corporate.taxOffice}
+              onChange={(e) => setCorporate({ ...corporate, taxOffice: e.target.value })}
+              required
+            />
+          </label>
+          <label>
+            {t('customers.companyRegistrationNumber')}
+            <input
+              value={corporate.companyRegistrationNumber}
+              onChange={(e) =>
+                setCorporate({ ...corporate, companyRegistrationNumber: e.target.value })
+              }
               required
             />
           </label>
