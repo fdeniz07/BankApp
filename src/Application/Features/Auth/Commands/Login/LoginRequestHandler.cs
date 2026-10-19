@@ -44,6 +44,7 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
             await _businessRules.UserShouldExist(user);
             await _businessRules.UserShouldBeActive(user!);
             await _businessRules.PasswordShouldBeCorrect(request.Password, user!.PasswordHash, user.PasswordSalt);
+            await _businessRules.EmailShouldBeConfirmed(user);
         }
         catch
         {
