@@ -1,3 +1,4 @@
+using Application.Features.Auth.Commands.ConfirmEmail;
 using Application.Features.Auth.Commands.Login;
 using Application.Features.Auth.Commands.Register;
 using Application.Features.Auth.Commands.RegisterIndividual;
@@ -30,6 +31,13 @@ public class AuthController : BaseController
     public async Task<IActionResult> RegisterIndividual([FromBody] RegisterIndividualRequest request)
     {
         RegisteredIndividualResponse response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
+    [HttpPost("confirm-email")]
+    public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+    {
+        ConfirmEmailResponse response = await Mediator.Send(request);
         return Ok(response);
     }
 }
