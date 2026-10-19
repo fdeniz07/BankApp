@@ -6,10 +6,10 @@ import type {
 } from '../types/api'
 import { apiRequest } from './client'
 
-export function login(email: string, password: string) {
+export function login(email: string, password: string, rememberMe = false) {
   return apiRequest<LoggedResponse>('/api/Auth/login', {
     method: 'POST',
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, rememberMe }),
   })
 }
 

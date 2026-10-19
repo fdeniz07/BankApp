@@ -1,6 +1,8 @@
 const TOKEN_KEY = 'bankapp.token'
 const EXP_KEY = 'bankapp.tokenExp'
 const PROFILE_OVERRIDE_KEY = 'bankapp.profileOverride'
+const REMEMBER_EMAIL_KEY = 'bankapp.rememberEmail'
+const PERSIST_FLAG_KEY = 'bankapp.sessionPersist'
 
 const ROLE_CLAIM = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
 /** .NET ClaimTypes.NameIdentifier (JWT) */
@@ -55,9 +57,16 @@ function claimValues(payload: Record<string, unknown>, key: string): string[] {
   return []
 }
 
+function activeStore(): Storage {
+  // Prefer the store that currently holds a token (session wins if both somehow set).
+  if (sessionStorage.getItem(TOKEN_KEY)) return sessionStorage
+  if (localStorage.getItem(TOKEN_KEY)) return localStorage
+  return localStorage.getItem(PERSIST_FLAG_KEY) === '1' ? localStorage : sessionStorage
+}
+
 export function readProfileOverride(): ProfileOverride | null {
   try {
-    const raw = localStorage.getItem(PROFILE_OVERRIDE_KEY)
+    const raw = activeStore().getItem(PROFILE_OVERRIDE_KEY)
     if (!raw) return null
     return JSON.parse(raw) as ProfileOverride
   } catch {
@@ -66,27 +75,43 @@ export function readProfileOverride(): ProfileOverride | null {
 }
 
 export function saveProfileOverride(override: ProfileOverride) {
-  localStorage.setItem(PROFILE_OVERRIDE_KEY, JSON.stringify(override))
+  activeStore().setItem(PROFILE_OVERRIDE_KEY, JSON.stringify(override))
 }
 
 export function clearProfileOverride() {
+  sessionStorage.removeItem(PROFILE_OVERRIDE_KEY)
   localStorage.removeItem(PROFILE_OVERRIDE_KEY)
 }
 
-export function saveSession(token: string, expiration: string) {
-  localStorage.setItem(TOKEN_KEY, token)
-  localStorage.setItem(EXP_KEY, expiration)
-  clearProfileOverride()
+export function saveSession(token: string, expiration: string, persist: boolean) {
+  clearSession()
+  const store = persist ? localStorage : sessionStorage
+  store.setItem(TOKEN_KEY, token)
+  store.setItem(EXP_KEY, expiration)
+  if (persist) localStorage.setItem(PERSIST_FLAG_KEY, '1')
+  else localStorage.removeItem(PERSIST_FLAG_KEY)
 }
 
 export function clearSession() {
+  sessionStorage.removeItem(TOKEN_KEY)
+  sessionStorage.removeItem(EXP_KEY)
   localStorage.removeItem(TOKEN_KEY)
   localStorage.removeItem(EXP_KEY)
+  localStorage.removeItem(PERSIST_FLAG_KEY)
   clearProfileOverride()
 }
 
 export function getToken(): string | null {
-  return localStorage.getItem(TOKEN_KEY)
+  return sessionStorage.getItem(TOKEN_KEY) ?? localStorage.getItem(TOKEN_KEY)
+}
+
+export function getRememberedEmail(): string | null {
+  return localStorage.getItem(REMEMBER_EMAIL_KEY)
+}
+
+export function setRememberedEmail(email: string | null) {
+  if (email) localStorage.setItem(REMEMBER_EMAIL_KEY, email)
+  else localStorage.removeItem(REMEMBER_EMAIL_KEY)
 }
 
 export function getAuthUser(): AuthUser | null {

@@ -91,6 +91,7 @@
     "hintStaff": "Staff: staff@bank.local | staff.tr@ | staff.en@ | staff.de@ / Staff123!",
     "hintManager": "Manager: manager@bank.local / Manager123!",
     "hintCustomer": "Customer: customer@bank.local | customer.tr@ | customer.en@ | customer.de@ / Customer123!",
+    "rememberMe": "Remember me",
     "error": "Sign-in failed. Check your credentials."
   },
   "register": {

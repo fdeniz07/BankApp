@@ -17,6 +17,7 @@ import {
   readProfileOverride,
   saveProfileOverride,
   saveSession,
+  setRememberedEmail,
   type AuthUser,
   type CustomerCategory,
 } from './token'
@@ -32,18 +33,21 @@ interface AuthContextValue {
   isAuthenticated: boolean
   isStaff: boolean
   isManager: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>
   registerIndividual: (body: RegisterIndividualRequest) => Promise<RegisteredIndividualResponse>
   logout: () => void
   updateProfileLocal: (patch: ProfilePatch) => void
 }
 
-function applySession(response: {
-  accessToken: { token: string; expiration: string }
-  displayName?: string | null
-  customerCategory?: string | null
-}) {
-  saveSession(response.accessToken.token, response.accessToken.expiration)
+function applySession(
+  response: {
+    accessToken: { token: string; expiration: string }
+    displayName?: string | null
+    customerCategory?: string | null
+  },
+  persist: boolean,
+) {
+  saveSession(response.accessToken.token, response.accessToken.expiration, persist)
 
   const category =
     response.customerCategory === 'Individual' || response.customerCategory === 'Corporate'
@@ -95,9 +99,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.userId])
 
-  const login = useCallback(async (email: string, password: string) => {
-    const response = await loginApi(email, password)
-    applySession(response)
+  const login = useCallback(async (email: string, password: string, rememberMe = false) => {
+    const response = await loginApi(email, password, rememberMe)
+    applySession(response, rememberMe)
+    setRememberedEmail(rememberMe ? email.trim() : null)
     setUser(getAuthUser())
   }, [])
 

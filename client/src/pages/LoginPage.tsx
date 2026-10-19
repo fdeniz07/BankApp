@@ -2,15 +2,20 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
+import { getRememberedEmail } from '../auth/token'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { mapApiError } from '../utils/mapApiError'
+
+const DEFAULT_EMAIL = 'staff@bank.local'
 
 export function LoginPage() {
   const { t } = useTranslation()
   const { login, isAuthenticated } = useAuth()
   const navigate = useNavigate()
-  const [email, setEmail] = useState('staff@bank.local')
-  const [password, setPassword] = useState('Staff123!')
+  const remembered = getRememberedEmail()
+  const [email, setEmail] = useState(remembered || DEFAULT_EMAIL)
+  const [password, setPassword] = useState(remembered ? '' : 'Staff123!')
+  const [rememberMe, setRememberMe] = useState(!!remembered)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -21,7 +26,7 @@ export function LoginPage() {
     setError(null)
     setLoading(true)
     try {
-      await login(email, password)
+      await login(email, password, rememberMe)
       navigate('/applications', { replace: true })
     } catch (err) {
       const mapped = mapApiError(err, t)
@@ -60,6 +65,14 @@ export function LoginPage() {
               required
               autoComplete="current-password"
             />
+          </label>
+          <label className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+            />
+            <span>{t('login.rememberMe')}</span>
           </label>
           {error && <p className="error-text">{error}</p>}
           <button type="submit" className="btn primary" disabled={loading}>
