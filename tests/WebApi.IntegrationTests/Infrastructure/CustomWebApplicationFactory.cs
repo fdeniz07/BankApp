@@ -37,6 +37,8 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
                     "BankApp-Super-Secret-Security-Key-For-Jwt-Must-Be-At-Least-64-Bytes-Long-1234567890",
                 ["Seq:ServerUrl"] = "",
                 ["Redis:ConnectionString"] = "localhost:6379",
+                ["RabbitMq:Enabled"] = "false",
+                ["App:PublicClientBaseUrl"] = "http://localhost:3000",
                 ["CacheSettings:SlidingExpirationMinutes"] = "30",
                 ["RateLimiting:PermitLimit"] = "1000",
                 ["RateLimiting:WindowSeconds"] = "60"
@@ -84,6 +86,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             PasswordHash = hash,
             PasswordSalt = salt,
             IsActive = true,
+            EmailConfirmed = true,
             FirstName = "Test",
             LastName = "Staff"
         };
@@ -188,6 +191,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             PasswordSalt = salt,
             CustomerId = customerId,
             IsActive = true,
+            EmailConfirmed = true,
             FirstName = "Test",
             LastName = "Customer"
         };
