@@ -9,5 +9,6 @@ public interface ITokenHelper
         IList<OperationClaim> operationClaims,
         Guid? customerId = null,
         string? displayName = null,
-        string? customerCategory = null);
+        string? customerCategory = null,
+        int? expirationMinutes = null);
 }

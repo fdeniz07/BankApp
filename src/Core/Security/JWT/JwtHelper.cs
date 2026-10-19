@@ -24,9 +24,13 @@ public class JwtHelper : ITokenHelper
         IList<OperationClaim> operationClaims,
         Guid? customerId = null,
         string? displayName = null,
-        string? customerCategory = null)
+        string? customerCategory = null,
+        int? expirationMinutes = null)
     {
-        _accessTokenExpiration = DateTime.UtcNow.AddMinutes(_tokenOptions.AccessTokenExpiration);
+        int minutes = expirationMinutes is > 0
+            ? expirationMinutes.Value
+            : _tokenOptions.AccessTokenExpiration;
+        _accessTokenExpiration = DateTime.UtcNow.AddMinutes(minutes);
         SecurityKey securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
         SigningCredentials signingCredentials = SigningCredentialsHelper.CreateSigningCredentials(securityKey);
         JwtSecurityToken jwt = CreateJwtSecurityToken(
