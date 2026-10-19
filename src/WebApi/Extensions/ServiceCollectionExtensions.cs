@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using Application.Services.Auth;
+using Application.Services.Messaging;
 using Application.Services.ProfileImages;
 using Ardalis.SmartEnum.SystemTextJson;
 using Core.Caching;
@@ -11,6 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using WebApi.Constants;
+using WebApi.Messaging;
 using WebApi.Services;
 
 namespace WebApi.Extensions;
@@ -22,6 +24,10 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IProfileImageStorage, LocalProfileImageStorage>();
+        services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
+        services.Configure<AppPublicOptions>(configuration.GetSection(AppPublicOptions.SectionName));
+        services.AddSingleton<IEmailConfirmationPublisher, RabbitMqEmailConfirmationPublisher>();
+        services.AddHostedService<EmailConfirmationConsumerHostedService>();
 
         services.AddControllers()
             .AddJsonOptions(options =>
