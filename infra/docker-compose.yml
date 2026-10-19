@@ -30,6 +30,22 @@ services:
     command: ["redis-server", "--appendonly", "yes"]
     restart: unless-stopped
 
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: bankapp-rabbitmq
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
+    restart: unless-stopped
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2025-latest
     container_name: bankapp-sql
@@ -68,6 +84,13 @@ services:
       ConnectionStrings__BankingConnectionString: "Data Source=sqlserver,1433;Initial Catalog=BankAppDb;User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
       Redis__ConnectionString: "redis:6379"
       Seq__ServerUrl: "http://seq"
+      RabbitMq__Enabled: "true"
+      RabbitMq__HostName: "rabbitmq"
+      RabbitMq__Port: "5672"
+      RabbitMq__UserName: "guest"
+      RabbitMq__Password: "guest"
+      RabbitMq__EmailConfirmationQueue: "email-confirmation"
+      App__PublicClientBaseUrl: "${PUBLIC_CLIENT_BASE_URL:-http://localhost:3000}"
       TokenOptions__Audience: "${TOKEN_AUDIENCE:-BankAppAudience}"
       TokenOptions__Issuer: "${TOKEN_ISSUER:-BankAppIssuer}"
       TokenOptions__AccessTokenExpiration: "${TOKEN_EXPIRATION_MINUTES:-60}"
@@ -82,6 +105,8 @@ services:
         condition: service_started
       seq:
         condition: service_started
+      rabbitmq:
+        condition: service_healthy
     restart: unless-stopped
 
   client:
@@ -102,6 +127,8 @@ volumes:
     name: bankapp-seq-data
   redis-data:
     name: bankapp-redis-data
+  rabbitmq-data:
+    name: bankapp-rabbitmq-data
   profile-uploads:
     name: bankapp-profile-uploads
   sqlserver-data:
