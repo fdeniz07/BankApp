@@ -6,12 +6,15 @@ import {
   deleteCorporateCustomer,
   deleteIndividualCustomer,
   getCorporateCustomer,
+  getCorporateCustomerCatalog,
   getIndividualCustomer,
   updateCorporateCustomer,
   updateIndividualCustomer,
 } from '../api/customersApi'
 import { useAuth } from '../auth/AuthContext'
+import { SuggestInput } from '../components/SuggestInput'
 import type {
+  CorporateCustomerCatalog,
   CorporateCustomerDetail,
   Gender,
   IndividualCustomerDetail,
@@ -19,6 +22,13 @@ import type {
 import { mapApiError } from '../utils/mapApiError'
 
 const GENDERS: Gender[] = ['Female', 'Male', 'PreferNotToSay']
+
+const emptyCatalog = (): CorporateCustomerCatalog => ({
+  companyTypes: [],
+  companySectors: [],
+  companyIndustries: [],
+  companySubIndustries: [],
+})
 
 export function CustomerDetailPage() {
   const { t } = useTranslation()
@@ -32,6 +42,7 @@ export function CustomerDetailPage() {
   const [error, setError] = useState<string | null>(null)
   const [individual, setIndividual] = useState<IndividualCustomerDetail | null>(null)
   const [corporate, setCorporate] = useState<CorporateCustomerDetail | null>(null)
+  const [catalog, setCatalog] = useState<CorporateCustomerCatalog>(emptyCatalog)
 
   useEffect(() => {
     if (!isStaff || !id) {
@@ -41,18 +52,21 @@ export function CustomerDetailPage() {
     let cancelled = false
     setLoading(true)
     setError(null)
-    const loader = isIndividual ? getIndividualCustomer(id) : getCorporateCustomer(id)
-    loader
-      .then((data) => {
-        if (cancelled) return
-        if (isIndividual) {
-          setIndividual(data as IndividualCustomerDetail)
+    const loader = isIndividual
+      ? getIndividualCustomer(id).then((data) => {
+          if (cancelled) return
+          setIndividual(data)
           setCorporate(null)
-        } else {
-          setCorporate(data as CorporateCustomerDetail)
-          setIndividual(null)
-        }
-      })
+        })
+      : Promise.all([getCorporateCustomer(id), getCorporateCustomerCatalog()]).then(
+          ([data, cat]) => {
+            if (cancelled) return
+            setCorporate(data)
+            setIndividual(null)
+            setCatalog(cat)
+          },
+        )
+    loader
       .catch((err: unknown) => {
         if (!cancelled) {
           const message = mapApiError(err, t)
@@ -87,6 +101,11 @@ export function CustomerDetailPage() {
       } else if (corporate) {
         const updated = await updateCorporateCustomer(corporate)
         setCorporate(updated)
+        try {
+          setCatalog(await getCorporateCustomerCatalog())
+        } catch {
+          // keep previous suggestions
+        }
       }
       toast.success(t('customers.saveSuccess'))
     } catch (err) {
@@ -136,13 +155,7 @@ export function CustomerDetailPage() {
         <form className="form create-panel" onSubmit={onSave}>
           <label>
             {t('customers.customerNumber')}
-            <input
-              value={individual.customerNumber}
-              onChange={(e) =>
-                setIndividual({ ...individual, customerNumber: e.target.value })
-              }
-              required
-            />
+            <input value={individual.customerNumber} readOnly disabled />
           </label>
           <label>
             {t('profile.firstName')}
@@ -191,6 +204,18 @@ export function CustomerDetailPage() {
               value={individual.nationalId}
               onChange={(e) => setIndividual({ ...individual, nationalId: e.target.value })}
               required
+              minLength={11}
+              maxLength={11}
+            />
+          </label>
+          <label>
+            {t('customers.dateOfBirth')}
+            <input
+              type="date"
+              value={individual.dateOfBirth?.slice(0, 10) || ''}
+              onChange={(e) =>
+                setIndividual({ ...individual, dateOfBirth: e.target.value || null })
+              }
             />
           </label>
           <label>
@@ -211,6 +236,24 @@ export function CustomerDetailPage() {
                 </option>
               ))}
             </select>
+          </label>
+          <label>
+            {t('customers.motherName')}
+            <input
+              value={individual.motherName || ''}
+              onChange={(e) =>
+                setIndividual({ ...individual, motherName: e.target.value || null })
+              }
+            />
+          </label>
+          <label>
+            {t('customers.fatherName')}
+            <input
+              value={individual.fatherName || ''}
+              onChange={(e) =>
+                setIndividual({ ...individual, fatherName: e.target.value || null })
+              }
+            />
           </label>
           <label className="checkbox-row">
             <input
@@ -253,13 +296,7 @@ export function CustomerDetailPage() {
         <form className="form create-panel" onSubmit={onSave}>
           <label>
             {t('customers.customerNumber')}
-            <input
-              value={corporate.customerNumber}
-              onChange={(e) =>
-                setCorporate({ ...corporate, customerNumber: e.target.value })
-              }
-              required
-            />
+            <input value={corporate.customerNumber} readOnly disabled />
           </label>
           <label>
             {t('profile.companyName')}
@@ -328,6 +365,77 @@ export function CustomerDetailPage() {
                 setCorporate({ ...corporate, companyRegistrationNumber: e.target.value })
               }
               required
+            />
+          </label>
+          <label>
+            {t('customers.companyEmail')}
+            <input
+              type="email"
+              value={corporate.companyEmail || ''}
+              onChange={(e) =>
+                setCorporate({ ...corporate, companyEmail: e.target.value || null })
+              }
+            />
+          </label>
+          <label>
+            {t('customers.companyAddress')}
+            <input
+              value={corporate.companyAddress || ''}
+              onChange={(e) =>
+                setCorporate({ ...corporate, companyAddress: e.target.value || null })
+              }
+            />
+          </label>
+          <p className="muted">{t('customers.suggestHint')}</p>
+          <label>
+            {t('customers.companyType')}
+            <SuggestInput
+              id="detail-companyType"
+              value={corporate.companyType || ''}
+              options={catalog.companyTypes}
+              onChange={(v) => setCorporate({ ...corporate, companyType: v || null })}
+            />
+          </label>
+          <label>
+            {t('customers.companySector')}
+            <SuggestInput
+              id="detail-companySector"
+              value={corporate.companySector || ''}
+              options={catalog.companySectors}
+              onChange={(v) => setCorporate({ ...corporate, companySector: v || null })}
+            />
+          </label>
+          <label>
+            {t('customers.companyIndustry')}
+            <SuggestInput
+              id="detail-companyIndustry"
+              value={corporate.companyIndustry || ''}
+              options={catalog.companyIndustries}
+              onChange={(v) => setCorporate({ ...corporate, companyIndustry: v || null })}
+            />
+          </label>
+          <label>
+            {t('customers.companySubIndustry')}
+            <SuggestInput
+              id="detail-companySubIndustry"
+              value={corporate.companySubIndustry || ''}
+              options={catalog.companySubIndustries}
+              onChange={(v) => setCorporate({ ...corporate, companySubIndustry: v || null })}
+            />
+          </label>
+          <label>
+            {t('customers.companyFoundationDate')}
+            <input
+              type="date"
+              value={corporate.companyFoundationDate?.slice(0, 10) || ''}
+              onChange={(e) =>
+                setCorporate({
+                  ...corporate,
+                  companyFoundationDate: e.target.value
+                    ? `${e.target.value}T00:00:00.000Z`
+                    : null,
+                })
+              }
             />
           </label>
           <label className="checkbox-row">

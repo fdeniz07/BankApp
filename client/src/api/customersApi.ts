@@ -1,4 +1,5 @@
 import type {
+  CorporateCustomerCatalog,
   CorporateCustomerDetail,
   CorporateCustomerListItem,
   CreateCorporateCustomerRequest,
@@ -70,6 +71,10 @@ export function deleteIndividualCustomer(id: string) {
 
 export function getCorporateCustomer(id: string) {
   return apiRequest<CorporateCustomerDetail>(`/api/CorporateCustomers/${id}`)
+}
+
+export function getCorporateCustomerCatalog() {
+  return apiRequest<CorporateCustomerCatalog>('/api/CorporateCustomers/catalog')
 }
 
 export function createCorporateCustomer(body: CreateCorporateCustomerRequest) {

@@ -57,6 +57,7 @@ export interface RegisterIndividualRequest {
   gender: Gender
   motherName?: string | null
   fatherName?: string | null
+  locale?: LocaleCode
 }
 
 export interface IndividualCustomerListItem {
@@ -90,7 +91,6 @@ export interface IndividualCustomerDetail {
 }
 
 export interface CreateIndividualCustomerRequest {
-  customerNumber: string
   email: string
   password: string
   phoneNumber: string
@@ -102,6 +102,7 @@ export interface CreateIndividualCustomerRequest {
   gender: Gender
   motherName?: string | null
   fatherName?: string | null
+  locale?: LocaleCode
 }
 
 export interface CorporateCustomerListItem {
@@ -140,7 +141,6 @@ export interface CorporateCustomerDetail {
 }
 
 export interface CreateCorporateCustomerRequest {
-  customerNumber: string
   email: string
   password: string
   phoneNumber: string
@@ -157,6 +157,14 @@ export interface CreateCorporateCustomerRequest {
   companyIndustry?: string | null
   companySubIndustry?: string | null
   companyFoundationDate?: string | null
+  locale?: LocaleCode
+}
+
+export interface CorporateCustomerCatalog {
+  companyTypes: string[]
+  companySectors: string[]
+  companyIndustries: string[]
+  companySubIndustries: string[]
 }
 
 export interface GetListResponse<T> {

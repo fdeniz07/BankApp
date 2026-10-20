@@ -5,12 +5,15 @@ import { toast } from 'react-toastify'
 import {
   createCorporateCustomer,
   createIndividualCustomer,
+  getCorporateCustomerCatalog,
   getCorporateCustomers,
   getIndividualCustomers,
   type CustomerListScope,
 } from '../api/customersApi'
 import { useAuth } from '../auth/AuthContext'
+import { SuggestInput } from '../components/SuggestInput'
 import type {
+  CorporateCustomerCatalog,
   CorporateCustomerListItem,
   CreateCorporateCustomerRequest,
   CreateIndividualCustomerRequest,
@@ -25,7 +28,6 @@ const GENDERS: Gender[] = ['Female', 'Male', 'PreferNotToSay']
 const SCOPES: CustomerListScope[] = ['active', 'inactive', 'deleted']
 
 const emptyIndividual = (): CreateIndividualCustomerRequest => ({
-  customerNumber: '',
   email: '',
   password: '',
   phoneNumber: '',
@@ -40,7 +42,6 @@ const emptyIndividual = (): CreateIndividualCustomerRequest => ({
 })
 
 const emptyCorporate = (): CreateCorporateCustomerRequest => ({
-  customerNumber: '',
   email: '',
   password: '',
   phoneNumber: '',
@@ -50,10 +51,29 @@ const emptyCorporate = (): CreateCorporateCustomerRequest => ({
   taxOffice: '',
   companyRegistrationNumber: '',
   authorizedPersonName: '',
+  companyEmail: '',
+  companyAddress: '',
+  companyType: '',
+  companySector: '',
+  companyIndustry: '',
+  companySubIndustry: '',
+  companyFoundationDate: '',
 })
 
+const emptyCatalog = (): CorporateCustomerCatalog => ({
+  companyTypes: [],
+  companySectors: [],
+  companyIndustries: [],
+  companySubIndustries: [],
+})
+
+function currentLocale(lang: string): 'tr' | 'en' | 'de' {
+  const code = lang.slice(0, 2).toLowerCase()
+  return code === 'en' || code === 'de' ? code : 'tr'
+}
+
 export function CustomersPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { isStaff } = useAuth()
   const [category, setCategory] = useState<CategoryTab>('Individual')
   const [scope, setScope] = useState<CustomerListScope>('active')
@@ -68,6 +88,7 @@ export function CustomersPage() {
     useState<GetListResponse<CorporateCustomerListItem> | null>(null)
   const [individualForm, setIndividualForm] = useState(emptyIndividual)
   const [corporateForm, setCorporateForm] = useState(emptyCorporate)
+  const [catalog, setCatalog] = useState<CorporateCustomerCatalog>(emptyCatalog)
 
   const loadList = useCallback(() => {
     if (!isStaff) return Promise.resolve()
@@ -97,6 +118,21 @@ export function CustomersPage() {
     void loadList()
   }, [loadList])
 
+  useEffect(() => {
+    if (!isStaff || !showCreate || category !== 'Corporate') return
+    let cancelled = false
+    void getCorporateCustomerCatalog()
+      .then((cat) => {
+        if (!cancelled) setCatalog(cat)
+      })
+      .catch(() => {
+        if (!cancelled) setCatalog(emptyCatalog())
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [isStaff, showCreate, category])
+
   if (!isStaff) {
     return (
       <section>
@@ -115,6 +151,7 @@ export function CustomersPage() {
         dateOfBirth: individualForm.dateOfBirth || null,
         motherName: individualForm.motherName || null,
         fatherName: individualForm.fatherName || null,
+        locale: currentLocale(i18n.language),
       })
       toast.success(t('customers.createSuccess'))
       setIndividualForm(emptyIndividual())
@@ -132,12 +169,29 @@ export function CustomersPage() {
     e.preventDefault()
     setCreating(true)
     try {
-      await createCorporateCustomer(corporateForm)
+      await createCorporateCustomer({
+        ...corporateForm,
+        companyEmail: corporateForm.companyEmail || null,
+        companyAddress: corporateForm.companyAddress || null,
+        companyType: corporateForm.companyType || null,
+        companySector: corporateForm.companySector || null,
+        companyIndustry: corporateForm.companyIndustry || null,
+        companySubIndustry: corporateForm.companySubIndustry || null,
+        companyFoundationDate: corporateForm.companyFoundationDate
+          ? `${corporateForm.companyFoundationDate}T00:00:00.000Z`
+          : null,
+        locale: currentLocale(i18n.language),
+      })
       toast.success(t('customers.createSuccess'))
       setCorporateForm(emptyCorporate())
       setShowCreate(false)
       setPageIndex(0)
       await loadList()
+      try {
+        setCatalog(await getCorporateCustomerCatalog())
+      } catch {
+        // keep suggestions
+      }
     } catch (err) {
       toast.error(mapApiError(err, t))
     } finally {
@@ -205,16 +259,7 @@ export function CustomersPage() {
       {showCreate && category === 'Individual' && (
         <form className="form create-panel" onSubmit={onCreateIndividual}>
           <h2>{t('customers.newIndividual')}</h2>
-          <label>
-            {t('customers.customerNumber')}
-            <input
-              value={individualForm.customerNumber}
-              onChange={(e) =>
-                setIndividualForm({ ...individualForm, customerNumber: e.target.value })
-              }
-              required
-            />
-          </label>
+          <p className="muted">{t('customers.numberAutoHint')}</p>
           <label>
             {t('profile.firstName')}
             <input
@@ -281,6 +326,16 @@ export function CustomersPage() {
             />
           </label>
           <label>
+            {t('customers.dateOfBirth')}
+            <input
+              type="date"
+              value={individualForm.dateOfBirth || ''}
+              onChange={(e) =>
+                setIndividualForm({ ...individualForm, dateOfBirth: e.target.value })
+              }
+            />
+          </label>
+          <label>
             {t('customers.gender')}
             <select
               value={individualForm.gender}
@@ -296,6 +351,24 @@ export function CustomersPage() {
               ))}
             </select>
           </label>
+          <label>
+            {t('customers.motherName')}
+            <input
+              value={individualForm.motherName || ''}
+              onChange={(e) =>
+                setIndividualForm({ ...individualForm, motherName: e.target.value })
+              }
+            />
+          </label>
+          <label>
+            {t('customers.fatherName')}
+            <input
+              value={individualForm.fatherName || ''}
+              onChange={(e) =>
+                setIndividualForm({ ...individualForm, fatherName: e.target.value })
+              }
+            />
+          </label>
           <button type="submit" className="btn primary" disabled={creating}>
             {creating ? t('common.loading') : t('customers.create')}
           </button>
@@ -305,16 +378,7 @@ export function CustomersPage() {
       {showCreate && category === 'Corporate' && (
         <form className="form create-panel" onSubmit={onCreateCorporate}>
           <h2>{t('customers.newCorporate')}</h2>
-          <label>
-            {t('customers.customerNumber')}
-            <input
-              value={corporateForm.customerNumber}
-              onChange={(e) =>
-                setCorporateForm({ ...corporateForm, customerNumber: e.target.value })
-              }
-              required
-            />
-          </label>
+          <p className="muted">{t('customers.numberAutoHint')}</p>
           <label>
             {t('profile.companyName')}
             <input
@@ -395,6 +459,72 @@ export function CustomersPage() {
                 })
               }
               required
+            />
+          </label>
+          <label>
+            {t('customers.companyEmail')}
+            <input
+              type="email"
+              value={corporateForm.companyEmail || ''}
+              onChange={(e) =>
+                setCorporateForm({ ...corporateForm, companyEmail: e.target.value })
+              }
+            />
+          </label>
+          <label>
+            {t('customers.companyAddress')}
+            <input
+              value={corporateForm.companyAddress || ''}
+              onChange={(e) =>
+                setCorporateForm({ ...corporateForm, companyAddress: e.target.value })
+              }
+            />
+          </label>
+          <p className="muted">{t('customers.suggestHint')}</p>
+          <label>
+            {t('customers.companyType')}
+            <SuggestInput
+              id="create-companyType"
+              value={corporateForm.companyType || ''}
+              options={catalog.companyTypes}
+              onChange={(v) => setCorporateForm({ ...corporateForm, companyType: v })}
+            />
+          </label>
+          <label>
+            {t('customers.companySector')}
+            <SuggestInput
+              id="create-companySector"
+              value={corporateForm.companySector || ''}
+              options={catalog.companySectors}
+              onChange={(v) => setCorporateForm({ ...corporateForm, companySector: v })}
+            />
+          </label>
+          <label>
+            {t('customers.companyIndustry')}
+            <SuggestInput
+              id="create-companyIndustry"
+              value={corporateForm.companyIndustry || ''}
+              options={catalog.companyIndustries}
+              onChange={(v) => setCorporateForm({ ...corporateForm, companyIndustry: v })}
+            />
+          </label>
+          <label>
+            {t('customers.companySubIndustry')}
+            <SuggestInput
+              id="create-companySubIndustry"
+              value={corporateForm.companySubIndustry || ''}
+              options={catalog.companySubIndustries}
+              onChange={(v) => setCorporateForm({ ...corporateForm, companySubIndustry: v })}
+            />
+          </label>
+          <label>
+            {t('customers.companyFoundationDate')}
+            <input
+              type="date"
+              value={corporateForm.companyFoundationDate || ''}
+              onChange={(e) =>
+                setCorporateForm({ ...corporateForm, companyFoundationDate: e.target.value })
+              }
             />
           </label>
           <button type="submit" className="btn primary" disabled={creating}>

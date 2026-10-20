@@ -9,7 +9,7 @@ import { mapApiError } from '../utils/mapApiError'
 const GENDERS: Gender[] = ['Female', 'Male', 'PreferNotToSay']
 
 export function RegisterPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { registerIndividual, isAuthenticated } = useAuth()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -47,6 +47,7 @@ export function RegisterPage() {
         gender: form.gender,
         motherName: form.motherName || null,
         fatherName: form.fatherName || null,
+        locale: (i18n.language?.slice(0, 2) as 'tr' | 'en' | 'de') || 'tr',
       })
       setDoneEmail(response.email)
     } catch (err) {
