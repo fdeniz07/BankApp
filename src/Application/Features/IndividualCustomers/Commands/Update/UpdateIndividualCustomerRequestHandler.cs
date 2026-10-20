@@ -50,7 +50,7 @@ public class UpdateIndividualCustomerRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.IndividualCustomerShouldExistWhenSelected(individualCustomer);
-        await _businessRules.CustomerNumberShouldBeUnique(request.CustomerNumber, request.Id);
+        // CustomerNumber is system-assigned and immutable.
         await _businessRules.EmailShouldBeUnique(request.Email, request.Id);
         await _businessRules.NationalIdShouldBeUnique(request.NationalId, request.Id);
         await _lifecycleRules.GenderShouldBeValidWhenProvided(request.Gender);
