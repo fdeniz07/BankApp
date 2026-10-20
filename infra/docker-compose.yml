@@ -18,6 +18,13 @@ services:
       ACCEPT_EULA: "Y"
     volumes:
       - seq-data:/data
+    # Seq image has no curl/wget — TCP open on :80 is enough for "ready to accept".
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c 'exec 3<>/dev/tcp/127.0.0.1/80'"]
+      interval: 10s
+      timeout: 5s
+      retries: 8
+      start_period: 20s
     restart: unless-stopped
 
   redis:
@@ -28,6 +35,12 @@ services:
     volumes:
       - redis-data:/data
     command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 8
+      start_period: 10s
     restart: unless-stopped
 
   rabbitmq:
@@ -103,11 +116,17 @@ services:
       sqlserver:
         condition: service_healthy
       redis:
-        condition: service_started
+        condition: service_healthy
       seq:
-        condition: service_started
+        condition: service_healthy
       rabbitmq:
         condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 90s
     restart: unless-stopped
 
   client:
@@ -120,7 +139,14 @@ services:
     ports:
       - "${CLIENT_PORT:-3000}:80"
     depends_on:
-      - webapi
+      webapi:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+      start_period: 10s
     restart: unless-stopped
 
 volumes:
