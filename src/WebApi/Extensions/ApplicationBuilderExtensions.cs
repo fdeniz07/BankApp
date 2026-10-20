@@ -35,6 +35,9 @@ public static class ApplicationBuilderExtensions
             app.MapScalarApiReference();
         }
 
+        // Liveness only — no DB/Redis probes (avoids false-unhealthy during migrate/seed).
+        app.MapHealthChecks("/health").AllowAnonymous().DisableRateLimiting();
+
         app.MapControllers();
 
         return app;

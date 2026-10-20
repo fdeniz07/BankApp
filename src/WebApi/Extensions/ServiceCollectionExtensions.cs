@@ -42,6 +42,7 @@ public static class ServiceCollectionExtensions
         services.AddJwtAuthentication(configuration);
         services.AddRedisCaching(configuration);
         services.AddOpenApi();
+        services.AddHealthChecks();
         services.AddResponseCompressionConfiguration();
         services.AddCorsConfiguration(configuration);
         services.AddRateLimitingConfiguration(configuration);
