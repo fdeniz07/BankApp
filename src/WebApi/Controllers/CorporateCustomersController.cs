@@ -2,6 +2,7 @@ using Application.Features.CorporateCustomers.Commands.Create;
 using Application.Features.CorporateCustomers.Commands.Delete;
 using Application.Features.CorporateCustomers.Commands.Update;
 using Application.Features.CorporateCustomers.Queries.GetById;
+using Application.Features.CorporateCustomers.Queries.GetCatalog;
 using Application.Features.CorporateCustomers.Queries.GetList;
 using Core.Application.Requests;
 using Core.Application.Responses;
@@ -51,6 +52,14 @@ public class CorporateCustomersController : BaseController
             OnlyDeleted = true
         };
         GetListResponse<GetListCorporateCustomerListItemDto> response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
+    [HttpGet("catalog")]
+    public async Task<IActionResult> GetCatalog()
+    {
+        GetCorporateCustomerCatalogResponse response =
+            await Mediator.Send(new GetCorporateCustomerCatalogRequest());
         return Ok(response);
     }
 
