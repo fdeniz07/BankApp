@@ -15,4 +15,6 @@ public class RegisterIndividualRequest : IRequest<RegisteredIndividualResponse>
     public string Gender { get; set; } = default!;
     public string? MotherName { get; set; }
     public string? FatherName { get; set; }
+    /// <summary>UI locale: tr | en | de — used in customer number prefix.</summary>
+    public string? Locale { get; set; }
 }

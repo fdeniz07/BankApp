@@ -1,3 +1,4 @@
+using Application.Common.CustomerNumbers;
 using Application.Features.Auth.Rules;
 using Application.Features.Customers.Rules;
 using Application.Features.IndividualCustomers.Rules;
@@ -55,8 +56,7 @@ public class RegisterIndividualRequestHandler
         await _lifecycleRules.GenderShouldBeValid(request.Gender);
         string gender = Gender.Normalize(request.Gender);
 
-        string customerNumber = $"IND-{DateTime.UtcNow:yyyyMMdd}-{Guid.NewGuid().ToString("N")[..8].ToUpperInvariant()}";
-
+        string customerNumber = CustomerNumberGenerator.NextIndividual(request.Locale);
         await _individualCustomerBusinessRules.CustomerNumberShouldBeUnique(customerNumber);
         await _individualCustomerBusinessRules.EmailShouldBeUnique(request.Email);
         await _individualCustomerBusinessRules.NationalIdShouldBeUnique(request.NationalId);
