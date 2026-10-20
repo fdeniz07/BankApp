@@ -2,6 +2,26 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-19 — Docker Compose health checks
+
+- Redis / Seq / WebApi (`/health`) / Client healthchecks; `depends_on: service_healthy` chain.
+- WebApi image includes `curl`; liveness only (no DB/Redis probes).
+
+## 2026-10-19 — Customer create/detail field parity + catalog suggestions
+
+- Individual/corporate create forms aligned with detail fields (password only on create).
+- Corporate type/sector/industry/sub-industry: datalist (pick or type new); `GET …/catalog`.
+
+## 2026-10-19 — Auto customer number / read-only
+
+- Staff create: system assigns number (`IND|CORP-{TR|EN|DE}-…`); no form field.
+- Detail/update: number visible, not editable (API ignores changes).
+
+## 2026-10-19 — Customer number locale + staff detail fields
+
+- Registration customer no: `IND-{TR|EN|DE}-{yyyyMMdd}-{hex}` (UI language).
+- Staff customer detail: individual DOB/parents; corporate company email/address/type/sector/industry/foundation.
+
 ## 2026-10-19 — Remember me + customer profile fields
 
 - Login: “Remember me” → longer JWT (7 days) + `localStorage`; unchecked → short JWT + `sessionStorage`; remembered email.

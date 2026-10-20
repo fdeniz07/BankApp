@@ -2,6 +2,26 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-19 — Docker-Compose-Healthchecks
+
+- Redis / Seq / WebApi (`/health`) / Client-Healthchecks; `depends_on: service_healthy`-Kette.
+- WebApi-Image mit `curl`; nur Liveness (kein DB/Redis-Probe).
+
+## 2026-10-19 — Kunden-Create/Detail-Felder + Katalog-Vorschläge
+
+- Privat/Firma-Create-Formulare an Detailfelder angeglichen (Passwort nur bei Create).
+- Firma Typ/Sektor/Branche/Unterbranche: Datalist (wählen oder neu tippen); `GET …/catalog`.
+
+## 2026-10-19 — Automatische Kundennummer / nur lesen
+
+- Mitarbeiter-Anlage: System vergibt Nummer (`IND|CORP-{TR|EN|DE}-…`); kein Formularfeld.
+- Detail/Update: Nummer sichtbar, nicht änderbar (API ignoriert).
+
+## 2026-10-19 — Kundennummer-Locale + Mitarbeiter-Detailfelder
+
+- Registrierungs-Kundennummer: `IND-{TR|EN|DE}-{yyyyMMdd}-{hex}` (UI-Sprache).
+- Mitarbeiter-Kundendetail: Privat Geburtsdatum/Eltern; Firma E-Mail/Adresse/Typ/Sektor/Branche/Gründung.
+
 ## 2026-10-19 — Angemeldet bleiben + Kundenprofil-Felder
 
 - Login: „Angemeldet bleiben“ → längeres JWT (7 Tage) + `localStorage`; unchecked → kurzes JWT + `sessionStorage`; E-Mail merken.

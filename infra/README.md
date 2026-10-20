@@ -6,13 +6,13 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 
 | Service | Host URL | Notes |
 |---------|----------|--------|
-| Seq | http://localhost:5341 | volume `bankapp-seq-data` |
-| Redis | `localhost:6379` | volume `bankapp-redis-data` |
-| RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation queue; volume `bankapp-rabbitmq-data` |
-| SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data` |
-| WebApi | http://localhost:8080 | — |
+| Seq | http://localhost:5341 | volume `bankapp-seq-data`; Compose **healthcheck** |
+| Redis | `localhost:6379` | volume `bankapp-redis-data`; Compose **healthcheck** |
+| RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation queue; volume `bankapp-rabbitmq-data`; **healthcheck** |
+| SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data`; **healthcheck** |
+| WebApi | http://localhost:8080 | `/health` liveness; waits for SQL/Redis/Seq/RabbitMQ **healthy** |
 | Scalar (Dev) | http://localhost:8080/scalar/v1 | — |
-| Client (React) | http://localhost:3000 | nginx static build; TR/EN/DE i18n |
+| Client (React) | http://localhost:3000 | nginx static build; waits for WebApi **healthy**; own **healthcheck** |
 
 ## Demo accounts
 
@@ -99,6 +99,22 @@ Seed logins:
 - WebApi from Visual Studio against SQL `localhost,11433`
 - Client: `cd client && npm run dev` (port 3000)
 - Seq/Redis from Compose
+
+## Health checks
+
+All long-running Compose services expose a Docker `healthcheck`. Startup order:
+
+1. SQL / Redis / Seq / RabbitMQ become **healthy**
+2. WebApi starts (migrate + seed), then becomes **healthy** via `GET /health`
+3. Client starts and becomes **healthy** (nginx serves `/`)
+
+Check status:
+
+```bash
+docker compose -f infra/docker-compose.yml --env-file infra/.env ps
+```
+
+WebApi liveness (host): `http://localhost:8080/health` — no auth; does not probe SQL/Redis (avoids false-unhealthy during seed).
 
 ## Caching / logging
 

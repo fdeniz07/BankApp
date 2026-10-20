@@ -2,6 +2,26 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-19 — Docker Compose healthcheck’ler
+
+- Redis / Seq / WebApi (`/health`) / Client healthcheck; `depends_on: service_healthy` zinciri.
+- WebApi Dockerfile’a `curl`; liveness only (DB/Redis probe yok).
+
+## 2026-10-19 — Müşteri create/detay alan hizası + katalog önerileri
+
+- Bireysel/kurumsal create formları detaydaki alanlarla hizalandı (şifre sadece create).
+- Kurumsal tür/sektör/iş kolu/alt iş kolu: datalist (seç veya yeni yaz); `GET …/catalog`.
+
+## 2026-10-19 — Müşteri numarası otomatik / salt okunur
+
+- Personel create: numara sistem üretir (`IND|CORP-{TR|EN|DE}-…`); formda alan yok.
+- Detay/güncelleme: numara görünür, değiştirilemez (API ignore).
+
+## 2026-10-19 — Müşteri no locale + personel detay alanları
+
+- Kayıt müşteri no: `IND-{TR|EN|DE}-{yyyyMMdd}-{hex}` (UI dili).
+- Personel müşteri detayı: bireysel doğum/anne/baba; kurumsal şirket e-posta/adres/tür/sektör/iş kolu/kuruluş.
+
 ## 2026-10-19 — Beni hatırla + müşteri profil alanları
 
 - Login: “Beni hatırla” → uzun JWT (7 gün) + `localStorage`; işaretsiz → kısa JWT + `sessionStorage`; e-posta hatırlama.
