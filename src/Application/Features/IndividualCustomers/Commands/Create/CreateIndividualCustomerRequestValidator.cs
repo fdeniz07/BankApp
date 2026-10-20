@@ -9,7 +9,6 @@ public class CreateIndividualCustomerRequestValidator : AbstractValidator<Create
 {
     public CreateIndividualCustomerRequestValidator()
     {
-        RuleFor(c => c.CustomerNumber).NotEmpty().MaximumLength(50);
         RuleFor(c => c.Email).NotEmpty().EmailAddress().MaximumLength(100)
             .MustNotContainTurkishCharacters();
         RuleFor(c => c.Password).NotEmpty().MinimumLength(6).MaximumLength(100);

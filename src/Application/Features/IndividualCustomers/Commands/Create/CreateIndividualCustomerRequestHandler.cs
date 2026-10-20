@@ -1,3 +1,4 @@
+using Application.Common.CustomerNumbers;
 using Application.Features.Auth.Rules;
 using Application.Features.Customers.Rules;
 using Application.Features.IndividualCustomers.Rules;
@@ -48,7 +49,6 @@ public class CreateIndividualCustomerRequestHandler
         CreateIndividualCustomerRequest request,
         CancellationToken cancellationToken)
     {
-        await _businessRules.CustomerNumberShouldBeUnique(request.CustomerNumber);
         await _businessRules.EmailShouldBeUnique(request.Email);
         await _businessRules.NationalIdShouldBeUnique(request.NationalId);
         await _authBusinessRules.EmailShouldBeUnique(request.Email);
@@ -56,6 +56,8 @@ public class CreateIndividualCustomerRequestHandler
         request.Gender = Gender.Normalize(request.Gender!);
 
         IndividualCustomer individualCustomer = _mapper.Map<IndividualCustomer>(request);
+        individualCustomer.CustomerNumber = await AllocateIndividualNumberAsync(request.Locale, cancellationToken);
+        individualCustomer.IsActive = true;
         await _individualCustomerRepository.AddAsync(individualCustomer, cancellationToken);
 
         HashingHelper.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -88,5 +90,24 @@ public class CreateIndividualCustomerRequestHandler
         CreatedIndividualCustomerResponse response = _mapper.Map<CreatedIndividualCustomerResponse>(individualCustomer);
         response.UserId = applicationUser.Id;
         return response;
+    }
+
+    private async Task<string> AllocateIndividualNumberAsync(string? locale, CancellationToken cancellationToken)
+    {
+        for (int attempt = 0; attempt < 8; attempt++)
+        {
+            string candidate = CustomerNumberGenerator.NextIndividual(locale);
+            try
+            {
+                await _businessRules.CustomerNumberShouldBeUnique(candidate);
+                return candidate;
+            }
+            catch
+            {
+                // rare collision — retry
+            }
+        }
+
+        throw new InvalidOperationException("Could not allocate a unique individual customer number.");
     }
 }
