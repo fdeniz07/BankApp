@@ -45,7 +45,7 @@ public class UpdateCorporateCustomerRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CorporateCustomerShouldExistWhenSelected(corporateCustomer);
-        await _businessRules.CustomerNumberShouldBeUnique(request.CustomerNumber, request.Id);
+        // CustomerNumber is system-assigned and immutable.
         await _businessRules.EmailShouldBeUnique(request.Email, request.Id);
         await _businessRules.TaxNumberShouldBeUnique(request.TaxNumber, request.Id);
         await _businessRules.CompanyRegistrationNumberShouldBeUnique(request.CompanyRegistrationNumber, request.Id);
