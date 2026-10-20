@@ -1,3 +1,4 @@
+using Application.Common.CustomerNumbers;
 using Application.Features.Auth.Rules;
 using Application.Features.CorporateCustomers.Rules;
 using Application.Services.Repositories;
@@ -43,13 +44,14 @@ public class CreateCorporateCustomerRequestHandler
         CreateCorporateCustomerRequest request,
         CancellationToken cancellationToken)
     {
-        await _businessRules.CustomerNumberShouldBeUnique(request.CustomerNumber);
         await _businessRules.EmailShouldBeUnique(request.Email);
         await _businessRules.TaxNumberShouldBeUnique(request.TaxNumber);
         await _businessRules.CompanyRegistrationNumberShouldBeUnique(request.CompanyRegistrationNumber);
         await _authBusinessRules.EmailShouldBeUnique(request.Email);
 
         CorporateCustomer corporateCustomer = _mapper.Map<CorporateCustomer>(request);
+        corporateCustomer.CustomerNumber = await AllocateCorporateNumberAsync(request.Locale, cancellationToken);
+        corporateCustomer.IsActive = true;
         await _corporateCustomerRepository.AddAsync(corporateCustomer, cancellationToken);
 
         HashingHelper.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -82,5 +84,24 @@ public class CreateCorporateCustomerRequestHandler
         CreatedCorporateCustomerResponse response = _mapper.Map<CreatedCorporateCustomerResponse>(corporateCustomer);
         response.UserId = applicationUser.Id;
         return response;
+    }
+
+    private async Task<string> AllocateCorporateNumberAsync(string? locale, CancellationToken cancellationToken)
+    {
+        for (int attempt = 0; attempt < 8; attempt++)
+        {
+            string candidate = CustomerNumberGenerator.NextCorporate(locale);
+            try
+            {
+                await _businessRules.CustomerNumberShouldBeUnique(candidate);
+                return candidate;
+            }
+            catch
+            {
+                // rare collision — retry
+            }
+        }
+
+        throw new InvalidOperationException("Could not allocate a unique corporate customer number.");
     }
 }

@@ -7,7 +7,6 @@ namespace Application.Features.CorporateCustomers.Commands.Create;
 public class CreateCorporateCustomerRequest : IRequest<CreatedCorporateCustomerResponse>, ISecuredRequest
 {
     public string[] Roles => [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager];
-    public string CustomerNumber { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string Password { get; set; } = default!;
     public string PhoneNumber { get; set; } = default!;
@@ -24,4 +23,6 @@ public class CreateCorporateCustomerRequest : IRequest<CreatedCorporateCustomerR
     public string? CompanyIndustry { get; set; }
     public string? CompanySubIndustry { get; set; }
     public DateTime? CompanyFoundationDate { get; set; }
+    /// <summary>UI locale: tr | en | de — used in generated customer number.</summary>
+    public string? Locale { get; set; }
 }
