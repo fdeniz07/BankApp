@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using WebApi.IntegrationTests.Infrastructure;
@@ -27,7 +26,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
             "Bearer",
             await TestAuthHelper.LoginAsync(client, "customer@bank.local", "Customer123!"));
 
-        HttpResponseMessage createResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage createResponse = await client.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
             new
             {
@@ -45,7 +44,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
         created.RootElement.GetProperty("status").GetString().Should().Be("Pending");
         created.RootElement.GetProperty("customerId").GetGuid().Should().Be(customerId);
 
-        HttpResponseMessage cancelResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage cancelResponse = await client.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/cancel",
             new { notes = "Changed my mind" });
 
@@ -66,7 +65,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
             "Bearer",
             await TestAuthHelper.LoginAsync(staffClient, "staff@bank.local", "Staff123!"));
 
-        HttpResponseMessage createResponse = await staffClient.PostAsJsonAsync(
+        HttpResponseMessage createResponse = await staffClient.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
             new
             {
@@ -85,7 +84,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
             "Bearer",
             await TestAuthHelper.LoginAsync(customerClient, "customer@bank.local", "Customer123!"));
 
-        HttpResponseMessage approveResponse = await customerClient.PostAsJsonAsync(
+        HttpResponseMessage approveResponse = await customerClient.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/approve",
             new
             {

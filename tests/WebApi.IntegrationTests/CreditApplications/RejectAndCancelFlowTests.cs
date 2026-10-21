@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using WebApi.IntegrationTests.Infrastructure;
@@ -29,7 +28,7 @@ public sealed class RejectAndCancelFlowTests : IClassFixture<CustomWebApplicatio
 
         Guid applicationId = await CreatePendingAsync(client, customerId, creditSubTypeId);
 
-        HttpResponseMessage rejectResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage rejectResponse = await client.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/reject",
             new
             {
@@ -56,7 +55,7 @@ public sealed class RejectAndCancelFlowTests : IClassFixture<CustomWebApplicatio
 
         Guid applicationId = await CreatePendingAsync(client, customerId, creditSubTypeId);
 
-        HttpResponseMessage cancelResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage cancelResponse = await client.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/cancel",
             new { notes = "Cancelled by staff" });
 
@@ -70,7 +69,7 @@ public sealed class RejectAndCancelFlowTests : IClassFixture<CustomWebApplicatio
         Guid customerId,
         Guid creditSubTypeId)
     {
-        HttpResponseMessage createResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage createResponse = await client.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
             new
             {

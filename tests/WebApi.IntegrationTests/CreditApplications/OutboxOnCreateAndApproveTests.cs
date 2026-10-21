@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using Domain.Events;
 using FluentAssertions;
@@ -34,7 +33,7 @@ public sealed class OutboxOnCreateAndApproveTests : IClassFixture<CustomWebAppli
         const decimal amount = 50_000m;
         const int termMonths = 24;
 
-        HttpResponseMessage createResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage createResponse = await client.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
             new
             {
@@ -52,7 +51,7 @@ public sealed class OutboxOnCreateAndApproveTests : IClassFixture<CustomWebAppli
         using JsonDocument created = JsonDocument.Parse(await createResponse.Content.ReadAsStringAsync());
         Guid applicationId = created.RootElement.GetProperty("id").GetGuid();
 
-        HttpResponseMessage approveResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage approveResponse = await client.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/approve",
             new
             {

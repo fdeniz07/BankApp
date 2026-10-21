@@ -1,6 +1,5 @@
 using System.Net;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text.Json;
 using FluentAssertions;
 using WebApi.IntegrationTests.Infrastructure;
@@ -30,7 +29,7 @@ public sealed class CreateAndApproveFlowTests : IClassFixture<CustomWebApplicati
         const decimal amount = 50_000m;
         const int termMonths = 24;
 
-        HttpResponseMessage createResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage createResponse = await client.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
             new
             {
@@ -49,7 +48,7 @@ public sealed class CreateAndApproveFlowTests : IClassFixture<CustomWebApplicati
         Guid applicationId = created.RootElement.GetProperty("id").GetGuid();
         created.RootElement.GetProperty("status").GetString().Should().Be("Pending");
 
-        HttpResponseMessage approveResponse = await client.PostAsJsonAsync(
+        HttpResponseMessage approveResponse = await client.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/approve",
             new
             {
@@ -73,7 +72,7 @@ public sealed class CreateAndApproveFlowTests : IClassFixture<CustomWebApplicati
         (Guid customerId, Guid creditSubTypeId) = await _factory.SeedCreditCatalogAsync();
         HttpClient client = _factory.CreateClient();
 
-        HttpResponseMessage response = await client.PostAsJsonAsync(
+        HttpResponseMessage response = await client.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
             new
             {
