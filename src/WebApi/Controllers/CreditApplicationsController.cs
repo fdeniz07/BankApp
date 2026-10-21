@@ -13,6 +13,7 @@ using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Idempotency;
 
 namespace WebApi.Controllers;
 
@@ -72,6 +73,7 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPost]
+    [IdempotencyKey]
     public async Task<IActionResult> Add([FromBody] CreateCreditApplicationRequest request)
     {
         CreatedCreditApplicationResponse response = await Mediator.Send(request);
@@ -86,6 +88,7 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPost("{id}/approve")]
+    [IdempotencyKey]
     public async Task<IActionResult> Approve(
         [FromRoute] Guid id, 
         [FromBody] ApproveCreditApplicationRequest request)
@@ -96,6 +99,7 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPost("{id}/reject")]
+    [IdempotencyKey]
     public async Task<IActionResult> Reject(
         [FromRoute] Guid id, 
         [FromBody] RejectCreditApplicationRequest request)
@@ -106,6 +110,7 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPost("{id}/cancel")]
+    [IdempotencyKey]
     public async Task<IActionResult> Cancel(
         [FromRoute] Guid id,
         [FromBody] CancelCreditApplicationRequest? request)

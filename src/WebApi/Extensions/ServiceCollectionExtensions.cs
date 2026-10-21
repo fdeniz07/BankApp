@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using WebApi.Constants;
+using WebApi.Idempotency;
 using WebApi.Messaging;
 using WebApi.Services;
 
@@ -30,6 +31,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<EmailConfirmationConsumerHostedService>();
         services.AddHostedService<OutboxDispatcherHostedService>();
         services.AddHostedService<DomainEventsConsumerHostedService>();
+        services.Configure<IdempotencyOptions>(configuration.GetSection(IdempotencyOptions.SectionName));
+        services.AddScoped<IdempotencyKeyFilter>();
 
         services.AddControllers()
             .AddJsonOptions(options =>
