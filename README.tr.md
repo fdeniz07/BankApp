@@ -65,6 +65,7 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
 | DB / önbellek / log | SQL Server, Redis, Serilog + Seq |
 | Messaging | RabbitMQ (e-posta doğrulama + domain events / transactional outbox) |
+| Idempotency | `Idempotency-Key` + Redis (kredi yazma API’leri, 24 saat) |
 | Domain enum | Ardalis SmartEnum (**isim** ile saklanır) |
 | Auth | JWT + rol claim’leri |
 | Client | React, Vite, TypeScript, react-i18next, react-router |

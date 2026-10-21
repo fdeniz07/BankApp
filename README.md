@@ -65,6 +65,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
 | DB / cache / logs | SQL Server, Redis, Serilog + Seq |
 | Messaging | RabbitMQ (email confirmation + domain events / transactional outbox) |
+| Idempotency | `Idempotency-Key` + Redis (credit write APIs, 24h) |
 | Domain enums | Ardalis SmartEnum (stored/exchanged by **name**) |
 | Auth | JWT + role claims |
 | Client | React, Vite, TypeScript, react-i18next, react-router |
