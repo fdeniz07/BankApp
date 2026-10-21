@@ -61,30 +61,38 @@ export function getPaymentPlan(params: {
   )
 }
 
-export function createApplication(body: CreateApplicationRequest) {
+function withIdempotencyKey(idempotencyKey?: string): HeadersInit {
+  return { 'Idempotency-Key': idempotencyKey ?? crypto.randomUUID() }
+}
+
+export function createApplication(body: CreateApplicationRequest, idempotencyKey?: string) {
   return apiRequest<CreditApplicationDetail>(`/api/CreditApplications`, {
     method: 'POST',
     body: JSON.stringify(body),
+    headers: withIdempotencyKey(idempotencyKey),
   })
 }
 
-export function cancelApplication(id: string, notes?: string) {
+export function cancelApplication(id: string, notes?: string, idempotencyKey?: string) {
   return apiRequest(`/api/CreditApplications/${id}/cancel`, {
     method: 'POST',
     body: JSON.stringify({ notes: notes ?? null }),
+    headers: withIdempotencyKey(idempotencyKey),
   })
 }
 
-export function approveApplication(id: string, body: ApproveRequest) {
+export function approveApplication(id: string, body: ApproveRequest, idempotencyKey?: string) {
   return apiRequest(`/api/CreditApplications/${id}/approve`, {
     method: 'POST',
     body: JSON.stringify(body),
+    headers: withIdempotencyKey(idempotencyKey),
   })
 }
 
-export function rejectApplication(id: string, body: RejectRequest) {
+export function rejectApplication(id: string, body: RejectRequest, idempotencyKey?: string) {
   return apiRequest(`/api/CreditApplications/${id}/reject`, {
     method: 'POST',
     body: JSON.stringify(body),
+    headers: withIdempotencyKey(idempotencyKey),
   })
 }

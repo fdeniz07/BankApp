@@ -206,13 +206,17 @@ export function ApplicationsPage() {
     setCreating(true)
     setError(null)
     setSuccess(null)
+    const idempotencyKey = crypto.randomUUID()
     try {
-      await createApplication({
-        creditSubTypeId: form.creditSubTypeId,
-        requestedAmount: Number(form.requestedAmount),
-        requestedTermMonths: Number(form.requestedTermMonths),
-        purpose: form.purpose || null,
-      })
+      await createApplication(
+        {
+          creditSubTypeId: form.creditSubTypeId,
+          requestedAmount: Number(form.requestedAmount),
+          requestedTermMonths: Number(form.requestedTermMonths),
+          purpose: form.purpose || null,
+        },
+        idempotencyKey,
+      )
       const ok = t('applications.createSuccess')
       setSuccess(ok)
       toast.success(ok)
@@ -234,8 +238,9 @@ export function ApplicationsPage() {
     setCancellingId(id)
     setError(null)
     setSuccess(null)
+    const idempotencyKey = crypto.randomUUID()
     try {
-      await cancelApplication(id)
+      await cancelApplication(id, undefined, idempotencyKey)
       const ok = t('applications.cancelSuccess')
       setSuccess(ok)
       toast.success(ok)
@@ -256,13 +261,18 @@ export function ApplicationsPage() {
     setDecidingAction('approve')
     setError(null)
     setSuccess(null)
+    const idempotencyKey = crypto.randomUUID()
     try {
-      await approveApplication(item.id, {
-        approvedAmount: item.requestedAmount,
-        approvedTermMonths: item.requestedTermMonths,
-        approvedInterestRate: item.interestRate,
-        decisionBy: user?.email,
-      })
+      await approveApplication(
+        item.id,
+        {
+          approvedAmount: item.requestedAmount,
+          approvedTermMonths: item.requestedTermMonths,
+          approvedInterestRate: item.interestRate,
+          decisionBy: user?.email,
+        },
+        idempotencyKey,
+      )
       const ok = t('applications.approveSuccess')
       setSuccess(ok)
       toast.success(ok)
@@ -291,11 +301,16 @@ export function ApplicationsPage() {
     setDecidingAction('reject')
     setError(null)
     setSuccess(null)
+    const idempotencyKey = crypto.randomUUID()
     try {
-      await rejectApplication(item.id, {
-        rejectionReason: trimmed,
-        decisionBy: user?.email,
-      })
+      await rejectApplication(
+        item.id,
+        {
+          rejectionReason: trimmed,
+          decisionBy: user?.email,
+        },
+        idempotencyKey,
+      )
       const ok = t('applications.rejectSuccess')
       setSuccess(ok)
       toast.success(ok)

@@ -125,14 +125,19 @@ export function ApplicationDetailPage() {
     setBusy(true)
     setMessage(null)
     setError(null)
+    const idempotencyKey = crypto.randomUUID()
     try {
-      await approveApplication(id, {
-        approvedAmount: Number(approvedAmount),
-        approvedTermMonths: Number(approvedTerm),
-        approvedInterestRate: Number(interestRate),
-        decisionBy: user?.email,
-        notes: notes || undefined,
-      })
+      await approveApplication(
+        id,
+        {
+          approvedAmount: Number(approvedAmount),
+          approvedTermMonths: Number(approvedTerm),
+          approvedInterestRate: Number(interestRate),
+          decisionBy: user?.email,
+          notes: notes || undefined,
+        },
+        idempotencyKey,
+      )
       setMessage(t('applications.approveSuccess'))
       await load()
     } catch (err) {
@@ -149,12 +154,17 @@ export function ApplicationDetailPage() {
     setBusy(true)
     setMessage(null)
     setError(null)
+    const idempotencyKey = crypto.randomUUID()
     try {
-      await rejectApplication(id, {
-        rejectionReason,
-        decisionBy: user?.email,
-        notes: notes || undefined,
-      })
+      await rejectApplication(
+        id,
+        {
+          rejectionReason,
+          decisionBy: user?.email,
+          notes: notes || undefined,
+        },
+        idempotencyKey,
+      )
       setMessage(t('applications.rejectSuccess'))
       await load()
     } catch (err) {
