@@ -1,6 +1,6 @@
 # Commit queue
 
-English, conventional-style commits (`feat:` / `fix:` / `doc:` / `test:` / `ci:`), **max 20 commits per calendar day** (local timezone).
+English, conventional-style commits (`feat:` / `fix:` / `docs:` / `test:` / `ci:` / `style:` / `refactor:` / `perf:` / `build:`  / `chore:`  / `revert:`), **max 20 commits per calendar day** (local timezone).
 
 ## Rules
 
