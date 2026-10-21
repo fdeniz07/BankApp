@@ -28,6 +28,8 @@ public static class ServiceCollectionExtensions
         services.Configure<AppPublicOptions>(configuration.GetSection(AppPublicOptions.SectionName));
         services.AddSingleton<IEmailConfirmationPublisher, RabbitMqEmailConfirmationPublisher>();
         services.AddHostedService<EmailConfirmationConsumerHostedService>();
+        services.AddHostedService<OutboxDispatcherHostedService>();
+        services.AddHostedService<DomainEventsConsumerHostedService>();
 
         services.AddControllers()
             .AddJsonOptions(options =>
