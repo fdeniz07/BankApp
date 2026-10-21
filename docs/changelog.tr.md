@@ -2,6 +2,18 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-22 — HashiCorp Vault lab (Docker Compose)
+
+- Compose: `vault` (dev mode, :8200) + one-shot `vault-seed`.
+- KV `secret/bankapp`: JWT / SQL / RabbitMQ örnek secret’lar.
+- WebApi henüz Vault okumuyor; `infra/README` lab adımları.
+
+## 2026-10-21 — Idempotency-Key (kredi yazma API’leri)
+
+- Header `Idempotency-Key` zorunlu: create / approve / reject / cancel.
+- Redis’te yanıt önbelleği (24s); aynı key+body → replay; farklı body → 409.
+- React client UUID header gönderir; entegrasyon testleri + lab notu.
+
 ## 2026-10-21 — Domain Events + Transactional Outbox
 
 - `AggregateRoot` + kredi başvurusu olayları (Created / Approved / Rejected / Cancelled).

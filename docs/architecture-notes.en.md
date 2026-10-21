@@ -97,7 +97,7 @@ Credit scorecard, contract PDF, installments/late fees, IBAN/transfer (idempoten
 ## Phase 6 — chosen order
 
 1. Domain Events + Transactional Outbox (RabbitMQ) — **done** (2026-10-21): `AggregateRoot`, `OutboxMessages`, dispatcher + Seq/log consumer; credit create/approve/reject/cancel events
-2. Idempotency-Key (critical write APIs)
+2. Idempotency-Key (critical write APIs) — **done** (2026-10-21): `Idempotency-Key` header, Redis 24h, create/approve/reject/cancel; same key replay / different body → 409
 3. Saga / Process Manager (credit application lifecycle)
 4. Modular Monolith (Customer / Credit / Identity / Notification)
 5. SignalR notifications (driven by Outbox events)
@@ -114,6 +114,20 @@ Broader training sequence (beyond Phase 6): Outbox → SignalR → OTel → Keyc
 
 ---
 
+## Lab — Idempotency-Key
+
+1. Via Scalar/curl: `POST /api/CreditApplications` with header `Idempotency-Key: <uuid>` and a body.
+2. Repeat with the **same** key and **same** body → same `id`; Seq shows `Idempotency replay` on the second call; one `CreditApplicationCreated` outbox row for that id.
+3. Same key + **different** amount → `409 Conflict`.
+4. Missing key → `400`.
+
+## Lab — HashiCorp Vault (Compose)
+
+- UI: http://localhost:8200 — token from `.env` → `VAULT_DEV_ROOT_TOKEN_ID`
+- KV path: `secret/bankapp` (`jwt_security_key`, `mssql_sa_password`, `rabbitmq_password`)
+- Seed: Compose `vault-seed` or `infra/scripts/vault-seed.sh`
+- **Note:** WebApi still reads `.env`; Vault is a side lab (SDK wiring in a later slice)
+
 ## Revisit before coding
 
-Next code step: **Idempotency-Key** (separate plan and approval). Outbox lives in `BankingDbContext` harvest; queue `domain-events`.
+Next code steps: **Saga / Process Manager**, then optional **Vault → WebApi secret load**. Outbox + Idempotency + Vault Compose lab are done.

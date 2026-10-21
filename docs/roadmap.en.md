@@ -40,6 +40,7 @@
 - [x] Privacy / cookie consent banner on first load (persist preference)
 - [x] Post-registration email verification (RabbitMQ queue + Seq/log link; no JWT on register)
 - [x] Domain Events + Transactional Outbox (credit applications; queue `domain-events`)
+- [x] Idempotency-Key (credit create/approve/reject/cancel; Redis)
 
 ## Todo
 
@@ -48,7 +49,7 @@
 Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 
 - [x] Domain Events + Transactional Outbox (reliable publish via RabbitMQ)
-- [ ] Idempotency-Key (critical write APIs)
+- [x] Idempotency-Key (critical write APIs)
 - [ ] Saga / Process Manager (credit application lifecycle)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR notifications (live status driven by Outbox events)
@@ -59,7 +60,8 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [ ] Admin welcome dashboard (Tailwind CSS + bundle compression / performance)
 - [ ] Kubernetes / ArgoCD deployment
 - [ ] OpenTelemetry + Grafana / Prometheus
-- [ ] Production hardening (secrets, rate-limit policies)
+- [x] HashiCorp Vault lab (Compose dev mode + `secret/bankapp` seed; WebApi not wired yet)
+- [ ] Production hardening (secrets, rate-limit policies; Vault integration)
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support
 - [ ] Chatbot (customer / staff support assistant)

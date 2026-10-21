@@ -40,6 +40,7 @@
 - [x] Datenschutz- / Cookie-Einwilligungsbanner beim ersten Laden (Speichern der Wahl)
 - [x] E-Mail-Verifizierung nach Registrierung (RabbitMQ-Queue + Seq/Log-Link; kein JWT bei Register)
 - [x] Domain Events + Transactional Outbox (Kreditanträge; Queue `domain-events`)
+- [x] Idempotency-Key (Kredit create/approve/reject/cancel; Redis)
 
 ## Offen
 
@@ -48,7 +49,7 @@
 Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 
 - [x] Domain Events + Transactional Outbox (zuverlässige Publikation über RabbitMQ)
-- [ ] Idempotency-Key (kritische Schreib-APIs)
+- [x] Idempotency-Key (kritische Schreib-APIs)
 - [ ] Saga / Process Manager (Kreditantrags-Lebenszyklus)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR-Benachrichtigungen (Live-Status über Outbox-Events)
@@ -59,7 +60,8 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [ ] Admin-Welcome-Dashboard (Tailwind CSS + Bundle-Kompression / Performance)
 - [ ] Kubernetes / ArgoCD Deployment
 - [ ] OpenTelemetry + Grafana / Prometheus
-- [ ] Produktions-Härtung (Secrets, Rate-Limit-Policies)
+- [x] HashiCorp Vault-Lab (Compose-Dev-Modus + Seed `secret/bankapp`; WebApi noch nicht angebunden)
+- [ ] Produktions-Härtung (Secrets, Rate-Limit-Policies; Vault-Integration)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung
 - [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)

@@ -97,7 +97,7 @@ Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), f
 ## Faz 6 — seçilen sıra
 
 1. Domain Events + Transactional Outbox (RabbitMQ) — **uygulandı** (2026-10-21): `AggregateRoot`, `OutboxMessages`, dispatcher + Seq/log consumer; kredi create/approve/reject/cancel olayları
-2. Idempotency-Key (kritik yazma API’leri)
+2. Idempotency-Key (kritik yazma API’leri) — **uygulandı** (2026-10-21): header `Idempotency-Key`, Redis 24 saat, create/approve/reject/cancel; aynı key replay / farklı body → 409
 3. Saga / Process Manager (kredi başvuru yaşam döngüsü)
 4. Modular Monolith (Customer / Credit / Identity / Notification)
 5. SignalR bildirimleri (Outbox olaylarına bağlı)
@@ -114,6 +114,20 @@ Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OT
 
 ---
 
+## Lab — Idempotency-Key
+
+1. Scalar veya curl ile `POST /api/CreditApplications` + header `Idempotency-Key: <uuid>` + body.
+2. **Aynı** key + **aynı** body’yi tekrar gönder → aynı `id`, Seq’de tek `Idempotency stored` / ikinci istek `Idempotency replay`; Outbox’ta tek `CreditApplicationCreated` (o id için).
+3. Aynı key + **farklı** tutar → `409 Conflict`.
+4. Key yok → `400`.
+
+## Lab — HashiCorp Vault (Compose)
+
+- UI: http://localhost:8200 — token: `.env` → `VAULT_DEV_ROOT_TOKEN_ID`
+- KV path: `secret/bankapp` (`jwt_security_key`, `mssql_sa_password`, `rabbitmq_password`)
+- Seed: Compose `vault-seed` veya `infra/scripts/vault-seed.sh`
+- **Önemli:** WebApi hâlâ `.env` okur; Vault yan lab (sonraki dilimde SDK entegrasyonu)
+
 ## Tekrar bakılacak
 
-Sonraki kod adımı: **Idempotency-Key** (ayrı plan ve onay). Outbox uygulaması: `BankingDbContext` harvest, kuyruk `domain-events`.
+Sonraki kod adımları: **Saga / Process Manager**, sonra isteğe bağlı **Vault → WebApi secret load**. Outbox + Idempotency + Vault Compose lab tamam.

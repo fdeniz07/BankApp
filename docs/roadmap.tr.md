@@ -40,6 +40,7 @@
 - [x] Datenschutz / çerez onayı (ilk yüklemede banner, tercih saklama)
 - [x] Kayıt sonrası e-posta doğrulama (RabbitMQ kuyruk + Seq/log bağlantısı; JWT kayıtta verilmez)
 - [x] Domain Events + Transactional Outbox (kredi başvurusu; kuyruk `domain-events`)
+- [x] Idempotency-Key (kredi create/approve/reject/cancel; Redis)
 
 ## Yapılacak
 
@@ -48,7 +49,7 @@
 Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 
 - [x] Domain Events + Transactional Outbox (RabbitMQ ile güvenilir yayın)
-- [ ] Idempotency-Key (kritik yazma API’leri)
+- [x] Idempotency-Key (kritik yazma API’leri)
 - [ ] Saga / Process Manager (kredi başvuru yaşam döngüsü)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR bildirimleri (Outbox olaylarına bağlı anlık durum)
@@ -59,7 +60,8 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
 - [ ] Kubernetes / ArgoCD dağıtımı
 - [ ] OpenTelemetry + Grafana / Prometheus
-- [ ] Üretim güvenlik sertleştirme (secret yönetimi, rate limit politikaları)
+- [x] HashiCorp Vault lab (Compose dev mode + `secret/bankapp` seed; WebApi henüz bağlı değil)
+- [ ] Üretim güvenlik sertleştirme (secret yönetimi, rate limit politikaları; Vault entegrasyonu)
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

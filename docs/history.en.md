@@ -53,7 +53,7 @@ Chronological summary of the BankApp training / corporate sample.
 Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 
 - [x] Domain Events + Transactional Outbox (RabbitMQ, credit applications)
-- [ ] Idempotency-Key (critical write APIs)
+- [x] Idempotency-Key (critical write APIs; Redis, 24h TTL)
 - [ ] Saga / Process Manager (credit application lifecycle)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR notifications (driven by Outbox events)
