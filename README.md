@@ -5,7 +5,7 @@
 BankApp is a **full-stack educational banking sample** for **individual and corporate credit applications**.  
 Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n. Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, WebApi, client).
 
-**Docs:** [Roadmap](docs/roadmap.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
+**Docs:** [Roadmap](docs/roadmap.en.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
 ---
 
@@ -64,6 +64,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 |------|------------|
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
 | DB / cache / logs | SQL Server, Redis, Serilog + Seq |
+| Messaging | RabbitMQ (email confirmation + domain events / transactional outbox) |
 | Domain enums | Ardalis SmartEnum (stored/exchanged by **name**) |
 | Auth | JWT + role claims |
 | Client | React, Vite, TypeScript, react-i18next, react-router |

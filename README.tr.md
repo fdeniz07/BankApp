@@ -5,7 +5,7 @@
 BankApp, **bireysel ve kurumsal kredi başvuruları** için eğitim amaçlı **full-stack** bir bankacılık örneğidir.  
 Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)**, **TR / EN / DE** i18n. Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, WebApi, client).
 
-**Dokümanlar:** [Yol haritası](docs/roadmap.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md) · [Altyapı](infra/README.md)
+**Dokümanlar:** [Yol haritası](docs/roadmap.tr.md) · [Mimari notlar](docs/architecture-notes.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md) · [Altyapı](infra/README.md)
 
 ---
 
@@ -64,6 +64,7 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 |------|-----------|
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
 | DB / önbellek / log | SQL Server, Redis, Serilog + Seq |
+| Messaging | RabbitMQ (e-posta doğrulama + domain events / transactional outbox) |
 | Domain enum | Ardalis SmartEnum (**isim** ile saklanır) |
 | Auth | JWT + rol claim’leri |
 | Client | React, Vite, TypeScript, react-i18next, react-router |
