@@ -10,6 +10,7 @@ public sealed class RabbitMqOptions
     public string UserName { get; set; } = "guest";
     public string Password { get; set; } = "guest";
     public string EmailConfirmationQueue { get; set; } = "email-confirmation";
+    public string DomainEventsQueue { get; set; } = "domain-events";
 }
 
 public sealed class AppPublicOptions
