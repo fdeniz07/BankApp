@@ -4,7 +4,6 @@ using Application.Services.Logging;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditApplications.Commands.Reject;
@@ -43,14 +42,7 @@ public class RejectCreditApplicationRequestHandler
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
         await _businessRules.ApplicationShouldBePending(creditApplication!);
 
-        creditApplication!.Status = CreditApplicationStatus.Rejected;
-        creditApplication.RejectionReason = request.RejectionReason;
-        creditApplication.DecisionDate = DateTimeOffset.UtcNow;
-        creditApplication.DecisionBy = request.DecisionBy;
-        creditApplication.Notes = request.Notes ?? creditApplication.Notes;
-        creditApplication.ApprovedAmount = null;
-        creditApplication.ApprovedTermMonths = null;
-        creditApplication.ApprovedInterestRate = null;
+        creditApplication!.Reject(request.RejectionReason, request.DecisionBy, request.Notes);
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
 

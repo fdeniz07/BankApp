@@ -4,7 +4,6 @@ using Application.Services.Logging;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditApplications.Commands.Cancel;
@@ -44,13 +43,7 @@ public class CancelCreditApplicationRequestHandler
         _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
         await _businessRules.ApplicationShouldBePendingForCancel(creditApplication);
 
-        creditApplication.Status = CreditApplicationStatus.Cancelled;
-        creditApplication.DecisionDate = DateTimeOffset.UtcNow;
-        creditApplication.Notes = request.Notes ?? creditApplication.Notes;
-        creditApplication.ApprovedAmount = null;
-        creditApplication.ApprovedTermMonths = null;
-        creditApplication.ApprovedInterestRate = null;
-        creditApplication.RejectionReason = null;
+        creditApplication.Cancel(request.Notes);
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
 

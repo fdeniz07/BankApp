@@ -4,7 +4,6 @@ using Application.Services.Logging;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditApplications.Commands.Approve;
@@ -47,14 +46,12 @@ public class ApproveCreditApplicationRequestHandler
             request.ApprovedAmount,
             request.ApprovedTermMonths);
 
-        creditApplication.Status = CreditApplicationStatus.Approved;
-        creditApplication.ApprovedAmount = request.ApprovedAmount;
-        creditApplication.ApprovedTermMonths = request.ApprovedTermMonths;
-        creditApplication.ApprovedInterestRate = request.ApprovedInterestRate;
-        creditApplication.DecisionDate = DateTimeOffset.UtcNow;
-        creditApplication.DecisionBy = request.DecisionBy;
-        creditApplication.Notes = request.Notes ?? creditApplication.Notes;
-        creditApplication.RejectionReason = null;
+        creditApplication.Approve(
+            request.ApprovedAmount,
+            request.ApprovedTermMonths,
+            request.ApprovedInterestRate,
+            request.DecisionBy,
+            request.Notes);
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
 

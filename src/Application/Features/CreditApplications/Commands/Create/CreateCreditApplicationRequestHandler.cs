@@ -3,7 +3,6 @@ using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
-using Domain.Enums;
 using MediatR;
 
 namespace Application.Features.CreditApplications.Commands.Create;
@@ -46,11 +45,10 @@ public class CreateCreditApplicationRequestHandler
             request.RequestedTermMonths);
 
         CreditApplication creditApplication = _mapper.Map<CreditApplication>(request);
-        creditApplication.ApplicationNumber = $"APP-{DateTime.UtcNow:yyyyMMddHHmmss}-{Random.Shared.Next(1000, 9999)}";
-        creditApplication.Status = CreditApplicationStatus.Pending;
-        creditApplication.ApplicationDate = DateTimeOffset.UtcNow;
+        string applicationNumber = $"APP-{DateTime.UtcNow:yyyyMMddHHmmss}-{Random.Shared.Next(1000, 9999)}";
+        await _businessRules.ApplicationNumberShouldBeUnique(applicationNumber);
+        creditApplication.InitializeAsNewApplication(applicationNumber);
 
-        await _businessRules.ApplicationNumberShouldBeUnique(creditApplication.ApplicationNumber);
         await _creditApplicationRepository.AddAsync(creditApplication, cancellationToken);
 
         return _mapper.Map<CreatedCreditApplicationResponse>(creditApplication);
