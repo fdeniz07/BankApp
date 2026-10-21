@@ -39,10 +39,19 @@
 - [x] Integration: reject / cancel / customer create+cancel (+ customer cannot approve)
 - [x] Privacy / cookie consent banner on first load (persist preference)
 - [x] Post-registration email verification (RabbitMQ queue + Seq/log link; no JWT on register)
+- [x] Domain Events + Transactional Outbox (credit applications; queue `domain-events`)
 
 ## Todo
 
-_(None for now — next items can be promoted from Later.)_
+### Phase 6 — Architectural deepening
+
+Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
+
+- [x] Domain Events + Transactional Outbox (reliable publish via RabbitMQ)
+- [ ] Idempotency-Key (critical write APIs)
+- [ ] Saga / Process Manager (credit application lifecycle)
+- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [ ] SignalR notifications (live status driven by Outbox events)
 
 ## Later
 

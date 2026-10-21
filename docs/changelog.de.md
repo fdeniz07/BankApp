@@ -2,6 +2,19 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-21 — Domain Events + Transactional Outbox
+
+- `AggregateRoot` + Kreditantrags-Events (Created / Approved / Rejected / Cancelled).
+- Tabelle `OutboxMessages`; Schreiben in derselben Transaktion wie `BankingDbContext.SaveChanges`.
+- `OutboxDispatcherHostedService` → RabbitMQ-Queue `domain-events`; Consumer loggt nach Seq/Konsole.
+- Unit- + Integrationstests (Outbox-Zeilen).
+
+## 2026-10-21 — Phase-6-Architektur-Roadmap + Diskussionsnotizen
+
+- Roadmap: **Phase 6 — Architekturtiefe** (Outbox, Idempotency, Saga, Modular Monolith, SignalR).
+- Diskussionsarchiv: [architecture-notes.de.md](architecture-notes.de.md) (TR/EN-Pendants).
+- History- und README-Dokumentlinks aktualisiert.
+
 ## 2026-10-19 — Docker-Compose-Healthchecks
 
 - Redis / Seq / WebApi (`/health`) / Client-Healthchecks; `depends_on: service_healthy`-Kette.

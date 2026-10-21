@@ -39,10 +39,21 @@ Kronolojik özet (eğitim / kurumsal BankApp çalışması).
 - Müşteri paneli, yeni başvuru, iptal (Cancel)
 - Liste sıralama ve durum filtresi
 
-## Faz 5 — Veri kalitesi ve UX (güncel)
+## Faz 5 — Veri kalitesi ve UX
 
 - Alt tür adları ürüne göre TR / EN / DE eklerle uyumlu
 - Yuvarlak tutarlar (örn. 50.000 ₺, 250.000 €), vade adımları 3–6–9–12–15–18–24–32
 - Mevcut kayıtlar için seed sync (SQL wipe gerekmez)
 - Tablo kayması giderimi; onay / red ve Detay / İptal buton boyutu eşitlendi
 - `docs/` altında yol haritası ve geçmiş (TR / EN / DE)
+- CI, entegrasyon testleri, Datenschutz, e-posta doğrulama (RabbitMQ), healthcheck’ler, müşteri no / form hizası
+
+## Faz 6 — Mimari derinleşme (devam ediyor)
+
+Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
+
+- [x] Domain Events + Transactional Outbox (RabbitMQ, kredi başvurusu)
+- [ ] Idempotency-Key (kritik yazma API’leri)
+- [ ] Saga / Process Manager (kredi başvuru yaşam döngüsü)
+- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [ ] SignalR bildirimleri (Outbox olaylarına bağlı)

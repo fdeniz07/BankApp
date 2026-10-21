@@ -2,6 +2,19 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-21 — Domain Events + Transactional Outbox
+
+- `AggregateRoot` + kredi başvurusu olayları (Created / Approved / Rejected / Cancelled).
+- `OutboxMessages` tablosu; `BankingDbContext.SaveChanges` ile aynı transaction’da yazım.
+- `OutboxDispatcherHostedService` → RabbitMQ kuyruk `domain-events`; consumer Seq/log.
+- Unit + entegrasyon testleri (outbox satırları).
+
+## 2026-10-21 — Faz 6 mimari yol haritası + tartışma notları
+
+- Yol haritasına **Faz 6 — Mimari derinleşme** eklendi (Outbox, Idempotency, Saga, Modular Monolith, SignalR).
+- Tartışma arşivi: [architecture-notes.tr.md](architecture-notes.tr.md) (EN/DE karşılıkları).
+- History ve README doküman linkleri güncellendi.
+
 ## 2026-10-19 — Docker Compose healthcheck’ler
 
 - Redis / Seq / WebApi (`/health`) / Client healthcheck; `depends_on: service_healthy` zinciri.

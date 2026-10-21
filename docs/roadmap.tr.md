@@ -39,10 +39,19 @@
 - [x] Entegrasyon: red / iptal / müşteri create+cancel (+ müşteri onaylayamaz)
 - [x] Datenschutz / çerez onayı (ilk yüklemede banner, tercih saklama)
 - [x] Kayıt sonrası e-posta doğrulama (RabbitMQ kuyruk + Seq/log bağlantısı; JWT kayıtta verilmez)
+- [x] Domain Events + Transactional Outbox (kredi başvurusu; kuyruk `domain-events`)
 
 ## Yapılacak
 
-_(Şimdilik boş — sonraki maddeler “İleride” listesinden seçilebilir.)_
+### Faz 6 — Mimari derinleşme
+
+Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
+
+- [x] Domain Events + Transactional Outbox (RabbitMQ ile güvenilir yayın)
+- [ ] Idempotency-Key (kritik yazma API’leri)
+- [ ] Saga / Process Manager (kredi başvuru yaşam döngüsü)
+- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [ ] SignalR bildirimleri (Outbox olaylarına bağlı anlık durum)
 
 ## İleride
 

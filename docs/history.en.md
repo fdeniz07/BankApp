@@ -39,10 +39,21 @@ Chronological summary of the BankApp training / corporate sample.
 - Customer dashboard, new application, cancel
 - List sorting and status filter
 
-## Phase 5 — Data quality and UX (current)
+## Phase 5 — Data quality and UX
 
 - Sub-type names aligned with product locale (TR / EN / DE suffixes)
 - Round amounts (e.g. 50,000 ₺, 250,000 €), term steps 3–6–9–12–15–18–24–32
 - Seed sync for existing rows (no SQL wipe required)
 - Table layout fixed; approve / reject and Details / Cancel button sizes unified
 - Roadmap and history under `docs/` (TR / EN / DE)
+- CI, integration tests, privacy consent, email verification (RabbitMQ), health checks, customer number / form parity
+
+## Phase 6 — Architectural deepening (in progress)
+
+Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
+
+- [x] Domain Events + Transactional Outbox (RabbitMQ, credit applications)
+- [ ] Idempotency-Key (critical write APIs)
+- [ ] Saga / Process Manager (credit application lifecycle)
+- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [ ] SignalR notifications (driven by Outbox events)

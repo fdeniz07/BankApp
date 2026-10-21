@@ -39,10 +39,21 @@ Chronologische Zusammenfassung der BankApp-Schulungs- / Unternehmensdemo.
 - Kunden-Dashboard, neuer Antrag, Storno
 - Listensortierung und Statusfilter
 
-## Phase 5 — Datenqualität und UX (aktuell)
+## Phase 5 — Datenqualität und UX
 
 - Untertyp-Namen an Produkt-Locale angepasst (TR / EN / DE)
 - Runde Beträge (z. B. 50.000 ₺, 250.000 €), Laufzeiten 3–6–9–12–15–18–24–32
 - Seed-Sync für bestehende Daten (kein SQL-Wipe nötig)
 - Tabellenlayout stabilisiert; Button-Größen vereinheitlicht
 - Roadmap und Verlauf unter `docs/` (TR / EN / DE)
+- CI, Integrationstests, Datenschutz-Einwilligung, E-Mail-Verifizierung (RabbitMQ), Healthchecks, Kundennummer / Formular-Parität
+
+## Phase 6 — Architekturtiefe (in Arbeit)
+
+Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
+
+- [x] Domain Events + Transactional Outbox (RabbitMQ, Kreditanträge)
+- [ ] Idempotency-Key (kritische Schreib-APIs)
+- [ ] Saga / Process Manager (Kreditantrags-Lebenszyklus)
+- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [ ] SignalR-Benachrichtigungen (getrieben von Outbox-Events)

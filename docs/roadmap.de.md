@@ -39,10 +39,19 @@
 - [x] Integration: Ablehnen / Storno / Kunde create+cancel (+ Kunde darf nicht genehmigen)
 - [x] Datenschutz- / Cookie-Einwilligungsbanner beim ersten Laden (Speichern der Wahl)
 - [x] E-Mail-Verifizierung nach Registrierung (RabbitMQ-Queue + Seq/Log-Link; kein JWT bei Register)
+- [x] Domain Events + Transactional Outbox (Kreditanträge; Queue `domain-events`)
 
 ## Offen
 
-_(Aktuell leer — nächste Punkte können aus „Später“ übernommen werden.)_
+### Phase 6 — Architekturtiefe
+
+Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
+
+- [x] Domain Events + Transactional Outbox (zuverlässige Publikation über RabbitMQ)
+- [ ] Idempotency-Key (kritische Schreib-APIs)
+- [ ] Saga / Process Manager (Kreditantrags-Lebenszyklus)
+- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [ ] SignalR-Benachrichtigungen (Live-Status über Outbox-Events)
 
 ## Später
 
