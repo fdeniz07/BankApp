@@ -3,7 +3,9 @@
 [English README](README.md) · [Türkçe README](README.tr.md)
 
 BankApp ist ein **full-stack Bildungsbeispiel** für **Privat- und Firmenkreditanträge**.  
-Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n. Lokal: **Docker Compose** (SQL Server, Redis, Seq, WebApi, Client).
+Backend: **.NET 10** Clean Architecture + CQRS (MediatR), Domain Events + Transactional Outbox, Idempotency-Key.  
+Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n.  
+Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, Client).
 
 **Dokumentation:** [Roadmap](docs/roadmap.de.md) · [Architekturnotizen](docs/architecture-notes.de.md) · [Verlauf](docs/history.de.md) · [Changelog](docs/changelog.de.md) · [Testnotizen](docs/test-notes.de.md) · [Infra](infra/README.md)
 
@@ -43,18 +45,22 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 ### Backend
 
 - Privat-/Firmenkunden (TPT), Kreditarten & Untertypen, Anträge
-- JWT-Auth + RBAC; öffentliche Privatkunden-Registrierung
+- JWT-Auth + RBAC; öffentliche Privatkunden-Registrierung + E-Mail-Verifizierung (RabbitMQ)
 - Genehmigen / Ablehnen / **Stornieren** (Statuswechsel — Storno ≠ Soft-Delete)
+- **Domain Events + Transactional Outbox** (Kredit-Lebenszyklus → Queue `domain-events`)
+- **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
 - Zahlungsplan, Dashboard-Summary, Personalverwaltung
 - Profilfelder + Avatar (≤ 2 MB), Seq-Audit-Kategorien
 - Kreditarten anlegen / ändern / löschen / aktiv-passiv (**BankManager**)
 - Serilog → Seq, Redis-Cache, FluentValidation, ProblemDetails
+- CI: GitHub Actions (Build + Unit/Integration + Client)
 
 ### Frontend (`client/`)
 
-- Login / Registrierung, Anträge, Kunden, Kreditarten, Personal, Profil
+- Login / Registrierung / E-Mail-Bestätigung, Anträge, Kunden, Kreditarten, Personal, Profil
 - Statistikleiste, FX-Ticker, Barrierefreiheits-Panel (Thema / Schrift / Kontrast)
-- Sprachumschalter TR / EN / DE
+- Datenschutz- / Cookie-Banner; Sprachumschalter TR / EN / DE
+- `Idempotency-Key` (UUID) bei Kredit-Schreibanfragen
 
 ---
 
@@ -63,15 +69,17 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 | Bereich | Technologie |
 |---------|-------------|
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
+| Domain | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**Name**) |
 | DB / Cache / Logs | SQL Server, Redis, Serilog + Seq |
-| Messaging | RabbitMQ (E-Mail-Verifizierung + Domain Events / Transactional Outbox) |
-| Idempotency | `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
-| Domain-Enums | Ardalis SmartEnum (als **Name**) |
-| Auth | JWT + Rollen-Claims |
+| Messaging | RabbitMQ (`email-confirmation`, `domain-events`) + Transactional Outbox |
+| Idempotency | Header `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
+| Secrets (Lab) | HashiCorp Vault **dev** (`secret/bankapp`; WebApi liest Vault noch nicht) |
+| Auth | JWT + Rollen-Claims (Customer / BankStaff / BankManager) |
 | Client | React, Vite, TypeScript, react-i18next, react-router |
 | Docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
+| Test / CI | xUnit (Application + WebApi.IntegrationTests), GitHub Actions |
 | Seed | Bogus (+ fester Kreditkatalog) |
-| Infra | Docker Compose (`infra/`) |
+| Infra | Docker Compose (`infra/`) — Healthcheck-Servicekette |
 
 ---
 
@@ -82,14 +90,15 @@ BankApp/
 ├── BankApp.slnx
 ├── README.md / README.tr.md / README.de.md
 ├── client/              # React-SPA
-├── docs/
-├── infra/
+├── docs/                # Roadmap, Architekturnotizen, Changelog, Verlauf
+├── infra/               # docker-compose, .env.example, scripts/vault-seed.sh
+├── tests/               # Application.UnitTests, WebApi.IntegrationTests
 └── src/
-    ├── WebApi/
-    ├── Application/
-    ├── Domain/
-    ├── Persistence/
-    └── Core/
+    ├── WebApi/          # Controllers, Idempotency, Messaging (Outbox Dispatcher/Consumers)
+    ├── Application/     # CQRS-Features, Validators, Rules
+    ├── Domain/          # Entities, Events, SmartEnums
+    ├── Persistence/     # DbContext (Outbox-Harvest), Migrations, Seed
+    └── Core/            # Entity, AggregateRoot, Security, Pipelines
 ```
 
 **Abhängigkeitsrichtung:** `WebApi` → `Application` / `Persistence` → `Domain` / `Core`.
@@ -220,16 +229,19 @@ stateDiagram-v2
 | Scalar | http://localhost:8080/scalar/v1 |
 | Client | http://localhost:3000 |
 | Seq | http://localhost:5341 |
+| RabbitMQ UI | http://localhost:15672 |
+| Vault UI (Lab) | http://localhost:8200 |
 
-Die meisten Endpunkte brauchen JWT (außer Login / öffentliche Registrierung).
+Die meisten Endpunkte brauchen JWT (außer Login / öffentliche Registrierung / E-Mail-Bestätigung).  
+Kredit-**Schreib**-APIs (`POST` create/approve/reject/cancel): Pflicht-Header **`Idempotency-Key`**.
 
 | Controller | Highlights |
 |------------|------------|
-| **Auth** | `login`, `register`, `register-individual` |
+| **Auth** | `login`, `register`, `register-individual`, `confirm-email` |
 | **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted |
 | **CreditTypes** | Liste; Mutation + `PUT {id}/active` (Manager) |
 | **CreditSubTypes** | CRUD |
-| **CreditApplications** | `approve` / `reject` / **`cancel`**; `payment-plan` |
+| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan` |
 | **Dashboard** | `GET summary` |
 | **StaffUsers** | Liste / anlegen / ändern (Manager) |
 | **Profile** | Eigenes Profil; Avatar |

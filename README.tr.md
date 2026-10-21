@@ -3,7 +3,9 @@
 [English README](README.md) · [Deutsche README](README.de.md)
 
 BankApp, **bireysel ve kurumsal kredi başvuruları** için eğitim amaçlı **full-stack** bir bankacılık örneğidir.  
-Backend: **.NET 10** Clean Architecture + CQRS. Frontend: **React (Vite + TypeScript)**, **TR / EN / DE** i18n. Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, WebApi, client).
+Backend: **.NET 10** Clean Architecture + CQRS (MediatR), Domain Events + Transactional Outbox, Idempotency-Key.  
+Frontend: **React (Vite + TypeScript)**, **TR / EN / DE** i18n.  
+Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, WebApi, client).
 
 **Dokümanlar:** [Yol haritası](docs/roadmap.tr.md) · [Mimari notlar](docs/architecture-notes.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md) · [Altyapı](infra/README.md)
 
@@ -43,18 +45,22 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 ### Backend
 
 - Bireysel / kurumsal müşteri (TPT), kredi tipi & alt tip, başvuru
-- JWT + RBAC; kamuya açık bireysel kayıt
+- JWT + RBAC; kamuya açık bireysel kayıt + e-posta doğrulama (RabbitMQ)
 - Onay / red / **iptal** (durum değişimi — iptal soft-delete değildir)
+- **Domain Events + Transactional Outbox** (kredi yaşam döngüsü → kuyruk `domain-events`)
+- **Idempotency-Key** (create / approve / reject / cancel; Redis, 24 saat)
 - Ödeme planı, dashboard özeti, personel yönetimi
 - Profil alanları + avatar (≤ 2 MB), Seq audit kategorileri
 - Kredi tipi oluşturma / güncelleme / silme / aktif-pasif (**BankManager**)
 - Serilog → Seq, Redis önbellek, FluentValidation, ProblemDetails
+- CI: GitHub Actions (build + unit/integration + client)
 
 ### Frontend (`client/`)
 
-- Giriş / kayıt, başvurular, müşteriler, kredi türleri, personel, profil
+- Giriş / kayıt / e-posta onay, başvurular, müşteriler, kredi türleri, personel, profil
 - İstatistik şeridi, döviz ticker, erişilebilirlik paneli (tema / yazı / kontrast)
-- Dil seçici TR / EN / DE
+- Datenschutz / çerez bandı; dil seçici TR / EN / DE
+- Kredi yazma isteklerinde `Idempotency-Key` (UUID)
 
 ---
 
@@ -63,15 +69,17 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 | Alan | Teknoloji |
 |------|-----------|
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
+| Domain | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**isim**) |
 | DB / önbellek / log | SQL Server, Redis, Serilog + Seq |
-| Messaging | RabbitMQ (e-posta doğrulama + domain events / transactional outbox) |
-| Idempotency | `Idempotency-Key` + Redis (kredi yazma API’leri, 24 saat) |
-| Domain enum | Ardalis SmartEnum (**isim** ile saklanır) |
-| Auth | JWT + rol claim’leri |
+| Messaging | RabbitMQ (`email-confirmation`, `domain-events`) + Transactional Outbox |
+| Idempotency | Header `Idempotency-Key` + Redis (kredi yazma API’leri, 24 saat) |
+| Secrets (lab) | HashiCorp Vault **dev** (`secret/bankapp`; WebApi henüz Vault okumaz) |
+| Auth | JWT + rol claim’leri (Customer / BankStaff / BankManager) |
 | Client | React, Vite, TypeScript, react-i18next, react-router |
 | Dokümantasyon (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
+| Test / CI | xUnit (Application + WebApi.IntegrationTests), GitHub Actions |
 | Seed | Bogus (+ sabit kredi kataloğu) |
-| Altyapı | Docker Compose (`infra/`) |
+| Altyapı | Docker Compose (`infra/`) — healthcheck’li servis zinciri |
 
 ---
 
@@ -82,14 +90,15 @@ BankApp/
 ├── BankApp.slnx
 ├── README.md / README.tr.md / README.de.md
 ├── client/              # React SPA
-├── docs/                # yol haritası, changelog, geçmiş, test notları
-├── infra/               # docker-compose, .env.example
+├── docs/                # yol haritası, mimari notlar, changelog, geçmiş
+├── infra/               # docker-compose, .env.example, scripts/vault-seed.sh
+├── tests/               # Application.UnitTests, WebApi.IntegrationTests
 └── src/
-    ├── WebApi/
-    ├── Application/
-    ├── Domain/
-    ├── Persistence/
-    └── Core/
+    ├── WebApi/          # Controllers, Idempotency, Messaging (Outbox dispatcher/consumers)
+    ├── Application/     # CQRS features, validators, rules
+    ├── Domain/          # Entities, Events, SmartEnums
+    ├── Persistence/     # DbContext (outbox harvest), migrations, seed
+    └── Core/            # Entity, AggregateRoot, security, pipelines
 ```
 
 **Bağımlılık yönü:** `WebApi` → `Application` / `Persistence` → `Domain` / `Core`.
@@ -220,16 +229,19 @@ Başvuru **iptali** `Cancelled` durumuna özel komutla geçer (soft-delete deği
 | Scalar | http://localhost:8080/scalar/v1 |
 | Client | http://localhost:3000 |
 | Seq | http://localhost:5341 |
+| RabbitMQ UI | http://localhost:15672 |
+| Vault UI (lab) | http://localhost:8200 |
 
-Login / kamu kayıt dışında çoğu endpoint JWT ister.
+Login / kamu kayıt / e-posta onay dışında çoğu endpoint JWT ister.  
+Kredi **yazma** (`POST` create/approve/reject/cancel): zorunlu header **`Idempotency-Key`**.
 
 | Controller | Öne çıkanlar |
 |------------|--------------|
-| **Auth** | `login`, `register`, `register-individual` |
+| **Auth** | `login`, `register`, `register-individual`, `confirm-email` |
 | **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted |
 | **CreditTypes** | Liste; mutasyon + `PUT {id}/active` (manager) |
 | **CreditSubTypes** | CRUD |
-| **CreditApplications** | `approve` / `reject` / **`cancel`**; `payment-plan` |
+| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan` |
 | **Dashboard** | `GET summary` |
 | **StaffUsers** | Liste / oluştur / güncelle (manager) |
 | **Profile** | Profilim; personel güncelleme; avatar |
