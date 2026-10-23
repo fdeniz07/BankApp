@@ -3,8 +3,8 @@
 [English README](README.md) · [Türkçe README](README.tr.md)
 
 BankApp ist ein **full-stack Bildungsbeispiel** für **Privat- und Firmenkreditanträge**.  
-Backend: **.NET 10** Clean Architecture + CQRS (MediatR), Domain Events + Transactional Outbox, Idempotency-Key.  
-Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n.  
+Backend: **.NET 10** Clean Architecture + CQRS (MediatR), Domain Events + Transactional Outbox, Idempotency-Key, Saga / Process Manager, SignalR.  
+Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n und Live-Kreditbenachrichtigungen (SignalR).  
 Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, Client).
 
 **Dokumentation:** [Roadmap](docs/roadmap.de.md) · [Architekturnotizen](docs/architecture-notes.de.md) · [Verlauf](docs/history.de.md) · [Changelog](docs/changelog.de.md) · [Testnotizen](docs/test-notes.de.md) · [Infra](infra/README.md)
@@ -49,6 +49,8 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - Genehmigen / Ablehnen / **Stornieren** (Statuswechsel — Storno ≠ Soft-Delete)
 - **Domain Events + Transactional Outbox** (Kredit-Lebenszyklus → Queue `domain-events`)
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
+- **Saga / Process Manager** (`CreditApplicationSagas`; Created → Entscheidung → Onboarding-Stubs)
+- **SignalR** (`/hubs/credit-applications`; Staff- + Kundengruppen; Publish nach Outbox-Consumer)
 - Zahlungsplan, Dashboard-Summary, Personalverwaltung
 - Profilfelder + Avatar (≤ 2 MB), Seq-Audit-Kategorien
 - Kreditarten anlegen / ändern / löschen / aktiv-passiv (**BankManager**)
@@ -61,6 +63,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - Statistikleiste, FX-Ticker, Barrierefreiheits-Panel (Thema / Schrift / Kontrast)
 - Datenschutz- / Cookie-Banner; Sprachumschalter TR / EN / DE
 - `Idempotency-Key` (UUID) bei Kredit-Schreibanfragen
+- SignalR: Antragsstatus-Toast + Listen-/Detail-Refresh
 
 ---
 
@@ -73,9 +76,11 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 | DB / Cache / Logs | SQL Server, Redis, Serilog + Seq |
 | Messaging | RabbitMQ (`email-confirmation`, `domain-events`) + Transactional Outbox |
 | Idempotency | Header `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
+| Saga | `CreditApplicationProcessManager` + Tabelle `CreditApplicationSagas` |
+| Realtime | SignalR-Hub `/hubs/credit-applications` (JWT `access_token`) |
 | Secrets (Lab) | HashiCorp Vault **dev** (`secret/bankapp`; WebApi liest Vault noch nicht) |
 | Auth | JWT + Rollen-Claims (Customer / BankStaff / BankManager) |
-| Client | React, Vite, TypeScript, react-i18next, react-router |
+| Client | React, Vite, TypeScript, react-i18next, react-router, `@microsoft/signalr` |
 | Docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
 | Test / CI | xUnit (Application + WebApi.IntegrationTests), GitHub Actions |
 | Seed | Bogus (+ fester Kreditkatalog) |
@@ -94,9 +99,9 @@ BankApp/
 ├── infra/               # docker-compose, .env.example, scripts/vault-seed.sh
 ├── tests/               # Application.UnitTests, WebApi.IntegrationTests
 └── src/
-    ├── WebApi/          # Controllers, Idempotency, Messaging (Outbox Dispatcher/Consumers)
-    ├── Application/     # CQRS-Features, Validators, Rules
-    ├── Domain/          # Entities, Events, SmartEnums
+    ├── WebApi/          # Controllers, Idempotency, Messaging, Realtime (SignalR-Hub)
+    ├── Application/     # CQRS-Features, Sagas (Process Manager), Validators, Rules
+    ├── Domain/          # Entities, Events, SmartEnums, CreditApplicationSaga
     ├── Persistence/     # DbContext (Outbox-Harvest), Migrations, Seed
     └── Core/            # Entity, AggregateRoot, Security, Pipelines
 ```
