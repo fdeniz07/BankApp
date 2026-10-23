@@ -42,6 +42,7 @@
 - [x] Domain Events + Transactional Outbox (kredi başvurusu; kuyruk `domain-events`)
 - [x] Idempotency-Key (kredi create/approve/reject/cancel; Redis)
 - [x] Saga / Process Manager (kredi başvuru yaşam döngüsü; `CreditApplicationSagas`)
+- [x] SignalR bildirimleri (Outbox olaylarına bağlı; hub `/hubs/credit-applications`)
 
 ## Yapılacak
 
@@ -52,8 +53,8 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Domain Events + Transactional Outbox (RabbitMQ ile güvenilir yayın)
 - [x] Idempotency-Key (kritik yazma API’leri)
 - [x] Saga / Process Manager (kredi başvuru yaşam döngüsü)
+- [x] SignalR bildirimleri (Outbox olaylarına bağlı anlık durum) — Modular’dan önce uygulandı
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
-- [ ] SignalR bildirimleri (Outbox olaylarına bağlı anlık durum)
 
 ## İleride
 

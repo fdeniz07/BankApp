@@ -99,15 +99,15 @@ Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), f
 1. Domain Events + Transactional Outbox (RabbitMQ) — **uygulandı** (2026-10-21): `AggregateRoot`, `OutboxMessages`, dispatcher + Seq/log consumer; kredi create/approve/reject/cancel olayları
 2. Idempotency-Key (kritik yazma API’leri) — **uygulandı** (2026-10-21): header `Idempotency-Key`, Redis 24 saat, create/approve/reject/cancel; aynı key replay / farklı body → 409
 3. Saga / Process Manager (kredi başvuru yaşam döngüsü) — **uygulandı** (2026-10-22): `CreditApplicationSagas`, Process Manager orkestrasyonu (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
-4. Modular Monolith (Customer / Credit / Identity / Notification)
-5. SignalR bildirimleri (Outbox olaylarına bağlı)
+4. SignalR bildirimleri (Outbox olaylarına bağlı) — **uygulandı** (2026-10-23): hub `/hubs/credit-applications`; consumer → staff + customer grupları; React toast + liste yenileme (Modular’dan önce)
+5. Modular Monolith (Customer / Credit / Identity / Notification)
 
 ```mermaid
 flowchart LR
   A[Outbox_DomainEvents] --> B[Idempotency]
   B --> C[Saga]
-  C --> D[Modular_Monolith]
-  D --> E[SignalR]
+  C --> D[SignalR]
+  D --> E[Modular_Monolith]
 ```
 
 Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OTel → Keycloak → ES/modül → AI RAG.
@@ -134,6 +134,14 @@ Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OT
 2. Onayla → adımlar `RiskChecked` → `ContractPrepared` → `CustomerNotified` → `Completed` + `ContractReference` (Seq adım logları).
 3. Ayrı başvuruyu reddet veya iptal → `Terminated` (onboarding yok).
 
+## Lab — SignalR (kredi başvurusu)
+
+1. WebApi + client ayakta; iki tarayıcı (veya gizli pencere): personel `staff@bank.local` + müşteri `customer@bank.local`.
+2. Her iki oturumda **Başvurular** sayfası açık kalsın (hub bağlanır).
+3. Personel bir başvuruyu onayla / reddet (veya müşteri oluştur / iptal et).
+4. Beklenen: toast (`realtime.creditChanged`), liste yenilenir; Seq: `Domain event consumed` + `Realtime notified`.
+5. Tarayıcı DevTools → Network → WS: `/hubs/credit-applications` bağlı olmalı.
+
 ## Tekrar bakılacak
 
-Sonraki kod adımları: **Modular Monolith**, sonra **SignalR** (Outbox olaylarına bağlı). İsteğe bağlı: **Vault → WebApi secret load**.
+Sonraki kod adımı: **Modular Monolith**. İsteğe bağlı: **Vault → WebApi secret load**.

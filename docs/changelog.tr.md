@@ -2,6 +2,13 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-23 — SignalR (kredi başvurusu anlık bildirim)
+
+- Hub `/hubs/credit-applications` (JWT `access_token`); gruplar `staff` + `customer:{id}`.
+- Domain events consumer → Process Manager sonrası hub publish.
+- React `@microsoft/signalr`: toast + başvuru listesi/detay yenileme.
+- Modular Monolith’ten önce uygulandı (pedagojik sıra).
+
 ## 2026-10-22 — Saga / Process Manager (kredi başvurusu)
 
 - `CreditApplicationSaga` + SmartEnum status/step; tablo `CreditApplicationSagas`.

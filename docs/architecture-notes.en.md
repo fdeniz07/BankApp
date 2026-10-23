@@ -99,15 +99,15 @@ Credit scorecard, contract PDF, installments/late fees, IBAN/transfer (idempoten
 1. Domain Events + Transactional Outbox (RabbitMQ) — **done** (2026-10-21): `AggregateRoot`, `OutboxMessages`, dispatcher + Seq/log consumer; credit create/approve/reject/cancel events
 2. Idempotency-Key (critical write APIs) — **done** (2026-10-21): `Idempotency-Key` header, Redis 24h, create/approve/reject/cancel; same key replay / different body → 409
 3. Saga / Process Manager (credit application lifecycle) — **done** (2026-10-22): `CreditApplicationSagas`, orchestrating Process Manager (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
-4. Modular Monolith (Customer / Credit / Identity / Notification)
-5. SignalR notifications (driven by Outbox events)
+4. SignalR notifications (driven by Outbox events) — **done** (2026-10-23): hub `/hubs/credit-applications`; consumer → staff + customer groups; React toast + list refresh (before Modular)
+5. Modular Monolith (Customer / Credit / Identity / Notification)
 
 ```mermaid
 flowchart LR
   A[Outbox_DomainEvents] --> B[Idempotency]
   B --> C[Saga]
-  C --> D[Modular_Monolith]
-  D --> E[SignalR]
+  C --> D[SignalR]
+  D --> E[Modular_Monolith]
 ```
 
 Broader training sequence (beyond Phase 6): Outbox → SignalR → OTel → Keycloak → ES/module → AI RAG.
@@ -134,6 +134,14 @@ Broader training sequence (beyond Phase 6): Outbox → SignalR → OTel → Keyc
 2. Approve → steps `RiskChecked` → `ContractPrepared` → `CustomerNotified` → `Completed` + `ContractReference` (Seq step logs).
 3. Reject or cancel a separate application → `Terminated` (no onboarding).
 
+## Lab — SignalR (credit applications)
+
+1. WebApi + client running; two browsers (or an incognito window): staff `staff@bank.local` + customer `customer@bank.local`.
+2. Keep **Applications** open in both sessions (hub connects).
+3. Staff approve/reject (or customer create/cancel).
+4. Expect: toast (`realtime.creditChanged`), list refreshes; Seq: `Domain event consumed` + `Realtime notified`.
+5. DevTools → Network → WS: `/hubs/credit-applications` should be connected.
+
 ## Revisit before coding
 
-Next code steps: **Modular Monolith**, then **SignalR** (driven by Outbox events). Optional: **Vault → WebApi secret load**.
+Next code step: **Modular Monolith**. Optional: **Vault → WebApi secret load**.

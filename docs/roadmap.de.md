@@ -42,6 +42,7 @@
 - [x] Domain Events + Transactional Outbox (Kreditanträge; Queue `domain-events`)
 - [x] Idempotency-Key (Kredit create/approve/reject/cancel; Redis)
 - [x] Saga / Process Manager (Kreditantrags-Lebenszyklus; `CreditApplicationSagas`)
+- [x] SignalR-Benachrichtigungen (Outbox-getrieben; Hub `/hubs/credit-applications`)
 
 ## Offen
 
@@ -52,8 +53,8 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Domain Events + Transactional Outbox (zuverlässige Publikation über RabbitMQ)
 - [x] Idempotency-Key (kritische Schreib-APIs)
 - [x] Saga / Process Manager (Kreditantrags-Lebenszyklus)
+- [x] SignalR-Benachrichtigungen (Live-Status über Outbox-Events) — vor Modular umgesetzt
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
-- [ ] SignalR-Benachrichtigungen (Live-Status über Outbox-Events)
 
 ## Später
 

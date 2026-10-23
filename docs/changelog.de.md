@@ -2,6 +2,13 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-23 — SignalR (Live-Benachrichtigungen Kreditantrag)
+
+- Hub `/hubs/credit-applications` (JWT `access_token`); Gruppen `staff` + `customer:{id}`.
+- Domain-Events-Consumer publiziert nach dem Process Manager an den Hub.
+- React `@microsoft/signalr`: Toast + Antrags-Listen/Detail-Refresh.
+- Vor Modular Monolith umgesetzt (pädagogische Reihenfolge).
+
 ## 2026-10-22 — Saga / Process Manager (Kreditanträge)
 
 - `CreditApplicationSaga` + SmartEnum Status/Step; Tabelle `CreditApplicationSagas`.
