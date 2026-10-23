@@ -143,6 +143,7 @@ services:
       RabbitMq__Password: "guest"
       RabbitMq__EmailConfirmationQueue: "email-confirmation"
       App__PublicClientBaseUrl: "${PUBLIC_CLIENT_BASE_URL:-http://localhost:3000}"
+      Cors__AllowedOrigins__0: "${PUBLIC_CLIENT_BASE_URL:-http://localhost:3000}"
       TokenOptions__Audience: "${TOKEN_AUDIENCE:-BankAppAudience}"
       TokenOptions__Issuer: "${TOKEN_ISSUER:-BankAppIssuer}"
       TokenOptions__AccessTokenExpiration: "${TOKEN_EXPIRATION_MINUTES:-60}"
