@@ -14,6 +14,7 @@ using Microsoft.IdentityModel.Tokens;
 using WebApi.Constants;
 using WebApi.Idempotency;
 using WebApi.Messaging;
+using WebApi.Realtime;
 using WebApi.Services;
 
 namespace WebApi.Extensions;
@@ -33,6 +34,8 @@ public static class ServiceCollectionExtensions
         services.AddHostedService<DomainEventsConsumerHostedService>();
         services.Configure<IdempotencyOptions>(configuration.GetSection(IdempotencyOptions.SectionName));
         services.AddScoped<IdempotencyKeyFilter>();
+        services.AddSignalR();
+        services.AddSingleton<ICreditApplicationRealtimeNotifier, CreditApplicationRealtimeNotifier>();
 
         services.AddControllers()
             .AddJsonOptions(options =>
@@ -101,6 +104,21 @@ public static class ServiceCollectionExtensions
                     NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier,
                     RoleClaimType = System.Security.Claims.ClaimTypes.Role
                 };
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        string? accessToken = context.Request.Query["access_token"];
+                        PathString path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken)
+                            && path.StartsWithSegments(CreditApplicationsHub.Path))
+                        {
+                            context.Token = accessToken;
+                        }
+
+                        return Task.CompletedTask;
+                    }
+                };
             });
 
         services.AddAuthorization();
@@ -143,7 +161,8 @@ public static class ServiceCollectionExtensions
 
                 policy.WithOrigins(allowedOrigins)
                     .AllowAnyHeader()
-                    .AllowAnyMethod();
+                    .AllowAnyMethod()
+                    .AllowCredentials();
             });
         });
 

@@ -2,6 +2,7 @@ using Core.CrossCuttingConcerns.Exceptions.Extensions;
 using Scalar.AspNetCore;
 using Serilog;
 using WebApi.Constants;
+using WebApi.Realtime;
 
 namespace WebApi.Extensions;
 
@@ -39,6 +40,7 @@ public static class ApplicationBuilderExtensions
         app.MapHealthChecks("/health").AllowAnonymous().DisableRateLimiting();
 
         app.MapControllers();
+        app.MapHub<CreditApplicationsHub>(CreditApplicationsHub.Path).DisableRateLimiting();
 
         return app;
     }
