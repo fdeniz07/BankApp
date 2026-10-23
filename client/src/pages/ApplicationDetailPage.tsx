@@ -11,6 +11,10 @@ import { getCreditSubTypes } from '../api/creditSubTypesApi'
 import { useAuth } from '../auth/AuthContext'
 import type { CreditApplicationDetail, CreditSubTypeListItem, PaymentPlanResponse } from '../types/api'
 import { ApiError } from '../api/client'
+import {
+  CREDIT_APPLICATION_CHANGED_EVENT,
+  type CreditApplicationChangedPayload,
+} from '../realtime/creditApplicationEvents'
 import { formatMoney } from '../utils/formatMoney'
 
 export function ApplicationDetailPage() {
@@ -64,6 +68,17 @@ export function ApplicationDetailPage() {
 
   useEffect(() => {
     void load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id])
+
+  useEffect(() => {
+    const onRealtime = (event: Event) => {
+      const detail = (event as CustomEvent<CreditApplicationChangedPayload>).detail
+      if (!id || !detail || detail.applicationId !== id) return
+      void load()
+    }
+    window.addEventListener(CREDIT_APPLICATION_CHANGED_EVENT, onRealtime)
+    return () => window.removeEventListener(CREDIT_APPLICATION_CHANGED_EVENT, onRealtime)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
 

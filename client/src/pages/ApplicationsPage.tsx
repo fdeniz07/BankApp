@@ -14,6 +14,7 @@ import { getCreditSubTypes } from '../api/creditSubTypesApi'
 import { getDashboardSummary } from '../api/dashboardApi'
 import { useAuth } from '../auth/AuthContext'
 import { DASHBOARD_REFRESH_EVENT } from '../components/StatsStrip'
+import { CREDIT_APPLICATION_CHANGED_EVENT } from '../realtime/creditApplicationEvents'
 import type {
   ApplicationSortBy,
   CreditApplicationListItem,
@@ -97,6 +98,15 @@ export function ApplicationsPage() {
       cancelled = true
     }
   }, [loadList])
+
+  useEffect(() => {
+    const onRealtime = () => {
+      void loadList()
+      void loadDashboard()
+    }
+    window.addEventListener(CREDIT_APPLICATION_CHANGED_EVENT, onRealtime)
+    return () => window.removeEventListener(CREDIT_APPLICATION_CHANGED_EVENT, onRealtime)
+  }, [loadList, loadDashboard])
 
   useEffect(() => {
     void loadDashboard()

@@ -159,6 +159,15 @@
     "Male": "Männlich",
     "PreferNotToSay": "Keine Angabe"
   },
+  "realtime": {
+    "creditChanged": "{{number}} — {{event}}",
+    "events": {
+      "CreditApplicationCreated": "Antrag erstellt",
+      "CreditApplicationApproved": "Antrag genehmigt",
+      "CreditApplicationRejected": "Antrag abgelehnt",
+      "CreditApplicationCancelled": "Antrag storniert"
+    }
+  },
   "common": {
     "loading": "Wird geladen…",
     "empty": "Keine Einträge gefunden.",

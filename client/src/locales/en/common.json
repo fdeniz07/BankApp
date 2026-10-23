@@ -159,6 +159,15 @@
     "Male": "Male",
     "PreferNotToSay": "Prefer not to say"
   },
+  "realtime": {
+    "creditChanged": "{{number}} — {{event}}",
+    "events": {
+      "CreditApplicationCreated": "Application created",
+      "CreditApplicationApproved": "Application approved",
+      "CreditApplicationRejected": "Application rejected",
+      "CreditApplicationCancelled": "Application cancelled"
+    }
+  },
   "common": {
     "loading": "Loading…",
     "empty": "No records found.",

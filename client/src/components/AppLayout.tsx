@@ -1,6 +1,7 @@
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
+import { useCreditApplicationRealtime } from '../realtime/useCreditApplicationRealtime'
 import { FxTicker } from './FxTicker'
 import { LanguageSwitcher } from './LanguageSwitcher'
 import { StatsStrip } from './StatsStrip'
@@ -8,6 +9,7 @@ import { StatsStrip } from './StatsStrip'
 export function AppLayout() {
   const { t } = useTranslation()
   const { user, isStaff, isManager, logout } = useAuth()
+  useCreditApplicationRealtime()
   const initial = (user?.displayName || user?.email || '?').slice(0, 1).toUpperCase()
 
   return (

@@ -159,6 +159,15 @@
     "Male": "Erkek",
     "PreferNotToSay": "Belirtmek istemiyorum"
   },
+  "realtime": {
+    "creditChanged": "{{number}} — {{event}}",
+    "events": {
+      "CreditApplicationCreated": "Başvuru oluşturuldu",
+      "CreditApplicationApproved": "Başvuru onaylandı",
+      "CreditApplicationRejected": "Başvuru reddedildi",
+      "CreditApplicationCancelled": "Başvuru iptal edildi"
+    }
+  },
   "common": {
     "loading": "Yükleniyor…",
     "empty": "Kayıt bulunamadı.",
