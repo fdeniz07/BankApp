@@ -98,7 +98,7 @@ Kredit-Scorecard, Vertrags-PDF, Raten/Verzug, IBAN/Transfer (idempotent), Fraud-
 
 1. Domain Events + Transactional Outbox (RabbitMQ) — **umgesetzt** (2026-10-21): `AggregateRoot`, `OutboxMessages`, Dispatcher + Seq/Log-Consumer; Kredit create/approve/reject/cancel Events
 2. Idempotency-Key (kritische Schreib-APIs) — **umgesetzt** (2026-10-21): Header `Idempotency-Key`, Redis 24h, create/approve/reject/cancel; gleicher Key Replay / anderer Body → 409
-3. Saga / Process Manager (Kreditantrags-Lebenszyklus)
+3. Saga / Process Manager (Kreditantrags-Lebenszyklus) — **umgesetzt** (2026-10-22): `CreditApplicationSagas`, orchestrierender Process Manager (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
 4. Modular Monolith (Customer / Credit / Identity / Notification)
 5. SignalR-Benachrichtigungen (getrieben von Outbox-Events)
 
@@ -128,6 +128,12 @@ Breitere Schulungsreihenfolge (außerhalb Phase 6): Outbox → SignalR → OTel 
 - Seed: Compose `vault-seed` oder `infra/scripts/vault-seed.sh`
 - **Hinweis:** WebApi liest weiterhin `.env`; Vault ist ein Neben-Lab (SDK später)
 
+## Lab — Saga / Process Manager
+
+1. Antrag anlegen → SQL-Zeile in `CreditApplicationSagas` mit `AwaitingDecision` (Seq: `Saga started`).
+2. Genehmigen → Schritte `RiskChecked` → `ContractPrepared` → `CustomerNotified` → `Completed` + `ContractReference` (Seq-Steplog).
+3. Anderen Antrag ablehnen oder stornieren → `Terminated` (kein Onboarding).
+
 ## Vor dem Codieren erneut lesen
 
-Nächste Schritte: **Saga / Process Manager**, optional danach **Vault → WebApi Secret-Load**. Outbox + Idempotency + Vault-Compose-Lab sind fertig.
+Nächste Schritte: **Modular Monolith**, dann **SignalR** (getrieben von Outbox-Events). Optional: **Vault → WebApi Secret-Load**.

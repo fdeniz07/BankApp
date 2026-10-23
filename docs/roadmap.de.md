@@ -41,6 +41,7 @@
 - [x] E-Mail-Verifizierung nach Registrierung (RabbitMQ-Queue + Seq/Log-Link; kein JWT bei Register)
 - [x] Domain Events + Transactional Outbox (Kreditanträge; Queue `domain-events`)
 - [x] Idempotency-Key (Kredit create/approve/reject/cancel; Redis)
+- [x] Saga / Process Manager (Kreditantrags-Lebenszyklus; `CreditApplicationSagas`)
 
 ## Offen
 
@@ -50,7 +51,7 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 
 - [x] Domain Events + Transactional Outbox (zuverlässige Publikation über RabbitMQ)
 - [x] Idempotency-Key (kritische Schreib-APIs)
-- [ ] Saga / Process Manager (Kreditantrags-Lebenszyklus)
+- [x] Saga / Process Manager (Kreditantrags-Lebenszyklus)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR-Benachrichtigungen (Live-Status über Outbox-Events)
 

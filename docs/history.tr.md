@@ -54,6 +54,6 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 
 - [x] Domain Events + Transactional Outbox (RabbitMQ, kredi başvurusu)
 - [x] Idempotency-Key (kritik yazma API’leri; Redis, 24 saat TTL)
-- [ ] Saga / Process Manager (kredi başvuru yaşam döngüsü)
+- [x] Saga / Process Manager (orkestrasyon; `CreditApplicationSagas`)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR bildirimleri (Outbox olaylarına bağlı)

@@ -98,7 +98,7 @@ Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), f
 
 1. Domain Events + Transactional Outbox (RabbitMQ) — **uygulandı** (2026-10-21): `AggregateRoot`, `OutboxMessages`, dispatcher + Seq/log consumer; kredi create/approve/reject/cancel olayları
 2. Idempotency-Key (kritik yazma API’leri) — **uygulandı** (2026-10-21): header `Idempotency-Key`, Redis 24 saat, create/approve/reject/cancel; aynı key replay / farklı body → 409
-3. Saga / Process Manager (kredi başvuru yaşam döngüsü)
+3. Saga / Process Manager (kredi başvuru yaşam döngüsü) — **uygulandı** (2026-10-22): `CreditApplicationSagas`, Process Manager orkestrasyonu (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
 4. Modular Monolith (Customer / Credit / Identity / Notification)
 5. SignalR bildirimleri (Outbox olaylarına bağlı)
 
@@ -128,6 +128,12 @@ Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OT
 - Seed: Compose `vault-seed` veya `infra/scripts/vault-seed.sh`
 - **Önemli:** WebApi hâlâ `.env` okur; Vault yan lab (sonraki dilimde SDK entegrasyonu)
 
+## Lab — Saga / Process Manager
+
+1. Başvuru oluştur → SQL `CreditApplicationSagas` satırı `AwaitingDecision` (Seq: `Saga started`).
+2. Onayla → adımlar `RiskChecked` → `ContractPrepared` → `CustomerNotified` → `Completed` + `ContractReference` (Seq adım logları).
+3. Ayrı başvuruyu reddet veya iptal → `Terminated` (onboarding yok).
+
 ## Tekrar bakılacak
 
-Sonraki kod adımları: **Saga / Process Manager**, sonra isteğe bağlı **Vault → WebApi secret load**. Outbox + Idempotency + Vault Compose lab tamam.
+Sonraki kod adımları: **Modular Monolith**, sonra **SignalR** (Outbox olaylarına bağlı). İsteğe bağlı: **Vault → WebApi secret load**.

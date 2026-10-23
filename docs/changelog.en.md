@@ -2,6 +2,12 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-22 — Saga / Process Manager (credit applications)
+
+- `CreditApplicationSaga` + SmartEnum status/step; table `CreditApplicationSagas`.
+- `CreditApplicationProcessManager`: Created → AwaitingDecision; Approved → Risk/Contract/Notify → Completed; Rejected/Cancelled → Terminated.
+- Domain events consumer wired to the process manager; unit tests.
+
 ## 2026-10-22 — HashiCorp Vault lab (Docker Compose)
 
 - Compose: `vault` (dev mode, :8200) + one-shot `vault-seed`.

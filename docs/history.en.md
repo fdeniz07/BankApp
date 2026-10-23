@@ -54,6 +54,6 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 
 - [x] Domain Events + Transactional Outbox (RabbitMQ, credit applications)
 - [x] Idempotency-Key (critical write APIs; Redis, 24h TTL)
-- [ ] Saga / Process Manager (credit application lifecycle)
+- [x] Saga / Process Manager (orchestration; `CreditApplicationSagas`)
 - [ ] Modular Monolith (Customer / Credit / Identity / Notification)
 - [ ] SignalR notifications (driven by Outbox events)
