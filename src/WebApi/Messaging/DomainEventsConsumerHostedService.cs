@@ -1,9 +1,11 @@
 using System.Text;
 using System.Text.Json;
 using Application.Sagas;
+using Domain.Events;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using WebApi.Realtime;
 
 namespace WebApi.Messaging;
 
@@ -116,6 +118,14 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
                 scope.ServiceProvider.GetRequiredService<ICreditApplicationProcessManager>();
             await processManager.HandleAsync(type, payload);
 
+            CreditApplicationChangedMessage? realtime = TryBuildRealtimeMessage(type, payload);
+            if (realtime is not null)
+            {
+                ICreditApplicationRealtimeNotifier notifier =
+                    scope.ServiceProvider.GetRequiredService<ICreditApplicationRealtimeNotifier>();
+                await notifier.NotifyAsync(realtime);
+            }
+
             _channel!.BasicAck(ea.DeliveryTag, multiple: false);
         }
         catch (Exception ex)
@@ -123,6 +133,65 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             _logger.LogError(ex, "Failed to process domain event message.");
             _channel?.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
         }
+    }
+
+    private static CreditApplicationChangedMessage? TryBuildRealtimeMessage(string eventType, string payload)
+    {
+        string shortName = ShortEventName(eventType);
+        if (shortName is not (
+            nameof(CreditApplicationCreated)
+            or nameof(CreditApplicationApproved)
+            or nameof(CreditApplicationRejected)
+            or nameof(CreditApplicationCancelled)))
+        {
+            return null;
+        }
+
+        using JsonDocument doc = JsonDocument.Parse(payload);
+        JsonElement root = doc.RootElement;
+
+        if (!TryGetGuid(root, "creditApplicationId", out Guid applicationId)
+            || !TryGetGuid(root, "customerId", out Guid customerId))
+        {
+            return null;
+        }
+
+        string applicationNumber = root.TryGetProperty("applicationNumber", out JsonElement numberEl)
+            ? numberEl.GetString() ?? string.Empty
+            : string.Empty;
+
+        DateTimeOffset occurredOnUtc = DateTimeOffset.UtcNow;
+        if (root.TryGetProperty("occurredOnUtc", out JsonElement occurredEl)
+            && occurredEl.ValueKind == JsonValueKind.String
+            && DateTimeOffset.TryParse(occurredEl.GetString(), out DateTimeOffset parsed))
+        {
+            occurredOnUtc = parsed;
+        }
+
+        return new CreditApplicationChangedMessage(
+            applicationId,
+            applicationNumber,
+            customerId,
+            shortName,
+            occurredOnUtc);
+    }
+
+    private static string ShortEventName(string eventType)
+    {
+        int lastDot = eventType.LastIndexOf('.');
+        return lastDot >= 0 && lastDot < eventType.Length - 1
+            ? eventType[(lastDot + 1)..]
+            : eventType;
+    }
+
+    private static bool TryGetGuid(JsonElement root, string name, out Guid value)
+    {
+        value = default;
+        if (!root.TryGetProperty(name, out JsonElement el))
+            return false;
+        if (el.ValueKind == JsonValueKind.String)
+            return Guid.TryParse(el.GetString(), out value);
+        return el.TryGetGuid(out value);
     }
 
     private void DisposeChannel()
