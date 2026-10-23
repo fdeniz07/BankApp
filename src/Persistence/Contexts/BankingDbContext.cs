@@ -22,6 +22,7 @@ public class BankingDbContext : DbContext
     public DbSet<CreditType> CreditTypes { get; set; }
     public DbSet<CreditSubType> CreditSubTypes { get; set; }
     public DbSet<CreditApplication> CreditApplications { get; set; }
+    public DbSet<CreditApplicationSaga> CreditApplicationSagas { get; set; }
     public DbSet<OutboxMessage> OutboxMessages { get; set; }
     public DbSet<ApplicationUser> Users { get; set; }
     public DbSet<OperationClaim> OperationClaims { get; set; }

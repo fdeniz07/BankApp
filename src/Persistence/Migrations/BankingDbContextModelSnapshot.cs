@@ -278,6 +278,79 @@ namespace Persistence.Migrations
                     b.ToTable("CreditApplications", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.CreditApplicationSaga", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("ApplicationNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("ApplicationNumber");
+
+                    b.Property<DateTimeOffset?>("CompletedOnUtc")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CompletedOnUtc");
+
+                    b.Property<string>("ContractReference")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ContractReference");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<Guid>("CreditApplicationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CreditApplicationId");
+
+                    b.Property<string>("CurrentStep")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("CurrentStep");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<string>("FailureReason")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("FailureReason");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<DateTimeOffset>("StartedOnUtc")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("StartedOnUtc");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("Status");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreditApplicationId")
+                        .IsUnique();
+
+                    b.HasIndex("Status");
+
+                    b.ToTable("CreditApplicationSagas", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.CreditSubType", b =>
                 {
                     b.Property<Guid>("Id")
