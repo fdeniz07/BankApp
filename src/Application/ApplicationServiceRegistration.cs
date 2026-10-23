@@ -1,4 +1,5 @@
 using System.Reflection;
+using Application.Sagas;
 using Application.Services.Logging;
 using Core.Application.Pipelines;
 using Core.Application.Pipelines.Authorization;
@@ -32,6 +33,7 @@ public static class ApplicationServiceRegistration
 
         services.AddScoped<ITokenHelper, JwtHelper>();
         services.AddScoped<IAuditLogger, SerilogAuditLogger>();
+        services.AddScoped<ICreditApplicationProcessManager, CreditApplicationProcessManager>();
         services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), typeof(BaseBusinessRules));
 
         return services;
