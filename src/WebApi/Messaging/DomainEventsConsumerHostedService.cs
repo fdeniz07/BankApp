@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Json;
+using Application.Sagas;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -8,15 +9,18 @@ namespace WebApi.Messaging;
 
 public sealed class DomainEventsConsumerHostedService : BackgroundService
 {
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly RabbitMqOptions _options;
     private readonly ILogger<DomainEventsConsumerHostedService> _logger;
     private IConnection? _connection;
     private IModel? _channel;
 
     public DomainEventsConsumerHostedService(
+        IServiceScopeFactory scopeFactory,
         IOptions<RabbitMqOptions> options,
         ILogger<DomainEventsConsumerHostedService> logger)
     {
+        _scopeFactory = scopeFactory;
         _options = options.Value;
         _logger = logger;
     }
@@ -77,34 +81,7 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             arguments: null);
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
-        consumer.Received += async (_, ea) =>
-        {
-            try
-            {
-                string json = Encoding.UTF8.GetString(ea.Body.ToArray());
-                using JsonDocument doc = JsonDocument.Parse(json);
-                string type = doc.RootElement.TryGetProperty("type", out JsonElement typeEl)
-                    ? typeEl.GetString() ?? "(unknown)"
-                    : "(unknown)";
-                string payload = doc.RootElement.TryGetProperty("payload", out JsonElement payloadEl)
-                    ? payloadEl.GetString() ?? "{}"
-                    : json;
-
-                _logger.LogInformation(
-                    "Domain event consumed. Type={EventType} Payload={Payload}",
-                    type,
-                    payload);
-
-                _channel.BasicAck(ea.DeliveryTag, multiple: false);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Failed to process domain event message.");
-                _channel?.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
-            }
-
-            await Task.CompletedTask;
-        };
+        consumer.Received += OnReceivedAsync;
 
         _channel.BasicConsume(
             queue: _options.DomainEventsQueue,
@@ -114,6 +91,38 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
         _logger.LogInformation(
             "Listening for domain events on queue {Queue}.",
             _options.DomainEventsQueue);
+    }
+
+    private async Task OnReceivedAsync(object sender, BasicDeliverEventArgs ea)
+    {
+        try
+        {
+            string json = Encoding.UTF8.GetString(ea.Body.ToArray());
+            using JsonDocument doc = JsonDocument.Parse(json);
+            string type = doc.RootElement.TryGetProperty("type", out JsonElement typeEl)
+                ? typeEl.GetString() ?? "(unknown)"
+                : "(unknown)";
+            string payload = doc.RootElement.TryGetProperty("payload", out JsonElement payloadEl)
+                ? payloadEl.GetString() ?? "{}"
+                : json;
+
+            _logger.LogInformation(
+                "Domain event consumed. Type={EventType} Payload={Payload}",
+                type,
+                payload);
+
+            using IServiceScope scope = _scopeFactory.CreateScope();
+            ICreditApplicationProcessManager processManager =
+                scope.ServiceProvider.GetRequiredService<ICreditApplicationProcessManager>();
+            await processManager.HandleAsync(type, payload);
+
+            _channel!.BasicAck(ea.DeliveryTag, multiple: false);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to process domain event message.");
+            _channel?.BasicNack(ea.DeliveryTag, multiple: false, requeue: false);
+        }
     }
 
     private void DisposeChannel()
