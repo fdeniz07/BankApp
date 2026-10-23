@@ -21,3 +21,4 @@ _(empty)_
 |------|------:|-------|
 | 2026-10-21 | 13 | Outbox feature + commit-queue convention |
 | 2026-10-22 | — | Vault Compose lab + Idempotency-Key (after midnight) |
+| 2026-10-23 | 6 | Saga / Process Manager (domain → persist → manager → consumer → tests → docs) |
