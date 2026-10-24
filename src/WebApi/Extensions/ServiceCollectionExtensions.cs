@@ -12,9 +12,11 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.IdentityModel.Tokens;
 using WebApi.Constants;
-using WebApi.Idempotency;
-using WebApi.Messaging;
-using WebApi.Realtime;
+using WebApi.Modules.Credit;
+using WebApi.Modules.Credit.Idempotency;
+using WebApi.Modules.Notification;
+using WebApi.Modules.Notification.Messaging;
+using WebApi.Modules.Notification.Realtime;
 using WebApi.Services;
 
 namespace WebApi.Extensions;
@@ -26,16 +28,9 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IProfileImageStorage, LocalProfileImageStorage>();
-        services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
         services.Configure<AppPublicOptions>(configuration.GetSection(AppPublicOptions.SectionName));
-        services.AddSingleton<IEmailConfirmationPublisher, RabbitMqEmailConfirmationPublisher>();
-        services.AddHostedService<EmailConfirmationConsumerHostedService>();
-        services.AddHostedService<OutboxDispatcherHostedService>();
-        services.AddHostedService<DomainEventsConsumerHostedService>();
-        services.Configure<IdempotencyOptions>(configuration.GetSection(IdempotencyOptions.SectionName));
-        services.AddScoped<IdempotencyKeyFilter>();
-        services.AddSignalR();
-        services.AddSingleton<ICreditApplicationRealtimeNotifier, CreditApplicationRealtimeNotifier>();
+        services.AddNotificationHostModule(configuration);
+        services.AddCreditHostModule(configuration);
 
         services.AddControllers()
             .AddJsonOptions(options =>

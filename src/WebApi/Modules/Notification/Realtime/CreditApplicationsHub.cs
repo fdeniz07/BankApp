@@ -3,7 +3,7 @@ using Core.Security.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 
-namespace WebApi.Realtime;
+namespace WebApi.Modules.Notification.Realtime;
 
 [Authorize]
 public sealed class CreditApplicationsHub : Hub

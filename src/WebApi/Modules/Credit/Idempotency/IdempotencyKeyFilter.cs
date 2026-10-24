@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 
-namespace WebApi.Idempotency;
+namespace WebApi.Modules.Credit.Idempotency;
 
 /// <summary>
 /// Resource filter (runs before model binding) so the request body can be read for fingerprinting.

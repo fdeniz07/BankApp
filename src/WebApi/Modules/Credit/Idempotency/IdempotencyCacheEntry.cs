@@ -1,4 +1,4 @@
-namespace WebApi.Idempotency;
+namespace WebApi.Modules.Credit.Idempotency;
 
 public sealed class IdempotencyCacheEntry
 {

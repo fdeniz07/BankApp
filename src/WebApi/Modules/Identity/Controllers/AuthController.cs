@@ -1,12 +1,13 @@
-using Application.Features.Auth.Commands.ConfirmEmail;
-using Application.Features.Auth.Commands.Login;
-using Application.Features.Auth.Commands.Register;
-using Application.Features.Auth.Commands.RegisterIndividual;
+using Application.Modules.Identity.Features.Auth.Commands.ConfirmEmail;
+using Application.Modules.Identity.Features.Auth.Commands.Login;
+using Application.Modules.Identity.Features.Auth.Commands.Register;
+using Application.Modules.Identity.Features.Auth.Commands.RegisterIndividual;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Controllers;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Identity.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

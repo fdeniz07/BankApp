@@ -1,21 +1,22 @@
-using Application.Features.CreditApplications.Commands.Approve;
-using Application.Features.CreditApplications.Commands.Cancel;
-using Application.Features.CreditApplications.Commands.Create;
-using Application.Features.CreditApplications.Commands.Delete;
-using Application.Features.CreditApplications.Commands.Reject;
-using Application.Features.CreditApplications.Commands.Update;
-using Application.Features.CreditApplications.Queries.GetById;
-using Application.Features.CreditApplications.Queries.GetList;
-using Application.Features.CreditApplications.Queries.GetPaymentPlan;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Approve;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Cancel;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Create;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Delete;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Reject;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Update;
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetById;
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetList;
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetPaymentPlan;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
-using WebApi.Idempotency;
+using WebApi.Controllers;
+using WebApi.Modules.Credit.Idempotency;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Credit.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

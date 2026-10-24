@@ -4,7 +4,7 @@ using Application.Services.Messaging;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 
-namespace WebApi.Messaging;
+namespace WebApi.Modules.Notification.Messaging;
 
 public sealed class RabbitMqEmailConfirmationPublisher : IEmailConfirmationPublisher
 {

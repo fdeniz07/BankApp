@@ -1,16 +1,17 @@
-using Application.Features.CorporateCustomers.Commands.Create;
-using Application.Features.CorporateCustomers.Commands.Delete;
-using Application.Features.CorporateCustomers.Commands.Update;
-using Application.Features.CorporateCustomers.Queries.GetById;
-using Application.Features.CorporateCustomers.Queries.GetCatalog;
-using Application.Features.CorporateCustomers.Queries.GetList;
+using Application.Modules.Customers.Features.CorporateCustomers.Commands.Create;
+using Application.Modules.Customers.Features.CorporateCustomers.Commands.Delete;
+using Application.Modules.Customers.Features.CorporateCustomers.Commands.Update;
+using Application.Modules.Customers.Features.CorporateCustomers.Queries.GetById;
+using Application.Modules.Customers.Features.CorporateCustomers.Queries.GetCatalog;
+using Application.Modules.Customers.Features.CorporateCustomers.Queries.GetList;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Controllers;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Customers.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

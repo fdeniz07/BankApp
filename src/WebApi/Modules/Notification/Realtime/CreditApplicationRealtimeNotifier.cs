@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace WebApi.Realtime;
+namespace WebApi.Modules.Notification.Realtime;
 
 public sealed class CreditApplicationRealtimeNotifier : ICreditApplicationRealtimeNotifier
 {

@@ -1,4 +1,4 @@
-namespace WebApi.Realtime;
+namespace WebApi.Modules.Notification.Realtime;
 
 public static class CreditApplicationRealtimeGroups
 {

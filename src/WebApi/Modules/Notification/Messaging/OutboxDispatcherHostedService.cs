@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 using Persistence.Contexts;
 using RabbitMQ.Client;
 
-namespace WebApi.Messaging;
+namespace WebApi.Modules.Notification.Messaging;
 
 public sealed class OutboxDispatcherHostedService : BackgroundService
 {

@@ -2,7 +2,7 @@ using Core.CrossCuttingConcerns.Exceptions.Extensions;
 using Scalar.AspNetCore;
 using Serilog;
 using WebApi.Constants;
-using WebApi.Realtime;
+using WebApi.Modules.Notification.Realtime;
 
 namespace WebApi.Extensions;
 

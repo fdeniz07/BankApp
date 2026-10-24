@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
-namespace WebApi.Messaging;
+namespace WebApi.Modules.Notification.Messaging;
 
 public sealed class EmailConfirmationConsumerHostedService : BackgroundService
 {

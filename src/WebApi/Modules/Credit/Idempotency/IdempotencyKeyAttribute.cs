@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace WebApi.Idempotency;
+namespace WebApi.Modules.Credit.Idempotency;
 
 [AttributeUsage(AttributeTargets.Method)]
 public sealed class IdempotencyKeyAttribute : Attribute, IFilterFactory

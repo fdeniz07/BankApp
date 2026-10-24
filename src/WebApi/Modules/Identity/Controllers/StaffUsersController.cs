@@ -1,13 +1,14 @@
-using Application.Features.StaffUsers.Commands.Create;
-using Application.Features.StaffUsers.Commands.Update;
-using Application.Features.StaffUsers.Queries.GetList;
+using Application.Modules.Identity.Features.StaffUsers.Commands.Create;
+using Application.Modules.Identity.Features.StaffUsers.Commands.Update;
+using Application.Modules.Identity.Features.StaffUsers.Queries.GetList;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Controllers;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Identity.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

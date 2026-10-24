@@ -1,4 +1,4 @@
-namespace WebApi.Realtime;
+namespace WebApi.Modules.Notification.Realtime;
 
 public sealed record CreditApplicationChangedMessage(
     Guid ApplicationId,

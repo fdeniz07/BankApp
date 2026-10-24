@@ -1,16 +1,17 @@
-using Application.Features.CreditTypes.Commands.Create;
-using Application.Features.CreditTypes.Commands.Delete;
-using Application.Features.CreditTypes.Commands.SetActive;
-using Application.Features.CreditTypes.Commands.Update;
-using Application.Features.CreditTypes.Queries.GetById;
-using Application.Features.CreditTypes.Queries.GetList;
+using Application.Modules.Credit.Features.CreditTypes.Commands.Create;
+using Application.Modules.Credit.Features.CreditTypes.Commands.Delete;
+using Application.Modules.Credit.Features.CreditTypes.Commands.SetActive;
+using Application.Modules.Credit.Features.CreditTypes.Commands.Update;
+using Application.Modules.Credit.Features.CreditTypes.Queries.GetById;
+using Application.Modules.Credit.Features.CreditTypes.Queries.GetList;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Controllers;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Credit.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

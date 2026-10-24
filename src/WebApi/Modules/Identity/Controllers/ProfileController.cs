@@ -1,13 +1,14 @@
-using Application.Features.ProfileImages.Commands.Upload;
-using Application.Features.Profiles.Queries.GetMine;
-using Application.Features.StaffUsers.Commands.Update;
+using Application.Modules.Identity.Features.ProfileImages.Commands.Upload;
+using Application.Modules.Identity.Features.Profiles.Queries.GetMine;
+using Application.Modules.Identity.Features.StaffUsers.Commands.Update;
 using Application.Services.Auth;
 using Core.CrossCuttingConcerns.Exceptions.Types;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Controllers;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Identity.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

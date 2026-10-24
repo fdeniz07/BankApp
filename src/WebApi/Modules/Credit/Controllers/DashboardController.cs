@@ -1,9 +1,10 @@
-using Application.Features.Dashboard.Queries.GetSummary;
+using Application.Modules.Credit.Features.Dashboard.Queries.GetSummary;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using WebApi.Constants;
+using WebApi.Controllers;
 
-namespace WebApi.Controllers;
+namespace WebApi.Modules.Credit.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]

@@ -1,13 +1,13 @@
 using System.Text;
 using System.Text.Json;
-using Application.Sagas;
+using Application.Modules.Credit.Sagas;
 using Domain.Events;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using WebApi.Realtime;
+using WebApi.Modules.Notification.Realtime;
 
-namespace WebApi.Messaging;
+namespace WebApi.Modules.Notification.Messaging;
 
 public sealed class DomainEventsConsumerHostedService : BackgroundService
 {

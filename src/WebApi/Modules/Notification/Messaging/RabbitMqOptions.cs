@@ -1,4 +1,4 @@
-namespace WebApi.Messaging;
+namespace WebApi.Modules.Notification.Messaging;
 
 public sealed class RabbitMqOptions
 {
