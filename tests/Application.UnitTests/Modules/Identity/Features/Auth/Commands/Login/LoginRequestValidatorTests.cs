@@ -1,4 +1,4 @@
-using Application.Features.Auth.Commands.Login;
+using Application.Modules.Identity.Features.Auth.Commands.Login;
 using FluentAssertions;
 using FluentValidation.Results;
 

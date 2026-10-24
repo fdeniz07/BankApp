@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Application.Features.Auth.Commands.Login;
-using Application.Features.Auth.Constants;
-using Application.Features.Auth.Rules;
+using Application.Modules.Identity.Features.Auth.Commands.Login;
+using Application.Modules.Identity.Features.Auth.Constants;
+using Application.Modules.Identity.Features.Auth.Rules;
 using Application.Services.Logging;
 using Application.Services.Repositories;
 using Core.CrossCuttingConcerns.Exceptions.Types;

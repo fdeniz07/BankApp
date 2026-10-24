@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
-using Application.Features.CreditApplications.Constants;
-using Application.Features.CreditApplications.Rules;
+using Application.Modules.Credit.Features.CreditApplications.Constants;
+using Application.Modules.Credit.Features.CreditApplications.Rules;
 using Application.Services.Repositories;
 using Core.CrossCuttingConcerns.Exceptions.Types;
 using Domain.Entities;

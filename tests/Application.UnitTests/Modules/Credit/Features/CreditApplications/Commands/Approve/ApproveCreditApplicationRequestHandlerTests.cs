@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Application.Features.CreditApplications.Commands.Approve;
-using Application.Features.CreditApplications.Constants;
-using Application.Features.CreditApplications.Profiles;
-using Application.Features.CreditApplications.Rules;
+using Application.Modules.Credit.Features.CreditApplications.Commands.Approve;
+using Application.Modules.Credit.Features.CreditApplications.Constants;
+using Application.Modules.Credit.Features.CreditApplications.Profiles;
+using Application.Modules.Credit.Features.CreditApplications.Rules;
 using Application.Services.Auth;
 using Application.Services.Logging;
 using Application.Services.Repositories;
