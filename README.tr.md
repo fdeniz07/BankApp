@@ -7,7 +7,7 @@ Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (
 Frontend: **React (Vite + TypeScript)**, **TR / EN / DE** i18n, anlık kredi bildirimleri (SignalR).  
 Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, WebApi, client).
 
-**Dokümanlar:** [Yol haritası](docs/roadmap.tr.md) · [Mimari notlar](docs/architecture-notes.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md) · [Altyapı](infra/README.md)
+**Dokümanlar:** [Yol haritası](docs/roadmap.tr.md) · [Tech öğrenme](docs/tech-learning.tr.md) · [Mimari notlar](docs/architecture-notes.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md) · [Altyapı](infra/README.md)
 
 ---
 
@@ -95,7 +95,7 @@ BankApp/
 ├── BankApp.slnx
 ├── README.md / README.tr.md / README.de.md
 ├── client/              # React SPA
-├── docs/                # yol haritası, mimari notlar, changelog, geçmiş
+├── docs/                # yol haritası, tech öğrenme, mimari notlar, changelog, geçmiş
 ├── infra/               # docker-compose, .env.example, scripts/vault-seed.sh
 ├── tests/               # Application.UnitTests, WebApi.IntegrationTests
 └── src/

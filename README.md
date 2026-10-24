@@ -7,7 +7,7 @@ Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (
 Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n and live credit notifications (SignalR).  
 Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, WebApi, client).
 
-**Docs:** [Roadmap](docs/roadmap.en.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
+**Docs:** [Roadmap](docs/roadmap.en.md) · [Tech learning](docs/tech-learning.en.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
 ---
 
@@ -95,7 +95,7 @@ BankApp/
 ├── BankApp.slnx
 ├── README.md / README.tr.md / README.de.md
 ├── client/              # React SPA
-├── docs/                # roadmap, architecture notes, changelog, history
+├── docs/                # roadmap, tech learning, architecture notes, changelog, history
 ├── infra/               # docker-compose, .env.example, scripts/vault-seed.sh
 ├── tests/               # Application.UnitTests, WebApi.IntegrationTests
 └── src/

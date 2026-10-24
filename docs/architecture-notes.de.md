@@ -5,7 +5,8 @@
 **Datum:** 2026-10-21  
 **Kontext:** Bildungsprojekt BankApp — Notizen zum erneuten Nachlesen vor der nächsten Phase.
 
-Roadmap: [roadmap.de.md](roadmap.de.md) (Phase 6).
+Roadmap: [roadmap.de.md](roadmap.de.md) (Phase 6).  
+Vertieftes Lernen (Warum + Beispiele): [tech-learning.de.md](tech-learning.de.md).
 
 ---
 

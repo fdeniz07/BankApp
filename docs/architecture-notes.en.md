@@ -5,7 +5,8 @@
 **Date:** 2026-10-21  
 **Context:** Educational BankApp — notes to revisit before starting the next phase.
 
-Roadmap: [roadmap.en.md](roadmap.en.md) (Phase 6).
+Roadmap: [roadmap.en.md](roadmap.en.md) (Phase 6).  
+Deep learning (why + examples): [tech-learning.en.md](tech-learning.en.md).
 
 ---
 

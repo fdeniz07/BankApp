@@ -5,7 +5,8 @@
 **Tarih:** 2026-10-21  
 **Bağlam:** Eğitim amaçlı BankApp — sonraki fazlara geçmeden önce tekrar bakılacak notlar.
 
-Yol haritası: [roadmap.tr.md](roadmap.tr.md) (Faz 6).
+Yol haritası: [roadmap.tr.md](roadmap.tr.md) (Faz 6).  
+Ayrıntılı öğrenme (neden + örnek): [tech-learning.tr.md](tech-learning.tr.md).
 
 ---
 
