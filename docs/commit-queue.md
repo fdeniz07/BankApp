@@ -23,3 +23,4 @@ _(empty)_
 | 2026-10-22 | — | Vault Compose lab + Idempotency-Key (after midnight) |
 | 2026-10-23 | 7 | Saga / Process Manager (domain → persist → manager → consumer → tests → docs) |
 | 2026-10-23 | +5 | SignalR hub → consumer → CORS → React client → docs |
+| 2026-10-24 | 4 | Modular Monolith (Application → WebApi host → tests → docs) |
