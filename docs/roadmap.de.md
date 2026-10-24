@@ -43,6 +43,7 @@
 - [x] Idempotency-Key (Kredit create/approve/reject/cancel; Redis)
 - [x] Saga / Process Manager (Kreditantrags-Lebenszyklus; `CreditApplicationSagas`)
 - [x] SignalR-Benachrichtigungen (Outbox-getrieben; Hub `/hubs/credit-applications`)
+- [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
 ## Offen
 
@@ -54,7 +55,7 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Idempotency-Key (kritische Schreib-APIs)
 - [x] Saga / Process Manager (Kreditantrags-Lebenszyklus)
 - [x] SignalR-Benachrichtigungen (Live-Status über Outbox-Events) — vor Modular umgesetzt
-- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
 ## Später
 

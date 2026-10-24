@@ -43,6 +43,7 @@
 - [x] Idempotency-Key (kredi create/approve/reject/cancel; Redis)
 - [x] Saga / Process Manager (kredi başvuru yaşam döngüsü; `CreditApplicationSagas`)
 - [x] SignalR bildirimleri (Outbox olaylarına bağlı; hub `/hubs/credit-applications`)
+- [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
 ## Yapılacak
 
@@ -54,7 +55,7 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Idempotency-Key (kritik yazma API’leri)
 - [x] Saga / Process Manager (kredi başvuru yaşam döngüsü)
 - [x] SignalR bildirimleri (Outbox olaylarına bağlı anlık durum) — Modular’dan önce uygulandı
-- [ ] Modular Monolith (Customer / Credit / Identity / Notification)
+- [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
 ## İleride
 

@@ -2,6 +2,13 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-24 — Modular Monolith (Identity / Customers / Credit / Notification)
+
+- Application: `Modules/{Identity,Customers,Credit,Notification}` + `AddApplicationModules()`.
+- WebApi: controllers / Idempotency / Messaging / SignalR moved under the same boundaries; host module registration.
+- Single deploy, single DB; module name `Customers` avoids clashing with entity `Customer`.
+- Phase 6 main slices complete.
+
 ## 2026-10-23 — SignalR (live credit application notifications)
 
 - Hub `/hubs/credit-applications` (JWT `access_token`); groups `staff` + `customer:{id}`.

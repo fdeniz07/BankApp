@@ -100,7 +100,7 @@ Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), f
 2. Idempotency-Key (kritik yazma API’leri) — **uygulandı** (2026-10-21): header `Idempotency-Key`, Redis 24 saat, create/approve/reject/cancel; aynı key replay / farklı body → 409
 3. Saga / Process Manager (kredi başvuru yaşam döngüsü) — **uygulandı** (2026-10-22): `CreditApplicationSagas`, Process Manager orkestrasyonu (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
 4. SignalR bildirimleri (Outbox olaylarına bağlı) — **uygulandı** (2026-10-23): hub `/hubs/credit-applications`; consumer → staff + customer grupları; React toast + liste yenileme (Modular’dan önce)
-5. Modular Monolith (Customer / Credit / Identity / Notification)
+5. Modular Monolith (Identity / Customers / Credit / Notification) — **uygulandı** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / host module kayıtları; tek deploy, tek DB
 
 ```mermaid
 flowchart LR
@@ -144,4 +144,4 @@ Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OT
 
 ## Tekrar bakılacak
 
-Sonraki kod adımı: **Modular Monolith**. İsteğe bağlı: **Vault → WebApi secret load**.
+Faz 6 ana dilimler tamam. İsteğe bağlı sonraki: **Vault → WebApi secret load**, OTel, Keycloak (İleride listesi).

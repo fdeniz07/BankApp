@@ -3,7 +3,7 @@
 [English README](README.md) · [Türkçe README](README.tr.md)
 
 BankApp ist ein **full-stack Bildungsbeispiel** für **Privat- und Firmenkreditanträge**.  
-Backend: **.NET 10** Clean Architecture + CQRS (MediatR), Domain Events + Transactional Outbox, Idempotency-Key, Saga / Process Manager, SignalR.  
+Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (Identity / Customers / Credit / Notification), Domain Events + Outbox, Idempotency-Key, Saga, SignalR.  
 Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n und Live-Kreditbenachrichtigungen (SignalR).  
 Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, Client).
 
@@ -99,8 +99,8 @@ BankApp/
 ├── infra/               # docker-compose, .env.example, scripts/vault-seed.sh
 ├── tests/               # Application.UnitTests, WebApi.IntegrationTests
 └── src/
-    ├── WebApi/          # Controllers, Idempotency, Messaging, Realtime (SignalR-Hub)
-    ├── Application/     # CQRS-Features, Sagas (Process Manager), Validators, Rules
+    ├── WebApi/          # Host + Modules/{Identity,Customers,Credit,Notification}
+    ├── Application/     # Modules/{Identity,Customers,Credit,Notification} + shared Services
     ├── Domain/          # Entities, Events, SmartEnums, CreditApplicationSaga
     ├── Persistence/     # DbContext (Outbox-Harvest), Migrations, Seed
     └── Core/            # Entity, AggregateRoot, Security, Pipelines

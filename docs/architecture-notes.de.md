@@ -100,7 +100,7 @@ Kredit-Scorecard, Vertrags-PDF, Raten/Verzug, IBAN/Transfer (idempotent), Fraud-
 2. Idempotency-Key (kritische Schreib-APIs) — **umgesetzt** (2026-10-21): Header `Idempotency-Key`, Redis 24h, create/approve/reject/cancel; gleicher Key Replay / anderer Body → 409
 3. Saga / Process Manager (Kreditantrags-Lebenszyklus) — **umgesetzt** (2026-10-22): `CreditApplicationSagas`, orchestrierender Process Manager (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
 4. SignalR-Benachrichtigungen (getrieben von Outbox-Events) — **umgesetzt** (2026-10-23): Hub `/hubs/credit-applications`; Consumer → Staff- + Kundengruppen; React-Toast + Listen-Refresh (vor Modular)
-5. Modular Monolith (Customer / Credit / Identity / Notification)
+5. Modular Monolith (Identity / Customers / Credit / Notification) — **umgesetzt** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / Host-Modul-Registrierung; ein Deploy, eine DB
 
 ```mermaid
 flowchart LR
@@ -144,4 +144,4 @@ Breitere Schulungsreihenfolge (außerhalb Phase 6): Outbox → SignalR → OTel 
 
 ## Vor dem Codieren erneut lesen
 
-Nächster Schritt: **Modular Monolith**. Optional: **Vault → WebApi Secret-Load**.
+Phase-6-Hauptscheiben fertig. Optional danach: **Vault → WebApi Secret-Load**, OTel, Keycloak (Später-Liste).
