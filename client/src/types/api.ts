@@ -197,6 +197,9 @@ export interface CreditApplicationListItem {
 export interface CreditApplicationDetail extends CreditApplicationListItem {
   customerName: string
   customerCategory?: CreditCategory | null
+  customerNumber?: string | null
+  /** Individual TCKN or corporate tax number. */
+  customerIdentityNumber?: string | null
   monthlyIncome?: number | null
   existingDebtAmount?: number | null
   purpose?: string | null
@@ -207,6 +210,9 @@ export interface CreditApplicationDetail extends CreditApplicationListItem {
   rejectionReason?: string | null
   notes?: string | null
   decisionBy?: string | null
+  decisionByName?: string | null
+  decisionByPosition?: string | null
+  decisionByEmail?: string | null
   createdDate: string
   updatedDate?: string | null
 }
@@ -285,7 +291,7 @@ export interface CreateApplicationRequest {
   creditSubTypeId: string
   requestedAmount: number
   requestedTermMonths: number
-  monthlyIncome?: number | null
+  monthlyIncome: number
   existingDebtAmount?: number | null
   purpose?: string | null
   notes?: string | null

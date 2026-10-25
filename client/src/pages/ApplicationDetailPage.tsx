@@ -20,7 +20,7 @@ import { formatMoney } from '../utils/formatMoney'
 export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>()
   const { t, i18n } = useTranslation()
-  const { isStaff, user } = useAuth()
+  const { isStaff } = useAuth()
   const [item, setItem] = useState<CreditApplicationDetail | null>(null)
   const [subType, setSubType] = useState<CreditSubTypeListItem | null>(null)
   const [paymentPlan, setPaymentPlan] = useState<PaymentPlanResponse | null>(null)
@@ -148,7 +148,6 @@ export function ApplicationDetailPage() {
           approvedAmount: Number(approvedAmount),
           approvedTermMonths: Number(approvedTerm),
           approvedInterestRate: Number(interestRate),
-          decisionBy: user?.email,
           notes: notes || undefined,
         },
         idempotencyKey,
@@ -175,7 +174,6 @@ export function ApplicationDetailPage() {
         id,
         {
           rejectionReason,
-          decisionBy: user?.email,
           notes: notes || undefined,
         },
         idempotencyKey,
@@ -227,6 +225,18 @@ export function ApplicationDetailPage() {
               ? ` (${t(`category.${item.customerCategory}`, { defaultValue: item.customerCategory })})`
               : ''}
           </dd>
+        </div>
+        <div>
+          <dt>{t('customers.customerNumber')}</dt>
+          <dd>{item.customerNumber || '—'}</dd>
+        </div>
+        <div>
+          <dt>
+            {item.customerCategory === 'Corporate'
+              ? t('customers.taxNumber')
+              : t('customers.nationalId')}
+          </dt>
+          <dd>{item.customerIdentityNumber || '—'}</dd>
         </div>
         <div>
           <dt>{t('applications.creditType')}</dt>
@@ -289,7 +299,25 @@ export function ApplicationDetailPage() {
         </div>
         <div>
           <dt>{t('applications.decisionBy')}</dt>
-          <dd>{item.decisionBy ?? '—'}</dd>
+          <dd>
+            {item.decisionByName || item.decisionByEmail || item.decisionBy ? (
+              <>
+                <div>
+                  {item.decisionByName || item.decisionByEmail || item.decisionBy}
+                  {item.decisionByPosition
+                    ? ` · ${t(`staffPosition.${item.decisionByPosition}`, {
+                        defaultValue: item.decisionByPosition,
+                      })}`
+                    : ''}
+                </div>
+                {item.decisionByName && (item.decisionByEmail || item.decisionBy) ? (
+                  <div className="muted">{item.decisionByEmail || item.decisionBy}</div>
+                ) : null}
+              </>
+            ) : (
+              '—'
+            )}
+          </dd>
         </div>
         <div>
           <dt>{t('applications.notes')}</dt>
