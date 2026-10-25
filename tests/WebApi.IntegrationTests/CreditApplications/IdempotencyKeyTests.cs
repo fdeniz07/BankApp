@@ -115,6 +115,7 @@ public sealed class IdempotencyKeyTests : IClassFixture<CustomWebApplicationFact
                 creditSubTypeId,
                 requestedAmount = 50_000m,
                 requestedTermMonths = 24,
+                monthlyIncome = 40_000m,
                 purpose = "First body"
             },
             key);
@@ -128,6 +129,7 @@ public sealed class IdempotencyKeyTests : IClassFixture<CustomWebApplicationFact
                 creditSubTypeId,
                 requestedAmount = 60_000m,
                 requestedTermMonths = 24,
+                monthlyIncome = 40_000m,
                 purpose = "Different body"
             },
             key);

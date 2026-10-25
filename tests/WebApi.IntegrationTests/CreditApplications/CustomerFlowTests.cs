@@ -73,6 +73,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
                 creditSubTypeId,
                 requestedAmount = 50_000m,
                 requestedTermMonths = 24,
+                monthlyIncome = 40_000m,
                 purpose = "For customer approve denial"
             });
         createResponse.StatusCode.Should().Be(HttpStatusCode.OK);
