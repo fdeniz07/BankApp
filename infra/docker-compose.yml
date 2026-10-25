@@ -1,4 +1,4 @@
-# Full local stack: Seq + Redis + RabbitMQ + SQL Server + Vault + WebApi + Client
+# Full local stack: Seq + Redis + RabbitMQ + SQL + Vault + OTel (collector/Tempo/Prometheus/Grafana) + WebApi + Client
 # SQL reuses existing Docker volume sqlserver-2025-data (same DB as former SQLServer2025).
 #
 # Usage (from repo root):
@@ -10,6 +10,7 @@
 #
 # Vault (dev mode) is optional for the app runtime today — WebApi still reads .env.
 # UI: http://localhost:8200  |  seed job writes KV secret/bankapp
+# Observability: Grafana http://localhost:3001 (default admin/admin) — Seq remains for logs
 
 services:
   seq:
@@ -60,6 +61,61 @@ services:
       timeout: 5s
       retries: 8
       start_period: 20s
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector:0.114.0
+    container_name: bankapp-otel-collector
+    command: ["--config=/etc/otelcol/config.yaml"]
+    volumes:
+      - ./otel/otel-collector-config.yaml:/etc/otelcol/config.yaml:ro
+    ports:
+      - "${OTEL_GRPC_PORT:-4317}:4317"
+      - "${OTEL_HTTP_PORT:-4318}:4318"
+    depends_on:
+      - tempo
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: bankapp-tempo
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    volumes:
+      - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo-data:/var/tempo
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: bankapp-prometheus
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.retention.time=24h"
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    depends_on:
+      - otel-collector
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.3.1
+    container_name: bankapp-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
+      GF_SECURITY_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
+      GF_USERS_DEFAULT_THEME: light
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "${GRAFANA_PORT:-3001}:3000"
+    depends_on:
+      - prometheus
+      - tempo
     restart: unless-stopped
 
   vault:
@@ -150,6 +206,9 @@ services:
       TokenOptions__RememberMeAccessTokenExpiration: "${TOKEN_REMEMBER_ME_MINUTES:-10080}"
       TokenOptions__SecurityKey: "${TOKEN_SECURITY_KEY}"
       CacheSettings__SlidingExpirationMinutes: "30"
+      OpenTelemetry__Enabled: "true"
+      OpenTelemetry__ServiceName: "bankapp-webapi"
+      OpenTelemetry__OtlpEndpoint: "http://otel-collector:4317"
     volumes:
       - profile-uploads:/app/wwwroot/uploads
     depends_on:
@@ -161,6 +220,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 10s
@@ -198,6 +259,12 @@ volumes:
     name: bankapp-rabbitmq-data
   profile-uploads:
     name: bankapp-profile-uploads
+  tempo-data:
+    name: bankapp-tempo-data
+  prometheus-data:
+    name: bankapp-prometheus-data
+  grafana-data:
+    name: bankapp-grafana-data
   sqlserver-data:
     name: sqlserver-2025-data
     external: true
