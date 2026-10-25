@@ -7,6 +7,8 @@ using Application.Modules.Credit.Features.CreditApplications.Commands.Update;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetById;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetList;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetPaymentPlan;
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetPaymentPlanExport;
+using Application.Services.Amortization.Export;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Domain.Enums;
@@ -63,6 +65,33 @@ public class CreditApplicationsController : BaseController
         };
         GetPaymentPlanResponse response = await Mediator.Send(request);
         return Ok(response);
+    }
+
+    /// <summary>
+    /// Download payment plan as a document. Format is pluggable (pdf today; csv/xlsx later).
+    /// </summary>
+    [HttpGet("payment-plan/export")]
+    public async Task<IActionResult> ExportPaymentPlan(
+        [FromQuery] string format = "pdf",
+        [FromQuery] Guid? creditSubTypeId = null,
+        [FromQuery] decimal amount = 0,
+        [FromQuery] int termMonths = 0,
+        [FromQuery] decimal? interestRate = null,
+        [FromQuery] string? applicationNumber = null,
+        [FromQuery] string? customerName = null)
+    {
+        GetPaymentPlanExportRequest request = new()
+        {
+            Format = format,
+            CreditSubTypeId = creditSubTypeId,
+            Amount = amount,
+            TermMonths = termMonths,
+            InterestRate = interestRate,
+            ApplicationNumber = applicationNumber,
+            CustomerName = customerName
+        };
+        PaymentPlanExportResult file = await Mediator.Send(request);
+        return File(file.Content, file.ContentType, file.FileName);
     }
 
     [HttpGet("{id}")]
