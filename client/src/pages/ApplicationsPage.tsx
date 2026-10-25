@@ -58,6 +58,8 @@ export function ApplicationsPage() {
     creditSubTypeId: '',
     requestedAmount: '',
     requestedTermMonths: '',
+    monthlyIncome: '',
+    existingDebtAmount: '',
     purpose: '',
   })
 
@@ -206,6 +208,8 @@ export function ApplicationsPage() {
       creditSubTypeId: id,
       requestedAmount: String(selected?.amountOptions[0] ?? selected?.minAmount ?? ''),
       requestedTermMonths: String(selected?.termOptions[0] ?? selected?.minTermMonths ?? ''),
+      monthlyIncome: form.monthlyIncome,
+      existingDebtAmount: form.existingDebtAmount,
       purpose: form.purpose,
     })
   }
@@ -218,11 +222,26 @@ export function ApplicationsPage() {
     setSuccess(null)
     const idempotencyKey = crypto.randomUUID()
     try {
+      const income = Number(form.monthlyIncome)
+      if (!form.monthlyIncome || Number.isNaN(income) || income <= 0) {
+        setError(t('applications.monthlyIncomeRequired'))
+        setCreating(false)
+        return
+      }
+      const debtRaw = form.existingDebtAmount.trim()
+      const debt = debtRaw === '' ? null : Number(debtRaw)
+      if (debt != null && (Number.isNaN(debt) || debt < 0)) {
+        setError(t('applications.existingDebtInvalid'))
+        setCreating(false)
+        return
+      }
       await createApplication(
         {
           creditSubTypeId: form.creditSubTypeId,
           requestedAmount: Number(form.requestedAmount),
           requestedTermMonths: Number(form.requestedTermMonths),
+          monthlyIncome: income,
+          existingDebtAmount: debt,
           purpose: form.purpose || null,
         },
         idempotencyKey,
@@ -230,7 +249,12 @@ export function ApplicationsPage() {
       const ok = t('applications.createSuccess')
       setSuccess(ok)
       toast.success(ok)
-      setForm((prev) => ({ ...prev, purpose: '' }))
+      setForm((prev) => ({
+        ...prev,
+        purpose: '',
+        monthlyIncome: '',
+        existingDebtAmount: '',
+      }))
       setPageIndex(0)
       await loadList()
       await loadDashboard()
@@ -279,7 +303,6 @@ export function ApplicationsPage() {
           approvedAmount: item.requestedAmount,
           approvedTermMonths: item.requestedTermMonths,
           approvedInterestRate: item.interestRate,
-          decisionBy: user?.email,
         },
         idempotencyKey,
       )
@@ -317,7 +340,6 @@ export function ApplicationsPage() {
         item.id,
         {
           rejectionReason: trimmed,
-          decisionBy: user?.email,
         },
         idempotencyKey,
       )
@@ -461,6 +483,35 @@ export function ApplicationsPage() {
                   </option>
                 ))}
               </select>
+            </label>
+            <label>
+              {t('applications.monthlyIncome')}
+              <input
+                type="number"
+                inputMode="decimal"
+                min={1}
+                step={1}
+                required
+                value={form.monthlyIncome}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, monthlyIncome: e.target.value }))
+                }
+                placeholder={t('applications.monthlyIncomeHint')}
+              />
+            </label>
+            <label>
+              {t('applications.existingDebt')}
+              <input
+                type="number"
+                inputMode="decimal"
+                min={0}
+                step={1}
+                value={form.existingDebtAmount}
+                onChange={(e) =>
+                  setForm((prev) => ({ ...prev, existingDebtAmount: e.target.value }))
+                }
+                placeholder={t('applications.existingDebtHint')}
+              />
             </label>
             <label>
               {t('applications.purpose')}
