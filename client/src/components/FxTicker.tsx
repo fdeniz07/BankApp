@@ -10,6 +10,18 @@ function formatRate(pair: string, rate: number): string {
   })
 }
 
+function formatUpdatedAt(iso: string, language: string): string {
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return '—'
+  return date.toLocaleString(language, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
 export function FxTicker() {
   const { t, i18n } = useTranslation()
   const [snapshot, setSnapshot] = useState<FxSnapshot | null>(null)
@@ -34,14 +46,11 @@ export function FxTicker() {
   if (!snapshot?.quotes.length) return null
 
   const items = [...snapshot.quotes, ...snapshot.quotes]
-  const updated = new Date(snapshot.updatedAt).toLocaleTimeString(i18n.language, {
-    hour: '2-digit',
-    minute: '2-digit',
-  })
+  const updated = formatUpdatedAt(snapshot.updatedAt, i18n.language)
 
   return (
     <div className="fx-ticker" aria-label={t('fx.label')}>
-      <span className="fx-ticker-badge">{t('fx.live')}</span>
+      <span className="fx-ticker-badge">{snapshot.isDemo ? t('fx.demo') : t('fx.live')}</span>
       <div className="fx-ticker-track-wrap">
         <div className="fx-ticker-track">
           {items.map((q, i) => (
@@ -53,7 +62,9 @@ export function FxTicker() {
         </div>
       </div>
       <span className="fx-ticker-updated muted">
-        {t('fx.updated', { time: updated })}
+        {snapshot.isDemo
+          ? t('fx.demoHint')
+          : t('fx.updated', { time: updated })}
       </span>
     </div>
   )

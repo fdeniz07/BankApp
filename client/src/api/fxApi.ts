@@ -7,6 +7,8 @@ export type FxSnapshot = {
   base: string
   updatedAt: string
   quotes: FxQuote[]
+  /** True when open.er-api failed and static sample rates are shown. */
+  isDemo: boolean
 }
 
 const PAIRS: { pair: string; from: string; to: string }[] = [
@@ -20,7 +22,8 @@ const PAIRS: { pair: string; from: string; to: string }[] = [
 
 const FALLBACK: FxSnapshot = {
   base: 'USD',
-  updatedAt: new Date(0).toISOString(),
+  updatedAt: new Date().toISOString(),
+  isDemo: true,
   quotes: [
     { pair: 'USD/TRY', rate: 34.2 },
     { pair: 'EUR/TRY', rate: 37.1 },
@@ -63,14 +66,14 @@ function rateFromUsd(rates: Record<string, number>, from: string, to: string): n
 export async function fetchFxSnapshot(): Promise<FxSnapshot> {
   try {
     const data = await fetchUsdRates()
-    if (data.result !== 'success' || !data.rates) return FALLBACK
+    if (data.result !== 'success' || !data.rates) return { ...FALLBACK, updatedAt: new Date().toISOString() }
 
     const quotes = PAIRS.map(({ pair, from, to }) => {
       const rate = rateFromUsd(data.rates!, from, to)
       return rate == null ? null : { pair, rate }
     }).filter((q): q is FxQuote => q != null)
 
-    if (quotes.length === 0) return FALLBACK
+    if (quotes.length === 0) return { ...FALLBACK, updatedAt: new Date().toISOString() }
 
     return {
       base: data.base_code ?? 'USD',
@@ -78,8 +81,9 @@ export async function fetchFxSnapshot(): Promise<FxSnapshot> {
         ? new Date(data.time_last_update_utc).toISOString()
         : new Date().toISOString(),
       quotes,
+      isDemo: false,
     }
   } catch {
-    return FALLBACK
+    return { ...FALLBACK, updatedAt: new Date().toISOString() }
   }
 }
