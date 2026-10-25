@@ -44,6 +44,7 @@ public static class ServiceCollectionExtensions
             });
         services.AddJwtAuthentication(configuration);
         services.AddRedisCaching(configuration);
+        services.AddBankAppOpenTelemetry(configuration);
         services.AddOpenApi();
         services.AddHealthChecks();
         services.AddResponseCompressionConfiguration();

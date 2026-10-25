@@ -16,7 +16,8 @@ public static class SerilogHostBuilderExtensions
             loggerConfiguration
                 .ReadFrom.Configuration(context.Configuration)
                 .ReadFrom.Services(services)
-                .Enrich.FromLogContext();
+                .Enrich.FromLogContext()
+                .Enrich.With<ActivityEnricher>();
 
             string? seqServerUrl = context.Configuration["Seq:ServerUrl"];
             if (!string.IsNullOrWhiteSpace(seqServerUrl))
