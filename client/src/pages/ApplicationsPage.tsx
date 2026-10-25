@@ -26,7 +26,7 @@ import type {
   PaymentPlanResponse,
 } from '../types/api'
 import { printDownloadedFile, saveDownloadedFile } from '../utils/downloadFile'
-import { formatMoney } from '../utils/formatMoney'
+import { currencySymbol, formatMoney } from '../utils/formatMoney'
 import { mapApiError } from '../utils/mapApiError'
 
 const STATUS_OPTIONS: Array<CreditApplicationStatus | ''> = [
@@ -199,6 +199,7 @@ export function ApplicationsPage() {
       creditSubTypeId: selectedSubType.id,
       amount: Number(form.requestedAmount),
       termMonths: Number(form.requestedTermMonths),
+      locale: i18n.language,
       customerName: user?.displayName || user?.email,
     })
   }
@@ -292,9 +293,8 @@ export function ApplicationsPage() {
         },
         idempotencyKey,
       )
-      const ok = t('applications.createSuccess')
-      setSuccess(ok)
-      toast.success(ok)
+      // Toast comes from SignalR (creditApplicationChanged); avoid duplicate local toast.
+      setSuccess(t('applications.createSuccess'))
       setForm((prev) => ({
         ...prev,
         purpose: '',
@@ -321,9 +321,8 @@ export function ApplicationsPage() {
     const idempotencyKey = crypto.randomUUID()
     try {
       await cancelApplication(id, undefined, idempotencyKey)
-      const ok = t('applications.cancelSuccess')
-      setSuccess(ok)
-      toast.success(ok)
+      // Toast comes from SignalR (warning); avoid duplicate local success toast.
+      setSuccess(t('applications.cancelSuccess'))
       await loadList()
       await loadDashboard()
     } catch (err: unknown) {
@@ -352,9 +351,8 @@ export function ApplicationsPage() {
         },
         idempotencyKey,
       )
-      const ok = t('applications.approveSuccess')
-      setSuccess(ok)
-      toast.success(ok)
+      // Toast comes from SignalR (success); avoid duplicate local toast.
+      setSuccess(t('applications.approveSuccess'))
       await loadList()
       await loadDashboard()
     } catch (err: unknown) {
@@ -389,9 +387,8 @@ export function ApplicationsPage() {
         },
         idempotencyKey,
       )
-      const ok = t('applications.rejectSuccess')
-      setSuccess(ok)
-      toast.success(ok)
+      // Toast comes from SignalR (error); avoid duplicate local toast.
+      setSuccess(t('applications.rejectSuccess'))
       await loadList()
       await loadDashboard()
     } catch (err: unknown) {
@@ -532,6 +529,9 @@ export function ApplicationsPage() {
             </label>
             <label>
               {t('applications.monthlyIncome')}
+              {selectedSubType?.currencyCode
+                ? ` (${currencySymbol(selectedSubType.currencyCode)})`
+                : ''}
               <input
                 type="number"
                 inputMode="decimal"
@@ -547,6 +547,9 @@ export function ApplicationsPage() {
             </label>
             <label>
               {t('applications.existingDebt')}
+              {selectedSubType?.currencyCode
+                ? ` (${currencySymbol(selectedSubType.currencyCode)})`
+                : ''}
               <input
                 type="number"
                 inputMode="decimal"
