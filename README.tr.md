@@ -51,7 +51,8 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24 saat)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → karar → onboarding stub’ları)
 - **SignalR** (`/hubs/credit-applications`; staff + müşteri grupları; Outbox consumer sonrası yayın)
-- Ödeme planı, dashboard özeti, personel yönetimi
+- Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
+- Dashboard özeti, personel yönetimi
 - Profil alanları + avatar (≤ 2 MB), Seq audit kategorileri
 - Kredi tipi oluşturma / güncelleme / silme / aktif-pasif (**BankManager**)
 - Serilog → Seq, Redis önbellek, FluentValidation, ProblemDetails
@@ -63,7 +64,8 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - İstatistik şeridi, döviz ticker, erişilebilirlik paneli (tema / yazı / kontrast)
 - Datenschutz / çerez bandı; dil seçici TR / EN / DE
 - Kredi yazma isteklerinde `Idempotency-Key` (UUID)
-- SignalR: başvuru durumu toast + liste/detay yenileme
+- SignalR: başvuru durumu toast (olaya göre success / error / warning) + liste/detay yenileme
+- Ödeme planı: açılır taksit listesi, **PDF indir** ve **yazdır** (müşteri + personel)
 
 ---
 
@@ -247,7 +249,7 @@ Kredi **yazma** (`POST` create/approve/reject/cancel): zorunlu header **`Idempot
 | **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted |
 | **CreditTypes** | Liste; mutasyon + `PUT {id}/active` (manager) |
 | **CreditSubTypes** | CRUD |
-| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan` |
+| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
 | **Dashboard** | `GET summary` |
 | **StaffUsers** | Liste / oluştur / güncelle (manager) |
 | **Profile** | Profilim; personel güncelleme; avatar |

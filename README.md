@@ -51,7 +51,8 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → decision → onboarding stubs)
 - **SignalR** (`/hubs/credit-applications`; staff + customer groups; publish after Outbox consumer)
-- Payment plan (amortization), dashboard summary, staff user management
+- Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
+- Dashboard summary, staff user management
 - Profile fields + avatar upload (≤ 2 MB), Seq audit categories
 - Credit type create / update / delete / activate-deactivate (**BankManager**)
 - Serilog → Seq, Redis cache, FluentValidation, ProblemDetails
@@ -63,7 +64,8 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - Stats strip, FX ticker, accessibility panel (theme / font size / contrast)
 - Privacy / cookie banner; locale switcher TR / EN / DE
 - Idempotency-Key (UUID) on credit write requests
-- SignalR: application-status toast + list/detail refresh
+- SignalR: application-status toast (success / error / warning by event) + list/detail refresh
+- Payment plan: collapsible installment table, **PDF download** and **print** (customer + staff)
 
 ---
 
@@ -247,7 +249,7 @@ Credit **writes** (`POST` create/approve/reject/cancel): required header **`Idem
 | **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted lists |
 | **CreditTypes** | List/get; mutate + `PUT {id}/active` (manager) |
 | **CreditSubTypes** | CRUD |
-| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan` |
+| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
 | **Dashboard** | `GET summary` |
 | **StaffUsers** | List / create / update (manager) |
 | **Profile** | Get mine; update staff profile; upload avatar |

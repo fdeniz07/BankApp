@@ -2,6 +2,12 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-25 — Ödeme planı PDF / yazdır + toast renkleri
+
+- `GET /api/CreditApplications/payment-plan/export?format=pdf` (pluggable exporter; CSV/XLSX için hazır).
+- Müşteri + personel: PDF indir / yazdır; taksit tablosu açılır-kapanır.
+- SignalR toast: onay success, red error, iptal warning.
+
 ## 2026-10-25 — OpenTelemetry + Grafana / Prometheus
 
 - WebApi: OTLP traces + metrics (`OpenTelemetry` config; Compose’ta açık).
