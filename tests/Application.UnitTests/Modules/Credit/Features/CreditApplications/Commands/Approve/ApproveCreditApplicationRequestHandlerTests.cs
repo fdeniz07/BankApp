@@ -120,6 +120,21 @@ public class ApproveCreditApplicationRequestHandlerTests
         SetupGetApplication(application);
         SetupCreditSubType(subTypeId, minAmount: 10_000, maxAmount: 100_000, minTerm: 6, maxTerm: 48);
 
+        Guid staffUserId = Guid.NewGuid();
+        _currentUserService.Setup(s => s.UserId).Returns(staffUserId);
+        _applicationUserRepository
+            .Setup(r => r.GetAsync(
+                It.IsAny<Expression<Func<ApplicationUser, bool>>>(),
+                It.IsAny<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, object>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ApplicationUser
+            {
+                Id = staffUserId,
+                Email = "staff@bank.local"
+            });
+
         _creditApplicationRepository
             .Setup(r => r.UpdateAsync(It.IsAny<CreditApplication>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync((CreditApplication entity, CancellationToken _) => entity);
@@ -130,7 +145,6 @@ public class ApproveCreditApplicationRequestHandlerTests
             ApprovedAmount = 25_000,
             ApprovedTermMonths = 24,
             ApprovedInterestRate = 1.9m,
-            DecisionBy = "staff@bank.local",
             Notes = "ok"
         };
 
