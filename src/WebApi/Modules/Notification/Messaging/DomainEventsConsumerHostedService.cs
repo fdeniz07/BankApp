@@ -168,12 +168,20 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             occurredOnUtc = parsed;
         }
 
+        decimal? amount = shortName switch
+        {
+            nameof(CreditApplicationCreated) => TryGetDecimal(root, "requestedAmount"),
+            nameof(CreditApplicationApproved) => TryGetDecimal(root, "approvedAmount"),
+            _ => null
+        };
+
         return new CreditApplicationChangedMessage(
             applicationId,
             applicationNumber,
             customerId,
             shortName,
-            occurredOnUtc);
+            occurredOnUtc,
+            amount);
     }
 
     private static string ShortEventName(string eventType)
@@ -192,6 +200,19 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
         if (el.ValueKind == JsonValueKind.String)
             return Guid.TryParse(el.GetString(), out value);
         return el.TryGetGuid(out value);
+    }
+
+    private static decimal? TryGetDecimal(JsonElement root, string name)
+    {
+        if (!root.TryGetProperty(name, out JsonElement el))
+            return null;
+        if (el.ValueKind == JsonValueKind.Number && el.TryGetDecimal(out decimal number))
+            return number;
+        if (el.ValueKind == JsonValueKind.String
+            && decimal.TryParse(el.GetString(), System.Globalization.NumberStyles.Number,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal parsed))
+            return parsed;
+        return null;
     }
 
     private void DisposeChannel()

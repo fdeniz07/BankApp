@@ -6,6 +6,7 @@ export type CreditApplicationChangedPayload = {
   customerId: string
   eventType: string
   occurredOnUtc: string
+  amount: number | null
 }
 
 export function dispatchCreditApplicationChanged(payload: CreditApplicationChangedPayload) {

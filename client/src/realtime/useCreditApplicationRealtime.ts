@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { useAuth } from '../auth/AuthContext'
 import { getToken } from '../auth/token'
+import { formatMoney } from '../utils/formatMoney'
 import {
   dispatchCreditApplicationChanged,
   type CreditApplicationChangedPayload,
@@ -18,21 +19,25 @@ type ServerMessage = {
   customerId: string
   eventType: string
   occurredOnUtc: string
+  amount?: number | null
 }
 
 function normalizeMessage(raw: ServerMessage): CreditApplicationChangedPayload {
+  const amount =
+    typeof raw.amount === 'number' && !Number.isNaN(raw.amount) ? raw.amount : null
   return {
     applicationId: raw.applicationId,
     applicationNumber: raw.applicationNumber,
     customerId: raw.customerId,
     eventType: raw.eventType,
     occurredOnUtc: raw.occurredOnUtc,
+    amount,
   }
 }
 
 export function useCreditApplicationRealtime() {
   const { isAuthenticated } = useAuth()
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const connectionRef = useRef<HubConnection | null>(null)
 
   useEffect(() => {
@@ -56,14 +61,21 @@ export function useCreditApplicationRealtime() {
     connection.on('creditApplicationChanged', (raw: ServerMessage) => {
       const payload = normalizeMessage(raw)
       dispatchCreditApplicationChanged(payload)
-      toast.info(
-        t('realtime.creditChanged', {
-          number: payload.applicationNumber || payload.applicationId.slice(0, 8),
-          event: t(`realtime.events.${payload.eventType}`, {
-            defaultValue: payload.eventType,
+
+      const event = t(`realtime.events.${payload.eventType}`, {
+        defaultValue: payload.eventType,
+      })
+
+      if (payload.amount != null) {
+        toast.info(
+          t('realtime.creditChangedWithAmount', {
+            event,
+            amount: formatMoney(payload.amount, 'TRY', i18n.language, 0),
           }),
-        }),
-      )
+        )
+      } else {
+        toast.info(t('realtime.creditChanged', { event }))
+      }
     })
 
     connectionRef.current = connection
@@ -75,5 +87,5 @@ export function useCreditApplicationRealtime() {
       void connection.stop()
       if (connectionRef.current === connection) connectionRef.current = null
     }
-  }, [isAuthenticated, t])
+  }, [isAuthenticated, t, i18n.language])
 }

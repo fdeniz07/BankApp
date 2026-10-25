@@ -5,4 +5,6 @@ public sealed record CreditApplicationChangedMessage(
     string ApplicationNumber,
     Guid CustomerId,
     string EventType,
-    DateTimeOffset OccurredOnUtc);
+    DateTimeOffset OccurredOnUtc,
+    /// <summary>Requested or approved amount when present on the domain event; null for reject/cancel.</summary>
+    decimal? Amount = null);
