@@ -16,6 +16,7 @@ import {
   CREDIT_APPLICATION_CHANGED_EVENT,
   type CreditApplicationChangedPayload,
 } from '../realtime/creditApplicationEvents'
+import { fillDecisionTemplate } from '../utils/decisionMessage'
 import { printDownloadedFile, saveDownloadedFile } from '../utils/downloadFile'
 import { formatMoney } from '../utils/formatMoney'
 
@@ -36,7 +37,8 @@ export function ApplicationDetailPage() {
   const [approvedAmount, setApprovedAmount] = useState('')
   const [approvedTerm, setApprovedTerm] = useState('')
   const [interestRate, setInterestRate] = useState('')
-  const [notes, setNotes] = useState('')
+  const [approveMessage, setApproveMessage] = useState('')
+  const [rejectMessage, setRejectMessage] = useState('')
   const [rejectionReason, setRejectionReason] = useState('')
 
   async function load() {
@@ -49,7 +51,9 @@ export function ApplicationDetailPage() {
       setApprovedAmount(String(data.requestedAmount))
       setApprovedTerm(String(data.requestedTermMonths))
       setInterestRate(String(data.approvedInterestRate ?? 1.75))
-      setNotes(data.notes ?? '')
+      setRejectionReason('')
+      setApproveMessage('')
+      setRejectMessage('')
 
       const subTypes = await getCreditSubTypes(0, 200)
       const match = subTypes.items.find((s) => s.id === data.creditSubTypeId) ?? null
@@ -113,6 +117,38 @@ export function ApplicationDetailPage() {
     if (item.status === 'Approved') return 'sourceApproved'
     return 'sourceRequested'
   }, [item, isStaff])
+
+  function buildApproveTemplate() {
+    if (!item) return ''
+    return fillDecisionTemplate(t('applications.templates.approve'), {
+      customerName: item.customerName || item.customerId,
+      applicationNumber: item.applicationNumber,
+      amount: formatMoney(
+        Number(approvedAmount) || item.requestedAmount,
+        item.currencyCode ?? 'TRY',
+        i18n.language,
+      ),
+      term: String(Number(approvedTerm) || item.requestedTermMonths),
+      rate: String(Number(interestRate) || subType?.interestRate || 0),
+    })
+  }
+
+  function buildRejectTemplate() {
+    if (!item) return ''
+    return fillDecisionTemplate(t('applications.templates.reject'), {
+      customerName: item.customerName || item.customerId,
+      applicationNumber: item.applicationNumber,
+      reason: rejectionReason.trim() || '…',
+    })
+  }
+
+  useEffect(() => {
+    if (!item || !isStaff || item.status !== 'Pending') return
+    setApproveMessage((current) => current || buildApproveTemplate())
+    setRejectMessage((current) => current || buildRejectTemplate())
+    // Prefill once when application is ready for decision; staff can edit freely.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [item?.id, isStaff, item?.status, i18n.language])
 
   async function fetchPlanExport() {
     if (!item || !planAmount || !planTerm) throw new Error('missing-plan')
@@ -194,7 +230,7 @@ export function ApplicationDetailPage() {
           approvedAmount: Number(approvedAmount),
           approvedTermMonths: Number(approvedTerm),
           approvedInterestRate: Number(interestRate),
-          notes: notes || undefined,
+          notes: approveMessage.trim() || undefined,
         },
         idempotencyKey,
       )
@@ -219,8 +255,8 @@ export function ApplicationDetailPage() {
       await rejectApplication(
         id,
         {
-          rejectionReason,
-          notes: notes || undefined,
+          rejectionReason: rejectionReason.trim(),
+          notes: rejectMessage.trim() || undefined,
         },
         idempotencyKey,
       )
@@ -366,8 +402,8 @@ export function ApplicationDetailPage() {
           </dd>
         </div>
         <div>
-          <dt>{t('applications.notes')}</dt>
-          <dd>{item.notes ?? '—'}</dd>
+          <dt>{t('applications.customerMessage')}</dt>
+          <dd className="customer-message-preview">{item.notes ?? '—'}</dd>
         </div>
       </dl>
 
@@ -499,9 +535,22 @@ export function ApplicationDetailPage() {
               />
             </label>
             <label>
-              {t('applications.notes')}
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+              {t('applications.customerMessage')}
+              <textarea
+                value={approveMessage}
+                onChange={(e) => setApproveMessage(e.target.value)}
+                rows={8}
+                required
+              />
             </label>
+            <p className="field-hint">{t('applications.customerMessageHint')}</p>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => setApproveMessage(buildApproveTemplate())}
+            >
+              {t('applications.reloadTemplate')}
+            </button>
             <button type="submit" className="btn success decision-btn" disabled={busy}>
               {t('applications.approve')}
             </button>
@@ -514,14 +563,28 @@ export function ApplicationDetailPage() {
               <textarea
                 value={rejectionReason}
                 onChange={(e) => setRejectionReason(e.target.value)}
-                rows={3}
+                rows={2}
                 required
               />
             </label>
+            <p className="field-hint">{t('applications.rejectionReasonHint')}</p>
             <label>
-              {t('applications.notes')}
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
+              {t('applications.customerMessage')}
+              <textarea
+                value={rejectMessage}
+                onChange={(e) => setRejectMessage(e.target.value)}
+                rows={8}
+                required
+              />
             </label>
+            <p className="field-hint">{t('applications.customerMessageHint')}</p>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => setRejectMessage(buildRejectTemplate())}
+            >
+              {t('applications.reloadTemplate')}
+            </button>
             <button type="submit" className="btn reject decision-btn" disabled={busy}>
               {t('applications.reject')}
             </button>

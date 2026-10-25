@@ -286,9 +286,17 @@
     "approvedAmount": "Onaylanan tutar",
     "approvedTerm": "Onaylanan vade",
     "interestRate": "Faiz oranı",
-    "rejectionReason": "Red gerekçesi",
+    "rejectionReason": "Red gerekçesi (kısa)",
+    "rejectionReasonHint": "Müşteri mektubundaki {{reason}} alanına yazılır; liste/özet için kısa tutun.",
     "decisionBy": "Karar veren",
     "notes": "Notlar",
+    "customerMessage": "Müşteriye mesaj",
+    "customerMessageHint": "Şablon doldurulur; göndermeden önce düzenleyebilirsiniz. İleride e-posta/SMS için kullanılacak.",
+    "reloadTemplate": "Şablonu yenile",
+    "templates": {
+      "approve": "Sayın {{customerName}},\n\n{{applicationNumber}} numaralı kredi başvurunuz onaylanmıştır.\nOnaylanan tutar: {{amount}} · Vade: {{term}} ay · Faiz: %{{rate}}\n\nSaygılarımızla,\nBankApp Kredi Operasyonları",
+      "reject": "Sayın {{customerName}},\n\n{{applicationNumber}} numaralı kredi başvurunuz, aşağıdaki gerekçe ile maalesef reddedilmiştir:\n\n{{reason}}\n\nSaygılarımızla,\nBankApp Kredi Operasyonları"
+    },
     "purpose": "Amaç",
     "monthlyIncome": "Aylık gelir",
     "monthlyIncomeHint": "Net aylık gelir (zorunlu)",

@@ -286,9 +286,17 @@
     "approvedAmount": "Genehmigter Betrag",
     "approvedTerm": "Genehmigte Laufzeit",
     "interestRate": "Zinssatz",
-    "rejectionReason": "Ablehnungsgrund",
+    "rejectionReason": "Ablehnungsgrund (kurz)",
+    "rejectionReasonHint": "Wird in den Platzhalter {{reason}} der Kundenmitteilung eingesetzt; für Listen kurz halten.",
     "decisionBy": "Entschieden von",
     "notes": "Notizen",
+    "customerMessage": "Nachricht an den Kunden",
+    "customerMessageHint": "Aus Vorlage befüllt; vor dem Absenden bearbeitbar. Später für E-Mail/SMS vorgesehen.",
+    "reloadTemplate": "Vorlage neu laden",
+    "templates": {
+      "approve": "Sehr geehrte/r {{customerName}},\n\nIhr Kreditantrag {{applicationNumber}} wurde genehmigt.\nGenehmigter Betrag: {{amount}} · Laufzeit: {{term}} Monate · Zinssatz: {{rate}} %\n\nMit freundlichen Grüßen\nBankApp Kreditoperationen",
+      "reject": "Sehr geehrte/r {{customerName}},\n\nIhr Kreditantrag {{applicationNumber}} wurde leider aus folgendem Grund abgelehnt:\n\n{{reason}}\n\nMit freundlichen Grüßen\nBankApp Kreditoperationen"
+    },
     "purpose": "Zweck",
     "monthlyIncome": "Monatliches Einkommen",
     "monthlyIncomeHint": "Netto-Monatseinkommen (Pflicht)",

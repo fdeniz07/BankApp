@@ -47,16 +47,16 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - Privat-/Firmenkunden (TPT), Kreditarten & Untertypen, Anträge
 - JWT-Auth + RBAC; öffentliche Privatkunden-Registrierung + E-Mail-Verifizierung (RabbitMQ)
 - Genehmigen / Ablehnen / **Stornieren** (Statuswechsel — Storno ≠ Soft-Delete)
+- Bearbeitbare **Kunden-Entscheidungsbriefe** (Genehmigungs-/Ablehnungsvorlagen; in `notes`)
 - **Domain Events + Transactional Outbox** (Kredit-Lebenszyklus → Queue `domain-events`)
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → Entscheidung → Onboarding-Stubs)
 - **SignalR** (`/hubs/credit-applications`; Staff- + Kundengruppen; Publish nach Outbox-Consumer)
 - Zahlungsplan (Amortisation) mit **erweiterbarem Export** (`payment-plan/export?format=pdf`; später CSV/XLSX) und Druck
-- Dashboard-Summary, Personalverwaltung
-- Profilfelder + Avatar (≤ 2 MB), Seq-Audit-Kategorien
+- Dashboard-Summary, Personalverwaltung, Profil + Avatar (≤ 2 MB)
 - Kreditarten anlegen / ändern / löschen / aktiv-passiv (**BankManager**)
 - Serilog → Seq, Redis-Cache, FluentValidation, ProblemDetails
-- CI: GitHub Actions (Build + Unit/Integration + Client)
+- OpenTelemetry → Collector → Tempo / Prometheus / Grafana
 
 ### Frontend (`client/`)
 
@@ -66,6 +66,18 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - `Idempotency-Key` (UUID) bei Kredit-Schreibanfragen
 - SignalR: Antragsstatus-Toast (success / error / warning je Event) + Listen-/Detail-Refresh
 - Zahlungsplan: einklappbare Ratenliste, **PDF-Download** und **Drucken** (Kunde + Personal)
+- Entscheidungsformulare: neu ladbare Genehmigungs-/Ablehnungsvorlagen
+
+### CI/CD
+
+- GitHub Actions: WebApi Restore/Build, Unit- + Integrationstests, React-Client-Build
+- Docker Compose (`infra/`) für lokalen Multi-Service-Betrieb (Healthcheck-Kette)
+
+### Test
+
+- xUnit **Application.UnitTests** (Domain-Regeln, Saga, Handler)
+- xUnit **WebApi.IntegrationTests** (API + Auth-/Kreditflüsse)
+- Client-Production-Build (`tsc` + Vite) in CI
 
 ---
 
@@ -236,7 +248,10 @@ stateDiagram-v2
 | WebApi | http://localhost:8080 |
 | Scalar | http://localhost:8080/scalar/v1 |
 | Client | http://localhost:3000 |
-| Seq | http://localhost:5341 |
+| Seq (Logs) | http://localhost:5341 |
+| Grafana (Metriken/Traces-UI) | http://localhost:3001 (`admin` / `admin`) |
+| Prometheus | http://localhost:9090 |
+| OTLP gRPC (Collector) | `localhost:4317` |
 | RabbitMQ UI | http://localhost:15672 |
 | Vault UI (Lab) | http://localhost:8200 |
 

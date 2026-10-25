@@ -286,9 +286,17 @@
     "approvedAmount": "Approved amount",
     "approvedTerm": "Approved term",
     "interestRate": "Interest rate",
-    "rejectionReason": "Rejection reason",
+    "rejectionReason": "Rejection reason (short)",
+    "rejectionReasonHint": "Inserted into the {{reason}} placeholder in the customer letter; keep it concise for lists.",
     "decisionBy": "Decided by",
     "notes": "Notes",
+    "customerMessage": "Message to customer",
+    "customerMessageHint": "Filled from a template; edit before you submit. Will be reused for email/SMS later.",
+    "reloadTemplate": "Reload template",
+    "templates": {
+      "approve": "Dear {{customerName}},\n\nYour credit application {{applicationNumber}} has been approved.\nApproved amount: {{amount}} · Term: {{term}} months · Rate: {{rate}}%\n\nKind regards,\nBankApp Credit Operations",
+      "reject": "Dear {{customerName}},\n\nUnfortunately, your credit application {{applicationNumber}} has been rejected for the following reason:\n\n{{reason}}\n\nKind regards,\nBankApp Credit Operations"
+    },
     "purpose": "Purpose",
     "monthlyIncome": "Monthly income",
     "monthlyIncomeHint": "Net monthly income (required)",

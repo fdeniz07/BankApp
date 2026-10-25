@@ -69,5 +69,6 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support
 - [ ] Credit application document upload (ID, payslip, etc.; may become mandatory later)
+- [ ] Send decision letters by email/SMS (Notification + Outbox; UI templates already exist)
 - [ ] Branch model + decision-maker branch on credit applications
 - [ ] Chatbot (customer / staff support assistant)

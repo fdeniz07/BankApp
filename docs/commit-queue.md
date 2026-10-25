@@ -29,3 +29,4 @@ _(empty)_
 | 2026-10-25 | +1 | Commit queue drain log |
 | 2026-10-25 | +5 | Toast severity + payment plan PDF/print/export + READMEs |
 | 2026-10-25 | +1 | Fix commit-queue encoding |
+| 2026-10-25 | +1 | Decision letter templates + README Features/URLs |

@@ -47,16 +47,16 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - Individual / corporate customers (TPT), credit types & sub-types, applications
 - JWT auth + RBAC; public individual registration with email confirmation (RabbitMQ)
 - Approve / reject / **cancel** (status change — not soft-delete for cancel)
+- Editable **customer decision letters** (approve/reject templates; stored in `notes`)
 - **Domain Events + Transactional Outbox** (credit lifecycle → `domain-events` queue)
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → decision → onboarding stubs)
 - **SignalR** (`/hubs/credit-applications`; staff + customer groups; publish after Outbox consumer)
 - Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
-- Dashboard summary, staff user management
-- Profile fields + avatar upload (≤ 2 MB), Seq audit categories
+- Dashboard summary, staff user management, profile + avatar (≤ 2 MB)
 - Credit type create / update / delete / activate-deactivate (**BankManager**)
 - Serilog → Seq, Redis cache, FluentValidation, ProblemDetails
-- CI: GitHub Actions (build + unit/integration + client)
+- OpenTelemetry → collector → Tempo / Prometheus / Grafana
 
 ### Frontend (`client/`)
 
@@ -66,6 +66,18 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - Idempotency-Key (UUID) on credit write requests
 - SignalR: application-status toast (success / error / warning by event) + list/detail refresh
 - Payment plan: collapsible installment table, **PDF download** and **print** (customer + staff)
+- Staff decision forms: reloadable approve/reject message templates
+
+### CI/CD
+
+- GitHub Actions: restore/build WebApi, run unit + integration tests, build React client
+- Docker Compose stack (`infra/`) for local multi-service runs (healthchecked chain)
+
+### Test
+
+- xUnit **Application.UnitTests** (domain rules, saga, handlers)
+- xUnit **WebApi.IntegrationTests** (API + auth/credit flows)
+- Client production build (`tsc` + Vite) in CI
 
 ---
 
@@ -236,7 +248,10 @@ Application **cancel** sets status to `Cancelled` via dedicated command (not sof
 | WebApi | http://localhost:8080 |
 | Scalar | http://localhost:8080/scalar/v1 |
 | Client | http://localhost:3000 |
-| Seq | http://localhost:5341 |
+| Seq (logs) | http://localhost:5341 |
+| Grafana (metrics/traces UI) | http://localhost:3001 (`admin` / `admin`) |
+| Prometheus | http://localhost:9090 |
+| OTLP gRPC (collector) | `localhost:4317` |
 | RabbitMQ UI | http://localhost:15672 |
 | Vault UI (lab) | http://localhost:8200 |
 

@@ -720,6 +720,16 @@ th {
   margin-bottom: 0.5rem;
 }
 
+.customer-message-preview {
+  white-space: pre-wrap;
+}
+
+.field-hint {
+  margin: -0.35rem 0 0.65rem;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .payment-plan-actions {
   display: flex;
   flex-wrap: wrap;

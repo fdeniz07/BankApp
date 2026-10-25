@@ -47,16 +47,16 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - Bireysel / kurumsal müşteri (TPT), kredi tipi & alt tip, başvuru
 - JWT + RBAC; kamuya açık bireysel kayıt + e-posta doğrulama (RabbitMQ)
 - Onay / red / **iptal** (durum değişimi — iptal soft-delete değildir)
+- Düzenlenebilir **müşteri karar mektubu** (onay/red şablonları; `notes` alanında saklanır)
 - **Domain Events + Transactional Outbox** (kredi yaşam döngüsü → kuyruk `domain-events`)
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24 saat)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → karar → onboarding stub’ları)
 - **SignalR** (`/hubs/credit-applications`; staff + müşteri grupları; Outbox consumer sonrası yayın)
 - Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
-- Dashboard özeti, personel yönetimi
-- Profil alanları + avatar (≤ 2 MB), Seq audit kategorileri
+- Dashboard özeti, personel yönetimi, profil + avatar (≤ 2 MB)
 - Kredi tipi oluşturma / güncelleme / silme / aktif-pasif (**BankManager**)
 - Serilog → Seq, Redis önbellek, FluentValidation, ProblemDetails
-- CI: GitHub Actions (build + unit/integration + client)
+- OpenTelemetry → collector → Tempo / Prometheus / Grafana
 
 ### Frontend (`client/`)
 
@@ -66,6 +66,18 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - Kredi yazma isteklerinde `Idempotency-Key` (UUID)
 - SignalR: başvuru durumu toast (olaya göre success / error / warning) + liste/detay yenileme
 - Ödeme planı: açılır taksit listesi, **PDF indir** ve **yazdır** (müşteri + personel)
+- Personel karar formları: yenilenebilir onay/red mesaj şablonları
+
+### CI/CD
+
+- GitHub Actions: WebApi restore/build, unit + integration testler, React client build
+- Docker Compose (`infra/`) ile yerel çoklu servis (healthcheck zinciri)
+
+### Test
+
+- xUnit **Application.UnitTests** (domain kuralları, saga, handler’lar)
+- xUnit **WebApi.IntegrationTests** (API + auth/kredi akışları)
+- CI’da client production build (`tsc` + Vite)
 
 ---
 
@@ -236,7 +248,10 @@ Başvuru **iptali** `Cancelled` durumuna özel komutla geçer (soft-delete deği
 | WebApi | http://localhost:8080 |
 | Scalar | http://localhost:8080/scalar/v1 |
 | Client | http://localhost:3000 |
-| Seq | http://localhost:5341 |
+| Seq (log) | http://localhost:5341 |
+| Grafana (metrik/trace UI) | http://localhost:3001 (`admin` / `admin`) |
+| Prometheus | http://localhost:9090 |
+| OTLP gRPC (collector) | `localhost:4317` |
 | RabbitMQ UI | http://localhost:15672 |
 | Vault UI (lab) | http://localhost:8200 |
 
