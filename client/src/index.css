@@ -720,6 +720,23 @@ th {
   margin-bottom: 0.5rem;
 }
 
+.payment-plan-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.payment-plan-toggle {
+  margin: 0;
+}
+
+.payment-plan-table-scroll {
+  margin-top: 0.75rem;
+  max-height: 18rem;
+  overflow: auto;
+}
+
 .credit-types-table {
   width: 100%;
   table-layout: auto;

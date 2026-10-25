@@ -82,6 +82,54 @@ export async function apiRequest<T>(
   return (await response.json()) as T
 }
 
+export interface DownloadedFile {
+  blob: Blob
+  fileName: string
+  contentType: string
+}
+
+/** Authenticated binary download (PDF and future export formats). */
+export async function apiDownload(path: string, options: RequestInit = {}): Promise<DownloadedFile> {
+  const headers = new Headers(options.headers)
+  const token = getToken()
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...options,
+    headers,
+  })
+
+  if (response.status === 401) {
+    clearSession()
+    const currentPath = window.location.pathname
+    if (!currentPath.startsWith('/login') && !currentPath.startsWith('/register')) {
+      window.location.assign('/login')
+    }
+    throw new ApiError(401, 'Unauthorized')
+  }
+
+  if (!response.ok) {
+    let message = response.statusText
+    try {
+      const body = (await response.json()) as ProblemBody
+      message = extractErrorMessage(body, message)
+    } catch {
+      // ignore parse errors
+    }
+    throw new ApiError(response.status, message)
+  }
+
+  const blob = await response.blob()
+  const disposition = response.headers.get('Content-Disposition') ?? ''
+  const match = /filename\*?=(?:UTF-8''|")?([^\";]+)/i.exec(disposition)
+  const fileName = match?.[1] ? decodeURIComponent(match[1].replace(/"/g, '')) : 'download'
+  const contentType = response.headers.get('Content-Type') ?? blob.type
+
+  return { blob, fileName, contentType }
+}
+
 /** Multipart upload — do not set Content-Type (browser sets boundary). */
 export async function apiUpload<T>(path: string, formData: FormData): Promise<T> {
   const headers = new Headers()

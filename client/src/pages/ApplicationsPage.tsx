@@ -6,6 +6,7 @@ import {
   approveApplication,
   cancelApplication,
   createApplication,
+  exportPaymentPlan,
   getApplications,
   getPaymentPlan,
   rejectApplication,
@@ -24,6 +25,7 @@ import type {
   GetListResponse,
   PaymentPlanResponse,
 } from '../types/api'
+import { printDownloadedFile, saveDownloadedFile } from '../utils/downloadFile'
 import { formatMoney } from '../utils/formatMoney'
 import { mapApiError } from '../utils/mapApiError'
 
@@ -53,6 +55,8 @@ export function ApplicationsPage() {
   const [decidingId, setDecidingId] = useState<string | null>(null)
   const [decidingAction, setDecidingAction] = useState<'approve' | 'reject' | null>(null)
   const [paymentPlan, setPaymentPlan] = useState<PaymentPlanResponse | null>(null)
+  const [planTableOpen, setPlanTableOpen] = useState(false)
+  const [planExportBusy, setPlanExportBusy] = useState(false)
   const [dashboard, setDashboard] = useState<DashboardSummary | null>(null)
   const [form, setForm] = useState({
     creditSubTypeId: '',
@@ -164,6 +168,7 @@ export function ApplicationsPage() {
   )
 
   useEffect(() => {
+    setPlanTableOpen(false)
     if (isStaff || !selectedSubType || !form.requestedAmount || !form.requestedTermMonths) {
       setPaymentPlan(null)
       return
@@ -184,6 +189,47 @@ export function ApplicationsPage() {
       cancelled = true
     }
   }, [isStaff, selectedSubType, form.requestedAmount, form.requestedTermMonths])
+
+  async function fetchCreateFormPlanExport() {
+    if (!selectedSubType || !form.requestedAmount || !form.requestedTermMonths) {
+      throw new Error('missing-plan')
+    }
+    return exportPaymentPlan({
+      format: 'pdf',
+      creditSubTypeId: selectedSubType.id,
+      amount: Number(form.requestedAmount),
+      termMonths: Number(form.requestedTermMonths),
+      customerName: user?.displayName || user?.email,
+    })
+  }
+
+  async function onDownloadCreatePlan() {
+    setPlanExportBusy(true)
+    setError(null)
+    try {
+      saveDownloadedFile(await fetchCreateFormPlanExport())
+    } catch (err) {
+      setError(mapApiError(err, t))
+    } finally {
+      setPlanExportBusy(false)
+    }
+  }
+
+  async function onPrintCreatePlan() {
+    setPlanExportBusy(true)
+    setError(null)
+    try {
+      printDownloadedFile(await fetchCreateFormPlanExport())
+    } catch (err) {
+      if (err instanceof Error && err.message === 'popup-blocked') {
+        setError(t('paymentPlan.printBlocked'))
+      } else {
+        setError(mapApiError(err, t))
+      }
+    } finally {
+      setPlanExportBusy(false)
+    }
+  }
 
   const welcomeName = user?.displayName || user?.email
 
@@ -553,32 +599,74 @@ export function ApplicationsPage() {
                   ),
                 })}
               </p>
-              <div className="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>{t('paymentPlan.month')}</th>
-                      <th>{t('paymentPlan.payment')}</th>
-                      <th>{t('paymentPlan.principal')}</th>
-                      <th>{t('paymentPlan.interest')}</th>
-                      <th>{t('paymentPlan.balance')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paymentPlan.installments.map((row) => (
-                      <tr key={row.month}>
-                        <td>{row.month}</td>
-                        <td>{formatMoney(row.payment, paymentPlan.currencyCode, i18n.language)}</td>
-                        <td>{formatMoney(row.principal, paymentPlan.currencyCode, i18n.language)}</td>
-                        <td>{formatMoney(row.interest, paymentPlan.currencyCode, i18n.language)}</td>
-                        <td>
-                          {formatMoney(row.remainingBalance, paymentPlan.currencyCode, i18n.language)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+              <div className="payment-plan-actions">
+                <button
+                  type="button"
+                  className="btn ghost"
+                  disabled={planExportBusy}
+                  onClick={() => void onDownloadCreatePlan()}
+                >
+                  {planExportBusy ? t('common.loading') : t('paymentPlan.downloadPdf')}
+                </button>
+                <button
+                  type="button"
+                  className="btn ghost"
+                  disabled={planExportBusy}
+                  onClick={() => void onPrintCreatePlan()}
+                >
+                  {t('paymentPlan.print')}
+                </button>
+                <button
+                  type="button"
+                  className="btn ghost"
+                  aria-expanded={planTableOpen}
+                  onClick={() => setPlanTableOpen((open) => !open)}
+                >
+                  {planTableOpen
+                    ? t('paymentPlan.hideInstallments')
+                    : t('paymentPlan.showInstallments', {
+                        count: paymentPlan.installments.length,
+                      })}
+                </button>
               </div>
+              {planTableOpen && (
+                <div className="table-wrap payment-plan-table-scroll">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>{t('paymentPlan.month')}</th>
+                        <th>{t('paymentPlan.payment')}</th>
+                        <th>{t('paymentPlan.principal')}</th>
+                        <th>{t('paymentPlan.interest')}</th>
+                        <th>{t('paymentPlan.balance')}</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paymentPlan.installments.map((row) => (
+                        <tr key={row.month}>
+                          <td>{row.month}</td>
+                          <td>
+                            {formatMoney(row.payment, paymentPlan.currencyCode, i18n.language)}
+                          </td>
+                          <td>
+                            {formatMoney(row.principal, paymentPlan.currencyCode, i18n.language)}
+                          </td>
+                          <td>
+                            {formatMoney(row.interest, paymentPlan.currencyCode, i18n.language)}
+                          </td>
+                          <td>
+                            {formatMoney(
+                              row.remainingBalance,
+                              paymentPlan.currencyCode,
+                              i18n.language,
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   approveApplication,
+  exportPaymentPlan,
   getApplicationById,
   getPaymentPlan,
   rejectApplication,
@@ -15,6 +16,7 @@ import {
   CREDIT_APPLICATION_CHANGED_EVENT,
   type CreditApplicationChangedPayload,
 } from '../realtime/creditApplicationEvents'
+import { printDownloadedFile, saveDownloadedFile } from '../utils/downloadFile'
 import { formatMoney } from '../utils/formatMoney'
 
 export function ApplicationDetailPage() {
@@ -24,6 +26,8 @@ export function ApplicationDetailPage() {
   const [item, setItem] = useState<CreditApplicationDetail | null>(null)
   const [subType, setSubType] = useState<CreditSubTypeListItem | null>(null)
   const [paymentPlan, setPaymentPlan] = useState<PaymentPlanResponse | null>(null)
+  const [planTableOpen, setPlanTableOpen] = useState(false)
+  const [planExportBusy, setPlanExportBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -110,7 +114,49 @@ export function ApplicationDetailPage() {
     return 'sourceRequested'
   }, [item, isStaff])
 
+  async function fetchPlanExport() {
+    if (!item || !planAmount || !planTerm) throw new Error('missing-plan')
+    return exportPaymentPlan({
+      format: 'pdf',
+      creditSubTypeId: item.creditSubTypeId,
+      amount: planAmount,
+      termMonths: planTerm,
+      interestRate: planRate,
+      applicationNumber: item.applicationNumber,
+      customerName: item.customerName,
+    })
+  }
+
+  async function onDownloadPlan() {
+    setPlanExportBusy(true)
+    setError(null)
+    try {
+      saveDownloadedFile(await fetchPlanExport())
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : t('paymentPlan.exportFailed'))
+    } finally {
+      setPlanExportBusy(false)
+    }
+  }
+
+  async function onPrintPlan() {
+    setPlanExportBusy(true)
+    setError(null)
+    try {
+      printDownloadedFile(await fetchPlanExport())
+    } catch (err) {
+      if (err instanceof Error && err.message === 'popup-blocked') {
+        setError(t('paymentPlan.printBlocked'))
+      } else {
+        setError(err instanceof ApiError ? err.message : t('paymentPlan.exportFailed'))
+      }
+    } finally {
+      setPlanExportBusy(false)
+    }
+  }
+
   useEffect(() => {
+    setPlanTableOpen(false)
     if (!item || !planAmount || !planTerm) {
       setPaymentPlan(null)
       return
@@ -345,30 +391,64 @@ export function ApplicationDetailPage() {
               interest: formatMoney(paymentPlan.totalInterest, paymentPlan.currencyCode, i18n.language),
             })}
           </p>
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>{t('paymentPlan.month')}</th>
-                  <th>{t('paymentPlan.payment')}</th>
-                  <th>{t('paymentPlan.principal')}</th>
-                  <th>{t('paymentPlan.interest')}</th>
-                  <th>{t('paymentPlan.balance')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paymentPlan.installments.map((row) => (
-                  <tr key={row.month}>
-                    <td>{row.month}</td>
-                    <td>{formatMoney(row.payment, paymentPlan.currencyCode, i18n.language)}</td>
-                    <td>{formatMoney(row.principal, paymentPlan.currencyCode, i18n.language)}</td>
-                    <td>{formatMoney(row.interest, paymentPlan.currencyCode, i18n.language)}</td>
-                    <td>{formatMoney(row.remainingBalance, paymentPlan.currencyCode, i18n.language)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="payment-plan-actions">
+            <button
+              type="button"
+              className="btn ghost"
+              disabled={planExportBusy}
+              onClick={() => void onDownloadPlan()}
+            >
+              {planExportBusy ? t('common.loading') : t('paymentPlan.downloadPdf')}
+            </button>
+            <button
+              type="button"
+              className="btn ghost"
+              disabled={planExportBusy}
+              onClick={() => void onPrintPlan()}
+            >
+              {t('paymentPlan.print')}
+            </button>
+            <button
+              type="button"
+              className="btn ghost payment-plan-toggle"
+              aria-expanded={planTableOpen}
+              onClick={() => setPlanTableOpen((open) => !open)}
+            >
+              {planTableOpen
+                ? t('paymentPlan.hideInstallments')
+                : t('paymentPlan.showInstallments', {
+                    count: paymentPlan.installments.length,
+                  })}
+            </button>
           </div>
+          {planTableOpen && (
+            <div className="table-wrap payment-plan-table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{t('paymentPlan.month')}</th>
+                    <th>{t('paymentPlan.payment')}</th>
+                    <th>{t('paymentPlan.principal')}</th>
+                    <th>{t('paymentPlan.interest')}</th>
+                    <th>{t('paymentPlan.balance')}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paymentPlan.installments.map((row) => (
+                    <tr key={row.month}>
+                      <td>{row.month}</td>
+                      <td>{formatMoney(row.payment, paymentPlan.currencyCode, i18n.language)}</td>
+                      <td>{formatMoney(row.principal, paymentPlan.currencyCode, i18n.language)}</td>
+                      <td>{formatMoney(row.interest, paymentPlan.currencyCode, i18n.language)}</td>
+                      <td>
+                        {formatMoney(row.remainingBalance, paymentPlan.currencyCode, i18n.language)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 

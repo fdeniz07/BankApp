@@ -9,7 +9,10 @@ import type {
   PaymentPlanResponse,
   RejectRequest,
 } from '../types/api'
-import { apiRequest } from './client'
+import { apiDownload, apiRequest, type DownloadedFile } from './client'
+
+/** Extensible export formats — backend registers exporters per value. */
+export type PaymentPlanExportFormat = 'pdf'
 
 export interface GetApplicationsParams {
   pageIndex?: number
@@ -59,6 +62,28 @@ export function getPaymentPlan(params: {
   return apiRequest<PaymentPlanResponse>(
     `/api/CreditApplications/payment-plan?${search}`,
   )
+}
+
+export function exportPaymentPlan(params: {
+  format?: PaymentPlanExportFormat
+  creditSubTypeId?: string
+  amount: number
+  termMonths: number
+  interestRate?: number
+  applicationNumber?: string
+  customerName?: string
+}): Promise<DownloadedFile> {
+  const search = new URLSearchParams({
+    format: params.format ?? 'pdf',
+    amount: String(params.amount),
+    termMonths: String(params.termMonths),
+  })
+  if (params.creditSubTypeId) search.set('creditSubTypeId', params.creditSubTypeId)
+  if (params.interestRate != null) search.set('interestRate', String(params.interestRate))
+  if (params.applicationNumber) search.set('applicationNumber', params.applicationNumber)
+  if (params.customerName) search.set('customerName', params.customerName)
+
+  return apiDownload(`/api/CreditApplications/payment-plan/export?${search}`)
 }
 
 function withIdempotencyKey(idempotencyKey?: string): HeadersInit {
