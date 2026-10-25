@@ -70,13 +70,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const mine = await getMyProfile()
       const url = resolveProfileImageUrl(mine.profileImageUrl)
-      const displayName =
-        `${mine.firstName ?? ''} ${mine.lastName ?? ''}`.trim() || mine.email
+      const profileDisplayName =
+        `${mine.firstName ?? ''} ${mine.lastName ?? ''}`.trim() || undefined
       setUser((current) => {
         if (!current) return current
         const next: AuthUser = {
           ...current,
-          displayName: displayName || current.displayName,
+          // Prefer real names from profile; never overwrite JWT/login name with email.
+          displayName: profileDisplayName || current.displayName,
           profileImageUrl: url ?? undefined,
         }
         const prev = readProfileOverride()

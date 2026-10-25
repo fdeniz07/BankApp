@@ -237,6 +237,15 @@ h2 {
   max-width: 12rem;
 }
 
+.user-email {
+  color: var(--muted);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
 .topbar-avatar {
   border-color: rgba(15, 92, 76, 0.35);
 }

@@ -35,15 +35,23 @@ export function AppLayout() {
               )}
             </div>
             <div className="user-meta">
-              <span className="user-display-name">{user?.displayName || user?.email}</span>
-              <span className="role-chip">
-                {user?.roles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(', ')}
+              <span className="user-display-name">
+                {user?.displayName || user?.email}
               </span>
-              {user?.customerCategory && (
+              {user?.displayName && user?.email && (
+                <span className="user-email">{user.email}</span>
+              )}
+              {user?.customerCategory ? (
                 <span className="role-chip">
-                  {t(`category.${user.customerCategory}`, {
-                    defaultValue: user.customerCategory,
+                  {t(`categoryLabel.${user.customerCategory}`, {
+                    defaultValue: t(`category.${user.customerCategory}`, {
+                      defaultValue: user.customerCategory,
+                    }),
                   })}
+                </span>
+              ) : (
+                <span className="role-chip">
+                  {user?.roles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(', ')}
                 </span>
               )}
             </div>
