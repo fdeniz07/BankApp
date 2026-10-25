@@ -15,16 +15,17 @@ Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab,
 
 1. [Demo girişler](#demo-girişler)
 2. [Özellikler](#özellikler)
-3. [Teknoloji yığını](#teknoloji-yığını)
-4. [Çözüm yapısı](#çözüm-yapısı)
-5. [Mimari diyagramlar](#mimari-diyagramlar)
-6. [Alan modeli](#alan-modeli)
-7. [İş kuralları](#iş-kuralları)
-8. [API özeti](#api-özeti)
-9. [SmartEnum](#smartenum)
-10. [Veri seed](#veri-seed)
-11. [Kurulum](#kurulum)
-12. [Örnek istekler](#örnek-istekler)
+3. [Ekran görüntüleri (EN)](#ekran-görüntüleri-en)
+4. [Teknoloji yığını](#teknoloji-yığını)
+5. [Çözüm yapısı](#çözüm-yapısı)
+6. [Mimari diyagramlar](#mimari-diyagramlar)
+7. [Alan modeli](#alan-modeli)
+8. [İş kuralları](#iş-kuralları)
+9. [API özeti](#api-özeti)
+10. [SmartEnum](#smartenum)
+11. [Veri seed](#veri-seed)
+12. [Kurulum](#kurulum)
+13. [Örnek istekler](#örnek-istekler)
 
 ---
 
@@ -78,6 +79,68 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - xUnit **Application.UnitTests** (domain kuralları, saga, handler’lar)
 - xUnit **WebApi.IntegrationTests** (API + auth/kredi akışları)
 - CI’da client production build (`tsc` + Vite)
+
+---
+
+## Ekran görüntüleri (EN)
+
+Yakalar [`docs/assets/screenshots/en/`](docs/assets/screenshots/en/) altında (şimdilik yalnızca İngilizce UI).  
+Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/screenshots/bank-employee.en.md) · [Yönetici](docs/screenshots/bank-manager.en.md)
+
+### Auth, gizlilik ve erişilebilirlik
+
+**Giriş ve gizlilik bandı** — TR/EN/DE dil seçici, beni hatırla, kart üzerinde demo kimlik bilgileri; SPA kullanımından önce çerez/gizlilik onayı.
+
+<img src="docs/assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Giriş sayfası ve gizlilik bandı" width="720" />
+
+**Erişilebilirlik paneli** — Açık/koyu tema, yazı boyutu ve yüksek kontrast (tarayıcıda saklanır).
+
+<img src="docs/assets/screenshots/en/Accessiblity%20Settings.png" alt="Erişilebilirlik ayarları" width="360" />
+
+### Dashboard’lar (role göre)
+
+**Müşteri** — Görünen adla karşılama; kendi başvuru sayaçları. Devamı: [müşteri galerisi](docs/screenshots/customer.en.md).
+
+<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard-1.png" alt="Müşteri dashboard" width="720" />
+
+**Banka personeli** — Genel istatistikler, döviz ticker, SignalR yaşam döngüsü toast’ları. Devamı: [personel galerisi](docs/screenshots/bank-employee.en.md).
+
+<img src="docs/assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png" alt="Personel dashboard" width="720" />
+
+**Banka yöneticisi** — Personel + kredi tipi yönetimiyle aynı özet. Devamı: [yönetici galerisi](docs/screenshots/bank-manager.en.md).
+
+<img src="docs/assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Yönetici dashboard" width="720" />
+
+### Altyapı ve gözlemlenebilirlik
+
+**Docker Compose** — Tam lab yığını (SQL, Redis, Seq, RabbitMQ, Vault, OTel, Prometheus, Grafana, WebApi, client).
+
+<img src="docs/assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker container’lar" width="720" />
+
+**Scalar API referansı** — WebApi için etkileşimli OpenAPI UI (`/scalar/v1`).
+
+<img src="docs/assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API dokümantasyonu" width="720" />
+
+**Seq** — Yapılandırılmış uygulama logları (Serilog); OTel açıksa TraceId ile ilişkilendirilebilir.
+
+<img src="docs/assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq logları" width="720" />
+
+**Prometheus ve Grafana** — Metrik scrape + dashboard/trace UI (`:9090` / `:3001`).
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana metrikleri" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana ek metrikler" width="720" />
+
+**RabbitMQ** — E-posta onay ve domain-events kuyrukları (Outbox consumer).
+
+<img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ kuyrukları" width="720" />
+
+**Vault (lab)** — Dev-mode secrets seed (`secret/bankapp`); WebApi henüz Vault okumaz.
+
+<img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
+
 
 ---
 

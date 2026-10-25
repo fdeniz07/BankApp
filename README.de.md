@@ -15,16 +15,17 @@ Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, 
 
 1. [Demo-Logins](#demo-logins)
 2. [Funktionen](#funktionen)
-3. [Tech-Stack](#tech-stack)
-4. [Lösungsstruktur](#lösungsstruktur)
-5. [Architekturdiagramme](#architekturdiagramme)
-6. [Domänenmodell](#domänenmodell)
-7. [Geschäftsregeln](#geschäftsregeln)
-8. [API-Überblick](#api-überblick)
-9. [SmartEnum](#smartenum)
-10. [Daten-Seed](#daten-seed)
-11. [Schnellstart](#schnellstart)
-12. [Beispielanfragen](#beispielanfragen)
+3. [Screenshots (EN)](#screenshots-en)
+4. [Tech-Stack](#tech-stack)
+5. [Lösungsstruktur](#lösungsstruktur)
+6. [Architekturdiagramme](#architekturdiagramme)
+7. [Domänenmodell](#domänenmodell)
+8. [Geschäftsregeln](#geschäftsregeln)
+9. [API-Überblick](#api-überblick)
+10. [SmartEnum](#smartenum)
+11. [Daten-Seed](#daten-seed)
+12. [Schnellstart](#schnellstart)
+13. [Beispielanfragen](#beispielanfragen)
 
 ---
 
@@ -78,6 +79,68 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - xUnit **Application.UnitTests** (Domain-Regeln, Saga, Handler)
 - xUnit **WebApi.IntegrationTests** (API + Auth-/Kreditflüsse)
 - Client-Production-Build (`tsc` + Vite) in CI
+
+---
+
+## Screenshots (EN)
+
+UI-Aufnahmen unter [`docs/assets/screenshots/en/`](docs/assets/screenshots/en/) (vorerst nur englische Oberfläche).  
+Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/screenshots/bank-employee.en.md) · [Manager](docs/screenshots/bank-manager.en.md)
+
+### Auth, Datenschutz & Barrierefreiheit
+
+**Login & Datenschutz-Banner** — Anmeldung mit TR/EN/DE-Umschalter, „Angemeldet bleiben“, Demo-Zugangsdaten auf der Karte und Cookie-/Datenschutz-Zustimmung vor der SPA.
+
+<img src="docs/assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login und Datenschutz-Banner" width="720" />
+
+**Barrierefreiheits-Panel** — Hell/Dunkel, Schriftgröße und hoher Kontrast (im Browser persistiert).
+
+<img src="docs/assets/screenshots/en/Accessiblity%20Settings.png" alt="Barrierefreiheitseinstellungen" width="360" />
+
+### Dashboards (nach Rolle)
+
+**Kunde** — Begrüßung mit Anzeigename; Zähler der eigenen Anträge. Mehr: [Kunden-Galerie](docs/screenshots/customer.en.md).
+
+<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard-1.png" alt="Kunden-Dashboard" width="720" />
+
+**Bankmitarbeiter** — Statistikleiste, FX-Ticker, SignalR-Lebenszyklus-Toasts. Mehr: [Mitarbeiter-Galerie](docs/screenshots/bank-employee.en.md).
+
+<img src="docs/assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png" alt="Mitarbeiter-Dashboard" width="720" />
+
+**Bankmanager** — Übersicht mit Personal- und Kreditarten-Admin. Mehr: [Manager-Galerie](docs/screenshots/bank-manager.en.md).
+
+<img src="docs/assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Manager-Dashboard" width="720" />
+
+### Infrastruktur & Observability
+
+**Docker Compose** — Vollständiger Lab-Stack (SQL, Redis, Seq, RabbitMQ, Vault, OTel, Prometheus, Grafana, WebApi, Client).
+
+<img src="docs/assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker-Container" width="720" />
+
+**Scalar API-Referenz** — Interaktive OpenAPI-UI für WebApi (`/scalar/v1`).
+
+<img src="docs/assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API-Dokumentation" width="720" />
+
+**Seq** — Strukturierte Anwendungslogs (Serilog), mit TraceId korrelierbar wenn OTel aktiv ist.
+
+<img src="docs/assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq-Logs" width="720" />
+
+**Prometheus & Grafana** — Metrics-Scrape + Dashboards/Traces (`:9090` / `:3001`).
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana-Metriken" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana weitere Metriken" width="720" />
+
+**RabbitMQ** — Queues für E-Mail-Bestätigung und Domain-Events (Outbox-Consumer).
+
+<img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ-Queues" width="720" />
+
+**Vault (Lab)** — Dev-Mode Secrets-Seed (`secret/bankapp`); WebApi liest Vault noch nicht.
+
+<img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault Secrets" width="720" />
+
 
 ---
 

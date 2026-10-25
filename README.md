@@ -15,26 +15,27 @@ Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, We
 
 1. [Demo logins](#demo-logins)
 2. [Features](#features)
-3. [Tech stack](#tech-stack)
-4. [Solution structure](#solution-structure)
-5. [Architecture diagrams](#architecture-diagrams)
-6. [Domain model](#domain-model)
-7. [Business rules](#business-rules)
-8. [API overview](#api-overview)
-9. [SmartEnum](#smartenum)
-10. [Data seeding](#data-seeding)
-11. [Getting started](#getting-started)
-12. [Example requests](#example-requests)
+3. [Screenshots (EN)](#screenshots-en)
+4. [Tech stack](#tech-stack)
+5. [Solution structure](#solution-structure)
+6. [Architecture diagrams](#architecture-diagrams)
+7. [Domain model](#domain-model)
+8. [Business rules](#business-rules)
+9. [API overview](#api-overview)
+10. [SmartEnum](#smartenum)
+11. [Data seeding](#data-seeding)
+12. [Getting started](#getting-started)
+13. [Example requests](#example-requests)
 
 ---
 
 ## Demo logins
 
-| Role | Email | Password |
-|------|-------|----------|
-| Bank staff | `staff@bank.local` (also `staff.tr` / `.en` / `.de`) | `Staff123!` |
-| Bank manager | `manager@bank.local` | `Manager123!` |
-| Customer | `customer@bank.local` (also `customer.tr` / `.en` / `.de`) | `Customer123!` |
+| Role         | Email                                                      | Password       |
+| ------------ | ---------------------------------------------------------- | -------------- |
+| Bank staff   | `staff@bank.local` (also `staff.tr` / `.en` / `.de`)       | `Staff123!`    |
+| Bank manager | `manager@bank.local`                                       | `Manager123!`  |
+| Customer     | `customer@bank.local` (also `customer.tr` / `.en` / `.de`) | `Customer123!` |
 
 Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff).
 
@@ -81,25 +82,86 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 
 ---
 
+## Screenshots (EN)
+
+UI captures under [`docs/assets/screenshots/en/`](docs/assets/screenshots/en/) (English locale for now).  
+Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](docs/screenshots/bank-employee.en.md) · [Bank manager](docs/screenshots/bank-manager.en.md)
+
+### Auth, privacy & accessibility
+
+**Login & privacy banner** — Sign-in with TR/EN/DE switcher, remember-me, demo credentials on the card, and cookie/privacy consent before using the SPA.
+
+<img src="docs/assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login page and privacy banner" width="720" />
+
+**Accessibility panel** — Floating controls for light/dark theme, font scale, and high contrast (persisted in the browser).
+
+<img src="docs/assets/screenshots/en/Accessiblity%20Settings.png" alt="Accessibility settings" width="360" />
+
+### Dashboards (by role)
+
+**Customer** — Welcome by display name; own application counters. More: [customer gallery](docs/screenshots/customer.en.md).
+
+<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard-1.png" alt="Customer dashboard" width="720" />
+
+**Bank staff** — Global stats, FX ticker, SignalR lifecycle toasts. More: [staff gallery](docs/screenshots/bank-employee.en.md).
+
+<img src="docs/assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png" alt="Bank employee dashboard" width="720" />
+
+**Bank manager** — Same overview with staff + credit-type admin. More: [manager gallery](docs/screenshots/bank-manager.en.md).
+
+<img src="docs/assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Bank manager dashboard" width="720" />
+
+### Infrastructure & observability
+
+**Docker Compose** — Full lab stack (SQL, Redis, Seq, RabbitMQ, Vault, OTel, Prometheus, Grafana, WebApi, client).
+
+<img src="docs/assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker containers" width="720" />
+
+**Scalar API reference** — Interactive OpenAPI UI for WebApi (`/scalar/v1`).
+
+<img src="docs/assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API docs" width="720" />
+
+**Seq** — Structured application logs (Serilog), correlatable with TraceId when OTel is on.
+
+<img src="docs/assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq logs" width="720" />
+
+**Prometheus & Grafana** — Metrics scrape + dashboards/traces UI (`:9090` / `:3001`).
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana metrics" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana additional metrics" width="720" />
+
+**RabbitMQ** — Queues for email confirmation and domain-events (Outbox consumer).
+
+<img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ queues" width="720" />
+
+**Vault (lab)** — Dev-mode secrets seed (`secret/bankapp`); WebApi does not read Vault yet.
+
+<img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
+
+---
+
 ## Tech stack
 
-| Area | Technology |
-|------|------------|
-| API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
-| Domain | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**name**) |
-| DB / cache / logs | SQL Server, Redis, Serilog + Seq |
-| Observability | OpenTelemetry (OTLP) → collector → Tempo + Prometheus + Grafana `:3001` |
-| Messaging | RabbitMQ (`email-confirmation`, `domain-events`) + Transactional Outbox |
-| Idempotency | Header `Idempotency-Key` + Redis (credit write APIs, 24h) |
-| Saga | `CreditApplicationProcessManager` + table `CreditApplicationSagas` |
-| Realtime | SignalR hub `/hubs/credit-applications` (JWT `access_token`) |
-| Secrets (lab) | HashiCorp Vault **dev** (`secret/bankapp`; WebApi does not read Vault yet) |
-| Auth | JWT + role claims (Customer / BankStaff / BankManager) |
-| Client | React, Vite, TypeScript, react-i18next, react-router, `@microsoft/signalr` |
-| Docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
-| Test / CI | xUnit (Application + WebApi.IntegrationTests), GitHub Actions |
-| Seed | Bogus (+ fixed credit catalog) |
-| Infra | Docker Compose (`infra/`) — healthchecked service chain |
+| Area              | Technology                                                                        |
+| ----------------- | --------------------------------------------------------------------------------- |
+| API               | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10          |
+| Domain            | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**name**) |
+| DB / cache / logs | SQL Server, Redis, Serilog + Seq                                                  |
+| Observability     | OpenTelemetry (OTLP) → collector → Tempo + Prometheus + Grafana `:3001`           |
+| Messaging         | RabbitMQ (`email-confirmation`, `domain-events`) + Transactional Outbox           |
+| Idempotency       | Header `Idempotency-Key` + Redis (credit write APIs, 24h)                         |
+| Saga              | `CreditApplicationProcessManager` + table `CreditApplicationSagas`                |
+| Realtime          | SignalR hub `/hubs/credit-applications` (JWT `access_token`)                      |
+| Secrets (lab)     | HashiCorp Vault **dev** (`secret/bankapp`; WebApi does not read Vault yet)        |
+| Auth              | JWT + role claims (Customer / BankStaff / BankManager)                            |
+| Client            | React, Vite, TypeScript, react-i18next, react-router, `@microsoft/signalr`        |
+| Docs (Dev)        | OpenAPI + Scalar (`/scalar/v1`)                                                   |
+| Test / CI         | xUnit (Application + WebApi.IntegrationTests), GitHub Actions                     |
+| Seed              | Bogus (+ fixed credit catalog)                                                    |
+| Infra             | Docker Compose (`infra/`) — healthchecked service chain                           |
 
 ---
 
@@ -195,25 +257,25 @@ stateDiagram-v2
 
 ### Customers (TPT)
 
-| Entity | Notes |
-|--------|--------|
-| **Customer** | Shared: number, email, phone, address, `IsActive`, soft-delete |
-| **IndividualCustomer** | Name, national id, DOB, gender, … |
-| **CorporateCustomer** | Company, tax, authorized person, … |
+| Entity                 | Notes                                                          |
+| ---------------------- | -------------------------------------------------------------- |
+| **Customer**           | Shared: number, email, phone, address, `IsActive`, soft-delete |
+| **IndividualCustomer** | Name, national id, DOB, gender, …                              |
+| **CorporateCustomer**  | Company, tax, authorized person, …                             |
 
 ### Credit catalog & applications
 
-| Entity | Role |
-|--------|------|
-| **CreditType** | Product (category, risk, currency, locale, active) |
-| **CreditSubType** | Package (amount/term ranges, rates) |
-| **CreditApplication** | Request + status + decision fields |
+| Entity                | Role                                               |
+| --------------------- | -------------------------------------------------- |
+| **CreditType**        | Product (category, risk, currency, locale, active) |
+| **CreditSubType**     | Package (amount/term ranges, rates)                |
+| **CreditApplication** | Request + status + decision fields                 |
 
 ### Soft delete vs active
 
-| Flag | Meaning |
-|------|---------|
-| **`IsActive`** | Business: usable for new operations |
+| Flag            | Meaning                               |
+| --------------- | ------------------------------------- |
+| **`IsActive`**  | Business: usable for new operations   |
 | **`IsDeleted`** | Technical soft delete (`DeletedDate`) |
 
 Application **cancel** sets status to `Cancelled` via dedicated command (not soft-delete).
@@ -243,31 +305,31 @@ Application **cancel** sets status to `Cancelled` via dedicated command (not sof
 
 ## API overview
 
-| Base (Docker Dev) | URL |
-|-------------------|-----|
-| WebApi | http://localhost:8080 |
-| Scalar | http://localhost:8080/scalar/v1 |
-| Client | http://localhost:3000 |
-| Seq (logs) | http://localhost:5341 |
+| Base (Docker Dev)           | URL                                       |
+| --------------------------- | ----------------------------------------- |
+| WebApi                      | http://localhost:8080                     |
+| Scalar                      | http://localhost:8080/scalar/v1           |
+| Client                      | http://localhost:3000                     |
+| Seq (logs)                  | http://localhost:5341                     |
 | Grafana (metrics/traces UI) | http://localhost:3001 (`admin` / `admin`) |
-| Prometheus | http://localhost:9090 |
-| OTLP gRPC (collector) | `localhost:4317` |
-| RabbitMQ UI | http://localhost:15672 |
-| Vault UI (lab) | http://localhost:8200 |
+| Prometheus                  | http://localhost:9090                     |
+| OTLP gRPC (collector)       | `localhost:4317`                          |
+| RabbitMQ UI                 | http://localhost:15672                    |
+| Vault UI (lab)              | http://localhost:8200                     |
 
 Most endpoints require JWT (`Authorization: Bearer …`) except login / public register / confirm-email.  
 Credit **writes** (`POST` create/approve/reject/cancel): required header **`Idempotency-Key`**.
 
-| Controller | Highlights |
-|------------|------------|
-| **Auth** | `POST login`, `register`, `register-individual`, `confirm-email` |
-| **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted lists |
-| **CreditTypes** | List/get; mutate + `PUT {id}/active` (manager) |
-| **CreditSubTypes** | CRUD |
-| **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
-| **Dashboard** | `GET summary` |
-| **StaffUsers** | List / create / update (manager) |
-| **Profile** | Get mine; update staff profile; upload avatar |
+| Controller                                       | Highlights                                                                                                |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
+| **Auth**                                         | `POST login`, `register`, `register-individual`, `confirm-email`                                          |
+| **IndividualCustomers** / **CorporateCustomers** | CRUD + inactive / deleted lists                                                                           |
+| **CreditTypes**                                  | List/get; mutate + `PUT {id}/active` (manager)                                                            |
+| **CreditSubTypes**                               | CRUD                                                                                                      |
+| **CreditApplications**                           | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
+| **Dashboard**                                    | `GET summary`                                                                                             |
+| **StaffUsers**                                   | List / create / update (manager)                                                                          |
+| **Profile**                                      | Get mine; update staff profile; upload avatar                                                             |
 
 Interactive details: Scalar UI.
 
@@ -277,14 +339,14 @@ Interactive details: Scalar UI.
 
 Stored and serialized by **name** (e.g. `"Pending"`), not integer ordinals.
 
-| Type | Values (examples) |
-|------|-------------------|
-| `CreditCategory` | Individual, Corporate |
-| `CreditRiskLevel` | Low, Medium, High |
-| `CreditApplicationStatus` | Pending, Approved, Rejected, Cancelled |
-| `Gender` | Female, Male, PreferNotToSay |
-| `PersonTitle` | Dr, Prof |
-| `StaffPosition` | CreditAnalyst, RelationshipManager, BranchOfficer, RiskOfficer, OperationsSpecialist, BranchManager |
+| Type                      | Values (examples)                                                                                   |
+| ------------------------- | --------------------------------------------------------------------------------------------------- |
+| `CreditCategory`          | Individual, Corporate                                                                               |
+| `CreditRiskLevel`         | Low, Medium, High                                                                                   |
+| `CreditApplicationStatus` | Pending, Approved, Rejected, Cancelled                                                              |
+| `Gender`                  | Female, Male, PreferNotToSay                                                                        |
+| `PersonTitle`             | Dr, Prof                                                                                            |
+| `StaffPosition`           | CreditAnalyst, RelationshipManager, BranchOfficer, RiskOfficer, OperationsSpecialist, BranchManager |
 
 ---
 
@@ -292,14 +354,14 @@ Stored and serialized by **name** (e.g. `"Pending"`), not integer ordinals.
 
 Runs when configured (`Database__RunSeed`, typical in Docker / Development). Top-up strategy: fill up to targets if short.
 
-| Seed | Approx. target |
-|------|----------------|
-| Individual customers | 30 (10 × tr/en/de) |
-| Corporate customers | 30 (10 × tr/en/de) |
-| Credit types | 16 (locale catalogs TRY/USD/EUR) |
-| Credit sub-types | Per type (packaged amounts/terms) |
-| Credit applications | 48 |
-| Identity | Demo staff / manager / customers |
+| Seed                 | Approx. target                    |
+| -------------------- | --------------------------------- |
+| Individual customers | 30 (10 × tr/en/de)                |
+| Corporate customers  | 30 (10 × tr/en/de)                |
+| Credit types         | 16 (locale catalogs TRY/USD/EUR)  |
+| Credit sub-types     | Per type (packaged amounts/terms) |
+| Credit applications  | 48                                |
+| Identity             | Demo staff / manager / customers  |
 
 ---
 
