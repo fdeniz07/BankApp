@@ -70,6 +70,8 @@ export function exportPaymentPlan(params: {
   amount: number
   termMonths: number
   interestRate?: number
+  /** UI language: tr | en | de */
+  locale?: string
   applicationNumber?: string
   customerName?: string
 }): Promise<DownloadedFile> {
@@ -80,6 +82,7 @@ export function exportPaymentPlan(params: {
   })
   if (params.creditSubTypeId) search.set('creditSubTypeId', params.creditSubTypeId)
   if (params.interestRate != null) search.set('interestRate', String(params.interestRate))
+  if (params.locale) search.set('locale', params.locale.slice(0, 2))
   if (params.applicationNumber) search.set('applicationNumber', params.applicationNumber)
   if (params.customerName) search.set('customerName', params.customerName)
 

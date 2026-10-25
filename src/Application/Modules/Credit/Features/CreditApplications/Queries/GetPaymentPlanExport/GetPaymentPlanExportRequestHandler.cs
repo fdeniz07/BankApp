@@ -40,6 +40,7 @@ public class GetPaymentPlanExportRequestHandler
 
         PaymentPlanExportDocument document = new()
         {
+            Locale = request.Locale,
             ApplicationNumber = request.ApplicationNumber,
             CustomerName = request.CustomerName,
             Amount = plan.Amount,

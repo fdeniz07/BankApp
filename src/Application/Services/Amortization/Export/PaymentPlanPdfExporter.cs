@@ -15,6 +15,10 @@ public sealed class PaymentPlanPdfExporter : IPaymentPlanDocumentExporter
 
     public PaymentPlanExportResult Export(PaymentPlanExportDocument document)
     {
+        PaymentPlanPdfLabels labels = PaymentPlanPdfLabels.For(document.Locale);
+        string money(decimal value) =>
+            PaymentPlanMoneyFormatter.Format(value, document.CurrencyCode, labels.Culture);
+
         string stamp = document.GeneratedAtUtc.ToString("yyyyMMdd-HHmm");
         string fileBase = string.IsNullOrWhiteSpace(document.ApplicationNumber)
             ? $"payment-plan-{stamp}"
@@ -31,23 +35,23 @@ public sealed class PaymentPlanPdfExporter : IPaymentPlanDocumentExporter
                 page.Header().Column(col =>
                 {
                     col.Item().Text("BankApp").Bold().FontSize(16).FontColor(Colors.Teal.Darken2);
-                    col.Item().Text("Payment schedule / Ödeme planı").FontSize(12);
+                    col.Item().Text(labels.Title).FontSize(12);
                     col.Item().PaddingTop(4).LineHorizontal(0.5f).LineColor(Colors.Grey.Lighten2);
                 });
 
                 page.Content().PaddingVertical(10).Column(col =>
                 {
                     if (!string.IsNullOrWhiteSpace(document.ApplicationNumber))
-                        col.Item().Text($"Application: {document.ApplicationNumber}");
+                        col.Item().Text($"{labels.ApplicationNumber}: {document.ApplicationNumber}");
                     if (!string.IsNullOrWhiteSpace(document.CustomerName))
-                        col.Item().Text($"Customer: {document.CustomerName}");
+                        col.Item().Text($"{labels.Customer}: {document.CustomerName}");
 
                     col.Item().PaddingTop(6).Text(
-                        $"Amount: {document.Amount:N2} {document.CurrencyCode}  ·  Term: {document.TermMonths} months  ·  Rate: {document.InterestRate:N2}%");
+                        $"{labels.Amount}: {money(document.Amount)}  ·  {labels.Term}: {document.TermMonths} {labels.MonthsUnit}  ·  {labels.Rate}: %{document.InterestRate.ToString("N2", labels.Culture)}");
                     col.Item().Text(
-                        $"Monthly: {document.MonthlyPayment:N2}  ·  Total: {document.TotalPayment:N2}  ·  Interest: {document.TotalInterest:N2}");
+                        $"{labels.Monthly}: {money(document.MonthlyPayment)}  ·  {labels.Total}: {money(document.TotalPayment)}  ·  {labels.TotalInterest}: {money(document.TotalInterest)}");
                     col.Item().PaddingBottom(8).Text(
-                        $"Generated (UTC): {document.GeneratedAtUtc:yyyy-MM-dd HH:mm}");
+                        $"{labels.GeneratedUtc}: {document.GeneratedAtUtc:yyyy-MM-dd HH:mm}");
 
                     col.Item().Table(table =>
                     {
@@ -62,27 +66,27 @@ public sealed class PaymentPlanPdfExporter : IPaymentPlanDocumentExporter
 
                         table.Header(header =>
                         {
-                            header.Cell().Element(HeaderCell).Text("Month");
-                            header.Cell().Element(HeaderCell).AlignRight().Text("Installment");
-                            header.Cell().Element(HeaderCell).AlignRight().Text("Principal");
-                            header.Cell().Element(HeaderCell).AlignRight().Text("Interest");
-                            header.Cell().Element(HeaderCell).AlignRight().Text("Balance");
+                            header.Cell().Element(HeaderCell).Text(labels.Month);
+                            header.Cell().Element(HeaderCell).AlignRight().Text(labels.Installment);
+                            header.Cell().Element(HeaderCell).AlignRight().Text(labels.Principal);
+                            header.Cell().Element(HeaderCell).AlignRight().Text(labels.Interest);
+                            header.Cell().Element(HeaderCell).AlignRight().Text(labels.Balance);
                         });
 
                         foreach (PaymentPlanInstallment row in document.Installments)
                         {
-                            table.Cell().Element(BodyCell).Text(row.Month.ToString());
-                            table.Cell().Element(BodyCell).AlignRight().Text($"{row.Payment:N2}");
-                            table.Cell().Element(BodyCell).AlignRight().Text($"{row.Principal:N2}");
-                            table.Cell().Element(BodyCell).AlignRight().Text($"{row.Interest:N2}");
-                            table.Cell().Element(BodyCell).AlignRight().Text($"{row.RemainingBalance:N2}");
+                            table.Cell().Element(BodyCell).Text(row.Month.ToString(labels.Culture));
+                            table.Cell().Element(BodyCell).AlignRight().Text(money(row.Payment));
+                            table.Cell().Element(BodyCell).AlignRight().Text(money(row.Principal));
+                            table.Cell().Element(BodyCell).AlignRight().Text(money(row.Interest));
+                            table.Cell().Element(BodyCell).AlignRight().Text(money(row.RemainingBalance));
                         }
                     });
                 });
 
                 page.Footer().AlignCenter().Text(text =>
                 {
-                    text.Span("Page ");
+                    text.Span($"{labels.Page} ");
                     text.CurrentPageNumber();
                     text.Span(" / ");
                     text.TotalPages();

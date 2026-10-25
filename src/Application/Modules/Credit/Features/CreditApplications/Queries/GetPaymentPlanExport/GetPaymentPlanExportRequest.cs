@@ -17,6 +17,9 @@ public class GetPaymentPlanExportRequest : IRequest<PaymentPlanExportResult>, IS
     public int TermMonths { get; set; }
     public decimal? InterestRate { get; set; }
 
+    /// <summary>UI locale (tr / en / de) for PDF labels and number format.</summary>
+    public string? Locale { get; set; }
+
     /// <summary>Optional header metadata (from application detail UI).</summary>
     public string? ApplicationNumber { get; set; }
     public string? CustomerName { get; set; }

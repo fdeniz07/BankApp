@@ -77,6 +77,7 @@ public class CreditApplicationsController : BaseController
         [FromQuery] decimal amount = 0,
         [FromQuery] int termMonths = 0,
         [FromQuery] decimal? interestRate = null,
+        [FromQuery] string? locale = null,
         [FromQuery] string? applicationNumber = null,
         [FromQuery] string? customerName = null)
     {
@@ -87,6 +88,7 @@ public class CreditApplicationsController : BaseController
             Amount = amount,
             TermMonths = termMonths,
             InterestRate = interestRate,
+            Locale = locale,
             ApplicationNumber = applicationNumber,
             CustomerName = customerName
         };
