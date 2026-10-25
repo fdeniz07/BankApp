@@ -66,15 +66,27 @@ export function useCreditApplicationRealtime() {
         defaultValue: payload.eventType,
       })
 
-      if (payload.amount != null) {
-        toast.info(
-          t('realtime.creditChangedWithAmount', {
-            event,
-            amount: formatMoney(payload.amount, 'TRY', i18n.language, 0),
-          }),
-        )
-      } else {
-        toast.info(t('realtime.creditChanged', { event }))
+      const message =
+        payload.amount != null
+          ? t('realtime.creditChangedWithAmount', {
+              event,
+              amount: formatMoney(payload.amount, 'TRY', i18n.language, 0),
+            })
+          : t('realtime.creditChanged', { event })
+
+      switch (payload.eventType) {
+        case 'CreditApplicationApproved':
+          toast.success(message)
+          break
+        case 'CreditApplicationRejected':
+          toast.error(message)
+          break
+        case 'CreditApplicationCancelled':
+          toast.warning(message)
+          break
+        default:
+          toast.info(message)
+          break
       }
     })
 
