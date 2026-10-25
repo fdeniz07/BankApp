@@ -25,3 +25,5 @@ _(empty)_
 | 2026-10-23 | +5 | SignalR hub → consumer → CORS → React client → docs |
 | 2026-10-24 | 5 | Modular Monolith (Application → WebApi host → tests → docs → queue) |
 | 2026-10-24 | +2 | Tech learning guides (TR/EN/DE + README/architecture links → queue) |
+| 2026-10-25 | 11 | OTel stack → toast/FX → income/DecisionBy → header name → docs |
+| 2026-10-25 | +1 | Commit queue drain log |
