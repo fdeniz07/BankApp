@@ -16,6 +16,7 @@ import type {
   GetListResponse,
   LocaleCode,
 } from '../types/api'
+import { currencySymbol } from '../utils/formatMoney'
 import { mapApiError } from '../utils/mapApiError'
 
 const LOCALE_FILTERS: Array<LocaleCode | ''> = ['', 'tr', 'en', 'de']
@@ -241,7 +242,7 @@ export function CreditTypesPage() {
             >
               {CURRENCIES.map((c) => (
                 <option key={c} value={c}>
-                  {c}
+                  {currencySymbol(c)} ({c})
                 </option>
               ))}
             </select>
@@ -381,7 +382,7 @@ export function CreditTypesPage() {
                     <td className="col-code">{item.code}</td>
                     <td>{t(`locale.${item.locale}`, { defaultValue: item.locale })}</td>
                     <td>{t(`category.${item.category}`, { defaultValue: item.category })}</td>
-                    <td>{item.currencyCode}</td>
+                    <td title={item.currencyCode}>{currencySymbol(item.currencyCode)}</td>
                     <td>{t(`risk.${item.riskLevel}`, { defaultValue: item.riskLevel })}</td>
                     <td>
                       <span

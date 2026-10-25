@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using Application.Modules.Credit.Sagas;
+using Application.Services.Repositories;
+using Domain.Entities;
 using Domain.Events;
 using Microsoft.Extensions.Options;
 using RabbitMQ.Client;
@@ -121,6 +123,11 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             CreditApplicationChangedMessage? realtime = TryBuildRealtimeMessage(type, payload);
             if (realtime is not null)
             {
+                string? currencyCode = await ResolveCurrencyCodeAsync(
+                    scope.ServiceProvider,
+                    realtime.ApplicationId);
+                realtime = realtime with { CurrencyCode = currencyCode };
+
                 ICreditApplicationRealtimeNotifier notifier =
                     scope.ServiceProvider.GetRequiredService<ICreditApplicationRealtimeNotifier>();
                 await notifier.NotifyAsync(realtime);
@@ -182,6 +189,35 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             shortName,
             occurredOnUtc,
             amount);
+    }
+
+    private static async Task<string?> ResolveCurrencyCodeAsync(
+        IServiceProvider services,
+        Guid applicationId)
+    {
+        ICreditApplicationRepository applications =
+            services.GetRequiredService<ICreditApplicationRepository>();
+        ICreditSubTypeRepository subTypes =
+            services.GetRequiredService<ICreditSubTypeRepository>();
+        ICreditTypeRepository creditTypes =
+            services.GetRequiredService<ICreditTypeRepository>();
+
+        CreditApplication? application = await applications.GetAsync(
+            a => a.Id == applicationId);
+        if (application is null)
+            return null;
+
+        CreditSubType? subType = await subTypes.GetAsync(
+            s => s.Id == application.CreditSubTypeId);
+        if (subType is null)
+            return null;
+
+        CreditType? creditType = await creditTypes.GetAsync(
+            t => t.Id == subType.CreditTypeId);
+        if (creditType is null || string.IsNullOrWhiteSpace(creditType.CurrencyCode))
+            return "USD";
+
+        return creditType.CurrencyCode;
     }
 
     private static string ShortEventName(string eventType)

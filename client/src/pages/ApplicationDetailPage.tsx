@@ -18,7 +18,7 @@ import {
 } from '../realtime/creditApplicationEvents'
 import { fillDecisionTemplate } from '../utils/decisionMessage'
 import { printDownloadedFile, saveDownloadedFile } from '../utils/downloadFile'
-import { formatMoney } from '../utils/formatMoney'
+import { currencySymbol, formatMoney } from '../utils/formatMoney'
 
 export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -125,7 +125,7 @@ export function ApplicationDetailPage() {
       applicationNumber: item.applicationNumber,
       amount: formatMoney(
         Number(approvedAmount) || item.requestedAmount,
-        item.currencyCode ?? 'TRY',
+        item.currencyCode ?? 'USD',
         i18n.language,
       ),
       term: String(Number(approvedTerm) || item.requestedTermMonths),
@@ -158,6 +158,7 @@ export function ApplicationDetailPage() {
       amount: planAmount,
       termMonths: planTerm,
       interestRate: planRate,
+      locale: i18n.language,
       applicationNumber: item.applicationNumber,
       customerName: item.customerName,
     })
@@ -497,7 +498,7 @@ export function ApplicationDetailPage() {
           <form className="panel form" onSubmit={onApprove}>
             <h2>{t('applications.approve')}</h2>
             <label>
-              {t('applications.approvedAmount')} ({item.currencyCode})
+              {t('applications.approvedAmount')} ({currencySymbol(item.currencyCode)})
               <select
                 value={approvedAmount}
                 onChange={(e) => setApprovedAmount(e.target.value)}

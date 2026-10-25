@@ -7,4 +7,6 @@ public sealed record CreditApplicationChangedMessage(
     string EventType,
     DateTimeOffset OccurredOnUtc,
     /// <summary>Requested or approved amount when present on the domain event; null for reject/cancel.</summary>
-    decimal? Amount = null);
+    decimal? Amount = null,
+    /// <summary>ISO currency from credit type (TRY/USD/EUR); clients should display symbols.</summary>
+    string? CurrencyCode = null);

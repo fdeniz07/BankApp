@@ -20,11 +20,16 @@ type ServerMessage = {
   eventType: string
   occurredOnUtc: string
   amount?: number | null
+  currencyCode?: string | null
 }
 
 function normalizeMessage(raw: ServerMessage): CreditApplicationChangedPayload {
   const amount =
     typeof raw.amount === 'number' && !Number.isNaN(raw.amount) ? raw.amount : null
+  const currencyCode =
+    typeof raw.currencyCode === 'string' && raw.currencyCode.trim()
+      ? raw.currencyCode.trim()
+      : null
   return {
     applicationId: raw.applicationId,
     applicationNumber: raw.applicationNumber,
@@ -32,6 +37,7 @@ function normalizeMessage(raw: ServerMessage): CreditApplicationChangedPayload {
     eventType: raw.eventType,
     occurredOnUtc: raw.occurredOnUtc,
     amount,
+    currencyCode,
   }
 }
 
@@ -70,7 +76,12 @@ export function useCreditApplicationRealtime() {
         payload.amount != null
           ? t('realtime.creditChangedWithAmount', {
               event,
-              amount: formatMoney(payload.amount, 'TRY', i18n.language, 0),
+              amount: formatMoney(
+                payload.amount,
+                payload.currencyCode ?? 'USD',
+                i18n.language,
+                0,
+              ),
             })
           : t('realtime.creditChanged', { event })
 
