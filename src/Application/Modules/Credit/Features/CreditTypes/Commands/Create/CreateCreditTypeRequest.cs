@@ -17,7 +17,7 @@ public class CreateCreditTypeRequest : IRequest<CreatedCreditTypeResponse>, ISec
     public CreditCategory Category { get; set; } = null!;
     public string? Description { get; set; }
     public string CurrencyCode { get; set; } = "TRY";
-    public CreditRiskLevel RiskLevel { get; set; } = null!; = CreditRiskLevel.Medium;
+    public CreditRiskLevel RiskLevel { get; set; } = CreditRiskLevel.Medium;
     public bool RequiresCollateral { get; set; }
     public bool RequiresGuarantor { get; set; }
 }
