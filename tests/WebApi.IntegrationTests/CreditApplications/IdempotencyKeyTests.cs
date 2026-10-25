@@ -38,7 +38,8 @@ public sealed class IdempotencyKeyTests : IClassFixture<CustomWebApplicationFact
                 customerId,
                 creditSubTypeId,
                 requestedAmount = 50_000m,
-                requestedTermMonths = 24
+                requestedTermMonths = 24,
+                monthlyIncome = 40_000m
             });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
