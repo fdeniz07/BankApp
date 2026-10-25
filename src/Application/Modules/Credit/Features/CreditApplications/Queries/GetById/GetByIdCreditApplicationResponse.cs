@@ -9,7 +9,7 @@ public class GetByIdCreditApplicationResponse
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = default!;
     public CreditCategory? CustomerCategory { get; set; }
-    /// <summary>Bank customer number (e.g. CUS-â€¦).</summary>
+    /// <summary>Bank customer number (e.g. CUS-…).</summary>
     public string? CustomerNumber { get; set; }
     /// <summary>Individual national ID (TCKN) or corporate tax number.</summary>
     public string? CustomerIdentityNumber { get; set; }
@@ -21,7 +21,7 @@ public class GetByIdCreditApplicationResponse
     public decimal? MonthlyIncome { get; set; }
     public decimal? ExistingDebtAmount { get; set; }
     public string? Purpose { get; set; }
-    public CreditApplicationStatus Status { get; set; }
+    public CreditApplicationStatus Status { get; set; } = null!;
     public DateTimeOffset ApplicationDate { get; set; }
     public DateTimeOffset? DecisionDate { get; set; }
     public decimal? ApprovedAmount { get; set; }

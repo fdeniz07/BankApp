@@ -8,10 +8,10 @@ public class UpdatedCreditTypeResponse
     public string Name { get; set; } = default!;
     public string Code { get; set; } = default!;
     public string Locale { get; set; } = "tr";
-    public CreditCategory Category { get; set; }
+    public CreditCategory Category { get; set; } = null!;
     public string? Description { get; set; }
     public string CurrencyCode { get; set; } = default!;
-    public CreditRiskLevel RiskLevel { get; set; }
+    public CreditRiskLevel RiskLevel { get; set; } = null!;
     public bool RequiresCollateral { get; set; }
     public bool RequiresGuarantor { get; set; }
     public bool IsActive { get; set; }

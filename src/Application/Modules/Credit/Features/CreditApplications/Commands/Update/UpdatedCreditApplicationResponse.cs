@@ -13,7 +13,7 @@ public class UpdatedCreditApplicationResponse
     public decimal? MonthlyIncome { get; set; }
     public decimal? ExistingDebtAmount { get; set; }
     public string? Purpose { get; set; }
-    public CreditApplicationStatus Status { get; set; }
+    public CreditApplicationStatus Status { get; set; } = null!;
     public string? Notes { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
     public DateTimeOffset? UpdatedDate { get; set; }

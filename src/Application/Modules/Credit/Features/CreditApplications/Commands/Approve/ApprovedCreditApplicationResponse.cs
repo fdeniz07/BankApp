@@ -6,7 +6,7 @@ public class ApprovedCreditApplicationResponse
 {
     public Guid Id { get; set; }
     public string ApplicationNumber { get; set; } = default!;
-    public CreditApplicationStatus Status { get; set; }
+    public CreditApplicationStatus Status { get; set; } = null!;
     public decimal? ApprovedAmount { get; set; }
     public int? ApprovedTermMonths { get; set; }
     public decimal? ApprovedInterestRate { get; set; }

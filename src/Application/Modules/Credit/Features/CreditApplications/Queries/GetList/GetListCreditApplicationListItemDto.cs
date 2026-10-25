@@ -14,7 +14,7 @@ public class GetListCreditApplicationListItemDto
     public int RequestedTermMonths { get; set; }
     public decimal InterestRate { get; set; }
     public decimal? ApprovedInterestRate { get; set; }
-    public CreditApplicationStatus Status { get; set; }
+    public CreditApplicationStatus Status { get; set; } = null!;
     public DateTimeOffset ApplicationDate { get; set; }
     public bool IsDeleted { get; set; }
 }

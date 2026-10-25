@@ -6,7 +6,7 @@ public class RejectedCreditApplicationResponse
 {
     public Guid Id { get; set; }
     public string ApplicationNumber { get; set; } = default!;
-    public CreditApplicationStatus Status { get; set; }
+    public CreditApplicationStatus Status { get; set; } = null!;
     public string? RejectionReason { get; set; }
     public DateTimeOffset? DecisionDate { get; set; }
     public string? DecisionBy { get; set; }

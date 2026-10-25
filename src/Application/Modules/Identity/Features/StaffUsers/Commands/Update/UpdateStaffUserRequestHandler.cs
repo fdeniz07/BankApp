@@ -59,7 +59,7 @@ public class UpdateStaffUserRequestHandler
         if (!isManager && !isSelf)
             throw new AuthorizationException("You can only update your own staff profile.");
 
-        bool currentIsManager = await _businessRules.UserHasManagerRoleAsync(user.Id);
+        bool currentIsManager = await _businessRules.UserHasManagerRoleAsync(user!.Id);
         bool nextIsActive = user.IsActive;
         bool nextIsManager = currentIsManager;
 
