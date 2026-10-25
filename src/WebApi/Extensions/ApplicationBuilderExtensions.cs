@@ -13,8 +13,15 @@ public static class ApplicationBuilderExtensions
         app.UseSerilogRequestLogging();
         app.ConfigureCustomExceptionMiddleware();
         app.UseResponseCompression();
-        if (!app.Environment.IsEnvironment("Testing"))
+        // Docker / local HTTP (:8080) has no TLS — skip redirect so Scalar and clients stay on http.
+        if (!app.Environment.IsEnvironment("Testing")
+            && !string.Equals(
+                Environment.GetEnvironmentVariable("DISABLE_HTTPS_REDIRECTION"),
+                "true",
+                StringComparison.OrdinalIgnoreCase))
+        {
             app.UseHttpsRedirection();
+        }
 
         string webRoot = app.Environment.WebRootPath
             ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
@@ -33,7 +40,12 @@ public static class ApplicationBuilderExtensions
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
-            app.MapScalarApiReference();
+            // Absolute OpenAPI URL: relative "openapi/v1.json" is resolved under /scalar/ → 404.
+            app.MapScalarApiReference((options, httpContext) =>
+            {
+                string baseUrl = $"{httpContext.Request.Scheme}://{httpContext.Request.Host}";
+                options.WithOpenApiRoutePattern($"{baseUrl}/openapi/{{documentName}}.json");
+            });
         }
 
         // Liveness only — no DB/Redis probes (avoids false-unhealthy during migrate/seed).

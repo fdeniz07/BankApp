@@ -187,6 +187,7 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Development}"
       ASPNETCORE_URLS: "http://+:8080"
+      DISABLE_HTTPS_REDIRECTION: "true"
       Database__RunMigrations: "true"
       Database__RunSeed: "true"
       ConnectionStrings__BankingConnectionString: "Data Source=sqlserver,1433;Initial Catalog=BankAppDb;User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
