@@ -20,6 +20,7 @@ namespace Application.UnitTests.Features.CreditApplications.Commands.Approve;
 public class ApproveCreditApplicationRequestHandlerTests
 {
     private readonly Mock<ICreditApplicationRepository> _creditApplicationRepository = new();
+    private readonly Mock<IApplicationUserRepository> _applicationUserRepository = new();
     private readonly Mock<ICustomerRepository> _customerRepository = new();
     private readonly Mock<IIndividualCustomerRepository> _individualCustomerRepository = new();
     private readonly Mock<ICorporateCustomerRepository> _corporateCustomerRepository = new();
@@ -47,6 +48,7 @@ public class ApproveCreditApplicationRequestHandlerTests
 
         _sut = new ApproveCreditApplicationRequestHandler(
             _creditApplicationRepository.Object,
+            _applicationUserRepository.Object,
             _mapper,
             businessRules,
             _currentUserService.Object,
