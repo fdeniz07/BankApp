@@ -11,6 +11,7 @@
     <PackageReference Include="MediatR" Version="14.2.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.*" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.*" />
+    <PackageReference Include="QuestPDF" Version="2025.7.4" />
   </ItemGroup>
 
   <PropertyGroup>
