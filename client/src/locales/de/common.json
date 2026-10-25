@@ -160,9 +160,10 @@
     "PreferNotToSay": "Keine Angabe"
   },
   "realtime": {
-    "creditChanged": "{{number}} — {{event}}",
+    "creditChanged": "{{event}}",
+    "creditChangedWithAmount": "{{event}} · {{amount}}",
     "events": {
-      "CreditApplicationCreated": "Antrag erstellt",
+      "CreditApplicationCreated": "Neuer Kreditantrag",
       "CreditApplicationApproved": "Antrag genehmigt",
       "CreditApplicationRejected": "Antrag abgelehnt",
       "CreditApplicationCancelled": "Antrag storniert"
@@ -198,6 +199,8 @@
   "fx": {
     "label": "Wechselkurse",
     "live": "Markt",
+    "demo": "Beispiel",
+    "demoHint": "Keine Live-Kurse · Beispieldaten",
     "updated": "Aktualisiert: {{time}}"
   },
   "consent": {
@@ -282,7 +285,11 @@
     "notes": "Notizen",
     "purpose": "Zweck",
     "monthlyIncome": "Monatliches Einkommen",
+    "monthlyIncomeHint": "Netto-Monatseinkommen (Pflicht)",
+    "monthlyIncomeRequired": "Monatliches Einkommen ist Pflicht und muss größer als 0 sein.",
     "existingDebt": "Bestehende Schulden",
+    "existingDebtHint": "Bestehende Gesamtschulden falls vorhanden (optional)",
+    "existingDebtInvalid": "Bestehende Schulden müssen 0 oder eine positive Zahl sein.",
     "decisionDate": "Entscheidungsdatum",
     "confirmApprove": "Diesen Antrag genehmigen?",
     "confirmQuickApprove": "Diesen Antrag mit dem beantragten Betrag, der Laufzeit und dem Zinssatz genehmigen?",
@@ -323,6 +330,10 @@
   "category": {
     "Individual": "Privat",
     "Corporate": "Unternehmen"
+  },
+  "categoryLabel": {
+    "Individual": "Privatkunde",
+    "Corporate": "Firmenkunde"
   },
   "risk": {
     "Low": "Niedrig",

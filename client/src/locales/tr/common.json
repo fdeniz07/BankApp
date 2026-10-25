@@ -160,9 +160,10 @@
     "PreferNotToSay": "Belirtmek istemiyorum"
   },
   "realtime": {
-    "creditChanged": "{{number}} — {{event}}",
+    "creditChanged": "{{event}}",
+    "creditChangedWithAmount": "{{event}} · {{amount}}",
     "events": {
-      "CreditApplicationCreated": "Başvuru oluşturuldu",
+      "CreditApplicationCreated": "Yeni kredi başvurusu",
       "CreditApplicationApproved": "Başvuru onaylandı",
       "CreditApplicationRejected": "Başvuru reddedildi",
       "CreditApplicationCancelled": "Başvuru iptal edildi"
@@ -198,6 +199,8 @@
   "fx": {
     "label": "Döviz kurları",
     "live": "Piyasa",
+    "demo": "Örnek",
+    "demoHint": "Canlı kur yok · örnek veri",
     "updated": "Güncelleme: {{time}}"
   },
   "consent": {
@@ -282,7 +285,11 @@
     "notes": "Notlar",
     "purpose": "Amaç",
     "monthlyIncome": "Aylık gelir",
+    "monthlyIncomeHint": "Net aylık gelir (zorunlu)",
+    "monthlyIncomeRequired": "Aylık gelir zorunludur ve 0’dan büyük olmalıdır.",
     "existingDebt": "Mevcut borç",
+    "existingDebtHint": "Varsa toplam mevcut borç (opsiyonel)",
+    "existingDebtInvalid": "Mevcut borç 0 veya daha büyük bir sayı olmalıdır.",
     "decisionDate": "Karar tarihi",
     "confirmApprove": "Bu başvuruyu onaylamak istiyor musunuz?",
     "confirmQuickApprove": "Bu başvuruyu talep edilen tutar, vade ve faiz ile onaylamak istiyor musunuz?",
@@ -323,6 +330,10 @@
   "category": {
     "Individual": "Bireysel",
     "Corporate": "Kurumsal"
+  },
+  "categoryLabel": {
+    "Individual": "Bireysel Müşteri",
+    "Corporate": "Kurumsal Müşteri"
   },
   "risk": {
     "Low": "Düşük",

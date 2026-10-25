@@ -160,9 +160,10 @@
     "PreferNotToSay": "Prefer not to say"
   },
   "realtime": {
-    "creditChanged": "{{number}} — {{event}}",
+    "creditChanged": "{{event}}",
+    "creditChangedWithAmount": "{{event}} · {{amount}}",
     "events": {
-      "CreditApplicationCreated": "Application created",
+      "CreditApplicationCreated": "New credit application",
       "CreditApplicationApproved": "Application approved",
       "CreditApplicationRejected": "Application rejected",
       "CreditApplicationCancelled": "Application cancelled"
@@ -198,6 +199,8 @@
   "fx": {
     "label": "Exchange rates",
     "live": "Market",
+    "demo": "Sample",
+    "demoHint": "No live rates · sample data",
     "updated": "Updated: {{time}}"
   },
   "consent": {
@@ -282,7 +285,11 @@
     "notes": "Notes",
     "purpose": "Purpose",
     "monthlyIncome": "Monthly income",
+    "monthlyIncomeHint": "Net monthly income (required)",
+    "monthlyIncomeRequired": "Monthly income is required and must be greater than 0.",
     "existingDebt": "Existing debt",
+    "existingDebtHint": "Total existing debt if any (optional)",
+    "existingDebtInvalid": "Existing debt must be 0 or a positive number.",
     "decisionDate": "Decision date",
     "confirmApprove": "Approve this application?",
     "confirmQuickApprove": "Approve this application with the requested amount, term, and interest rate?",
@@ -323,6 +330,10 @@
   "category": {
     "Individual": "Individual",
     "Corporate": "Corporate"
+  },
+  "categoryLabel": {
+    "Individual": "Individual customer",
+    "Corporate": "Corporate customer"
   },
   "risk": {
     "Low": "Low",
