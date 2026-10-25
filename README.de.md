@@ -74,6 +74,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 | API | .NET 10, ASP.NET Core, MediatR, FluentValidation, AutoMapper, EF Core 10 |
 | Domain | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**Name**) |
 | DB / Cache / Logs | SQL Server, Redis, Serilog + Seq |
+| Observability | OpenTelemetry (OTLP) → Collector → Tempo + Prometheus + Grafana `:3001` |
 | Messaging | RabbitMQ (`email-confirmation`, `domain-events`) + Transactional Outbox |
 | Idempotency | Header `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
 | Saga | `CreditApplicationProcessManager` + Tabelle `CreditApplicationSagas` |

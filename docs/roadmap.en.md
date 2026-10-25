@@ -44,6 +44,7 @@
 - [x] Saga / Process Manager (credit application lifecycle; `CreditApplicationSagas`)
 - [x] SignalR notifications (Outbox-driven; hub `/hubs/credit-applications`)
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
+- [x] OpenTelemetry + Grafana / Prometheus (collector + Tempo; Seq stays for logs)
 
 ## Todo
 
@@ -62,9 +63,11 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [ ] Elasticsearch for staff GET endpoints
 - [ ] Admin welcome dashboard (Tailwind CSS + bundle compression / performance)
 - [ ] Kubernetes / ArgoCD deployment
-- [ ] OpenTelemetry + Grafana / Prometheus
+- [x] OpenTelemetry + Grafana / Prometheus (collector + Tempo; Seq stays for logs)
 - [x] HashiCorp Vault lab (Compose dev mode + `secret/bankapp` seed; WebApi not wired yet)
 - [ ] Production hardening (secrets, rate-limit policies; Vault integration)
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support
+- [ ] Credit application document upload (ID, payslip, etc.; may become mandatory later)
+- [ ] Branch model + decision-maker branch on credit applications
 - [ ] Chatbot (customer / staff support assistant)

@@ -16,7 +16,7 @@ Bu belge “ne kurduk?” listesi değil; her madde için **ne / neden burada / 
 3. Kodda `Örnek` yollarına bak; dosyayı açıp akışı izle.
 4. “Ne zaman kullanma?” notları, eğitim projesinde bile aşırı mühendislik tuzağını gösterir.
 
-Önerilen sıra: Auth/JWT → CQRS handler → Domain Event + Outbox → Idempotency → Saga → SignalR → Modular Monolith.
+Önerilen sıra: Auth/JWT → CQRS handler → Domain Event + Outbox → Idempotency → Saga → SignalR → Modular Monolith → OTel.
 
 ---
 
@@ -160,13 +160,29 @@ Outbox consumer sonrası anlık UI: toast + liste yenileme. Hub: `/hubs/credit-a
 
 **Örnek:** `CreditApplicationsHub` · `CreditApplicationRealtimeNotifier` · `client/src/realtime/useCreditApplicationRealtime.ts`
 
+### OpenTelemetry + Grafana / Prometheus
+
+| | |
+|--|--|
+| **Ne** | Trace (istek zinciri) + metrik (süre, rate); OTLP ile dışarı aktarım. |
+| **Neden** | Seq = log; OTel = “hangi istek yavaş / nerede kırıldı?” |
+| **Avantaj** | Standart vendor-neutral; Tempo/Prometheus/Grafana ile lab. |
+| **Trade-off** | Ek Compose servisleri; dashboard metrik adları sürüme göre değişebilir. |
+| **Örnek** | `OpenTelemetryExtensions.cs` · Grafana `:3001` · [infra/README.md](../infra/README.md) lab |
+
+```text
+WebApi → otel-collector → Tempo (traces)
+                       → Prometheus (metrics) → Grafana
+Seq: yapısal log (+ TraceId/SpanId)
+```
+
 ### HashiCorp Vault (lab)
 
 Compose **dev** mode + `secret/bankapp` seed. WebApi henüz Vault’tan okumaz — amaç secret yönetimini tanımak.
 
 ### Docker Compose
 
-Tek komutla Seq, Redis, RabbitMQ, SQL, Vault, WebApi, Client. Healthcheck zinciri ile “hazır olunca ayağa kalk”.
+Tek komutla Seq, Redis, RabbitMQ, SQL, Vault, OTel yığını, WebApi, Client. Healthcheck zinciri ile “hazır olunca ayağa kalk”.
 
 **Örnek:** `infra/docker-compose.yml` · [infra/README.md](../infra/README.md)
 
@@ -234,4 +250,4 @@ Bu tek akışta CQRS, domain event, outbox, saga, idempotency ve SignalR bir ara
 
 ## 8) İleride (roadmap)
 
-Elasticsearch, OpenTelemetry + Grafana, Keycloak, K8s/ArgoCD, chatbot — [architecture-notes.tr.md](architecture-notes.tr.md) ve [roadmap.tr.md](roadmap.tr.md). Önce buradaki temelleri kodda gez; sonra yeni katmanı eklerken aynı “neden / örnek” şablonunu uygula.
+Keycloak, Elasticsearch, K8s/ArgoCD, chatbot — [architecture-notes.tr.md](architecture-notes.tr.md) ve [roadmap.tr.md](roadmap.tr.md). OTel yığında; Grafana’da dolaş, sonra bir sonraki katmana aynı “neden / örnek” şablonunu uygula.

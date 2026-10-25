@@ -2,6 +2,13 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-25 — OpenTelemetry + Grafana / Prometheus
+
+- WebApi: OTLP traces + metrics (`OpenTelemetry` config; Compose’ta açık).
+- Compose: `otel-collector`, Tempo, Prometheus, Grafana (`:3001`).
+- Serilog `TraceId` / `SpanId` enricher (Seq ↔ trace korelasyonu).
+- Seq log için kalır; OTel metrik/trace laboratuvarı.
+
 ## 2026-10-24 — Modular Monolith (Identity / Customers / Credit / Notification)
 
 - Application: `Modules/{Identity,Customers,Credit,Notification}` + `AddApplicationModules()`.

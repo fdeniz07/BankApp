@@ -133,10 +133,12 @@ Strukturierte Logs lokal; einheitliche API-Fehler für den Client.
 | **Redis** | Cache + Idempotency-Store |
 | **RabbitMQ** | `email-confirmation`, `domain-events` |
 | **SignalR** | Hub `/hubs/credit-applications` nach Outbox-Consume |
+| **OpenTelemetry** | OTLP Traces + Metrics → Collector → Tempo / Prometheus / Grafana `:3001` |
 | **Vault (Lab)** | Dev-Mode + Seed `secret/bankapp` (WebApi noch nicht angebunden) |
 | **Docker Compose** | Kompletter Lokalstack — `infra/docker-compose.yml` |
 
-**Client:** `client/src/realtime/useCreditApplicationRealtime.ts`
+**Client:** `client/src/realtime/useCreditApplicationRealtime.ts`  
+**OTel:** `WebApi/Extensions/OpenTelemetryExtensions.cs` · Seq erhält `TraceId`/`SpanId` über `ActivityEnricher`
 
 ---
 
@@ -183,4 +185,4 @@ Ein Flow zeigt CQRS, Domain Events, Outbox, Saga, Idempotency und SignalR zusamm
 
 ## 8) Später (Roadmap)
 
-Elasticsearch, OpenTelemetry + Grafana, Keycloak, K8s/ArgoCD, Chatbot — [architecture-notes.de.md](architecture-notes.de.md) und [roadmap.de.md](roadmap.de.md). Zuerst die Grundlagen im Code gehen; beim nächsten Layer dasselbe Was/Warum/Beispiel-Schema nutzen.
+Keycloak, Elasticsearch, K8s/ArgoCD, Chatbot — [architecture-notes.de.md](architecture-notes.de.md) und [roadmap.de.md](roadmap.de.md). OTel ist bereits im Stack; in Grafana ansehen, dann beim nächsten Layer dasselbe Was/Warum/Beispiel-Schema nutzen.

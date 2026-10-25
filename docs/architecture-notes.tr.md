@@ -22,7 +22,7 @@ Bundan sonrası “eksik feature” değil; **öğrenim değeri yüksek modern k
 
 **Mimari derinleşme** (platform / ürün-AI değil).
 
-Kapsam dışı (şimdilik): OTel/Grafana uygulaması, Keycloak, OAuth, K8s, AI chatbot kodu.
+Kapsam dışı (şimdilik): Keycloak, OAuth, K8s, AI chatbot kodu. (OTel/Grafana uygulandı 2026-10-25.)
 
 ---
 
@@ -82,6 +82,8 @@ Kapsam dışı (şimdilik): OTel/Grafana uygulaması, Keycloak, OAuth, K8s, AI c
 
 Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), fraud alert, multi-tenant şube — teknolojiyi görünür kılar.
 
+Başvuru **evrak yükleme** (kimlik, bordro vb.): roadmap İleride; şimdilik zorunlu değil, ileride KYC/doğrulama için zorunlu yapılabilir.
+
 ---
 
 ## Mevcut “İleride” listesine yorum
@@ -89,7 +91,7 @@ Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), f
 - **Elasticsearch** — iyi; önce Outbox veya event hikâyesi daha pedagojik.
 - **Admin Tailwind dashboard** — görsel; mimari öğrenim düşük.
 - **K8s/ArgoCD** — monolit modülerleşmeden ağır.
-- **OTel/Grafana** — Seq yanına güçlü; Faz 6 sonrası doğal aday.
+- **OTel/Grafana** — **uygulandı** (2026-10-25); Seq yanına trace/metrik.
 - **OAuth + Keycloak** — Keycloak/OIDC önce, sosyal login sonra.
 - **Chatbot** — “sadece UI chat” yerine RAG + tool ayrı lab gibi düşünülmeli.
 
@@ -102,6 +104,7 @@ Kredi skor kartı, sözleşme PDF, taksit/gecikme, IBAN/transfer (idempotent), f
 3. Saga / Process Manager (kredi başvuru yaşam döngüsü) — **uygulandı** (2026-10-22): `CreditApplicationSagas`, Process Manager orkestrasyonu (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
 4. SignalR bildirimleri (Outbox olaylarına bağlı) — **uygulandı** (2026-10-23): hub `/hubs/credit-applications`; consumer → staff + customer grupları; React toast + liste yenileme (Modular’dan önce)
 5. Modular Monolith (Identity / Customers / Credit / Notification) — **uygulandı** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / host module kayıtları; tek deploy, tek DB
+6. OpenTelemetry + Grafana / Prometheus — **uygulandı** (2026-10-25): WebApi OTLP → collector → Tempo (trace) + Prometheus (metrik) + Grafana `:3001`; Seq log kalır; `TraceId`/`SpanId` enricher
 
 ```mermaid
 flowchart LR
@@ -109,9 +112,10 @@ flowchart LR
   B --> C[Saga]
   C --> D[SignalR]
   D --> E[Modular_Monolith]
+  E --> F[OTel_Grafana]
 ```
 
-Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OTel → Keycloak → ES/modül → AI RAG.
+Daha geniş eğitim sırası: Outbox → SignalR → OTel → Keycloak → ES → AI RAG.
 
 ---
 
@@ -145,4 +149,4 @@ Daha geniş eğitim sırası (Faz 6 dışı referans): Outbox → SignalR → OT
 
 ## Tekrar bakılacak
 
-Faz 6 ana dilimler tamam. İsteğe bağlı sonraki: **Vault → WebApi secret load**, OTel, Keycloak (İleride listesi).
+Faz 6 ana dilimler + OTel tamam. İsteğe bağlı sonraki: **Keycloak**, Elasticsearch, **Vault → WebApi** (İleride listesi).

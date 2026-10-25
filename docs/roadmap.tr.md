@@ -44,6 +44,7 @@
 - [x] Saga / Process Manager (kredi başvuru yaşam döngüsü; `CreditApplicationSagas`)
 - [x] SignalR bildirimleri (Outbox olaylarına bağlı; hub `/hubs/credit-applications`)
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
+- [x] OpenTelemetry + Grafana / Prometheus (collector + Tempo; Seq log kalır)
 
 ## Yapılacak
 
@@ -62,9 +63,11 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] Personel GET’leri için Elasticsearch
 - [ ] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
 - [ ] Kubernetes / ArgoCD dağıtımı
-- [ ] OpenTelemetry + Grafana / Prometheus
+- [x] OpenTelemetry + Grafana / Prometheus (collector + Tempo; Seq log kalır)
 - [x] HashiCorp Vault lab (Compose dev mode + `secret/bankapp` seed; WebApi henüz bağlı değil)
 - [ ] Üretim güvenlik sertleştirme (secret yönetimi, rate limit politikaları; Vault entegrasyonu)
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
+- [ ] Kredi başvurusunda evrak yükleme (kimlik, gelir bordrosu vb.; ileride zorunlu tutulabilir)
+- [ ] Şube / branch modeli + karar veren personelde şube bilgisi
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

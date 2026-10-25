@@ -22,7 +22,7 @@ Als Nächstes keine „fehlenden Features“, sondern **lernstarke moderne Schic
 
 **Architekturtiefe** (nicht zuerst Plattform / Produkt-AI).
 
-Vorerst außer Scope: OTel/Grafana-Implementierung, Keycloak, OAuth, K8s, AI-Chatbot-Code.
+Vorerst außer Scope: Keycloak, OAuth, K8s, AI-Chatbot-Code. (OTel/Grafana umgesetzt 2026-10-25.)
 
 ---
 
@@ -82,6 +82,8 @@ Vorerst außer Scope: OTel/Grafana-Implementierung, Keycloak, OAuth, K8s, AI-Cha
 
 Kredit-Scorecard, Vertrags-PDF, Raten/Verzug, IBAN/Transfer (idempotent), Fraud-Alert, Multi-Tenant-Filiale — machen Technik greifbar.
 
+**Dokumenten-Upload** beim Antrag (Ausweis, Gehaltsabrechnung usw.): auf der Später-Roadmap; derzeit nicht Pflicht, später für KYC/Prüfung ggf. verpflichtend.
+
 ---
 
 ## Kommentar zur bestehenden „Später“-Liste
@@ -89,7 +91,7 @@ Kredit-Scorecard, Vertrags-PDF, Raten/Verzug, IBAN/Transfer (idempotent), Fraud-
 - **Elasticsearch** — gut; Outbox/Event-Geschichte zuerst ist pädagogischer.
 - **Admin-Tailwind-Dashboard** — visuell; geringer Architekturlernwert.
 - **K8s/ArgoCD** — schwer vor Modularisierung des Monolithen.
-- **OTel/Grafana** — stark neben Seq; natürlich nach Phase 6.
+- **OTel/Grafana** — **umgesetzt** (2026-10-25); Traces/Metriken neben Seq.
 - **OAuth + Keycloak** — zuerst Keycloak/OIDC, dann Social Login.
 - **Chatbot** — lieber RAG + Tools als separates Lab, nicht nur UI-Chat.
 
@@ -102,6 +104,7 @@ Kredit-Scorecard, Vertrags-PDF, Raten/Verzug, IBAN/Transfer (idempotent), Fraud-
 3. Saga / Process Manager (Kreditantrags-Lebenszyklus) — **umgesetzt** (2026-10-22): `CreditApplicationSagas`, orchestrierender Process Manager (AwaitingDecision → Onboarding → Completed / Terminated / Compensated)
 4. SignalR-Benachrichtigungen (getrieben von Outbox-Events) — **umgesetzt** (2026-10-23): Hub `/hubs/credit-applications`; Consumer → Staff- + Kundengruppen; React-Toast + Listen-Refresh (vor Modular)
 5. Modular Monolith (Identity / Customers / Credit / Notification) — **umgesetzt** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / Host-Modul-Registrierung; ein Deploy, eine DB
+6. OpenTelemetry + Grafana / Prometheus — **umgesetzt** (2026-10-25): WebApi OTLP → Collector → Tempo (Traces) + Prometheus (Metriken) + Grafana `:3001`; Seq bleibt für Logs; `TraceId`/`SpanId`-Enricher
 
 ```mermaid
 flowchart LR
@@ -109,9 +112,10 @@ flowchart LR
   B --> C[Saga]
   C --> D[SignalR]
   D --> E[Modular_Monolith]
+  E --> F[OTel_Grafana]
 ```
 
-Breitere Schulungsreihenfolge (außerhalb Phase 6): Outbox → SignalR → OTel → Keycloak → ES/Modul → AI RAG.
+Breitere Schulungsreihenfolge: Outbox → SignalR → OTel → Keycloak → ES → AI RAG.
 
 ---
 
@@ -145,4 +149,4 @@ Breitere Schulungsreihenfolge (außerhalb Phase 6): Outbox → SignalR → OTel 
 
 ## Vor dem Codieren erneut lesen
 
-Phase-6-Hauptscheiben fertig. Optional danach: **Vault → WebApi Secret-Load**, OTel, Keycloak (Später-Liste).
+Phase-6-Hauptscheiben + OTel fertig. Optional danach: **Keycloak**, Elasticsearch, **Vault → WebApi** (Später-Liste).

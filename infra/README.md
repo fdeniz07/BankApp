@@ -11,9 +11,13 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 | RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation + domain-events queues; volume `bankapp-rabbitmq-data`; **healthcheck** |
 | Vault | http://localhost:8200 | **dev mode** lab; root token from `.env`; `vault-seed` writes `secret/bankapp` |
 | SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data`; **healthcheck** |
-| WebApi | http://localhost:8080 | `/health` liveness; waits for SQL/Redis/Seq/RabbitMQ **healthy** (not Vault yet) |
+| WebApi | http://localhost:8080 | `/health` liveness; waits for SQL/Redis/Seq/RabbitMQ **healthy**; OTLP → collector |
 | Scalar (Dev) | http://localhost:8080/scalar/v1 | — |
 | Client (React) | http://localhost:3000 | nginx static build; waits for WebApi **healthy**; own **healthcheck** |
+| OTel Collector | host `:4317` / `:4318` | receives OTLP from WebApi |
+| Tempo | (internal + Grafana) | distributed traces |
+| Prometheus | http://localhost:9090 | scrapes collector `:8889` |
+| Grafana | http://localhost:3001 | metrics + traces UI (default `admin` / `admin`) |
 
 ## Demo accounts
 
@@ -74,6 +78,10 @@ Secrets and ports live in `infra/.env` (gitignored). Template: `infra/.env.examp
 | `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512) |
 | `VAULT_PORT` | Host port for Vault UI/API (default 8200) |
 | `VAULT_DEV_ROOT_TOKEN_ID` | Dev root token (lab only; not for production) |
+| `OTEL_GRPC_PORT` / `OTEL_HTTP_PORT` | Host ports for OTLP (default 4317 / 4318) |
+| `PROMETHEUS_PORT` | Host port for Prometheus (default 9090) |
+| `GRAFANA_PORT` | Host port for Grafana (default **3001**, avoids client `:3000`) |
+| `GRAFANA_ADMIN_USER` / `GRAFANA_ADMIN_PASSWORD` | Grafana login (lab defaults `admin` / `admin`) |
 
 Inside Docker network, the API uses:
 
@@ -144,14 +152,33 @@ Re-seed manually after Vault restart (dev data is ephemeral):
 docker compose -f infra/docker-compose.yml --env-file infra/.env up vault-seed
 ```
 
-## Caching / logging
+## Caching / logging / observability
 
 - Cache: CreditTypes / CreditSubTypes queries (`ICacheableRequest`); Idempotency-Key responses in Redis
-- Logs: Seq UI → filter `Application = 'BankApp'`
+- Logs: Seq UI → filter `Application = 'BankApp'` (also `TraceId` / `SpanId` when OTel is on)
+- Traces/metrics: WebApi OTLP → collector → Tempo + Prometheus → Grafana
+
+### Lab — OpenTelemetry
+
+```text
+WebApi → otel-collector → Tempo (traces)
+                       → Prometheus scrape (metrics)
+                       → Grafana
+Seq stays for structured logs (complement, not replacement)
+```
+
+1. Full stack up (`docker compose ... up -d --build`)
+2. Hit the API a few times (login, list applications, `/health` is excluded from traces)
+3. Open http://localhost:3001 → login `admin` / `admin`
+4. **Dashboards → BankApp → BankApp HTTP (OTel)** (or Explore → Prometheus / Tempo)
+5. Tempo: search service `bankapp-webapi`
+6. Seq: same request should show `TraceId` when OTel enabled (Compose sets `OpenTelemetry__Enabled=true`)
+
+Local `dotnet run` keeps OTel **off** by default (`appsettings`); point `OpenTelemetry:OtlpEndpoint` at `http://localhost:4317` and set `Enabled: true` if the collector is running.
 
 ## Roadmap
 
 - GitHub Actions / ArgoCD / K8s
-- OpenTelemetry + Prometheus + Grafana
 - WebApi reading secrets from Vault (next Vault slice)
 - File/raft Vault (non-dev) for production-like labs
+- Keycloak / OIDC, Elasticsearch (see docs roadmap)
