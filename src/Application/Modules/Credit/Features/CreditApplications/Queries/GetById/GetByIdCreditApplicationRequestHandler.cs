@@ -13,6 +13,7 @@ public class GetByIdCreditApplicationRequestHandler
 {
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly ICustomerRepository _customerRepository;
+    private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly ICreditSubTypeRepository _creditSubTypeRepository;
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly IMapper _mapper;
@@ -22,6 +23,7 @@ public class GetByIdCreditApplicationRequestHandler
     public GetByIdCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         ICustomerRepository customerRepository,
+        IApplicationUserRepository applicationUserRepository,
         ICreditSubTypeRepository creditSubTypeRepository,
         ICreditTypeRepository creditTypeRepository,
         IMapper mapper,
@@ -30,6 +32,7 @@ public class GetByIdCreditApplicationRequestHandler
     {
         _creditApplicationRepository = creditApplicationRepository;
         _customerRepository = customerRepository;
+        _applicationUserRepository = applicationUserRepository;
         _creditSubTypeRepository = creditSubTypeRepository;
         _creditTypeRepository = creditTypeRepository;
         _mapper = mapper;
@@ -56,6 +59,9 @@ public class GetByIdCreditApplicationRequestHandler
 
         response.CustomerName = ResolveCustomerDisplayName(customer);
         response.CustomerCategory = ResolveCustomerCategory(customer);
+        response.CustomerNumber = customer?.CustomerNumber;
+        response.CustomerIdentityNumber = ResolveCustomerIdentityNumber(customer);
+        await PopulateDecisionMakerAsync(response, creditApplication.DecisionBy, cancellationToken);
 
         CreditSubType? subType = await _creditSubTypeRepository.GetAsync(
             c => c.Id == creditApplication.CreditSubTypeId,
@@ -63,6 +69,30 @@ public class GetByIdCreditApplicationRequestHandler
         response.CreditSubTypeName = subType?.Name ?? string.Empty;
         response.CurrencyCode = await ResolveCurrencyCodeAsync(subType, cancellationToken);
         return response;
+    }
+
+    private async Task PopulateDecisionMakerAsync(
+        GetByIdCreditApplicationResponse response,
+        string? decisionBy,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(decisionBy))
+            return;
+
+        response.DecisionByEmail = decisionBy;
+
+        string email = decisionBy.Trim();
+        ApplicationUser? staff = await _applicationUserRepository.GetAsync(
+            u => u.Email == email,
+            cancellationToken: cancellationToken);
+
+        if (staff is null)
+            return;
+
+        string name = $"{staff.FirstName} {staff.LastName}".Trim();
+        response.DecisionByName = string.IsNullOrWhiteSpace(name) ? null : name;
+        response.DecisionByPosition = staff.Position?.Name;
+        response.DecisionByEmail = staff.Email;
     }
 
     private async Task<string> ResolveCurrencyCodeAsync(CreditSubType? subType, CancellationToken cancellationToken)
@@ -91,6 +121,14 @@ public class GetByIdCreditApplicationRequestHandler
         {
             IndividualCustomer => CreditCategory.Individual,
             CorporateCustomer => CreditCategory.Corporate,
+            _ => null
+        };
+
+    private static string? ResolveCustomerIdentityNumber(Customer? customer) =>
+        customer switch
+        {
+            IndividualCustomer individual => individual.NationalId,
+            CorporateCustomer corporate => corporate.TaxNumber,
             _ => null
         };
 }

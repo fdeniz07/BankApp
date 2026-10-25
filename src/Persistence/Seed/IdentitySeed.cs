@@ -2,6 +2,7 @@ using Core.Security.Constants;
 using Core.Security.Entities;
 using Core.Security.Hashing;
 using Domain.Entities;
+using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
 
@@ -9,23 +10,24 @@ namespace Persistence.Seed;
 
 public static class IdentitySeed
 {
-    private static readonly (string Email, string Password, string[] Roles, string? Locale)[] DemoUsers =
+    private static readonly (string Email, string Password, string[] Roles, string? Locale, string? FirstName, string? LastName, StaffPosition? Position)[] DemoUsers =
     [
-        ("staff@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null),
-        ("staff.tr@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null),
-        ("staff.en@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null),
-        ("staff.de@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null),
-        ("manager@bank.local", "Manager123!", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null),
-        ("customer@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "tr"),
-        ("customer.tr@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "tr"),
-        ("customer.en@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "en"),
-        ("customer.de@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "de")
+        ("staff@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Selin", "Yılmaz", StaffPosition.CreditAnalyst),
+        ("staff.tr@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Emre", "Kaya", StaffPosition.BranchOfficer),
+        ("staff.en@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Anna", "Miller", StaffPosition.RelationshipManager),
+        ("staff.de@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Jonas", "Weber", StaffPosition.RiskOfficer),
+        ("manager@bank.local", "Manager123!", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Deniz", "Aydın", StaffPosition.BranchManager),
+        ("customer@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "tr", null, null, null),
+        ("customer.tr@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "tr", null, null, null),
+        ("customer.en@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "en", null, null, null),
+        ("customer.de@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "de", null, null, null)
     ];
 
     public static async Task SeedAsync(BankingDbContext context)
     {
         await SeedOperationClaimsAsync(context);
         await SeedUsersAsync(context);
+        await EnsureDemoStaffProfilesAsync(context);
         await EnsureDemoCustomersHaveApplicationsAsync(context);
     }
 
@@ -71,6 +73,9 @@ public static class IdentitySeed
                 PasswordHash = hash,
                 PasswordSalt = salt,
                 CustomerId = customerId,
+                FirstName = demo.FirstName,
+                LastName = demo.LastName,
+                Position = demo.Position,
                 IsActive = true,
                 EmailConfirmed = true
             };
@@ -91,6 +96,41 @@ public static class IdentitySeed
 
             await context.SaveChangesAsync();
         }
+    }
+
+    /// <summary>
+    /// Backfills name/position on existing demo staff so decision-maker enrichment is visible without DB wipe.
+    /// </summary>
+    private static async Task EnsureDemoStaffProfilesAsync(BankingDbContext context)
+    {
+        foreach (var demo in DemoUsers.Where(d => d.FirstName is not null))
+        {
+            ApplicationUser? user = await context.Users.FirstOrDefaultAsync(u => u.Email == demo.Email);
+            if (user is null)
+                continue;
+
+            bool changed = false;
+            if (string.IsNullOrWhiteSpace(user.FirstName) && demo.FirstName is not null)
+            {
+                user.FirstName = demo.FirstName;
+                changed = true;
+            }
+            if (string.IsNullOrWhiteSpace(user.LastName) && demo.LastName is not null)
+            {
+                user.LastName = demo.LastName;
+                changed = true;
+            }
+            if (user.Position is null && demo.Position is not null)
+            {
+                user.Position = demo.Position;
+                changed = true;
+            }
+
+            if (changed)
+                context.Users.Update(user);
+        }
+
+        await context.SaveChangesAsync();
     }
 
     private static async Task EnsureDemoCustomersHaveApplicationsAsync(BankingDbContext context)

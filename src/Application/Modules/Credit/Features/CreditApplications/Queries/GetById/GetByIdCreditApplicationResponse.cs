@@ -9,6 +9,10 @@ public class GetByIdCreditApplicationResponse
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = default!;
     public CreditCategory? CustomerCategory { get; set; }
+    /// <summary>Bank customer number (e.g. CUS-…).</summary>
+    public string? CustomerNumber { get; set; }
+    /// <summary>Individual national ID (TCKN) or corporate tax number.</summary>
+    public string? CustomerIdentityNumber { get; set; }
     public Guid CreditSubTypeId { get; set; }
     public string CreditSubTypeName { get; set; } = default!;
     public string CurrencyCode { get; set; } = "USD";
@@ -26,6 +30,11 @@ public class GetByIdCreditApplicationResponse
     public string? RejectionReason { get; set; }
     public string? Notes { get; set; }
     public string? DecisionBy { get; set; }
+    /// <summary>Resolved staff display name for <see cref="DecisionBy"/> email.</summary>
+    public string? DecisionByName { get; set; }
+    /// <summary>StaffPosition SmartEnum name when the decision maker is a staff user.</summary>
+    public string? DecisionByPosition { get; set; }
+    public string? DecisionByEmail { get; set; }
     public bool IsDeleted { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
     public DateTimeOffset? UpdatedDate { get; set; }

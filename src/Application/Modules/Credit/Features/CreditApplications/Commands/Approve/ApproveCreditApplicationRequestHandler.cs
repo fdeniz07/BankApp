@@ -12,6 +12,7 @@ public class ApproveCreditApplicationRequestHandler
     : IRequestHandler<ApproveCreditApplicationRequest, ApprovedCreditApplicationResponse>
 {
     private readonly ICreditApplicationRepository _creditApplicationRepository;
+    private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
     private readonly ICurrentUserService _currentUserService;
@@ -19,12 +20,14 @@ public class ApproveCreditApplicationRequestHandler
 
     public ApproveCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
+        IApplicationUserRepository applicationUserRepository,
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
         ICurrentUserService currentUserService,
         IAuditLogger auditLogger)
     {
         _creditApplicationRepository = creditApplicationRepository;
+        _applicationUserRepository = applicationUserRepository;
         _mapper = mapper;
         _businessRules = businessRules;
         _currentUserService = currentUserService;
@@ -46,11 +49,13 @@ public class ApproveCreditApplicationRequestHandler
             request.ApprovedAmount,
             request.ApprovedTermMonths);
 
+        string? decisionBy = await ResolveDecisionByEmailAsync(cancellationToken);
+
         creditApplication.Approve(
             request.ApprovedAmount,
             request.ApprovedTermMonths,
             request.ApprovedInterestRate,
-            request.DecisionBy,
+            decisionBy,
             request.Notes);
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
@@ -70,5 +75,17 @@ public class ApproveCreditApplicationRequestHandler
             });
 
         return _mapper.Map<ApprovedCreditApplicationResponse>(creditApplication);
+    }
+
+    private async Task<string?> ResolveDecisionByEmailAsync(CancellationToken cancellationToken)
+    {
+        if (!_currentUserService.UserId.HasValue)
+            return null;
+
+        ApplicationUser? user = await _applicationUserRepository.GetAsync(
+            u => u.Id == _currentUserService.UserId.Value,
+            cancellationToken: cancellationToken);
+
+        return string.IsNullOrWhiteSpace(user?.Email) ? null : user.Email;
     }
 }
