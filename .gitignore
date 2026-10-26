@@ -1,6 +1,9 @@
 /.vscode
 /.vs
-/.cursor
+# Keep Cursor project rules in git; ignore other local Cursor state
+/.cursor/*
+!/.cursor/rules/
+!/.cursor/rules/**
 
 **/bin/
 **/obj/

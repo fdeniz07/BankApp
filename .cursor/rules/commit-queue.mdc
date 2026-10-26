@@ -1,0 +1,16 @@
+---
+description: Daily English commit splitting with max 20/day and queue overflow
+alwaysApply: true
+---
+
+# Commit queue — daily GitHub activity
+
+When the user asks to commit (or after approved feature work they want committed):
+
+1. Split changes into **small English commits** using this repo’s prefixes: `feat:`, `fix:`, `doc:`, `test:`, `ci:`.
+2. One concern per commit (easier bisect / review).
+3. Cap: **max 20 commits per calendar day** (`git log --since=midnight --oneline`).
+4. If more than remaining capacity: commit what fits; append the rest to [docs/commit-queue.md](docs/commit-queue.md) under **Pending** (message + file list).
+5. On a later day, **drain Pending first**, then new work.
+6. Never push unless the user asks. Never amend unless amend rules allow it.
+7. Keep [docs/commit-queue.md](docs/commit-queue.md) updated when enqueueing or draining.

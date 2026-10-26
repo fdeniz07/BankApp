@@ -1,0 +1,50 @@
+---
+description: Keep the beginner tech learning MD library up to date with every approved feature
+alwaysApply: true
+---
+
+# Tech learning library — ongoing documentation
+
+## Location
+
+- Index: [docs/learning/00-index.tr.md](docs/learning/00-index.tr.md)
+- Chapters: `docs/learning/*.tr.md` (Turkish primary; EN/DE later if requested)
+- Overview pointer: [docs/tech-learning.tr.md](docs/tech-learning.tr.md)
+
+## When to update
+
+After **every explicitly approved** feature or infra change that introduces or meaningfully changes a technology, library, pattern, CLI command, or key class:
+
+1. Update the matching chapter under `docs/learning/`, or add a new numbered chapter if none fits.
+2. Update `docs/learning/00-index.tr.md` (table of contents + Faz order).
+3. Append a short line to `docs/learning/99-changelog-learning.tr.md`.
+4. Keep chronology aligned with [docs/history.tr.md](docs/history.tr.md) / roadmap.
+
+Do **not** skip the library update for “small” tech changes (new NuGet package, new Compose service, new CI step, new client lib).
+
+## Chapter template (required sections)
+
+Each chapter must stay beginner-friendly and include:
+
+1. **Bu nedir?** — plain-language definition  
+2. **Bu projede ne işe yarar?** — BankApp role  
+3. **Ne zaman eklendi?** — Faz / approximate order  
+4. **Temel kavramlar** — vocabulary a junior needs  
+5. **Komutlar** — real CLI examples + what each flag/arg does  
+6. **Sınıflar, metotlar, paketler** — concrete names from this repo  
+7. **Repoda nerede?** — paths  
+8. **Mini akış** — short end-to-end story  
+
+## Scope rules
+
+- Prefer depth for technologies **already used** in the repo; do not invent unused stacks.
+- Link to code with repo-relative paths; do not paste huge source dumps.
+- Turkish first. Mirror EN/DE only when the user asks.
+- Still obey approval-gates: propose doc file list before first creation of a **new** chapter file if the user’s request did not already approve the learning library work.
+
+## Relationship to other docs
+
+- `tech-learning.*.md` = short “why we chose it” overview → points here for deep beginner text  
+- `architecture-notes.*.md` = design decisions / trade-offs  
+- `history.*.md` = chronological product phases  
+- This library = **teach the stack from zero**, in build order  

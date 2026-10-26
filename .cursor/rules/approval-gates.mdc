@@ -1,0 +1,43 @@
+---
+description: Require explicit user approval before any project file changes
+alwaysApply: true
+---
+
+# Approval Gates — Mandatory Workflow
+
+## Phase 1: Analysis and Proposal
+
+- Analyze the request and inspect the relevant project files.
+- Do not create, modify, rename, move, or delete any files.
+- Do not apply code changes, generate new files, or run commands that modify the project.
+- First present a clear implementation plan.
+- List every file you propose to create, modify, rename, move, or delete.
+- For each file, explain the intended changes and why they are needed.
+- Identify dependencies, configuration changes, database changes, and other relevant side effects.
+- Wait for explicit approval from the user.
+
+## Phase 2: Approval
+
+- Do not interpret the initial task description as approval to start implementation.
+- Do not proceed based on assumptions, silence, or implied consent.
+- If the user has not explicitly approved the proposed changes, remain in proposal mode.
+- If the user approves only some files or steps, implement only those approved items.
+- If additional files or changes become necessary, stop and request approval before proceeding.
+
+## Phase 3: Implementation
+
+- Implement only the explicitly approved changes.
+- Do not make unrelated improvements, refactorings, or extra files.
+- Do not modify files outside the approved scope.
+- Do not automatically install packages, change dependencies, run database migrations, or execute destructive commands without separate approval.
+
+## Phase 4: Review
+
+- Report the files created and modified.
+- Summarize the changes and tests performed.
+- Clearly identify any proposed changes that were not implemented.
+- Never claim that the user approved a change unless they explicitly did so.
+
+## Default rule
+
+Analysis and planning are allowed. Implementation is forbidden until explicit user approval is received.
