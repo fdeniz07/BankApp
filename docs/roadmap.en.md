@@ -58,6 +58,10 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] SignalR notifications (live status driven by Outbox events) — done before Modular
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
+## Documentation (ongoing)
+
+- [x] Beginner tech learning library (`docs/learning/`) + Cursor rule `tech-learning-library` — updated with every new feature
+
 ## Later
 
 - [ ] Elasticsearch for staff GET endpoints

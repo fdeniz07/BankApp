@@ -5,6 +5,8 @@
 **Ziel:** BankApp als Produkt weiterbauen und gleichzeitig verstehen, *warum* der Stack so gewählt ist.  
 **Verwandt:** [roadmap.de.md](roadmap.de.md) · [architecture-notes.de.md](architecture-notes.de.md) · [README.de.md](../README.de.md)
 
+> **Einsteiger-Tiefenwissen (Befehle, Klassen, Pakete, Baureihenfolge):** [learning/00-index.tr.md](learning/00-index.tr.md) (türkische Bibliothek; wird bis Projektende gepflegt).
+
 Kein Installationskatalog — jeder Punkt: **Was / Warum hier / Vorteil / Trade-off / Repo-Beispiel**.
 
 ---

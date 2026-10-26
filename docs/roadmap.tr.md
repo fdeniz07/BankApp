@@ -58,6 +58,10 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] SignalR bildirimleri (Outbox olaylarına bağlı anlık durum) — Modular’dan önce uygulandı
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
+## Dokümantasyon (sürekli)
+
+- [x] Sıfırdan tech öğrenme kitaplığı (`docs/learning/`) + Cursor kuralı `tech-learning-library` — her yeni özellikte güncellenir
+
 ## İleride
 
 - [ ] Personel GET’leri için Elasticsearch

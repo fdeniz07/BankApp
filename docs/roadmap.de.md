@@ -58,6 +58,10 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] SignalR-Benachrichtigungen (Live-Status über Outbox-Events) — vor Modular umgesetzt
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
 
+## Dokumentation (laufend)
+
+- [x] Einsteiger-Tech-Lernbibliothek (`docs/learning/`) + Cursor-Regel `tech-learning-library` — bei jedem neuen Feature aktualisiert
+
 ## Später
 
 - [ ] Elasticsearch für Mitarbeiter-GET-Endpunkte

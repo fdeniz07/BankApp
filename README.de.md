@@ -7,7 +7,7 @@ Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (
 Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n und Live-Kreditbenachrichtigungen (SignalR).  
 Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, Client).
 
-**Dokumentation:** [Roadmap](docs/roadmap.de.md) · [Tech-Lernen](docs/tech-learning.de.md) · [Architekturnotizen](docs/architecture-notes.de.md) · [Verlauf](docs/history.de.md) · [Changelog](docs/changelog.de.md) · [Testnotizen](docs/test-notes.de.md) · [Infra](infra/README.md)
+**Dokumentation:** [Roadmap](docs/roadmap.de.md) · [Tech-Lernen](docs/tech-learning.de.md) · [Lernbibliothek (TR)](docs/learning/00-index.tr.md) · [Architekturnotizen](docs/architecture-notes.de.md) · [Verlauf](docs/history.de.md) · [Changelog](docs/changelog.de.md) · [Testnotizen](docs/test-notes.de.md) · [Infra](infra/README.md)
 
 ---
 

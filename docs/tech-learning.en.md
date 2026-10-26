@@ -5,6 +5,8 @@
 **Goal:** Grow BankApp as a product while learning *why* each piece of the stack exists.  
 **Related:** [roadmap.en.md](roadmap.en.md) · [architecture-notes.en.md](architecture-notes.en.md) · [README.md](../README.md)
 
+> **Beginner deep-dive (commands, classes, packages, build order):** [learning/00-index.tr.md](learning/00-index.tr.md) (Turkish library; kept up to date until the project ends).
+
 Not a dump of “what we installed” — each item covers **what / why here / benefits / trade-offs / repo example**.
 
 ---

@@ -7,7 +7,7 @@ Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (
 Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n and live credit notifications (SignalR).  
 Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, WebApi, client).
 
-**Docs:** [Roadmap](docs/roadmap.en.md) · [Tech learning](docs/tech-learning.en.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
+**Docs:** [Roadmap](docs/roadmap.en.md) · [Tech learning](docs/tech-learning.en.md) · [Learning library (TR)](docs/learning/00-index.tr.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
 ---
 
