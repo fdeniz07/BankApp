@@ -309,17 +309,20 @@ Başvuru **iptali** `Cancelled` durumuna özel komutla geçer (soft-delete deği
 
 ## API özeti
 
-| Ortam (Docker Dev) | URL |
-|--------------------|-----|
-| WebApi | http://localhost:8080 |
-| Scalar | http://localhost:8080/scalar/v1 |
-| Client | http://localhost:3000 |
-| Seq (log) | http://localhost:5341 |
-| Grafana (metrik/trace UI) | http://localhost:3001 (`admin` / `admin`) |
-| Prometheus | http://localhost:9090 |
-| OTLP gRPC (collector) | `localhost:4317` |
-| RabbitMQ UI | http://localhost:15672 |
-| Vault UI (lab) | http://localhost:8200 |
+| Servis (Docker lab) | URL / uç | Lab kimlik / not |
+|---------------------|----------|------------------|
+| WebApi | http://localhost:8080 | Login sonrası JWT ([Demo girişler](#demo-girişler)) |
+| Scalar | http://localhost:8080/scalar/v1 | Dev OpenAPI UI |
+| Client | http://localhost:3000 | Demo hesaplar giriş kartında |
+| SQL Server | `localhost,11433` | `sa` / `MSSQL_SA_PASSWORD` (`.env.example` varsayılan: `1q2w3e4r!`) |
+| Redis | `localhost:6379` | Şifre yok (lab) |
+| Redis Insight (UI) | http://localhost:5540 | Giriş yok; DB eklerken host **`redis`**, port **6379** (Compose DNS) |
+| Seq (log) | http://localhost:5341 | Giriş yok (lab; UI doğrudan açılır) |
+| Grafana (metrik/trace UI) | http://localhost:3001 | `admin` / `admin` (`GRAFANA_ADMIN_*`) |
+| Prometheus | http://localhost:9090 | Giriş yok (lab) |
+| OTLP gRPC (collector) | `localhost:4317` | Uygulama → collector (tarayıcı UI değil) |
+| RabbitMQ UI | http://localhost:15672 | `guest` / `guest` |
+| Vault UI (lab) | http://localhost:8200 | Yöntem **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (varsayılan `bankapp-vault-root-token`); KV `secret/bankapp` |
 
 Login / kamu kayıt / e-posta onay dışında çoğu endpoint JWT ister.  
 Kredi **yazma** (`POST` create/approve/reject/cancel): zorunlu header **`Idempotency-Key`**.

@@ -11,10 +11,11 @@ BankApp’te iki ana iş: **cache** (liste) ve **Idempotency-Key** saklama.
 
 1. Kredi tipi / alt tip listesi gibi okumaları hızlandırmak (`ICacheRemoverRequest` ile invalidate).
 2. Aynı `Idempotency-Key` ile tekrarlayan create/approve/reject/cancel’ı güvenli yönetmek (24 saat TTL).
+3. Lab’de anahtarları tarayıcıdan görmek için **Redis Insight** UI (`http://localhost:5540`).
 
 ## Ne zaman eklendi?
 
-Cache: **Faz 2–3**. Idempotency: **Faz 6**.
+Cache: **Faz 2–3**. Idempotency: **Faz 6**. Redis Insight UI: lab (Compose).
 
 ## Temel kavramlar
 
@@ -24,16 +25,20 @@ Cache: **Faz 2–3**. Idempotency: **Faz 6**.
 | **TTL** | Key’in otomatik silinme süresi |
 | **Cache stampede** | Cache boşalınca ani DB yükü (bilinçli olmak için) |
 | **Idempotency** | Aynı isteği iki kez göndersen aynı etki / replay |
+| **Redis Insight** | Resmi web UI; Redis’in kendisinde yerleşik arayüz yoktur |
 
 ## Komutlar
 
 ```powershell
 cd infra
-docker compose up -d redis
+docker compose --env-file .env up -d redis redis-insight
 
 # Container içine girip key bakmak (opsiyonel)
 docker compose exec redis redis-cli KEYS "*"
 ```
+
+Tarayıcı: `http://localhost:5540` → **Add Redis database** → Host **`redis`**, Port **`6379`**, şifre yok.  
+(`localhost` Insight konteynerinden Redis’e gitmez; Compose servis adı kullanılır.)
 
 HTTP tarafı:
 
@@ -55,7 +60,8 @@ Idempotency-Key: 3f2c9a...   # istemci üretir (UUID)
 ```
 src/WebApi/…          # Redis DI, idempotency
 src/Core/…            # cache pipeline parçaları
-infra/docker-compose.yml
+infra/docker-compose.yml   # redis + redis-insight
+infra/.env.example         # REDIS_INSIGHT_PORT
 tests/.../IdempotencyKeyTests.cs
 ```
 

@@ -55,7 +55,7 @@ docker compose down
 | `--no-cache` | Docker layer cache kullanma |
 | `-f` | Log’u takip et |
 
-Örnek URL’ler (README ile doğrula): WebApi `:8080`, client `:3000`, Seq, Grafana `:3001`, Prometheus `:9090`.
+Örnek URL’ler (README ile doğrula): WebApi `:8080`, client `:3000`, Seq, Grafana `:3001`, Prometheus `:9090`, Redis Insight `:5540`.
 
 ## Sınıflar, metotlar, paketler
 

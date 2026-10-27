@@ -309,17 +309,20 @@ stateDiagram-v2
 
 ## API-Überblick
 
-| Docker Dev | URL |
-|------------|-----|
-| WebApi | http://localhost:8080 |
-| Scalar | http://localhost:8080/scalar/v1 |
-| Client | http://localhost:3000 |
-| Seq (Logs) | http://localhost:5341 |
-| Grafana (Metriken/Traces-UI) | http://localhost:3001 (`admin` / `admin`) |
-| Prometheus | http://localhost:9090 |
-| OTLP gRPC (Collector) | `localhost:4317` |
-| RabbitMQ UI | http://localhost:15672 |
-| Vault UI (Lab) | http://localhost:8200 |
+| Dienst (Docker-Lab) | URL / Endpoint | Lab-Zugangsdaten / Hinweis |
+|---------------------|----------------|----------------------------|
+| WebApi | http://localhost:8080 | JWT nach Login (siehe [Demo-Logins](#demo-logins)) |
+| Scalar | http://localhost:8080/scalar/v1 | Dev-OpenAPI-UI |
+| Client | http://localhost:3000 | Demo-Konten auf der Login-Karte |
+| SQL Server | `localhost,11433` | `sa` / `MSSQL_SA_PASSWORD` (Default in `.env.example`: `1q2w3e4r!`) |
+| Redis | `localhost:6379` | Kein Passwort (Lab) |
+| Redis Insight (UI) | http://localhost:5540 | Kein Login; DB-Host **`redis`**, Port **6379** (Compose-DNS) |
+| Seq (Logs) | http://localhost:5341 | Kein Login (Lab; UI direkt) |
+| Grafana (Metriken/Traces-UI) | http://localhost:3001 | `admin` / `admin` (`GRAFANA_ADMIN_*`) |
+| Prometheus | http://localhost:9090 | Kein Login (Lab) |
+| OTLP gRPC (Collector) | `localhost:4317` | App → Collector (keine Browser-UI) |
+| RabbitMQ UI | http://localhost:15672 | `guest` / `guest` |
+| Vault UI (Lab) | http://localhost:8200 | Methode **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (Default `bankapp-vault-root-token`); KV `secret/bankapp` |
 
 Die meisten Endpunkte brauchen JWT (außer Login / öffentliche Registrierung / E-Mail-Bestätigung).  
 Kredit-**Schreib**-APIs (`POST` create/approve/reject/cancel): Pflicht-Header **`Idempotency-Key`**.

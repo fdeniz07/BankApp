@@ -36,3 +36,4 @@ _(empty)_
 | 2026-10-27 | 4 | Decision letter email lab (contract → consumer → test → docs) |
 | 2026-10-27 | +1 | Commit queue drain log |
 | 2026-10-27 | +3 | Rate-limit policies + Vault JWT overlay + docs |
+| 2026-10-27 | +2 | Redis Insight Compose + lab credentials / learning docs |

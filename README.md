@@ -308,17 +308,20 @@ Application **cancel** sets status to `Cancelled` via dedicated command (not sof
 
 ## API overview
 
-| Base (Docker Dev)           | URL                                       |
-| --------------------------- | ----------------------------------------- |
-| WebApi                      | http://localhost:8080                     |
-| Scalar                      | http://localhost:8080/scalar/v1           |
-| Client                      | http://localhost:3000                     |
-| Seq (logs)                  | http://localhost:5341                     |
-| Grafana (metrics/traces UI) | http://localhost:3001 (`admin` / `admin`) |
-| Prometheus                  | http://localhost:9090                     |
-| OTLP gRPC (collector)       | `localhost:4317`                          |
-| RabbitMQ UI                 | http://localhost:15672                    |
-| Vault UI (lab)              | http://localhost:8200                     |
+| Service (Docker lab)        | URL / endpoint                            | Lab credentials / notes                                      |
+| --------------------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| WebApi                      | http://localhost:8080                     | JWT after login (see [Demo logins](#demo-logins))            |
+| Scalar                      | http://localhost:8080/scalar/v1           | Dev OpenAPI UI                                               |
+| Client                      | http://localhost:3000                     | Demo users on login card                                     |
+| SQL Server                  | `localhost,11433`                         | `sa` / `MSSQL_SA_PASSWORD` (default in `.env.example`: `1q2w3e4r!`) |
+| Redis                       | `localhost:6379`                          | No password (lab)                                            |
+| Redis Insight (UI)          | http://localhost:5540                     | No login; add DB host **`redis`**, port **6379** (Compose DNS) |
+| Seq (logs)                  | http://localhost:5341                     | No login (lab; open UI directly)                             |
+| Grafana (metrics/traces UI) | http://localhost:3001                     | `admin` / `admin` (`GRAFANA_ADMIN_*`)                        |
+| Prometheus                  | http://localhost:9090                     | No login (lab)                                               |
+| OTLP gRPC (collector)       | `localhost:4317`                          | App → collector (not a browser UI)                           |
+| RabbitMQ UI                 | http://localhost:15672                    | `guest` / `guest`                                            |
+| Vault UI (lab)              | http://localhost:8200                     | Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (default `bankapp-vault-root-token`); KV `secret/bankapp` |
 
 Most endpoints require JWT (`Authorization: Bearer …`) except login / public register / confirm-email.  
 Credit **writes** (`POST` create/approve/reject/cancel): required header **`Idempotency-Key`**.
