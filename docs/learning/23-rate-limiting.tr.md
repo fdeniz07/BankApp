@@ -1,6 +1,6 @@
 # 23 — Rate limiting (ASP.NET Core)
 
-[← Önceki](22-decision-letter-email.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](22-decision-letter-email.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](24-lab-tools.tr.md)
 
 İlgili: [19 — Vault lab](19-vault-lab.tr.md)
 

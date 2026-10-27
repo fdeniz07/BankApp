@@ -22,10 +22,11 @@ Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, We
 7. [Domain model](#domain-model)
 8. [Business rules](#business-rules)
 9. [API overview](#api-overview)
-10. [SmartEnum](#smartenum)
-11. [Data seeding](#data-seeding)
-12. [Getting started](#getting-started)
-13. [Example requests](#example-requests)
+10. [Lab tools](#lab-tools)
+11. [SmartEnum](#smartenum)
+12. [Data seeding](#data-seeding)
+13. [Getting started](#getting-started)
+14. [Example requests](#example-requests)
 
 ---
 
@@ -338,6 +339,12 @@ Credit **writes** (`POST` create/approve/reject/cancel): required header **`Idem
 | **Profile**                                      | Get mine; update staff profile; upload avatar                                                             |
 
 Interactive details: Scalar UI.
+
+## Lab tools
+
+How to watch the stack (Scalar, Seq, Redis Insight, RabbitMQ UI, Grafana, Vault, SQL client, Docker) — setup, Compose DNS (`redis` vs `localhost`), cautions, and best practices → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (Turkish chapter; URLs match this README).
+
+Short debug chain: Scalar request → Redis Insight / RabbitMQ → Seq logs → (optional) Grafana traces.
 
 ---
 

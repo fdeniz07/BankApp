@@ -9,6 +9,8 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 | Seq | http://localhost:5341 | volume `bankapp-seq-data`; Compose **healthcheck** |
 | Redis | `localhost:6379` | volume `bankapp-redis-data`; Compose **healthcheck** |
 | Redis Insight | http://localhost:5540 | official UI; add DB **host `redis`**, port **6379** (no password); volume `bankapp-redis-insight-data` |
+
+Lab tooling guide (setup / cautions / best practices): [docs/learning/24-lab-tools.tr.md](../docs/learning/24-lab-tools.tr.md).
 | RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation + domain-events queues; volume `bankapp-rabbitmq-data`; **healthcheck** |
 | Vault | http://localhost:8200 | **dev mode** lab; root token from `.env`; `vault-seed` writes `secret/bankapp` |
 | SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data`; **healthcheck** |

@@ -22,10 +22,11 @@ Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, 
 7. [Domänenmodell](#domänenmodell)
 8. [Geschäftsregeln](#geschäftsregeln)
 9. [API-Überblick](#api-überblick)
-10. [SmartEnum](#smartenum)
-11. [Daten-Seed](#daten-seed)
-12. [Schnellstart](#schnellstart)
-13. [Beispielanfragen](#beispielanfragen)
+10. [Lab-Tools](#lab-tools)
+11. [SmartEnum](#smartenum)
+12. [Daten-Seed](#daten-seed)
+13. [Schnellstart](#schnellstart)
+14. [Beispielanfragen](#beispielanfragen)
 
 ---
 
@@ -339,6 +340,12 @@ Kredit-**Schreib**-APIs (`POST` create/approve/reject/cancel): Pflicht-Header **
 | **Profile** | Eigenes Profil; Avatar |
 
 Details: Scalar-UI.
+
+## Lab-Tools
+
+Stack beobachten (Scalar, Seq, Redis Insight, RabbitMQ-UI, Grafana, Vault, SQL-Client, Docker) — Setup, Compose-DNS (`redis` vs. `localhost`), Hinweise und Best Practices → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (TR-Kapitel; URLs wie in dieser README).
+
+Kurze Debug-Kette: Scalar-Request → Redis Insight / RabbitMQ → Seq-Logs → (optional) Grafana-Traces.
 
 ---
 

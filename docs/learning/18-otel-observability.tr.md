@@ -30,10 +30,26 @@ WebApi OTLP ile collector’a gönderir → Prometheus / Tempo → Grafana `:300
 
 ```powershell
 cd infra
-docker compose up -d otel-collector prometheus grafana tempo
-# Grafana: http://localhost:3001  (şifre README’de)
-# Prometheus: http://localhost:9090
+docker compose --env-file .env up -d otel-collector prometheus grafana tempo
+
+# Grafana http://localhost:3001  → admin / admin
+# Prometheus http://localhost:9090
+# OTLP (uygulama → collector) localhost:4317
+
+docker compose --env-file .env ps otel-collector tempo prometheus grafana
+curl -s http://localhost:9090/-/ready
+curl -s -o NUL -w "%{http_code}`n" http://localhost:3001/api/health
 ```
+
+Grafana’da hızlı tur:
+
+1. Birkaç API isteği at (Scalar / client; `/health` genelde trace dışı).
+2. **Dashboards → BankApp → BankApp HTTP (OTel)**.
+3. **Explore → Tempo** → service `bankapp-webapi`.
+4. **Explore → Prometheus** → örn. `up` veya HTTP duration metrikleri.
+5. Seq’te aynı isteğin `TraceId` alanına bak.
+
+Detaylı lab araç notları: [24 — Lab tools](24-lab-tools.tr.md).
 
 ## Sınıflar, metotlar, paketler
 

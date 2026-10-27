@@ -54,6 +54,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | DevOps | GitHub Actions CI | [21](21-ci-github-actions.tr.md) |
 | Notification | Karar mektubu e-posta (lab) | [22](22-decision-letter-email.tr.md) |
 | Security | Rate limiting (auth / write / fixed) | [23](23-rate-limiting.tr.md) |
+| Lab / DX | İzleme araçları (Scalar, Seq, Insight, Grafana…) | [24](24-lab-tools.tr.md) |
 
 Kitaplık güncelleme günlüğü: [99-changelog-learning.tr.md](99-changelog-learning.tr.md)
 

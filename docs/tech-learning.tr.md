@@ -254,6 +254,10 @@ Bu tek akışta CQRS, domain event, outbox, saga, idempotency ve SignalR bir ara
 
 ---
 
-## 8) İleride (roadmap)
+## 8) Lab araçları (DX)
+
+Compose URL’leri yetmezse: kurulum, Compose DNS, dikkat ve best practice için → [learning/24-lab-tools.tr.md](learning/24-lab-tools.tr.md).
+
+## 9) İleride (roadmap)
 
 Keycloak, Elasticsearch, K8s/ArgoCD, chatbot — [architecture-notes.tr.md](architecture-notes.tr.md) ve [roadmap.tr.md](roadmap.tr.md). OTel yığında; Grafana’da dolaş, sonra bir sonraki katmana aynı “neden / örnek” şablonunu uygula.

@@ -22,10 +22,11 @@ Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab,
 7. [Alan modeli](#alan-modeli)
 8. [İş kuralları](#iş-kuralları)
 9. [API özeti](#api-özeti)
-10. [SmartEnum](#smartenum)
-11. [Veri seed](#veri-seed)
-12. [Kurulum](#kurulum)
-13. [Örnek istekler](#örnek-istekler)
+10. [Lab araçları](#lab-araçları)
+11. [SmartEnum](#smartenum)
+12. [Veri seed](#veri-seed)
+13. [Kurulum](#kurulum)
+14. [Örnek istekler](#örnek-istekler)
 
 ---
 
@@ -339,6 +340,12 @@ Kredi **yazma** (`POST` create/approve/reject/cancel): zorunlu header **`Idempot
 | **Profile** | Profilim; personel güncelleme; avatar |
 
 Detaylar: Scalar UI.
+
+## Lab araçları
+
+Stack’i izlemek için (Scalar, Seq, Redis Insight, RabbitMQ UI, Grafana, Vault, SQL istemcisi, Docker): kurulum, Compose DNS (`redis` vs `localhost`), dikkat noktaları ve best practice → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)**.
+
+Kısa debug zinciri: Scalar istek → Redis Insight / RabbitMQ → Seq log → (gerekirse) Grafana trace.
 
 ---
 
