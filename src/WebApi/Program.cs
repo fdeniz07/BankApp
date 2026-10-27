@@ -3,6 +3,7 @@ using Core.Logging;
 using Persistence;
 using Persistence.Contexts;
 using Serilog;
+using WebApi.Configuration;
 using WebApi.Extensions;
 
 Log.Logger = new LoggerConfiguration()
@@ -15,6 +16,9 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseCoreSerilog();
+
+    // Lab: optional JWT key from Vault KV (secret/bankapp); falls back to env/appsettings.
+    await builder.Configuration.ApplyVaultSecretsAsync();
 
     builder.Services.AddWebApiInfrastructure(builder.Configuration);
     builder.Services.AddApplicationServices();

@@ -8,8 +8,8 @@
 #   docker compose -f infra/docker-compose.yml --env-file infra/.env down -v
 #   Note: down -v does NOT remove external volume sqlserver-2025-data
 #
-# Vault (dev mode) is optional for the app runtime today — WebApi still reads .env.
-# UI: http://localhost:8200  |  seed job writes KV secret/bankapp
+# Vault (dev mode): UI http://localhost:8200 | vault-seed writes KV secret/bankapp
+# WebApi overlays TokenOptions:SecurityKey from Vault when Vault__Enabled=true (Compose default).
 # Observability: Grafana http://localhost:3001 (default admin/admin) — Seq remains for logs
 
 services:
@@ -206,6 +206,11 @@ services:
       TokenOptions__AccessTokenExpiration: "${TOKEN_EXPIRATION_MINUTES:-60}"
       TokenOptions__RememberMeAccessTokenExpiration: "${TOKEN_REMEMBER_ME_MINUTES:-10080}"
       TokenOptions__SecurityKey: "${TOKEN_SECURITY_KEY}"
+      Vault__Enabled: "true"
+      Vault__Address: "http://vault:8200"
+      Vault__Token: "${VAULT_DEV_ROOT_TOKEN_ID:-bankapp-vault-root-token}"
+      Vault__MountPath: "secret"
+      Vault__SecretPath: "bankapp"
       CacheSettings__SlidingExpirationMinutes: "30"
       OpenTelemetry__Enabled: "true"
       OpenTelemetry__ServiceName: "bankapp-webapi"
@@ -221,6 +226,8 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+      vault-seed:
+        condition: service_completed_successfully
       otel-collector:
         condition: service_started
     healthcheck:
