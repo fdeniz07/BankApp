@@ -135,6 +135,7 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             }
 
             await TryPublishDecisionLetterAsync(scope.ServiceProvider, type, payload);
+            await TryPublishDecisionSmsAsync(scope.ServiceProvider, type, payload);
 
             _channel!.BasicAck(ea.DeliveryTag, multiple: false);
         }
@@ -275,6 +276,95 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
                 subject,
                 body,
                 occurredOnUtc));
+    }
+
+    private async Task TryPublishDecisionSmsAsync(
+        IServiceProvider services,
+        string eventType,
+        string payload)
+    {
+        string shortName = ShortEventName(eventType);
+        if (shortName is not (nameof(CreditApplicationApproved) or nameof(CreditApplicationRejected)))
+            return;
+
+        using JsonDocument doc = JsonDocument.Parse(payload);
+        JsonElement root = doc.RootElement;
+
+        if (!TryGetGuid(root, "creditApplicationId", out Guid applicationId)
+            || !TryGetGuid(root, "customerId", out Guid customerId))
+        {
+            _logger.LogWarning(
+                "Decision SMS skipped: missing application/customer id. Type={EventType}",
+                shortName);
+            return;
+        }
+
+        string applicationNumber = root.TryGetProperty("applicationNumber", out JsonElement numberEl)
+            ? numberEl.GetString() ?? string.Empty
+            : string.Empty;
+
+        string? rejectionReason = root.TryGetProperty("rejectionReason", out JsonElement reasonEl)
+            ? reasonEl.GetString()
+            : null;
+
+        DateTimeOffset occurredOnUtc = DateTimeOffset.UtcNow;
+        if (root.TryGetProperty("occurredOnUtc", out JsonElement occurredEl)
+            && occurredEl.ValueKind == JsonValueKind.String
+            && DateTimeOffset.TryParse(occurredEl.GetString(), out DateTimeOffset parsed))
+        {
+            occurredOnUtc = parsed;
+        }
+
+        ICustomerRepository customers = services.GetRequiredService<ICustomerRepository>();
+        Customer? customer = await customers.GetAsync(c => c.Id == customerId);
+        if (customer is null || string.IsNullOrWhiteSpace(customer.PhoneNumber))
+        {
+            _logger.LogWarning(
+                "Decision SMS skipped: no customer phone for CustomerId={CustomerId} Application={ApplicationNumber}",
+                customerId,
+                applicationNumber);
+            return;
+        }
+
+        ICreditApplicationRepository applications =
+            services.GetRequiredService<ICreditApplicationRepository>();
+        CreditApplication? application = await applications.GetAsync(a => a.Id == applicationId);
+        string? notes = application?.Notes;
+
+        bool approved = shortName == nameof(CreditApplicationApproved);
+        string decision = approved ? "Approved" : "Rejected";
+
+        // SMS body: prefer staff notes, else short status text (keep compact for lab).
+        string body;
+        if (!string.IsNullOrWhiteSpace(notes))
+            body = TruncateSms(notes.Trim());
+        else if (!approved && !string.IsNullOrWhiteSpace(rejectionReason))
+            body = TruncateSms($"BankApp: {applicationNumber} rejected. {rejectionReason}");
+        else if (approved)
+            body = TruncateSms($"BankApp: {applicationNumber} approved.");
+        else
+            body = TruncateSms($"BankApp: {applicationNumber} rejected.");
+
+        IApplicationUserRepository users = services.GetRequiredService<IApplicationUserRepository>();
+        ApplicationUser? user = await users.GetAsync(u => u.CustomerId == customerId);
+        string? customerName = user is null ? null : FormatCustomerName(user.FirstName, user.LastName);
+
+        IDecisionSmsPublisher publisher = services.GetRequiredService<IDecisionSmsPublisher>();
+        await publisher.PublishAsync(
+            new DecisionSmsRequested(
+                customer.PhoneNumber.Trim(),
+                customerName,
+                applicationNumber,
+                decision,
+                body,
+                occurredOnUtc));
+    }
+
+    private static string TruncateSms(string text, int maxLength = 320)
+    {
+        if (text.Length <= maxLength)
+            return text;
+        return text[..(maxLength - 1)] + "…";
     }
 
     private static string? FormatCustomerName(string? firstName, string? lastName)

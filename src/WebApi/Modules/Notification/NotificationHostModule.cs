@@ -14,8 +14,10 @@ public static class NotificationHostModule
         services.Configure<RabbitMqOptions>(configuration.GetSection(RabbitMqOptions.SectionName));
         services.AddSingleton<IEmailConfirmationPublisher, RabbitMqEmailConfirmationPublisher>();
         services.AddSingleton<IDecisionLetterPublisher, RabbitMqDecisionLetterPublisher>();
+        services.AddSingleton<IDecisionSmsPublisher, RabbitMqDecisionSmsPublisher>();
         services.AddHostedService<EmailConfirmationConsumerHostedService>();
         services.AddHostedService<DecisionLetterConsumerHostedService>();
+        services.AddHostedService<DecisionSmsConsumerHostedService>();
         services.AddHostedService<OutboxDispatcherHostedService>();
         services.AddHostedService<DomainEventsConsumerHostedService>();
         services.AddSignalR();
