@@ -54,6 +54,8 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → Entscheidung → Onboarding-Stubs)
 - **SignalR** (`/hubs/credit-applications`; Staff- + Kundengruppen; Publish nach Outbox-Consumer)
 - **Entscheidungsbrief-E-Mail (Lab)** — nach Genehmigung/Ablehnung Queue `decision-letter` → Seq/Log (kein SMTP; SMS später)
+- **Rate limiting** — Policies `auth` / `write` / `fixed` (429); Health + SignalR ausgenommen
+- **Vault-Lab** — JWT-`SecurityKey`-Overlay aus `secret/bankapp` (Compose); Env-Fallback
 - Zahlungsplan (Amortisation) mit **erweiterbarem Export** (`payment-plan/export?format=pdf`; später CSV/XLSX) und Druck
 - Dashboard-Summary, Personalverwaltung, Profil + Avatar (≤ 2 MB)
 - Kreditarten anlegen / ändern / löschen / aktiv-passiv (**BankManager**)

@@ -49,10 +49,11 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | 6 | SignalR | [16](16-signalr.tr.md) |
 | 6 | Modular Monolith | [17](17-modular-monolith.tr.md) |
 | 6 | OpenTelemetry / Grafana / Prometheus | [18](18-otel-observability.tr.md) |
-| Lab | HashiCorp Vault | [19](19-vault-lab.tr.md) |
+| Lab | HashiCorp Vault (+ WebApi JWT overlay) | [19](19-vault-lab.tr.md) |
 | UX | QuestPDF / ödeme planı export | [20](20-pdf-export.tr.md) |
 | DevOps | GitHub Actions CI | [21](21-ci-github-actions.tr.md) |
 | Notification | Karar mektubu e-posta (lab) | [22](22-decision-letter-email.tr.md) |
+| Security | Rate limiting (auth / write / fixed) | [23](23-rate-limiting.tr.md) |
 
 Kitaplık güncelleme günlüğü: [99-changelog-learning.tr.md](99-changelog-learning.tr.md)
 

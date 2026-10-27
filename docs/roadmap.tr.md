@@ -69,7 +69,9 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] Kubernetes / ArgoCD dağıtımı
 - [x] OpenTelemetry + Grafana / Prometheus (collector + Tempo; Seq log kalır)
 - [x] HashiCorp Vault lab (Compose dev mode + `secret/bankapp` seed; WebApi henüz bağlı değil)
-- [ ] Üretim güvenlik sertleştirme (secret yönetimi, rate limit politikaları; Vault entegrasyonu)
+- [x] Rate limit politikaları (auth / write / fixed; 429)
+- [x] Vault → WebApi JWT key overlay (lab; SQL hâlâ Compose env)
+- [ ] Üretim güvenlik sertleştirme (rate limit üretim değerleri, Raft Vault, secret rotasyonu)
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
 - [ ] Kredi başvurusunda evrak yükleme (kimlik, gelir bordrosu vb.; ileride zorunlu tutulabilir)

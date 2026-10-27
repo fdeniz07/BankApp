@@ -69,7 +69,9 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [ ] Kubernetes / ArgoCD Deployment
 - [x] OpenTelemetry + Grafana / Prometheus (Collector + Tempo; Seq bleibt für Logs)
 - [x] HashiCorp Vault-Lab (Compose-Dev-Modus + Seed `secret/bankapp`; WebApi noch nicht angebunden)
-- [ ] Produktions-Härtung (Secrets, Rate-Limit-Policies; Vault-Integration)
+- [x] Rate-Limit-Policies (auth / write / fixed; 429)
+- [x] Vault → WebApi JWT-Key-Overlay (Lab; SQL weiter Compose-Env)
+- [ ] Produktions-Härtung (Prod-Rate-Werte, Raft-Vault, Secret-Rotation)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung
 - [ ] Dokumenten-Upload beim Kreditantrag (Ausweis, Gehaltsabrechnung usw.; später ggf. Pflicht)

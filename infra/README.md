@@ -89,7 +89,7 @@ Inside Docker network, the API uses:
 - Redis: `redis:6379`
 - Seq: `http://seq`
 - RabbitMQ: `rabbitmq:5672`
-- Vault: `http://vault:8200` (available; **WebApi does not read it yet**)
+- Vault: `http://vault:8200` (Compose sets `Vault__Enabled=true`; JWT key from `secret/bankapp`)
 
 The React app runs in the browser, so it calls the host-mapped API (`VITE_API_BASE_URL`, default `http://localhost:8080`), not the Compose service name.
 
@@ -131,7 +131,7 @@ WebApi liveness (host): `http://localhost:8080/health` — no auth; does not pro
 
 ## HashiCorp Vault (lab)
 
-Dev-mode Vault for learning secret management. **WebApi still loads secrets from `.env` / Compose env** — Vault is side-by-side until a later integration slice.
+Dev-mode Vault for learning secret management. Compose WebApi enables Vault and overlays **JWT `SecurityKey`** from `secret/bankapp` (`jwt_security_key`). SQL/Redis/RabbitMQ connection settings still come from Compose env; if Vault is down, `TokenOptions__SecurityKey` from `.env` remains the fallback.
 
 ```bash
 # start only Vault (+ one-shot seed)
@@ -179,6 +179,6 @@ Local `dotnet run` keeps OTel **off** by default (`appsettings`); point `OpenTel
 ## Roadmap
 
 - GitHub Actions / ArgoCD / K8s
-- WebApi reading secrets from Vault (next Vault slice)
-- File/raft Vault (non-dev) for production-like labs
+- WebApi JWT overlay from Vault (`Vault__Enabled`, path `secret/bankapp` → `jwt_security_key`) — **done in lab**
+- File/raft Vault (non-dev) and more secret keys (SQL/RabbitMQ) for production-like labs
 - Keycloak / OIDC, Elasticsearch (see docs roadmap)

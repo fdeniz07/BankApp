@@ -54,6 +54,8 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → decision → onboarding stubs)
 - **SignalR** (`/hubs/credit-applications`; staff + customer groups; publish after Outbox consumer)
 - **Decision letter email (lab)** — after approve/reject, queue `decision-letter` → Seq/log (no SMTP; SMS later)
+- **Rate limiting** — policies `auth` / `write` / `fixed` (429); health + SignalR exempt
+- **Vault lab** — JWT `SecurityKey` overlay from `secret/bankapp` (Compose); env fallback
 - Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
 - Dashboard summary, staff user management, profile + avatar (≤ 2 MB)
 - Credit type create / update / delete / activate-deactivate (**BankManager**)

@@ -54,6 +54,8 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → karar → onboarding stub’ları)
 - **SignalR** (`/hubs/credit-applications`; staff + müşteri grupları; Outbox consumer sonrası yayın)
 - **Karar mektubu e-posta (lab)** — onay/red sonrası kuyruk `decision-letter` → Seq/log (SMTP yok; SMS ileride)
+- **Rate limiting** — `auth` / `write` / `fixed` politikaları (429); health + SignalR muaf
+- **Vault lab** — JWT `SecurityKey` `secret/bankapp` overlay (Compose); env fallback
 - Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
 - Dashboard özeti, personel yönetimi, profil + avatar (≤ 2 MB)
 - Kredi tipi oluşturma / güncelleme / silme / aktif-pasif (**BankManager**)

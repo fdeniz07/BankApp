@@ -106,6 +106,7 @@ Başvuru **evrak yükleme** (kimlik, bordro vb.): roadmap İleride; şimdilik zo
 5. Modular Monolith (Identity / Customers / Credit / Notification) — **uygulandı** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / host module kayıtları; tek deploy, tek DB
 6. OpenTelemetry + Grafana / Prometheus — **uygulandı** (2026-10-25): WebApi OTLP → collector → Tempo (trace) + Prometheus (metrik) + Grafana `:3001`; Seq log kalır; `TraceId`/`SpanId` enricher
 7. Karar mektubu e-posta (lab) — **uygulandı** (2026-10-27): onay/red → `decision-letter` kuyruk + Seq log; SMS yok
+8. Rate limit auth/write/fixed + Vault JWT overlay — **uygulandı** (2026-10-27)
 
 ```mermaid
 flowchart LR
