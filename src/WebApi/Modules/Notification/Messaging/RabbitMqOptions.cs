@@ -11,6 +11,7 @@ public sealed class RabbitMqOptions
     public string Password { get; set; } = "guest";
     public string EmailConfirmationQueue { get; set; } = "email-confirmation";
     public string DomainEventsQueue { get; set; } = "domain-events";
+    public string DecisionLetterQueue { get; set; } = "decision-letter";
 }
 
 public sealed class AppPublicOptions
