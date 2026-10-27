@@ -65,12 +65,20 @@ Servisler Faz 2–6 boyunca geldi; **Redis Insight** ve bu birleşik “lab tool
 
 ### 2) Seq (log)
 
-**Kurulum:** Compose `seq` servisi; `ACCEPT_EULA=Y`. Lab’de genelde **giriş yok**.  
-**Kullanım:** UI’da signal / level filtrele; correlation / request id ile bir isteği takip et.
+Ayrıntılı filtre, checklist, kurtarma: **[07 — Serilog/Seq](07-serilog-seq.tr.md)**.
 
-**Dikkat:** Seq volume’u büyür; lab reset: Compose volume temizliği (`infra/README`). Prod’da auth + retention zorunlu düşün.
+**Kurulum:** Compose `seq`; lab’de genelde **giriş yok** → http://localhost:5341.
 
-**Best practice:** Hassas veri (şifre, tam kart no, ham JWT) loglama. Lab’de bile PII’yi minimize et. Hata ayıklarken **Error/Warning** ile başla, sonra Debug.
+```powershell
+cd infra
+docker compose --env-file .env up -d seq
+# Kontrol: ps → healthy; UI Events; filtre örn. @Level = 'Error'
+docker compose --env-file .env logs --tail=50 webapi   # sink bağlanamıyorsa burada
+```
+
+**Dikkat:** Volume büyür; lab reset `down -v` ([09](09-docker-compose.tr.md)). Prod auth + retention.
+
+**Best practice:** PII/JWT loglama. Error ile başla; TraceId ile Grafana’ya köprüle.
 
 ---
 
@@ -99,12 +107,20 @@ Insight **konteyner içinde** çalıştığı için host **`redis`** (Compose se
 
 ### 4) RabbitMQ Management
 
-**Kurulum:** `rabbitmq:…-management` imajı; UI `:15672`. Lab: **`guest` / `guest`**.  
-**Kullanım:** Queues → `email-confirmation`, domain-events, `decision-letter` vb. → Ready / Unacked / Consumers.
+Ayrıntılı kuyruk tablosu + felaket: **[13 — RabbitMQ](13-rabbitmq.tr.md)**.
 
-**Dikkat:** `guest` yalnızca localhost lab için tipik; prod’da ayrı user + TLS + güçlü şifre. Mesajı UI’dan “get” etmek consumer davranışını değiştirebilir (ack/requeue).
+**Kurulum:** UI http://localhost:15672 → **`guest` / `guest`**.
 
-**Best practice:** Önce **consumer bağlı mı** ve **Ready sayısı**na bak. Mesaj birikiyorsa WebApi/consumer log’una (Seq) geç.
+```powershell
+cd infra
+docker compose --env-file .env up -d rabbitmq
+docker compose --env-file .env exec rabbitmq rabbitmq-diagnostics -q ping
+# UI: Queues → Consumers ≥ 1, Ready birikmiyor olmalı
+```
+
+**Dikkat:** `guest` = lab. UI’dan Get message consumer’ı bozabilir.
+
+**Best practice:** Önce Consumers + Ready; birikince Seq + `logs webapi`.
 
 ---
 
@@ -148,10 +164,21 @@ Prometheus UI (http://localhost:9090): **Status → Targets** → `otel-collecto
 
 ### 6) Vault UI
 
-**Kurulum:** Dev mode Vault; token = `VAULT_DEV_ROOT_TOKEN_ID` (ör. `bankapp-vault-root-token`). Method: **Token**. KV: `secret/bankapp` (JWT key seed).  
-**Dikkat:** Dev mode **üretim değil** (raft/HA, unseal, policy). Root token’ı repoya / ekran görüntüsüne koyma (lab `.env.example` bilerek açık; gerçek secret değil gibi davran).
+Ayrıntılı CLI, overlay log, kurtarma: **[19 — Vault lab](19-vault-lab.tr.md)**.
 
-**Best practice:** UI’da oku; değişikliği Compose seed / dokümantasyon akışıyla yap. WebApi JWT overlay için [19](19-vault-lab.tr.md).
+**Kurulum:** http://localhost:8200 → Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` → KV `secret/bankapp`.
+
+```powershell
+cd infra
+docker compose --env-file .env up -d vault
+docker compose --env-file .env up vault-seed
+docker compose --env-file .env exec vault vault kv get secret/bankapp
+# WebApi: logs | Select-String Vault  → overlay applied / fallback
+```
+
+**Dikkat:** Dev mode ≠ prod. Root token’ı ekran görüntüsüne koyma.
+
+**Best practice:** Secret’ı UI/CLI ile oku; seed + WebApi recreate ile yenile.
 
 ---
 

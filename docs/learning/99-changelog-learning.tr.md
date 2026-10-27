@@ -11,3 +11,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-10-27 | `24-lab-tools.tr.md` — lab izleme araçları, kurulum / dikkat / best practice |
 | 2026-10-27 | `24` + `18`: Grafana/Prometheus temel CLI ve UI adımları |
 | 2026-10-27 | `09` Compose: açıklamalı komutlar, sağlık checklist, felaket/kurtarma; kural: annotated Komutlar |
+| 2026-10-27 | `07` Seq, `13` RabbitMQ, `19` Vault: açıklamalı komut + checklist + kurtarma; `24` çapraz link |

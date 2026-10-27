@@ -38,3 +38,4 @@ _(empty)_
 | 2026-10-27 | +3 | Rate-limit policies + Vault JWT overlay + docs |
 | 2026-10-27 | +2 | Redis Insight Compose + lab credentials / learning docs |
 | 2026-10-27 | +2 | Lab tools chapter (24) + annotated Compose recovery docs |
+| 2026-10-27 | +1 | Annotated Seq / RabbitMQ / Vault learning chapters |
