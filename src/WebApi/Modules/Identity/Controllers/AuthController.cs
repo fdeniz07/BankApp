@@ -11,7 +11,7 @@ namespace WebApi.Modules.Identity.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[EnableRateLimiting(RateLimitPolicies.Fixed)]
+[EnableRateLimiting(RateLimitPolicies.Auth)]
 public class AuthController : BaseController
 {
     [HttpPost("login")]

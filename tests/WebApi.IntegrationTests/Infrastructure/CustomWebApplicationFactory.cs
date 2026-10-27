@@ -38,10 +38,15 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 ["Seq:ServerUrl"] = "",
                 ["Redis:ConnectionString"] = "localhost:6379",
                 ["RabbitMq:Enabled"] = "false",
+                ["Vault:Enabled"] = "false",
                 ["App:PublicClientBaseUrl"] = "http://localhost:3000",
                 ["CacheSettings:SlidingExpirationMinutes"] = "30",
-                ["RateLimiting:PermitLimit"] = "1000",
-                ["RateLimiting:WindowSeconds"] = "60"
+                ["RateLimiting:Fixed:PermitLimit"] = "1000",
+                ["RateLimiting:Fixed:WindowSeconds"] = "60",
+                ["RateLimiting:Auth:PermitLimit"] = "1000",
+                ["RateLimiting:Auth:WindowSeconds"] = "60",
+                ["RateLimiting:Write:PermitLimit"] = "1000",
+                ["RateLimiting:Write:WindowSeconds"] = "60"
             });
         });
 

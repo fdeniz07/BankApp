@@ -167,17 +167,39 @@ public static class ServiceCollectionExtensions
 
     private static IServiceCollection AddRateLimitingConfiguration(this IServiceCollection services, IConfiguration configuration)
     {
-        int permitLimit = configuration.GetValue("RateLimiting:PermitLimit", 100);
-        int windowSeconds = configuration.GetValue("RateLimiting:WindowSeconds", 60);
+        // Legacy flat keys remain as Fixed defaults when nested sections are absent.
+        int fixedPermit = configuration.GetValue("RateLimiting:Fixed:PermitLimit",
+            configuration.GetValue("RateLimiting:PermitLimit", 100));
+        int fixedWindow = configuration.GetValue("RateLimiting:Fixed:WindowSeconds",
+            configuration.GetValue("RateLimiting:WindowSeconds", 60));
+        int authPermit = configuration.GetValue("RateLimiting:Auth:PermitLimit", 20);
+        int authWindow = configuration.GetValue("RateLimiting:Auth:WindowSeconds", 60);
+        int writePermit = configuration.GetValue("RateLimiting:Write:PermitLimit", 60);
+        int writeWindow = configuration.GetValue("RateLimiting:Write:WindowSeconds", 60);
 
         services.AddRateLimiter(options =>
         {
             options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
             options.AddFixedWindowLimiter(RateLimitPolicies.Fixed, limiterOptions =>
             {
-                limiterOptions.PermitLimit = permitLimit;
-                limiterOptions.Window = TimeSpan.FromSeconds(windowSeconds);
-                limiterOptions.QueueLimit = 100;
+                limiterOptions.PermitLimit = fixedPermit;
+                limiterOptions.Window = TimeSpan.FromSeconds(fixedWindow);
+                limiterOptions.QueueLimit = 50;
+            });
+
+            options.AddFixedWindowLimiter(RateLimitPolicies.Auth, limiterOptions =>
+            {
+                limiterOptions.PermitLimit = authPermit;
+                limiterOptions.Window = TimeSpan.FromSeconds(authWindow);
+                limiterOptions.QueueLimit = 0;
+            });
+
+            options.AddFixedWindowLimiter(RateLimitPolicies.Write, limiterOptions =>
+            {
+                limiterOptions.PermitLimit = writePermit;
+                limiterOptions.Window = TimeSpan.FromSeconds(writeWindow);
+                limiterOptions.QueueLimit = 20;
             });
         });
 

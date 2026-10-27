@@ -106,6 +106,7 @@ public class CreditApplicationsController : BaseController
 
     [HttpPost]
     [IdempotencyKey]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
     public async Task<IActionResult> Add([FromBody] CreateCreditApplicationRequest request)
     {
         CreatedCreditApplicationResponse response = await Mediator.Send(request);
@@ -113,6 +114,7 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpPut]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
     public async Task<IActionResult> Update([FromBody] UpdateCreditApplicationRequest request)
     {
         UpdatedCreditApplicationResponse response = await Mediator.Send(request);
@@ -121,6 +123,7 @@ public class CreditApplicationsController : BaseController
 
     [HttpPost("{id}/approve")]
     [IdempotencyKey]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
     public async Task<IActionResult> Approve(
         [FromRoute] Guid id, 
         [FromBody] ApproveCreditApplicationRequest request)
@@ -132,6 +135,7 @@ public class CreditApplicationsController : BaseController
 
     [HttpPost("{id}/reject")]
     [IdempotencyKey]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
     public async Task<IActionResult> Reject(
         [FromRoute] Guid id, 
         [FromBody] RejectCreditApplicationRequest request)
@@ -143,6 +147,7 @@ public class CreditApplicationsController : BaseController
 
     [HttpPost("{id}/cancel")]
     [IdempotencyKey]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
     public async Task<IActionResult> Cancel(
         [FromRoute] Guid id,
         [FromBody] CancelCreditApplicationRequest? request)
@@ -154,6 +159,7 @@ public class CreditApplicationsController : BaseController
     }
 
     [HttpDelete("{id}")]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
     public async Task<IActionResult> Delete([FromRoute] Guid id)
     {
         DeleteCreditApplicationRequest request = new() { Id = id };
