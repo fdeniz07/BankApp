@@ -31,3 +31,6 @@ _(empty)_
 | 2026-10-25 | +1 | Fix commit-queue encoding |
 | 2026-10-25 | +1 | Decision letter templates + README Features/URLs |
 | 2026-10-26 | 5 | Drain: PDF locale → toast currency → duplicate toasts → Scalar → screenshot gallery |
+| 2026-10-26 | +2 | Learning library (`docs/learning/`) + track Cursor rules in git |
+| 2026-10-26 | +N | CI fixes (NU1605, approve handler tests, monthlyIncome, RiskLevel syntax) |
+| 2026-10-27 | 4 | Decision letter email lab (contract → consumer → test → docs) |
