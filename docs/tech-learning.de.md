@@ -133,7 +133,7 @@ Strukturierte Logs lokal; einheitliche API-Fehler für den Client.
 | Technik | Rolle |
 |---------|--------|
 | **Redis** | Cache + Idempotency-Store |
-| **RabbitMQ** | `email-confirmation`, `domain-events` |
+| **RabbitMQ** | `email-confirmation`, `domain-events`, `decision-letter` (Lab-Entscheidungsmail → Seq) |
 | **SignalR** | Hub `/hubs/credit-applications` nach Outbox-Consume |
 | **OpenTelemetry** | OTLP Traces + Metrics → Collector → Tempo / Prometheus / Grafana `:3001` |
 | **Vault (Lab)** | Dev-Mode + Seed `secret/bankapp` (WebApi noch nicht angebunden) |

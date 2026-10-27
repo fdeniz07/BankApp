@@ -52,6 +52,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Lab | HashiCorp Vault | [19](19-vault-lab.tr.md) |
 | UX | QuestPDF / ödeme planı export | [20](20-pdf-export.tr.md) |
 | DevOps | GitHub Actions CI | [21](21-ci-github-actions.tr.md) |
+| Notification | Karar mektubu e-posta (lab) | [22](22-decision-letter-email.tr.md) |
 
 Kitaplık güncelleme günlüğü: [99-changelog-learning.tr.md](99-changelog-learning.tr.md)
 

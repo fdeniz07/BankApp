@@ -73,6 +73,7 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung
 - [ ] Dokumenten-Upload beim Kreditantrag (Ausweis, Gehaltsabrechnung usw.; später ggf. Pflicht)
-- [ ] Entscheidungsbriefe per E-Mail/SMS senden (Notification + Outbox; UI-Vorlagen vorhanden)
+- [x] Entscheidungsbriefe per E-Mail senden (Lab: Queue `decision-letter` + Seq-Log; UI-Vorlagen / Outbox)
+- [ ] Entscheidungsbriefe per SMS senden
 - [ ] Filial-/Branch-Modell + Entscheider-Filiale beim Kreditantrag
 - [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)

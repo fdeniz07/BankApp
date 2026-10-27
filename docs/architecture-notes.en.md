@@ -105,6 +105,7 @@ Application **document upload** (ID, payslip, etc.): on the Later roadmap; not r
 4. SignalR notifications (driven by Outbox events) — **done** (2026-10-23): hub `/hubs/credit-applications`; consumer → staff + customer groups; React toast + list refresh (before Modular)
 5. Modular Monolith (Identity / Customers / Credit / Notification) — **done** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / host module registration; single deploy, single DB
 6. OpenTelemetry + Grafana / Prometheus — **done** (2026-10-25): WebApi OTLP → collector → Tempo (traces) + Prometheus (metrics) + Grafana `:3001`; Seq stays for logs; `TraceId`/`SpanId` enricher
+7. Decision letter email (lab) — **done** (2026-10-27): approve/reject → `decision-letter` queue + Seq log; no SMS yet
 
 ```mermaid
 flowchart LR

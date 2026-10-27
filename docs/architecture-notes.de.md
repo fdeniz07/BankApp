@@ -105,6 +105,7 @@ Kredit-Scorecard, Vertrags-PDF, Raten/Verzug, IBAN/Transfer (idempotent), Fraud-
 4. SignalR-Benachrichtigungen (getrieben von Outbox-Events) — **umgesetzt** (2026-10-23): Hub `/hubs/credit-applications`; Consumer → Staff- + Kundengruppen; React-Toast + Listen-Refresh (vor Modular)
 5. Modular Monolith (Identity / Customers / Credit / Notification) — **umgesetzt** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / Host-Modul-Registrierung; ein Deploy, eine DB
 6. OpenTelemetry + Grafana / Prometheus — **umgesetzt** (2026-10-25): WebApi OTLP → Collector → Tempo (Traces) + Prometheus (Metriken) + Grafana `:3001`; Seq bleibt für Logs; `TraceId`/`SpanId`-Enricher
+7. Entscheidungsbrief-E-Mail (Lab) — **umgesetzt** (2026-10-27): Genehmigung/Ablehnung → Queue `decision-letter` + Seq-Log; SMS noch nicht
 
 ```mermaid
 flowchart LR

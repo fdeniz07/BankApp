@@ -105,6 +105,7 @@ Başvuru **evrak yükleme** (kimlik, bordro vb.): roadmap İleride; şimdilik zo
 4. SignalR bildirimleri (Outbox olaylarına bağlı) — **uygulandı** (2026-10-23): hub `/hubs/credit-applications`; consumer → staff + customer grupları; React toast + liste yenileme (Modular’dan önce)
 5. Modular Monolith (Identity / Customers / Credit / Notification) — **uygulandı** (2026-10-24): `Application.Modules.*` + `WebApi.Modules.*`; `AddApplicationModules` / host module kayıtları; tek deploy, tek DB
 6. OpenTelemetry + Grafana / Prometheus — **uygulandı** (2026-10-25): WebApi OTLP → collector → Tempo (trace) + Prometheus (metrik) + Grafana `:3001`; Seq log kalır; `TraceId`/`SpanId` enricher
+7. Karar mektubu e-posta (lab) — **uygulandı** (2026-10-27): onay/red → `decision-letter` kuyruk + Seq log; SMS yok
 
 ```mermaid
 flowchart LR
@@ -113,9 +114,10 @@ flowchart LR
   C --> D[SignalR]
   D --> E[Modular_Monolith]
   E --> F[OTel_Grafana]
+  F --> G[DecisionLetter_lab]
 ```
 
-Daha geniş eğitim sırası: Outbox → SignalR → OTel → Keycloak → ES → AI RAG.
+Daha geniş eğitim sırası: Outbox → SignalR → OTel → Decision letter → Keycloak → ES → AI RAG.
 
 ---
 

@@ -74,5 +74,6 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] Keycloak desteği
 - [ ] Kredi başvurusunda evrak yükleme (kimlik, gelir bordrosu vb.; ileride zorunlu tutulabilir)
 - [ ] Şube / branch modeli + karar veren personelde şube bilgisi
-- [ ] Karar mektubunu e-posta/SMS ile gönderme (Notification + Outbox; UI şablonları hazır)
+- [x] Karar mektubunu e-posta ile gönderme (lab: `decision-letter` kuyruk + Seq log; UI şablonları / Outbox)
+- [ ] Karar mektubunu SMS ile gönderme
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

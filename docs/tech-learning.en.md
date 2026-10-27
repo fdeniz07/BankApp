@@ -135,7 +135,7 @@ Structured logs for local investigation; consistent API errors for the client.
 | Tech | Role in BankApp |
 |------|------------------|
 | **Redis** | Cache + idempotency store |
-| **RabbitMQ** | `email-confirmation`, `domain-events` |
+| **RabbitMQ** | `email-confirmation`, `domain-events`, `decision-letter` (lab decision email → Seq) |
 | **SignalR** | Hub `/hubs/credit-applications` after Outbox consume |
 | **OpenTelemetry** | OTLP traces + metrics → collector → Tempo / Prometheus / Grafana `:3001` |
 | **Vault (lab)** | Dev mode + `secret/bankapp` seed (WebApi not wired yet) |

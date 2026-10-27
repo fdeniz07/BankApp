@@ -79,7 +79,7 @@ Bu belge “ne kurduk?” listesi değil; her madde için **ne / neden burada / 
 ```text
 Handler → SaveChanges (aggregate + outbox satırı)
        → Dispatcher publish → RabbitMQ
-       → Consumer → Saga + SignalR
+       → Consumer → Saga + SignalR + decision-letter (lab)
 ```
 
 ### Saga / Process Manager
@@ -154,7 +154,11 @@ Cache (MediatR caching behaviors) + Idempotency store. Hızlı, TTL’li veri.
 
 ### RabbitMQ
 
-Kuyruklar: `email-confirmation`, `domain-events`. Async iş; API’yi yavaşlatmadan yan etki.
+Kuyruklar: `email-confirmation`, `domain-events`, `decision-letter`. Async iş; API’yi yavaşlatmadan yan etki.
+
+### Karar mektubu e-posta (lab)
+
+Onay/red sonrası müşteriye notes gövdesi: domain-events consumer → `IDecisionLetterPublisher` → `decision-letter` → Seq log (SMTP yok). Ayrıntı: [learning/22-decision-letter-email.tr.md](learning/22-decision-letter-email.tr.md).
 
 ### SignalR
 

@@ -1,6 +1,6 @@
 # 21 — GitHub Actions CI
 
-[← Önceki](20-pdf-export.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](20-pdf-export.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](22-decision-letter-email.tr.md)
 
 ## Bu nedir?
 
