@@ -30,14 +30,16 @@ Each chapter must stay beginner-friendly and include:
 2. **Bu projede ne işe yarar?** — BankApp role  
 3. **Ne zaman eklendi?** — Faz / approximate order  
 4. **Temel kavramlar** — vocabulary a junior needs  
-5. **Komutlar** — real CLI examples + what each flag/arg does  
+5. **Komutlar** — real CLI examples; **above/beside each block** explain what it does, what to verify afterward, and important flags  
 6. **Sınıflar, metotlar, paketler** — concrete names from this repo  
 7. **Repoda nerede?** — paths  
 8. **Mini akış** — short end-to-end story  
+9. **Where useful** — health checklist + lab “disaster / recovery” paths (least destructive first; mark `-v` / volume deletes clearly)
 
 ## Scope rules
 
 - Prefer depth for technologies **already used** in the repo; do not invent unused stacks.
+- Prefer annotated, copy-pasteable commands over bare lists; include common ops (ps, logs, recreate) and recovery when the chapter is infra/tooling.
 - Link to code with repo-relative paths; do not paste huge source dumps.
 - Turkish first. Mirror EN/DE only when the user asks.
 - Still obey approval-gates: propose doc file list before first creation of a **new** chapter file if the user’s request did not already approve the learning library work.
