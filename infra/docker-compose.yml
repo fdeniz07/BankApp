@@ -1,4 +1,4 @@
-# Full local stack: Seq + Redis + RabbitMQ + SQL + Vault + OTel (collector/Tempo/Prometheus/Grafana) + WebApi + Client
+# Full local stack: Seq + Redis (+ Insight UI) + RabbitMQ + SQL + Vault + OTel (collector/Tempo/Prometheus/Grafana) + WebApi + Client
 # SQL reuses existing Docker volume sqlserver-2025-data (same DB as former SQLServer2025).
 #
 # Usage (from repo root):
@@ -45,6 +45,21 @@ services:
       timeout: 3s
       retries: 8
       start_period: 10s
+    restart: unless-stopped
+
+  # Official Redis UI — http://localhost:5540 ; add DB host `redis` port 6379 (Compose DNS)
+  redis-insight:
+    image: redis/redisinsight:2.70
+    container_name: bankapp-redis-insight
+    ports:
+      - "${REDIS_INSIGHT_PORT:-5540}:5540"
+    volumes:
+      - redis-insight-data:/data
+    environment:
+      RI_ACCEPT_TERMS_AND_CONDITIONS: "true"
+    depends_on:
+      redis:
+        condition: service_healthy
     restart: unless-stopped
 
   rabbitmq:
@@ -263,6 +278,8 @@ volumes:
     name: bankapp-seq-data
   redis-data:
     name: bankapp-redis-data
+  redis-insight-data:
+    name: bankapp-redis-insight-data
   rabbitmq-data:
     name: bankapp-rabbitmq-data
   profile-uploads:
