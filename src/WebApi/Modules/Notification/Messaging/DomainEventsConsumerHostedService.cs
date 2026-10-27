@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Application.Modules.Credit.Sagas;
+using Application.Services.Messaging;
 using Application.Services.Repositories;
 using Domain.Entities;
 using Domain.Events;
@@ -133,6 +134,8 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
                 await notifier.NotifyAsync(realtime);
             }
 
+            await TryPublishDecisionLetterAsync(scope.ServiceProvider, type, payload);
+
             _channel!.BasicAck(ea.DeliveryTag, multiple: false);
         }
         catch (Exception ex)
@@ -189,6 +192,95 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             shortName,
             occurredOnUtc,
             amount);
+    }
+
+    private async Task TryPublishDecisionLetterAsync(
+        IServiceProvider services,
+        string eventType,
+        string payload)
+    {
+        string shortName = ShortEventName(eventType);
+        if (shortName is not (nameof(CreditApplicationApproved) or nameof(CreditApplicationRejected)))
+            return;
+
+        using JsonDocument doc = JsonDocument.Parse(payload);
+        JsonElement root = doc.RootElement;
+
+        if (!TryGetGuid(root, "creditApplicationId", out Guid applicationId)
+            || !TryGetGuid(root, "customerId", out Guid customerId))
+        {
+            _logger.LogWarning(
+                "Decision letter skipped: missing application/customer id. Type={EventType}",
+                shortName);
+            return;
+        }
+
+        string applicationNumber = root.TryGetProperty("applicationNumber", out JsonElement numberEl)
+            ? numberEl.GetString() ?? string.Empty
+            : string.Empty;
+
+        string? rejectionReason = root.TryGetProperty("rejectionReason", out JsonElement reasonEl)
+            ? reasonEl.GetString()
+            : null;
+
+        DateTimeOffset occurredOnUtc = DateTimeOffset.UtcNow;
+        if (root.TryGetProperty("occurredOnUtc", out JsonElement occurredEl)
+            && occurredEl.ValueKind == JsonValueKind.String
+            && DateTimeOffset.TryParse(occurredEl.GetString(), out DateTimeOffset parsed))
+        {
+            occurredOnUtc = parsed;
+        }
+
+        IApplicationUserRepository users = services.GetRequiredService<IApplicationUserRepository>();
+        ApplicationUser? user = await users.GetAsync(u => u.CustomerId == customerId);
+        if (user is null || string.IsNullOrWhiteSpace(user.Email))
+        {
+            _logger.LogWarning(
+                "Decision letter skipped: no customer email for CustomerId={CustomerId} Application={ApplicationNumber}",
+                customerId,
+                applicationNumber);
+            return;
+        }
+
+        ICreditApplicationRepository applications =
+            services.GetRequiredService<ICreditApplicationRepository>();
+        CreditApplication? application = await applications.GetAsync(a => a.Id == applicationId);
+        string? notes = application?.Notes;
+
+        bool approved = shortName == nameof(CreditApplicationApproved);
+        string decision = approved ? "Approved" : "Rejected";
+        string subject = approved
+            ? $"BankApp — Application {applicationNumber} approved"
+            : $"BankApp — Application {applicationNumber} rejected";
+
+        string body;
+        if (!string.IsNullOrWhiteSpace(notes))
+            body = notes.Trim();
+        else if (!approved && !string.IsNullOrWhiteSpace(rejectionReason))
+            body = $"Your credit application {applicationNumber} was rejected. Reason: {rejectionReason}";
+        else if (approved)
+            body = $"Your credit application {applicationNumber} was approved.";
+        else
+            body = $"Your credit application {applicationNumber} was rejected.";
+
+        string? customerName = FormatCustomerName(user.FirstName, user.LastName);
+
+        IDecisionLetterPublisher publisher = services.GetRequiredService<IDecisionLetterPublisher>();
+        await publisher.PublishAsync(
+            new DecisionLetterRequested(
+                user.Email,
+                customerName,
+                applicationNumber,
+                decision,
+                subject,
+                body,
+                occurredOnUtc));
+    }
+
+    private static string? FormatCustomerName(string? firstName, string? lastName)
+    {
+        string name = $"{firstName} {lastName}".Trim();
+        return string.IsNullOrWhiteSpace(name) ? null : name;
     }
 
     private static async Task<string?> ResolveCurrencyCodeAsync(
