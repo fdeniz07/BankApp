@@ -77,5 +77,5 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] Kredi başvurusunda evrak yükleme (kimlik, gelir bordrosu vb.; ileride zorunlu tutulabilir)
 - [ ] Şube / branch modeli + karar veren personelde şube bilgisi
 - [x] Karar mektubunu e-posta ile gönderme (lab: `decision-letter` kuyruk + Seq log; UI şablonları / Outbox)
-- [ ] Karar mektubunu SMS ile gönderme
+- [x] Karar mektubunu SMS ile gönderme (lab: `decision-letter-sms` kuyruk + Seq log; gateway yok)
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

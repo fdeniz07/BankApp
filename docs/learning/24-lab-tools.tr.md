@@ -1,6 +1,6 @@
 # 24 — Lab araçları (izleme ve inceleme)
 
-[← Önceki](23-rate-limiting.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](23-rate-limiting.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](25-decision-letter-sms.tr.md)
 
 İlgili: [07 Seq](07-serilog-seq.tr.md) · [08 Redis](08-redis.tr.md) · [09 Compose](09-docker-compose.tr.md) · [13 RabbitMQ](13-rabbitmq.tr.md) · [18 OTel/Grafana](18-otel-observability.tr.md) · [19 Vault](19-vault-lab.tr.md)
 
@@ -116,6 +116,7 @@ cd infra
 docker compose --env-file .env up -d rabbitmq
 docker compose --env-file .env exec rabbitmq rabbitmq-diagnostics -q ping
 # UI: Queues → Consumers ≥ 1, Ready birikmiyor olmalı
+# decision-letter + decision-letter-sms (onay/red lab)
 ```
 
 **Dikkat:** `guest` = lab. UI’dan Get message consumer’ı bozabilir.

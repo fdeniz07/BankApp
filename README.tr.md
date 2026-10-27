@@ -54,7 +54,7 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24 saat)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → karar → onboarding stub’ları)
 - **SignalR** (`/hubs/credit-applications`; staff + müşteri grupları; Outbox consumer sonrası yayın)
-- **Karar mektubu e-posta (lab)** — onay/red sonrası kuyruk `decision-letter` → Seq/log (SMTP yok; SMS ileride)
+- **Karar mektubu e-posta / SMS (lab)** — onay/red sonrası `decision-letter` + `decision-letter-sms` → Seq/log (SMTP/SMS gateway yok)
 - **Rate limiting** — `auth` / `write` / `fixed` politikaları (429); health + SignalR muaf
 - **Vault lab** — JWT `SecurityKey` `secret/bankapp` overlay (Compose); env fallback
 - Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
@@ -137,7 +137,7 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 
 <img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana ek metrikler" width="720" />
 
-**RabbitMQ** — E-posta onay, domain-events (Outbox) ve decision-letter (lab) kuyrukları.
+**RabbitMQ** — E-posta onay, domain-events (Outbox), decision-letter ve decision-letter-sms (lab) kuyrukları.
 
 <img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ kuyrukları" width="720" />
 
@@ -156,7 +156,7 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 | Domain | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**isim**) |
 | DB / önbellek / log | SQL Server, Redis, Serilog + Seq |
 | Observability | OpenTelemetry (OTLP) → collector → Tempo + Prometheus + Grafana `:3001` |
-| Messaging | RabbitMQ (`email-confirmation`, `domain-events`, `decision-letter`) + Outbox |
+| Messaging | RabbitMQ (`email-confirmation`, `domain-events`, `decision-letter`, `decision-letter-sms`) + Outbox |
 | Idempotency | Header `Idempotency-Key` + Redis (kredi yazma API’leri, 24 saat) |
 | Saga | `CreditApplicationProcessManager` + tablo `CreditApplicationSagas` |
 | Realtime | SignalR hub `/hubs/credit-applications` (JWT `access_token`) |

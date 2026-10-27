@@ -54,7 +54,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → Entscheidung → Onboarding-Stubs)
 - **SignalR** (`/hubs/credit-applications`; Staff- + Kundengruppen; Publish nach Outbox-Consumer)
-- **Entscheidungsbrief-E-Mail (Lab)** — nach Genehmigung/Ablehnung Queue `decision-letter` → Seq/Log (kein SMTP; SMS später)
+- **Entscheidungsbrief E-Mail / SMS (Lab)** — nach Genehmigung/Ablehnung Queues `decision-letter` + `decision-letter-sms` → Seq/Log (kein SMTP/SMS-Gateway)
 - **Rate limiting** — Policies `auth` / `write` / `fixed` (429); Health + SignalR ausgenommen
 - **Vault-Lab** — JWT-`SecurityKey`-Overlay aus `secret/bankapp` (Compose); Env-Fallback
 - Zahlungsplan (Amortisation) mit **erweiterbarem Export** (`payment-plan/export?format=pdf`; später CSV/XLSX) und Druck
@@ -137,7 +137,7 @@ Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/
 
 <img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana weitere Metriken" width="720" />
 
-**RabbitMQ** — Queues für E-Mail-Bestätigung, Domain-Events (Outbox) und decision-letter (Lab).
+**RabbitMQ** — Queues für E-Mail-Bestätigung, Domain-Events (Outbox), decision-letter und decision-letter-sms (Lab).
 
 <img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ-Queues" width="720" />
 
@@ -156,7 +156,7 @@ Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/
 | Domain | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**Name**) |
 | DB / Cache / Logs | SQL Server, Redis, Serilog + Seq |
 | Observability | OpenTelemetry (OTLP) → Collector → Tempo + Prometheus + Grafana `:3001` |
-| Messaging | RabbitMQ (`email-confirmation`, `domain-events`, `decision-letter`) + Outbox |
+| Messaging | RabbitMQ (`email-confirmation`, `domain-events`, `decision-letter`, `decision-letter-sms`) + Outbox |
 | Idempotency | Header `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
 | Saga | `CreditApplicationProcessManager` + Tabelle `CreditApplicationSagas` |
 | Realtime | SignalR-Hub `/hubs/credit-applications` (JWT `access_token`) |

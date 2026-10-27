@@ -54,7 +54,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - **Idempotency-Key** (create / approve / reject / cancel; Redis, 24h)
 - **Saga / Process Manager** (`CreditApplicationSagas`; Created → decision → onboarding stubs)
 - **SignalR** (`/hubs/credit-applications`; staff + customer groups; publish after Outbox consumer)
-- **Decision letter email (lab)** — after approve/reject, queue `decision-letter` → Seq/log (no SMTP; SMS later)
+- **Decision letter email / SMS (lab)** — after approve/reject, queues `decision-letter` + `decision-letter-sms` → Seq/log (no SMTP/SMS gateway)
 - **Rate limiting** — policies `auth` / `write` / `fixed` (429); health + SignalR exempt
 - **Vault lab** — JWT `SecurityKey` overlay from `secret/bankapp` (Compose); env fallback
 - Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
@@ -137,7 +137,7 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 
 <img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana additional metrics" width="720" />
 
-**RabbitMQ** — Queues for email confirmation, domain-events (Outbox consumer), and decision-letter (lab).
+**RabbitMQ** — Queues for email confirmation, domain-events (Outbox consumer), decision-letter and decision-letter-sms (lab).
 
 <img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ queues" width="720" />
 
@@ -155,7 +155,7 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 | Domain            | AggregateRoot, Domain Events (`CreditApplication*`), Ardalis SmartEnum (**name**) |
 | DB / cache / logs | SQL Server, Redis, Serilog + Seq                                                  |
 | Observability     | OpenTelemetry (OTLP) → collector → Tempo + Prometheus + Grafana `:3001`           |
-| Messaging         | RabbitMQ (`email-confirmation`, `domain-events`, `decision-letter`) + Outbox      |
+| Messaging         | RabbitMQ (`email-confirmation`, `domain-events`, `decision-letter`, `decision-letter-sms`) + Outbox |
 | Idempotency       | Header `Idempotency-Key` + Redis (credit write APIs, 24h)                         |
 | Saga              | `CreditApplicationProcessManager` + table `CreditApplicationSagas`                |
 | Realtime          | SignalR hub `/hubs/credit-applications` (JWT `access_token`)                      |

@@ -1,6 +1,8 @@
 # 22 — Karar mektubu e-posta (lab)
 
-[← Önceki](21-ci-github-actions.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](21-ci-github-actions.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](25-decision-letter-sms.tr.md)
+
+İlgili: [25 SMS lab](25-decision-letter-sms.tr.md)
 
 ## Bu nedir?
 
@@ -15,7 +17,7 @@ BankApp lab’inde gerçek SMTP yok: mesaj **RabbitMQ** kuyruğuna yazılır, co
 
 ## Ne zaman eklendi?
 
-Roadmap “İleride” maddesi — e-posta lab dilimi (SMS yok).
+Roadmap “İleride” maddesi — e-posta lab dilimi; SMS ayrı bölümde ([25](25-decision-letter-sms.tr.md)).
 
 ## Temel kavramlar
 

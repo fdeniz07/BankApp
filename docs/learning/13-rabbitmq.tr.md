@@ -15,7 +15,8 @@ HTTP isteğini yavaş işlerden (e-posta simülasyonu, event yayını) ayırır.
 |--------------|-----------|
 | `email-confirmation` | Kayıt sonrası e-posta doğrulama (JWT hemen yok) |
 | `domain-events` | Outbox → Saga + SignalR |
-| `decision-letter` | Onay/red sonrası karar mektubu (Seq’e log; SMTP yok) |
+| `decision-letter` | Onay/red sonrası karar mektubu e-posta (Seq’e log; SMTP yok) |
+| `decision-letter-sms` | Onay/red sonrası SMS lab (Seq’e log; gateway yok) |
 
 ## Ne zaman eklendi?
 
@@ -55,7 +56,7 @@ docker compose --env-file .env logs --tail=100 webapi
 **Management UI — ne bakılır?**
 
 1. Login: `guest` / `guest`.
-2. **Queues** — `email-confirmation`, `domain-events`, `decision-letter` (isimler seed/kod ile uyumlu olmalı).
+2. **Queues** — `email-confirmation`, `domain-events`, `decision-letter`, `decision-letter-sms` (isimler kod ile uyumlu olmalı).
 3. Her kuyrukta:
    - **Consumers** ≥ 1 → WebApi hosted service bağlı
    - **Ready** büyüyorsa → consumer yok / yavaş / hata (Seq + `logs webapi`)
