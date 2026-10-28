@@ -313,7 +313,20 @@
     "confirmReject": "Diesen Antrag ablehnen?",
     "approveSuccess": "Antrag genehmigt.",
     "rejectSuccess": "Antrag abgelehnt.",
-    "onlyPending": "Nur ausstehende Anträge können entschieden werden."
+    "onlyPending": "Nur ausstehende Anträge können entschieden werden.",
+    "documentsTitle": "Unterlagen",
+    "documentsHint": "PDF, JPEG oder PNG; max. 5 MB. Nur bei ausstehendem Antrag (Lab; noch nicht Pflicht).",
+    "documentsEmpty": "Noch keine Unterlagen.",
+    "documentType": "Typ",
+    "documentFile": "Datei",
+    "documentUpload": "Hochladen",
+    "documentDownload": "Herunterladen",
+    "documentUploadSuccess": "Unterlage hochgeladen.",
+    "documentTypes": {
+      "IdentityDocument": "Ausweis",
+      "IncomeProof": "Einkommensnachweis",
+      "Other": "Sonstiges"
+    }
   },
   "creditTypes": {
     "title": "Kreditarten",
@@ -385,6 +398,14 @@
     "avatarTooLarge": "Profilbild darf höchstens 2 MB groß sein.",
     "avatarInvalidType": "Profilbild muss JPEG, PNG oder WebP sein.",
     "avatarInvalidContent": "Profilbild-Inhalt ist ungültig.",
+    "documentRequired": "Unterlagen-Datei ist erforderlich.",
+    "documentTooLarge": "Unterlage darf höchstens 5 MB groß sein.",
+    "documentInvalidType": "Unterlage muss PDF, JPEG oder PNG sein.",
+    "documentInvalidContent": "Dateiinhalt entspricht nicht dem angegebenen Typ.",
+    "documentTypeInvalid": "Unterlagen-Typ ist ungültig.",
+    "documentOnlyPending": "Unterlagen können nur bei ausstehendem Antrag hochgeladen werden.",
+    "documentMaxExceeded": "Höchstens 10 Unterlagen pro Antrag.",
+    "documentNotFound": "Unterlage nicht gefunden.",
     "unauthorized": "Ihre Sitzung ist abgelaufen. Bitte erneut anmelden."
   }
 }

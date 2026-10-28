@@ -313,7 +313,20 @@
     "confirmReject": "Bu başvuruyu reddetmek istiyor musunuz?",
     "approveSuccess": "Başvuru onaylandı.",
     "rejectSuccess": "Başvuru reddedildi.",
-    "onlyPending": "Yalnızca beklemedeki başvurular karara bağlanabilir."
+    "onlyPending": "Yalnızca beklemedeki başvurular karara bağlanabilir.",
+    "documentsTitle": "Evraklar",
+    "documentsHint": "PDF, JPEG veya PNG; en fazla 5 MB. Yalnızca beklemedeki başvuruya yüklenebilir (lab; henüz zorunlu değil).",
+    "documentsEmpty": "Henüz evrak yok.",
+    "documentType": "Tür",
+    "documentFile": "Dosya",
+    "documentUpload": "Yükle",
+    "documentDownload": "İndir",
+    "documentUploadSuccess": "Evrak yüklendi.",
+    "documentTypes": {
+      "IdentityDocument": "Kimlik",
+      "IncomeProof": "Gelir belgesi",
+      "Other": "Diğer"
+    }
   },
   "creditTypes": {
     "title": "Kredi Türleri",
@@ -385,6 +398,14 @@
     "avatarTooLarge": "Profil görseli en fazla 2 MB olabilir.",
     "avatarInvalidType": "Profil görseli JPEG, PNG veya WebP olmalıdır.",
     "avatarInvalidContent": "Profil görseli içeriği geçersiz.",
+    "documentRequired": "Evrak dosyası zorunludur.",
+    "documentTooLarge": "Evrak en fazla 5 MB olabilir.",
+    "documentInvalidType": "Evrak PDF, JPEG veya PNG olmalıdır.",
+    "documentInvalidContent": "Evrak içeriği beyan edilen türe uymuyor.",
+    "documentTypeInvalid": "Evrak türü geçersiz.",
+    "documentOnlyPending": "Evrak yalnızca beklemedeki başvuruya yüklenebilir.",
+    "documentMaxExceeded": "Başvuru başına en fazla 10 evrak yüklenebilir.",
+    "documentNotFound": "Evrak bulunamadı.",
     "unauthorized": "Oturum süreniz doldu. Lütfen yeniden giriş yapın."
   }
 }

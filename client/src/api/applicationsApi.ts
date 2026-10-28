@@ -3,13 +3,16 @@ import type {
   ApproveRequest,
   CreateApplicationRequest,
   CreditApplicationDetail,
+  CreditApplicationDocumentItem,
   CreditApplicationListItem,
   CreditApplicationStatus,
+  CreditDocumentType,
   GetListResponse,
   PaymentPlanResponse,
   RejectRequest,
+  UploadCreditApplicationDocumentResponse,
 } from '../types/api'
-import { apiDownload, apiRequest, type DownloadedFile } from './client'
+import { apiDownload, apiRequest, apiUpload, type DownloadedFile } from './client'
 
 /** Extensible export formats — backend registers exporters per value. */
 export type PaymentPlanExportFormat = 'pdf'
@@ -123,4 +126,28 @@ export function rejectApplication(id: string, body: RejectRequest, idempotencyKe
     body: JSON.stringify(body),
     headers: withIdempotencyKey(idempotencyKey),
   })
+}
+
+export function getApplicationDocuments(applicationId: string) {
+  return apiRequest<CreditApplicationDocumentItem[]>(
+    `/api/CreditApplications/${applicationId}/documents`,
+  )
+}
+
+export function uploadApplicationDocument(
+  applicationId: string,
+  documentType: CreditDocumentType,
+  file: File,
+) {
+  const form = new FormData()
+  form.append('documentType', documentType)
+  form.append('file', file)
+  return apiUpload<UploadCreditApplicationDocumentResponse>(
+    `/api/CreditApplications/${applicationId}/documents`,
+    form,
+  )
+}
+
+export function downloadApplicationDocument(applicationId: string, documentId: string) {
+  return apiDownload(`/api/CreditApplications/${applicationId}/documents/${documentId}/download`)
 }

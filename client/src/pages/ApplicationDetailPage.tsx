@@ -3,14 +3,23 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   approveApplication,
+  downloadApplicationDocument,
   exportPaymentPlan,
   getApplicationById,
+  getApplicationDocuments,
   getPaymentPlan,
   rejectApplication,
+  uploadApplicationDocument,
 } from '../api/applicationsApi'
 import { getCreditSubTypes } from '../api/creditSubTypesApi'
 import { useAuth } from '../auth/AuthContext'
-import type { CreditApplicationDetail, CreditSubTypeListItem, PaymentPlanResponse } from '../types/api'
+import type {
+  CreditApplicationDetail,
+  CreditApplicationDocumentItem,
+  CreditDocumentType,
+  CreditSubTypeListItem,
+  PaymentPlanResponse,
+} from '../types/api'
 import { ApiError } from '../api/client'
 import {
   CREDIT_APPLICATION_CHANGED_EVENT,
@@ -19,6 +28,7 @@ import {
 import { fillDecisionTemplate } from '../utils/decisionMessage'
 import { printDownloadedFile, saveDownloadedFile } from '../utils/downloadFile'
 import { currencySymbol, formatMoney } from '../utils/formatMoney'
+import { mapApiError } from '../utils/mapApiError'
 
 export function ApplicationDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -40,6 +50,15 @@ export function ApplicationDetailPage() {
   const [approveMessage, setApproveMessage] = useState('')
   const [rejectMessage, setRejectMessage] = useState('')
   const [rejectionReason, setRejectionReason] = useState('')
+  const [documents, setDocuments] = useState<CreditApplicationDocumentItem[]>([])
+  const [documentType, setDocumentType] = useState<CreditDocumentType>('IdentityDocument')
+  const [documentFile, setDocumentFile] = useState<File | null>(null)
+  const [documentBusy, setDocumentBusy] = useState(false)
+
+  async function loadDocuments(applicationId: string) {
+    const list = await getApplicationDocuments(applicationId)
+    setDocuments(list)
+  }
 
   async function load() {
     if (!id) return
@@ -48,6 +67,7 @@ export function ApplicationDetailPage() {
     try {
       const data = await getApplicationById(id)
       setItem(data)
+      await loadDocuments(data.id)
       setApprovedAmount(String(data.requestedAmount))
       setApprovedTerm(String(data.requestedTermMonths))
       setInterestRate(String(data.approvedInterestRate ?? 1.75))
@@ -215,6 +235,36 @@ export function ApplicationDetailPage() {
       cancelled = true
     }
   }, [item, planAmount, planTerm, planRate])
+
+  async function onUploadDocument() {
+    if (!id || !documentFile) return
+    setDocumentBusy(true)
+    setMessage(null)
+    setError(null)
+    try {
+      await uploadApplicationDocument(id, documentType, documentFile)
+      setDocumentFile(null)
+      setMessage(t('applications.documentUploadSuccess'))
+      await loadDocuments(id)
+    } catch (err) {
+      setError(mapApiError(err, t))
+    } finally {
+      setDocumentBusy(false)
+    }
+  }
+
+  async function onDownloadDocument(documentId: string) {
+    if (!id) return
+    setDocumentBusy(true)
+    setError(null)
+    try {
+      saveDownloadedFile(await downloadApplicationDocument(id, documentId))
+    } catch (err) {
+      setError(mapApiError(err, t))
+    } finally {
+      setDocumentBusy(false)
+    }
+  }
 
   async function onApprove(e: FormEvent) {
     e.preventDefault()
@@ -407,6 +457,76 @@ export function ApplicationDetailPage() {
           <dd className="customer-message-preview">{item.notes ?? '—'}</dd>
         </div>
       </dl>
+
+      <section className="panel documents-panel">
+        <h2>{t('applications.documentsTitle')}</h2>
+        <p className="muted">{t('applications.documentsHint')}</p>
+
+        {item.status === 'Pending' && (
+          <form
+            className="documents-upload"
+            onSubmit={(e) => {
+              e.preventDefault()
+              void onUploadDocument()
+            }}
+          >
+            <label>
+              {t('applications.documentType')}
+              <select
+                value={documentType}
+                onChange={(e) => setDocumentType(e.target.value as CreditDocumentType)}
+                disabled={documentBusy}
+              >
+                <option value="IdentityDocument">
+                  {t('applications.documentTypes.IdentityDocument')}
+                </option>
+                <option value="IncomeProof">{t('applications.documentTypes.IncomeProof')}</option>
+                <option value="Other">{t('applications.documentTypes.Other')}</option>
+              </select>
+            </label>
+            <label>
+              {t('applications.documentFile')}
+              <input
+                type="file"
+                accept=".pdf,image/jpeg,image/png,application/pdf"
+                disabled={documentBusy}
+                onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)}
+              />
+            </label>
+            <button type="submit" className="btn" disabled={documentBusy || !documentFile}>
+              {documentBusy ? t('common.loading') : t('applications.documentUpload')}
+            </button>
+          </form>
+        )}
+
+        {documents.length === 0 ? (
+          <p className="muted">{t('applications.documentsEmpty')}</p>
+        ) : (
+          <ul className="documents-list">
+            {documents.map((doc) => (
+              <li key={doc.id}>
+                <span>
+                  {t(`applications.documentTypes.${doc.documentType}`, {
+                    defaultValue: doc.documentType,
+                  })}
+                  {' · '}
+                  {doc.originalFileName}
+                  {' · '}
+                  {(doc.sizeBytes / 1024).toFixed(0)} KB
+                </span>
+                <button
+                  type="button"
+                  className="btn ghost"
+                  disabled={documentBusy}
+                  onClick={() => void onDownloadDocument(doc.id)}
+                >
+                  {t('applications.documentDownload')}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       {paymentPlan && paymentPlan.installments.length > 0 && (
         <div className="payment-plan panel">

@@ -313,7 +313,20 @@
     "confirmReject": "Reject this application?",
     "approveSuccess": "Application approved.",
     "rejectSuccess": "Application rejected.",
-    "onlyPending": "Only pending applications can be decided."
+    "onlyPending": "Only pending applications can be decided.",
+    "documentsTitle": "Documents",
+    "documentsHint": "PDF, JPEG, or PNG; max 5 MB. Upload only while Pending (lab; not required yet).",
+    "documentsEmpty": "No documents yet.",
+    "documentType": "Type",
+    "documentFile": "File",
+    "documentUpload": "Upload",
+    "documentDownload": "Download",
+    "documentUploadSuccess": "Document uploaded.",
+    "documentTypes": {
+      "IdentityDocument": "Identity",
+      "IncomeProof": "Income proof",
+      "Other": "Other"
+    }
   },
   "creditTypes": {
     "title": "Credit Types",
@@ -385,6 +398,14 @@
     "avatarTooLarge": "Profile image must be at most 2 MB.",
     "avatarInvalidType": "Profile image must be JPEG, PNG, or WebP.",
     "avatarInvalidContent": "Profile image content is invalid.",
+    "documentRequired": "Document file is required.",
+    "documentTooLarge": "Document must be at most 5 MB.",
+    "documentInvalidType": "Document must be PDF, JPEG, or PNG.",
+    "documentInvalidContent": "Document content does not match the declared type.",
+    "documentTypeInvalid": "Document type is invalid.",
+    "documentOnlyPending": "Documents can only be uploaded while the application is Pending.",
+    "documentMaxExceeded": "At most 10 documents are allowed per application.",
+    "documentNotFound": "Document not found.",
     "unauthorized": "Your session expired. Please sign in again."
   }
 }

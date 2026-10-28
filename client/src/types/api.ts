@@ -369,6 +369,27 @@ export interface UploadProfileImageResponse {
   profileImageUrl: string
 }
 
+export type CreditDocumentType = 'IdentityDocument' | 'IncomeProof' | 'Other'
+
+export interface CreditApplicationDocumentItem {
+  id: string
+  documentType: CreditDocumentType | string
+  originalFileName: string
+  contentType: string
+  sizeBytes: number
+  uploadedAt: string
+}
+
+export interface UploadCreditApplicationDocumentResponse {
+  id: string
+  creditApplicationId: string
+  documentType: string
+  originalFileName: string
+  contentType: string
+  sizeBytes: number
+  uploadedAt: string
+}
+
 export interface ApproveRequest {
   approvedAmount: number
   approvedTermMonths: number
