@@ -59,3 +59,4 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
 - [x] OpenTelemetry + Grafana / Prometheus (OTLP → collector → Tempo/Prometheus/Grafana)
 - [x] Rate limit ortam ayrımı (sıkı base + Development lab) + Vault rotasyon/Raft notları
+- [x] Başvuru evrak yükleme lab (App_Data + documents API; henüz zorunlu değil)

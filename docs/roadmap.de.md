@@ -75,7 +75,7 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [ ] Raft-Vault / Secret-Rotation (Produktion; jenseits Compose-Dev-Mode — Learning 19)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung
-- [ ] Dokumenten-Upload beim Kreditantrag (Ausweis, Gehaltsabrechnung usw.; später ggf. Pflicht)
+- [x] Dokumenten-Upload beim Kreditantrag (Lab: PDF/JPEG/PNG, App_Data; noch nicht Pflicht für Genehmigung)
 - [x] Entscheidungsbriefe per E-Mail senden (Lab: Queue `decision-letter` + Seq-Log; UI-Vorlagen / Outbox)
 - [ ] Entscheidungsbriefe per SMS senden
 - [ ] Filial-/Branch-Modell + Entscheider-Filiale beim Kreditantrag

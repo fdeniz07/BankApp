@@ -57,6 +57,7 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - **Karar mektubu e-posta / SMS (lab)** — onay/red sonrası `decision-letter` + `decision-letter-sms` → Seq/log (SMTP/SMS gateway yok)
 - **Rate limiting** — `auth` / `write` / `fixed` politikaları (429); health + SignalR muaf
 - **Vault lab** — JWT `SecurityKey` `secret/bankapp` overlay (Compose); env fallback
+- Başvuru **evrak yükleme** (lab: kimlik / gelir / diğer; PDF/JPEG/PNG ≤5 MB; App_Data; onay için henüz zorunlu değil)
 - Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
 - Dashboard özeti, personel yönetimi, profil + avatar (≤ 2 MB)
 - Kredi tipi oluşturma / güncelleme / silme / aktif-pasif (**BankManager**)
@@ -70,6 +71,7 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - Datenschutz / çerez bandı; dil seçici TR / EN / DE
 - Kredi yazma isteklerinde `Idempotency-Key` (UUID)
 - SignalR: başvuru durumu toast (olaya göre success / error / warning) + liste/detay yenileme
+- Başvuru detayı: evrak yükleme / liste / indirme (Pending)
 - Ödeme planı: açılır taksit listesi, **PDF indir** ve **yazdır** (müşteri + personel)
 - Personel karar formları: yenilenebilir onay/red mesaj şablonları
 

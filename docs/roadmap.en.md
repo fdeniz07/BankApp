@@ -75,7 +75,7 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [ ] Raft Vault / secret rotation (production; beyond Compose dev-mode — see learning 19)
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support
-- [ ] Credit application document upload (ID, payslip, etc.; may become mandatory later)
+- [x] Credit application document upload (lab: PDF/JPEG/PNG, App_Data; not mandatory for approval yet)
 - [x] Send decision letters by email (lab: `decision-letter` queue + Seq log; UI templates / Outbox)
 - [ ] Send decision letters by SMS
 - [ ] Branch model + decision-maker branch on credit applications

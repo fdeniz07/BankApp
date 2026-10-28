@@ -2,6 +2,13 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-28 — Başvuru evrak yükleme (lab)
+
+- `CreditApplicationDocuments` + disk `App_Data/credit-documents` (wwwroot değil; JWT ile download).
+- API: `GET/POST …/documents`, `GET …/documents/{id}/download`; Pending + ≤5 MB PDF/JPEG/PNG; max 10.
+- React başvuru detayı: yükleme formu + liste; Compose volume `credit-document-uploads`.
+- Learning: `26-credit-application-documents.tr.md`.
+
 ## 2026-10-28 — Güvenlik sertleştirme lab (rate limit ortamı)
 
 - `appsettings.json`: sıkı prod-benzeri limitler (Auth 10 / Write 30 / Fixed 60 per 60s).

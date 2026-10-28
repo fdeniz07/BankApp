@@ -75,7 +75,7 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] Raft Vault / secret rotasyonu (üretim; Compose dev-mode dışı — learning 19 notu)
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
-- [ ] Kredi başvurusunda evrak yükleme (kimlik, gelir bordrosu vb.; ileride zorunlu tutulabilir)
+- [x] Kredi başvurusunda evrak yükleme (lab: PDF/JPEG/PNG, App_Data; henüz onay için zorunlu değil)
 - [ ] Şube / branch modeli + karar veren personelde şube bilgisi
 - [x] Karar mektubunu e-posta ile gönderme (lab: `decision-letter` kuyruk + Seq log; UI şablonları / Outbox)
 - [x] Karar mektubunu SMS ile gönderme (lab: `decision-letter-sms` kuyruk + Seq log; gateway yok)

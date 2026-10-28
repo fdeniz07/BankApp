@@ -57,6 +57,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - **Entscheidungsbrief E-Mail / SMS (Lab)** — nach Genehmigung/Ablehnung Queues `decision-letter` + `decision-letter-sms` → Seq/Log (kein SMTP/SMS-Gateway)
 - **Rate limiting** — Policies `auth` / `write` / `fixed` (429); Health + SignalR ausgenommen
 - **Vault-Lab** — JWT-`SecurityKey`-Overlay aus `secret/bankapp` (Compose); Env-Fallback
+- Antrags-**Dokumenten-Upload** (Lab: Ausweis / Einkommen / Sonstiges; PDF/JPEG/PNG ≤5 MB; App_Data; noch nicht Pflicht)
 - Zahlungsplan (Amortisation) mit **erweiterbarem Export** (`payment-plan/export?format=pdf`; später CSV/XLSX) und Druck
 - Dashboard-Summary, Personalverwaltung, Profil + Avatar (≤ 2 MB)
 - Kreditarten anlegen / ändern / löschen / aktiv-passiv (**BankManager**)
@@ -70,6 +71,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - Datenschutz- / Cookie-Banner; Sprachumschalter TR / EN / DE
 - `Idempotency-Key` (UUID) bei Kredit-Schreibanfragen
 - SignalR: Antragsstatus-Toast (success / error / warning je Event) + Listen-/Detail-Refresh
+- Antragsdetail: Dokument hochladen / Liste / Download (Pending)
 - Zahlungsplan: einklappbare Ratenliste, **PDF-Download** und **Drucken** (Kunde + Personal)
 - Entscheidungsformulare: neu ladbare Genehmigungs-/Ablehnungsvorlagen
 

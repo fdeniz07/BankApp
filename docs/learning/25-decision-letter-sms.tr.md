@@ -1,6 +1,6 @@
 # 25 — Karar mektubu SMS (lab)
 
-[← Önceki](24-lab-tools.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](24-lab-tools.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](26-credit-application-documents.tr.md)
 
 İlgili: [22 E-posta lab](22-decision-letter-email.tr.md) · [13 RabbitMQ](13-rabbitmq.tr.md) · [07 Seq](07-serilog-seq.tr.md)
 

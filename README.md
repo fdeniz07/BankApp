@@ -57,6 +57,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - **Decision letter email / SMS (lab)** — after approve/reject, queues `decision-letter` + `decision-letter-sms` → Seq/log (no SMTP/SMS gateway)
 - **Rate limiting** — policies `auth` / `write` / `fixed` (429); health + SignalR exempt
 - **Vault lab** — JWT `SecurityKey` overlay from `secret/bankapp` (Compose); env fallback
+- Application **document upload** (lab: identity / income / other; PDF/JPEG/PNG ≤5 MB; App_Data; not required for approval yet)
 - Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
 - Dashboard summary, staff user management, profile + avatar (≤ 2 MB)
 - Credit type create / update / delete / activate-deactivate (**BankManager**)
@@ -70,6 +71,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - Privacy / cookie banner; locale switcher TR / EN / DE
 - Idempotency-Key (UUID) on credit write requests
 - SignalR: application-status toast (success / error / warning by event) + list/detail refresh
+- Application detail: document upload / list / download (Pending)
 - Payment plan: collapsible installment table, **PDF download** and **print** (customer + staff)
 - Staff decision forms: reloadable approve/reject message templates
 

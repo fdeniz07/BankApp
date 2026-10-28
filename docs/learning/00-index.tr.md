@@ -56,6 +56,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Security | Rate limiting (auth / write / fixed; ortam ayrımı) | [23](23-rate-limiting.tr.md) |
 | Lab / DX | İzleme araçları (Scalar, Seq, Insight, Grafana…) | [24](24-lab-tools.tr.md) |
 | Notification | Karar mektubu SMS (lab) | [25](25-decision-letter-sms.tr.md) |
+| Credit / UX | Başvuru evrak yükleme (lab) | [26](26-credit-application-documents.tr.md) |
 
 Kitaplık güncelleme günlüğü: [99-changelog-learning.tr.md](99-changelog-learning.tr.md)
 

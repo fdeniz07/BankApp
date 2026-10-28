@@ -2,6 +2,13 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-28 — Credit application document upload (lab)
+
+- `CreditApplicationDocuments` + disk `App_Data/credit-documents` (not wwwroot; JWT download).
+- API: `GET/POST …/documents`, `GET …/documents/{id}/download`; Pending + ≤5 MB PDF/JPEG/PNG; max 10.
+- React application detail: upload form + list; Compose volume `credit-document-uploads`.
+- Learning: `26-credit-application-documents.tr.md`.
+
 ## 2026-10-28 — Security hardening lab (rate-limit environments)
 
 - `appsettings.json`: stricter prod-like limits (Auth 10 / Write 30 / Fixed 60 per 60s).
