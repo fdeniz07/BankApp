@@ -2,6 +2,13 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-28 — Sicherheits-Härtungs-Lab (Rate-Limit-Umgebungen)
+
+- `appsettings.json`: strengere prod-ähnliche Limits (Auth 10 / Write 30 / Fixed 60 pro 60s).
+- `appsettings.Development.json`: lockere Lab-Limits (20 / 60 / 100) — Compose Standard: Development.
+- Learning: `23-rate-limiting` Umgebungstabelle + Checklist; `19-vault-lab` Rotation / Raft „später“.
+- Raft-Vault und produktive Secret-Rotation bleiben eigener Slice.
+
 ## 2026-10-25 — Zahlungsplan-PDF / Druck + Toast-Farben
 
 - `GET /api/CreditApplications/payment-plan/export?format=pdf` (austauschbare Exporter; CSV/XLSX vorbereitet).

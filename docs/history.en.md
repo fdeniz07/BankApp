@@ -58,3 +58,4 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] SignalR notifications (Outbox → hub; before Modular)
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
 - [x] OpenTelemetry + Grafana / Prometheus (OTLP → collector → Tempo/Prometheus/Grafana)
+- [x] Rate-limit environment split (strict base + Development lab) + Vault rotation/Raft notes

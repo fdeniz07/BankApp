@@ -53,7 +53,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | UX | QuestPDF / ödeme planı export | [20](20-pdf-export.tr.md) |
 | DevOps | GitHub Actions CI | [21](21-ci-github-actions.tr.md) |
 | Notification | Karar mektubu e-posta (lab) | [22](22-decision-letter-email.tr.md) |
-| Security | Rate limiting (auth / write / fixed) | [23](23-rate-limiting.tr.md) |
+| Security | Rate limiting (auth / write / fixed; ortam ayrımı) | [23](23-rate-limiting.tr.md) |
 | Lab / DX | İzleme araçları (Scalar, Seq, Insight, Grafana…) | [24](24-lab-tools.tr.md) |
 | Notification | Karar mektubu SMS (lab) | [25](25-decision-letter-sms.tr.md) |
 

@@ -58,3 +58,4 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] SignalR bildirimleri (Outbox → hub; Modular’dan önce)
 - [x] Modular Monolith (Identity / Customers / Credit / Notification)
 - [x] OpenTelemetry + Grafana / Prometheus (OTLP → collector → Tempo/Prometheus/Grafana)
+- [x] Rate limit ortam ayrımı (sıkı base + Development lab) + Vault rotasyon/Raft notları

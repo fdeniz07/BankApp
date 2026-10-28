@@ -107,6 +107,7 @@ Başvuru **evrak yükleme** (kimlik, bordro vb.): roadmap İleride; şimdilik zo
 6. OpenTelemetry + Grafana / Prometheus — **uygulandı** (2026-10-25): WebApi OTLP → collector → Tempo (trace) + Prometheus (metrik) + Grafana `:3001`; Seq log kalır; `TraceId`/`SpanId` enricher
 7. Karar mektubu e-posta (lab) — **uygulandı** (2026-10-27): onay/red → `decision-letter` kuyruk + Seq log; SMS yok
 8. Rate limit auth/write/fixed + Vault JWT overlay — **uygulandı** (2026-10-27)
+9. Rate limit ortam ayrımı (sıkı base / gevşek Development) + Vault rotasyon/Raft notu — **uygulandı** (2026-10-28); Raft cluster hâlâ sonra
 
 ```mermaid
 flowchart LR
@@ -152,4 +153,4 @@ Daha geniş eğitim sırası: Outbox → SignalR → OTel → Decision letter �
 
 ## Tekrar bakılacak
 
-Faz 6 ana dilimler + OTel tamam. İsteğe bağlı sonraki: **Keycloak**, Elasticsearch, **Vault → WebApi** (İleride listesi).
+Faz 6 ana dilimler + OTel + rate-limit ortam ayrımı tamam. İsteğe bağlı sonraki: **Keycloak**, Elasticsearch, **Raft Vault / secret rotasyonu** (İleride listesi).

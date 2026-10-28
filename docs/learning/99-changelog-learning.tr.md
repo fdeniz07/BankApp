@@ -13,3 +13,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-10-27 | `09` Compose: açıklamalı komutlar, sağlık checklist, felaket/kurtarma; kural: annotated Komutlar |
 | 2026-10-27 | `07` Seq, `13` RabbitMQ, `19` Vault: açıklamalı komut + checklist + kurtarma; `24` çapraz link |
 | 2026-10-27 | `25-decision-letter-sms.tr.md` — onay/red SMS lab (`decision-letter-sms` → Seq) |
+| 2026-10-28 | `23-rate-limiting`: ortam ayrımı (prod-benzeri vs Development) + checklist; `19-vault-lab`: rotasyon / Raft “sonra” |

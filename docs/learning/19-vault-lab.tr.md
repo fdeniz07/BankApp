@@ -99,6 +99,35 @@ docker compose --env-file .env up -d --force-recreate webapi
 
 **Dikkat / best practice:** Dev mode ≠ prod (Raft, policy, rotation). Root token’ı public issue’ya yapıştırma. SQL/Rabbit hâlâ Compose env — bilinçli sadeleştirme.
 
+## Secret rotasyonu ve Raft (bilinçli olarak sonra)
+
+Bu lab **dev-mode** Vault kullanır: tek süreç, bellek/ephemeral, root token. Amaç JWT overlay’i görmek — HA production değil.
+
+| Konu | Lab’de durum | Üretimde (sonraki dilim) |
+|------|--------------|---------------------------|
+| **Raft / HA** | Yok (dev server) | En az 3 node Raft, unseal, audit |
+| **Policy** | Root token her şeye yetkili | App role / policy: sadece `secret/data/bankapp` okuma |
+| **Secret rotasyonu** | Seed tekrar + WebApi recreate (manuel) | Lease/TTL, JWT key rotate → rolling restart; SQL/Rabbit ayrı |
+| **JWT key değiştirme (lab)** | UI veya `vault kv put` → `webapi` force-recreate | Key id / dual-key penceresi (kesinti az) |
+
+Lab’de “rotasyon” deneyi (en az yıkıcı → daha yıkıcı):
+
+```powershell
+# 1) Sadece KV değerini güncelle (UI veya CLI), sonra WebApi’yi yeniden başlat
+docker compose -f infra/docker-compose.yml --env-file infra/.env exec vault `
+  vault kv put secret/bankapp jwt_security_key="YENI_EN_AZ_64_BYTE_KEY_BURAYA________________________"
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate webapi
+# Seq/log: Vault overlay applied; eski JWT’ler geçersiz olabilir → yeniden login
+
+# 2) Vault recreate (dev secret’lar silinir) → seed → webapi
+# (-v volume silme: bu Compose’ta Vault genelde ephemeral; yine de dikkat)
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate vault
+docker compose -f infra/docker-compose.yml --env-file infra/.env up vault-seed
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate webapi
+```
+
+**Raft neden şimdi yok?** Compose’a 3 node + unseal + storage eklemek eğitim maliyetini şişirir; JWT overlay öğrenildikten sonra ayrı platform dilimi olarak anlamlı. Roadmap: *Raft Vault / secret rotasyonu (üretim)*.
+
 ## Sınıflar, metotlar, paketler
 
 | İsim | Rol |

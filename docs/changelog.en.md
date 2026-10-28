@@ -2,6 +2,13 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-28 — Security hardening lab (rate-limit environments)
+
+- `appsettings.json`: stricter prod-like limits (Auth 10 / Write 30 / Fixed 60 per 60s).
+- `appsettings.Development.json`: loose lab limits (20 / 60 / 100) — Compose defaults to Development.
+- Learning: `23-rate-limiting` environment table + checklist; `19-vault-lab` rotation / Raft “later” notes.
+- Raft Vault and production secret rotation remain a separate slice.
+
 ## 2026-10-25 — Payment plan PDF / print + toast colors
 
 - `GET /api/CreditApplications/payment-plan/export?format=pdf` (pluggable exporters; CSV/XLSX-ready).

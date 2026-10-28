@@ -2,6 +2,13 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-28 — Güvenlik sertleştirme lab (rate limit ortamı)
+
+- `appsettings.json`: sıkı prod-benzeri limitler (Auth 10 / Write 30 / Fixed 60 per 60s).
+- `appsettings.Development.json`: lab gevşek limitler (20 / 60 / 100) — Compose varsayılanı Development.
+- Learning: `23-rate-limiting` ortam tablosu + checklist; `19-vault-lab` secret rotasyonu / Raft “sonra” notu.
+- Raft Vault ve üretim secret rotasyonu hâlâ ayrı dilim.
+
 ## 2026-10-25 — Ödeme planı PDF / yazdır + toast renkleri
 
 - `GET /api/CreditApplications/payment-plan/export?format=pdf` (pluggable exporter; CSV/XLSX için hazır).

@@ -40,3 +40,4 @@ _(empty)_
 | 2026-10-27 | +2 | Lab tools chapter (24) + annotated Compose recovery docs |
 | 2026-10-27 | +1 | Annotated Seq / RabbitMQ / Vault learning chapters |
 | 2026-10-27 | +3 | Decision SMS lab (feat → test → docs) |
+| 2026-10-28 | +2 | Rate-limit env split (feat → docs) |
