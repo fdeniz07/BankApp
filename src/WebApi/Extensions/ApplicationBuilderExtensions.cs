@@ -26,6 +26,7 @@ public static class ApplicationBuilderExtensions
         string webRoot = app.Environment.WebRootPath
             ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
         Directory.CreateDirectory(Path.Combine(webRoot, "uploads", "profiles"));
+        Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "App_Data", "credit-documents"));
         app.UseStaticFiles(new StaticFileOptions
         {
             FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(webRoot),

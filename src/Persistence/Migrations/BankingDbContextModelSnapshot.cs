@@ -17,7 +17,7 @@ namespace Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.13")
+                .HasAnnotation("ProductVersion", "10.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -276,6 +276,78 @@ namespace Persistence.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("CreditApplications", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditApplicationDocument", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("ContentType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("ContentType");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<Guid>("CreditApplicationId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("CreditApplicationId");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<string>("DocumentType")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("DocumentType");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("OriginalFileName")
+                        .IsRequired()
+                        .HasMaxLength(260)
+                        .HasColumnType("nvarchar(260)")
+                        .HasColumnName("OriginalFileName");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("SizeBytes");
+
+                    b.Property<string>("StoragePath")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)")
+                        .HasColumnName("StoragePath");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<DateTimeOffset>("UploadedAt")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UploadedAt");
+
+                    b.Property<Guid>("UploadedByUserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UploadedByUserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CreditApplicationId");
+
+                    b.HasIndex("CreditApplicationId", "DocumentType");
+
+                    b.ToTable("CreditApplicationDocuments", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.CreditApplicationSaga", b =>
@@ -895,6 +967,17 @@ namespace Persistence.Migrations
                     b.Navigation("CreditSubType");
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("Domain.Entities.CreditApplicationDocument", b =>
+                {
+                    b.HasOne("Domain.Entities.CreditApplication", "CreditApplication")
+                        .WithMany()
+                        .HasForeignKey("CreditApplicationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CreditApplication");
                 });
 
             modelBuilder.Entity("Domain.Entities.CreditSubType", b =>

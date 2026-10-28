@@ -1,5 +1,6 @@
 using System.Threading.RateLimiting;
 using Application.Services.Auth;
+using Application.Services.CreditDocuments;
 using Application.Services.Messaging;
 using Application.Services.ProfileImages;
 using Ardalis.SmartEnum.SystemTextJson;
@@ -28,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IProfileImageStorage, LocalProfileImageStorage>();
+        services.AddScoped<ICreditDocumentStorage, LocalCreditDocumentStorage>();
         services.Configure<AppPublicOptions>(configuration.GetSection(AppPublicOptions.SectionName));
         services.AddNotificationHostModule(configuration);
         services.AddCreditHostModule(configuration);

@@ -1,3 +1,6 @@
+using Application.Modules.Credit.Features.CreditApplicationDocuments.Commands.Upload;
+using Application.Modules.Credit.Features.CreditApplicationDocuments.Queries.Download;
+using Application.Modules.Credit.Features.CreditApplicationDocuments.Queries.GetList;
 using Application.Modules.Credit.Features.CreditApplications.Commands.Approve;
 using Application.Modules.Credit.Features.CreditApplications.Commands.Cancel;
 using Application.Modules.Credit.Features.CreditApplications.Commands.Create;
@@ -102,6 +105,53 @@ public class CreditApplicationsController : BaseController
         GetByIdCreditApplicationRequest request = new() { Id = id };
         GetByIdCreditApplicationResponse response = await Mediator.Send(request);
         return Ok(response);
+    }
+
+    [HttpGet("{id}/documents")]
+    public async Task<IActionResult> GetDocuments([FromRoute] Guid id)
+    {
+        IReadOnlyList<GetListCreditApplicationDocumentItemDto> response = await Mediator.Send(
+            new GetListCreditApplicationDocumentRequest { CreditApplicationId = id });
+        return Ok(response);
+    }
+
+    [HttpPost("{id}/documents")]
+    [RequestSizeLimit(5 * 1024 * 1024)]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
+    public async Task<IActionResult> UploadDocument(
+        [FromRoute] Guid id,
+        [FromForm] string documentType,
+        IFormFile? file)
+    {
+        if (file is null || file.Length == 0)
+            return BadRequest(new { detail = "Document file is required." });
+
+        await using Stream stream = file.OpenReadStream();
+        UploadCreditApplicationDocumentResponse response = await Mediator.Send(
+            new UploadCreditApplicationDocumentRequest
+            {
+                CreditApplicationId = id,
+                DocumentType = documentType,
+                OriginalFileName = file.FileName,
+                Content = stream,
+                ContentType = file.ContentType,
+                Length = file.Length
+            });
+        return Ok(response);
+    }
+
+    [HttpGet("{id}/documents/{documentId}/download")]
+    public async Task<IActionResult> DownloadDocument(
+        [FromRoute] Guid id,
+        [FromRoute] Guid documentId)
+    {
+        DownloadCreditApplicationDocumentResponse file = await Mediator.Send(
+            new DownloadCreditApplicationDocumentRequest
+            {
+                CreditApplicationId = id,
+                DocumentId = documentId
+            });
+        return File(file.Content, file.ContentType, file.FileName);
     }
 
     [HttpPost]

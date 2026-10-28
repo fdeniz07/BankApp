@@ -232,6 +232,7 @@ services:
       OpenTelemetry__OtlpEndpoint: "http://otel-collector:4317"
     volumes:
       - profile-uploads:/app/wwwroot/uploads
+      - credit-document-uploads:/app/App_Data/credit-documents
     depends_on:
       sqlserver:
         condition: service_healthy
@@ -284,6 +285,8 @@ volumes:
     name: bankapp-rabbitmq-data
   profile-uploads:
     name: bankapp-profile-uploads
+  credit-document-uploads:
+    name: bankapp-credit-document-uploads
   tempo-data:
     name: bankapp-tempo-data
   prometheus-data:
