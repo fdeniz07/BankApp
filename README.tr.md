@@ -34,11 +34,12 @@ Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab,
 
 | Rol | E-posta | Şifre |
 |-----|---------|-------|
-| Banka personeli | `staff@bank.local` (ayrıca `staff.tr` / `.en` / `.de`) | `Staff123!` |
-| Banka yöneticisi | `manager@bank.local` | `Manager123!` |
-| Müşteri | `customer@bank.local` (ayrıca `customer.tr` / `.en` / `.de`) | `Customer123!` |
+| Banka personeli | `staff.tr@` / `staff.de@` / `staff.en@bank.local` (+ eski `staff@`, `.nyc`, `.chi`) | `Demo123!` |
+| Banka yöneticisi | `manager.tr@` / `manager.de@` / `manager.en@bank.local` (+ eski `manager@`, `.nyc`, `.chi`, `.ber`) | `Demo123!` |
+| SuperAdmin | `superadmin@bank.local` | `Demo123!` |
+| Müşteri | `customer.tr@` / `customer.de@` / `customer.en@bank.local` (+ `customer@`) | `Demo123!` |
 
-Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda BankStaff).
+Roller: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (yönetici aynı zamanda BankStaff; SuperAdmin şube CRUD).
 
 ---
 
@@ -57,6 +58,7 @@ Roller: **Customer**, **BankStaff**, **BankManager** (yönetici aynı zamanda Ba
 - **Karar mektubu e-posta / SMS (lab)** — onay/red sonrası `decision-letter` + `decision-letter-sms` → Seq/log (SMTP/SMS gateway yok)
 - **Rate limiting** — `auth` / `write` / `fixed` politikaları (429); health + SignalR muaf
 - **Vault lab** — JWT `SecurityKey` `secret/bankapp` overlay (Compose); env fallback
+- **Şube modeli** (Branches; personel BranchId; onay/red karar şubesi snapshot)
 - Başvuru **evrak yükleme** (lab: kimlik / gelir / diğer; PDF/JPEG/PNG ≤5 MB; App_Data; onay için henüz zorunlu değil)
 - Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
 - Dashboard özeti, personel yönetimi, profil + avatar (≤ 2 MB)
@@ -431,7 +433,7 @@ Content-Type: application/json
 
 {
   "email": "staff@bank.local",
-  "password": "Staff123!"
+  "password": "Demo123!"
 }
 ```
 

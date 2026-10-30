@@ -34,11 +34,12 @@ Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, 
 
 | Rolle | E-Mail | Passwort |
 |-------|--------|----------|
-| Bankmitarbeiter | `staff@bank.local` (auch `staff.tr` / `.en` / `.de`) | `Staff123!` |
-| Bankmanager | `manager@bank.local` | `Manager123!` |
-| Kunde | `customer@bank.local` (auch `customer.tr` / `.en` / `.de`) | `Customer123!` |
+| Bankmitarbeiter | `staff.tr@` / `staff.de@` / `staff.en@bank.local` (+ Legacy `staff@`, `.nyc`, `.chi`) | `Demo123!` |
+| Bankmanager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` (+ Legacy `manager@`, `.nyc`, `.chi`, `.ber`) | `Demo123!` |
+| SuperAdmin | `superadmin@bank.local` | `Demo123!` |
+| Kunde | `customer.tr@` / `customer.de@` / `customer.en@bank.local` (+ `customer@`) | `Demo123!` |
 
-Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff).
+Rollen: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (Manager hat auch BankStaff; SuperAdmin: Filial-CRUD).
 
 ---
 
@@ -57,6 +58,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager** (Manager hat auch BankStaff
 - **Entscheidungsbrief E-Mail / SMS (Lab)** — nach Genehmigung/Ablehnung Queues `decision-letter` + `decision-letter-sms` → Seq/Log (kein SMTP/SMS-Gateway)
 - **Rate limiting** — Policies `auth` / `write` / `fixed` (429); Health + SignalR ausgenommen
 - **Vault-Lab** — JWT-`SecurityKey`-Overlay aus `secret/bankapp` (Compose); Env-Fallback
+- **Filialmodell** (Branches; Personal-BranchId; Genehmigung/Ablehnung Entscheidungsfiliale-Snapshot)
 - Antrags-**Dokumenten-Upload** (Lab: Ausweis / Einkommen / Sonstiges; PDF/JPEG/PNG ≤5 MB; App_Data; noch nicht Pflicht)
 - Zahlungsplan (Amortisation) mit **erweiterbarem Export** (`payment-plan/export?format=pdf`; später CSV/XLSX) und Druck
 - Dashboard-Summary, Personalverwaltung, Profil + Avatar (≤ 2 MB)
@@ -431,7 +433,7 @@ Content-Type: application/json
 
 {
   "email": "staff@bank.local",
-  "password": "Staff123!"
+  "password": "Demo123!"
 }
 ```
 

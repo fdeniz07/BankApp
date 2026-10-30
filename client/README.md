@@ -22,9 +22,10 @@ Open http://localhost:3000
 
 | Role | Email | Password |
 |------|-------|----------|
-| Staff | `staff@bank.local` | `Staff123!` |
-| Manager | `manager@bank.local` | `Manager123!` |
-| Customer | `customer@bank.local` | `Customer123!` |
+| Staff | `staff.tr@` / `staff.de@` / `staff.en@bank.local` | `Demo123!` |
+| Manager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` | `Demo123!` |
+| Customer | `customer.tr@` / `customer.de@` / `customer.en@bank.local` | `Demo123!` |
+| SuperAdmin | `superadmin@bank.local` | `Demo123!` |
 
 Locale variants: `staff.{tr\|en\|de}@bank.local`, `customer.{tr\|en\|de}@bank.local`.
 

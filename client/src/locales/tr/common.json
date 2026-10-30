@@ -6,8 +6,28 @@
     "customers": "Müşteriler",
     "creditTypes": "Kredi Türleri",
     "staff": "Personel",
+    "branches": "Şubeler",
     "profile": "Profil",
     "logout": "Çıkış"
+  },
+  "branches": {
+    "title": "Şube yönetimi",
+    "hint": "Yalnızca SuperAdmin şube oluşturabilir, güncelleyebilir veya pasifleştirebilir.",
+    "superAdminOnly": "Bu sayfa yalnızca SuperAdmin içindir.",
+    "newBranch": "Yeni şube",
+    "editBranch": "Şubeyi düzenle",
+    "create": "Oluştur",
+    "createSuccess": "Şube oluşturuldu.",
+    "updateSuccess": "Şube güncellendi.",
+    "code": "Kod",
+    "name": "Ad",
+    "city": "Şehir",
+    "status": "Durum",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "filter": "Şube",
+    "allBranches": "Tüm şubeler",
+    "ownBranchDefault": "Kendi şubem (varsayılan)"
   },
   "staff": {
     "title": "Personel yönetimi",
@@ -36,7 +56,9 @@
     "filter_all": "Tümü",
     "filter_active": "Aktif",
     "filter_inactive": "Pasif",
-    "you": "siz"
+    "you": "siz",
+    "branch": "Şube",
+    "branchUnset": "Şube seçilmedi"
   },
   "profile": {
     "title": "Profil",
@@ -51,6 +73,8 @@
     "positionUnset": "Seçilmedi",
     "dateOfBirth": "Doğum tarihi",
     "position": "Pozisyon",
+    "branch": "Şube",
+    "branchUnset": "Şube yok",
     "newPassword": "Yeni şifre",
     "newPasswordHint": "Boş bırakırsanız şifre değişmez",
     "avatar": "Avatar",
@@ -88,9 +112,15 @@
     "submit": "Giriş",
     "noAccount": "Hesabınız yok mu?",
     "goRegister": "Bireysel kayıt ol",
-    "hintStaff": "Personel: staff@bank.local | staff.tr@ | staff.en@ | staff.de@ / Staff123!",
-    "hintManager": "Yönetici: manager@bank.local / Manager123!",
-    "hintCustomer": "Müşteri: customer@bank.local | customer.tr@ | customer.en@ | customer.de@ / Customer123!",
+    "hintPassword": "Lab şifresi (hepsi): Demo123!",
+    "hintStaff": "Personel: staff.tr@ · staff.de@ · staff.en@bank.local",
+    "hintManager": "Yönetici: manager.tr@ · manager.de@ · manager.en@bank.local",
+    "hintSuperAdmin": "SuperAdmin: superadmin@bank.local",
+    "hintCustomer": "Müşteri: customer.tr@ · customer.de@ · customer.en@bank.local",
+    "demoFill": "Formu doldur",
+    "demoStaff": "Personel",
+    "demoManager": "Yönetici",
+    "demoCustomer": "Müşteri",
     "rememberMe": "Beni hatırla",
     "error": "Giriş başarısız. Bilgilerinizi kontrol edin."
   },
@@ -166,7 +196,8 @@
       "CreditApplicationCreated": "Yeni kredi başvurusu",
       "CreditApplicationApproved": "Başvuru onaylandı",
       "CreditApplicationRejected": "Başvuru reddedildi",
-      "CreditApplicationCancelled": "Başvuru iptal edildi"
+      "CreditApplicationCancelled": "Başvuru iptal edildi",
+      "CreditApplicationDocumentUploaded": "Evrak yüklendi"
     }
   },
   "common": {
@@ -212,6 +243,7 @@
   "roles": {
     "BankStaff": "Banka Personeli",
     "BankManager": "Banka Yöneticisi",
+    "SuperAdmin": "Süper Yönetici",
     "Customer": "Müşteri"
   },
   "status": {
@@ -293,6 +325,19 @@
     "customerMessage": "Müşteriye mesaj",
     "customerMessageHint": "Şablon doldurulur; göndermeden önce düzenleyebilirsiniz. İleride e-posta/SMS için kullanılacak.",
     "reloadTemplate": "Şablonu yenile",
+    "templatesUi": {
+      "pick": "Mektup şablonu",
+      "systemCurrent": "Sistem (arayüz dili: {{locale}})",
+      "systemLocale": "Sistem — {{locale}}",
+      "saveAs": "Şablon olarak kaydet",
+      "create": "Yeni şablon",
+      "edit": "Şablonu düzenle",
+      "delete": "Şablonu sil",
+      "confirmDelete": "Bu şablonu silmek istiyor musunuz?",
+      "name": "Şablon adı",
+      "body": "Şablon metni",
+      "placeholders": "Yer tutucular (çift süslü parantez): customerName, applicationNumber, amount, term, rate, reason"
+    },
     "templates": {
       "approve": "Sayın {{customerName}},\n\n{{applicationNumber}} numaralı kredi başvurunuz onaylanmıştır.\nOnaylanan tutar: {{amount}} · Vade: {{term}} ay · Faiz: %{{rate}}\n\nSaygılarımızla,\nBankApp Kredi Operasyonları",
       "reject": "Sayın {{customerName}},\n\n{{applicationNumber}} numaralı kredi başvurunuz, aşağıdaki gerekçe ile maalesef reddedilmiştir:\n\n{{reason}}\n\nSaygılarımızla,\nBankApp Kredi Operasyonları"
@@ -305,7 +350,9 @@
     "existingDebtHint": "Varsa toplam mevcut borç (opsiyonel)",
     "existingDebtInvalid": "Mevcut borç 0 veya daha büyük bir sayı olmalıdır.",
     "decisionDate": "Karar tarihi",
+    "decisionBranch": "Karar şubesi",
     "confirmApprove": "Bu başvuruyu onaylamak istiyor musunuz?",
+    "confirmApproveMissingDocs": "Kimlik veya gelir belgesi eksik. Yine de onaylamak istiyor musunuz? (Lab: henüz zorunlu blok yok.)",
     "confirmQuickApprove": "Bu başvuruyu talep edilen tutar, vade ve faiz ile onaylamak istiyor musunuz?",
     "quickApproveHint": "Talep edilen tutar, vade ve faiz ile hızlı onay",
     "promptRejectReason": "Red gerekçesini girin:",
@@ -314,8 +361,14 @@
     "approveSuccess": "Başvuru onaylandı.",
     "rejectSuccess": "Başvuru reddedildi.",
     "onlyPending": "Yalnızca beklemedeki başvurular karara bağlanabilir.",
+    "decisionAudit": "Karar kaydı",
+    "decisionTemplate": "Mektup şablonu",
+    "missingDocsFilter": "Eksik zorunlu evrak",
+    "missingDocsBadge": "Evrak eksik",
+    "missingDocsWarn": "Bekleyen başvuru: kimlik ve/veya gelir belgesi henüz yüklenmemiş.",
     "documentsTitle": "Evraklar",
     "documentsHint": "PDF, JPEG veya PNG; en fazla 5 MB. Yalnızca beklemedeki başvuruya yüklenebilir (lab; henüz zorunlu değil).",
+    "createDocumentsHint": "İsteğe bağlı (lab). Başvuru kaydedilince seçilen dosyalar yüklenir; sonra detay sayfasından da ekleyebilirsiniz. PDF/JPEG/PNG, dosya başına en fazla 5 MB.",
     "documentsEmpty": "Henüz evrak yok.",
     "documentType": "Tür",
     "documentFile": "Dosya",

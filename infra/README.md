@@ -26,9 +26,10 @@ Lab tooling guide (setup / cautions / best practices): [docs/learning/24-lab-too
 
 | Role | Email | Password |
 |------|-------|----------|
-| Staff | `staff@bank.local` (also `.tr` / `.en` / `.de`) | `Staff123!` |
-| Manager | `manager@bank.local` | `Manager123!` |
-| Customer | `customer@bank.local` (also `.tr` / `.en` / `.de`) | `Customer123!` |
+| Staff | `staff.tr@` / `staff.de@` / `staff.en@bank.local` | `Demo123!` |
+| Manager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` | `Demo123!` |
+| Customer | `customer.tr@` / `customer.de@` / `customer.en@bank.local` | `Demo123!` |
+| SuperAdmin | `superadmin@bank.local` | `Demo123!` |
 
 ## Prerequisites
 
@@ -107,8 +108,8 @@ On container start, WebApi applies EF migrations and runs Bogus/identity seed wh
 
 Seed logins:
 
-- `staff@bank.local` / `Staff123!`
-- `customer@bank.local` / `Customer123!`
+- `staff.tr@bank.local` / `Demo123!`
+- `customer.tr@bank.local` / `Demo123!`
 
 ## Local VS / Vite debug
 

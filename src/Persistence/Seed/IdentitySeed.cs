@@ -1,6 +1,7 @@
 using Core.Security.Constants;
 using Core.Security.Entities;
 using Core.Security.Hashing;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -10,24 +11,55 @@ namespace Persistence.Seed;
 
 public static class IdentitySeed
 {
-    private static readonly (string Email, string Password, string[] Roles, string? Locale, string? FirstName, string? LastName, StaffPosition? Position)[] DemoUsers =
+    /// <summary>Unified lab password for all demo accounts (easy copy/paste on login card).</summary>
+    public const string DemoPassword = BranchLocaleMap.DemoPassword;
+
+    private static readonly (string Email, string[] Roles, string? Locale, string? FirstName, string? LastName, StaffPosition? Position)[] DemoUsers =
     [
-        ("staff@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Selin", "Yılmaz", StaffPosition.CreditAnalyst),
-        ("staff.tr@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Emre", "Kaya", StaffPosition.BranchOfficer),
-        ("staff.en@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Anna", "Miller", StaffPosition.RelationshipManager),
-        ("staff.de@bank.local", "Staff123!", [GeneralOperationClaims.BankStaff], null, "Jonas", "Weber", StaffPosition.RiskOfficer),
-        ("manager@bank.local", "Manager123!", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Deniz", "Aydın", StaffPosition.BranchManager),
-        ("customer@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "tr", null, null, null),
-        ("customer.tr@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "tr", null, null, null),
-        ("customer.en@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "en", null, null, null),
-        ("customer.de@bank.local", "Customer123!", [GeneralOperationClaims.Customer], "de", null, null, null)
+        ("staff.tr@bank.local", [GeneralOperationClaims.BankStaff], null, "Emre", "Kaya", StaffPosition.BranchOfficer),
+        ("staff.en@bank.local", [GeneralOperationClaims.BankStaff], null, "Anna", "Miller", StaffPosition.RelationshipManager),
+        ("staff.de@bank.local", [GeneralOperationClaims.BankStaff], null, "Jonas", "Weber", StaffPosition.RiskOfficer),
+        ("staff@bank.local", [GeneralOperationClaims.BankStaff], null, "Selin", "Yılmaz", StaffPosition.CreditAnalyst),
+        ("staff.nyc@bank.local", [GeneralOperationClaims.BankStaff], null, "Maya", "Chen", StaffPosition.CreditAnalyst),
+        ("staff.chi@bank.local", [GeneralOperationClaims.BankStaff], null, "Jordan", "Lee", StaffPosition.BranchOfficer),
+        ("manager.tr@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Deniz", "Aydın", StaffPosition.BranchManager),
+        ("manager.en@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Alex", "Brooks", StaffPosition.BranchManager),
+        ("manager.de@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Lena", "Hoffmann", StaffPosition.BranchManager),
+        ("manager@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Deniz", "Aydın", StaffPosition.BranchManager),
+        ("manager.nyc@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Alex", "Brooks", StaffPosition.BranchManager),
+        ("manager.chi@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Sam", "Patel", StaffPosition.BranchManager),
+        ("manager.ber@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Lena", "Hoffmann", StaffPosition.BranchManager),
+        ("superadmin@bank.local", [GeneralOperationClaims.SuperAdmin, GeneralOperationClaims.BankStaff], null, "Root", "Admin", StaffPosition.BranchManager),
+        ("customer@bank.local", [GeneralOperationClaims.Customer], "tr", null, null, null),
+        ("customer.tr@bank.local", [GeneralOperationClaims.Customer], "tr", null, null, null),
+        ("customer.en@bank.local", [GeneralOperationClaims.Customer], "en", null, null, null),
+        ("customer.de@bank.local", [GeneralOperationClaims.Customer], "de", null, null, null)
     ];
+
+    private static readonly Dictionary<string, string> DemoStaffBranchCodes = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["staff.tr@bank.local"] = "IST-01",
+        ["staff@bank.local"] = "IST-01",
+        ["staff.en@bank.local"] = "NYC-01",
+        ["staff.nyc@bank.local"] = "NYC-01",
+        ["staff.chi@bank.local"] = "CHI-01",
+        ["staff.de@bank.local"] = "BER-01",
+        ["manager.tr@bank.local"] = "ANK-01",
+        ["manager@bank.local"] = "ANK-01",
+        ["manager.en@bank.local"] = "NYC-01",
+        ["manager.nyc@bank.local"] = "NYC-01",
+        ["manager.chi@bank.local"] = "CHI-01",
+        ["manager.de@bank.local"] = "BER-01",
+        ["manager.ber@bank.local"] = "BER-01"
+    };
 
     public static async Task SeedAsync(BankingDbContext context)
     {
         await SeedOperationClaimsAsync(context);
         await SeedUsersAsync(context);
+        await EnsureDemoPasswordsAsync(context);
         await EnsureDemoStaffProfilesAsync(context);
+        await EnsureDemoStaffBranchesAsync(context);
         await EnsureDemoCustomersHaveApplicationsAsync(context);
     }
 
@@ -37,7 +69,8 @@ public static class IdentitySeed
         [
             GeneralOperationClaims.Customer,
             GeneralOperationClaims.BankStaff,
-            GeneralOperationClaims.BankManager
+            GeneralOperationClaims.BankManager,
+            GeneralOperationClaims.SuperAdmin
         ];
 
         foreach (string claimName in claimNames)
@@ -62,7 +95,7 @@ public static class IdentitySeed
             if (await context.Users.AnyAsync(u => u.Email == demo.Email))
                 continue;
 
-            HashingHelper.CreatePasswordHash(demo.Password, out byte[] hash, out byte[] salt);
+            HashingHelper.CreatePasswordHash(DemoPassword, out byte[] hash, out byte[] salt);
             Guid? customerId = demo.Roles.Contains(GeneralOperationClaims.Customer)
                 ? await ResolveCustomerIdForLocaleAsync(context, demo.Locale ?? "tr")
                 : null;
@@ -98,9 +131,28 @@ public static class IdentitySeed
         }
     }
 
-    /// <summary>
-    /// Backfills name/position on existing demo staff so decision-maker enrichment is visible without DB wipe.
-    /// </summary>
+    /// <summary>Resets all known demo accounts to the shared lab password (no DB wipe).</summary>
+    private static async Task EnsureDemoPasswordsAsync(BankingDbContext context)
+    {
+        HashingHelper.CreatePasswordHash(DemoPassword, out byte[] hash, out byte[] salt);
+        HashSet<string> emails = DemoUsers.Select(d => d.Email).ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        List<ApplicationUser> users = await context.Users
+            .Where(u => emails.Contains(u.Email))
+            .ToListAsync();
+
+        foreach (ApplicationUser user in users)
+        {
+            user.PasswordHash = hash;
+            user.PasswordSalt = salt;
+            user.EmailConfirmed = true;
+            user.IsActive = true;
+            context.Users.Update(user);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
     private static async Task EnsureDemoStaffProfilesAsync(BankingDbContext context)
     {
         foreach (var demo in DemoUsers.Where(d => d.FirstName is not null))
@@ -128,6 +180,28 @@ public static class IdentitySeed
 
             if (changed)
                 context.Users.Update(user);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static async Task EnsureDemoStaffBranchesAsync(BankingDbContext context)
+    {
+        foreach ((string email, string branchCode) in DemoStaffBranchCodes)
+        {
+            ApplicationUser? user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user is null)
+                continue;
+
+            Guid? branchId = await BranchSeed.ResolveIdByCodeAsync(context, branchCode);
+            if (!branchId.HasValue)
+                continue;
+
+            if (user.BranchId == branchId)
+                continue;
+
+            user.BranchId = branchId;
+            context.Users.Update(user);
         }
 
         await context.SaveChangesAsync();

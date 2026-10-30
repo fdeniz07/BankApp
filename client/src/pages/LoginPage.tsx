@@ -6,7 +6,21 @@ import { getRememberedEmail } from '../auth/token'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
 import { mapApiError } from '../utils/mapApiError'
 
-const DEFAULT_EMAIL = 'staff@bank.local'
+/** Unified lab password — matches IdentitySeed / BranchLocaleMap.DemoPassword */
+const DEMO_PASSWORD = 'Demo123!'
+const DEFAULT_EMAIL = 'staff.tr@bank.local'
+
+const DEMO_ACCOUNTS = [
+  { role: 'staff' as const, locale: 'TR', email: 'staff.tr@bank.local' },
+  { role: 'staff' as const, locale: 'DE', email: 'staff.de@bank.local' },
+  { role: 'staff' as const, locale: 'EN', email: 'staff.en@bank.local' },
+  { role: 'manager' as const, locale: 'TR', email: 'manager.tr@bank.local' },
+  { role: 'manager' as const, locale: 'DE', email: 'manager.de@bank.local' },
+  { role: 'manager' as const, locale: 'EN', email: 'manager.en@bank.local' },
+  { role: 'customer' as const, locale: 'TR', email: 'customer.tr@bank.local' },
+  { role: 'customer' as const, locale: 'DE', email: 'customer.de@bank.local' },
+  { role: 'customer' as const, locale: 'EN', email: 'customer.en@bank.local' },
+]
 
 export function LoginPage() {
   const { t } = useTranslation()
@@ -14,12 +28,18 @@ export function LoginPage() {
   const navigate = useNavigate()
   const remembered = getRememberedEmail()
   const [email, setEmail] = useState(remembered || DEFAULT_EMAIL)
-  const [password, setPassword] = useState(remembered ? '' : 'Staff123!')
+  const [password, setPassword] = useState(remembered ? '' : DEMO_PASSWORD)
   const [rememberMe, setRememberMe] = useState(!!remembered)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
   if (isAuthenticated) return <Navigate to="/applications" replace />
+
+  function fillDemo(demoEmail: string) {
+    setEmail(demoEmail)
+    setPassword(DEMO_PASSWORD)
+    setError(null)
+  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -34,6 +54,12 @@ export function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  const roleLabel = (role: (typeof DEMO_ACCOUNTS)[number]['role']) => {
+    if (role === 'staff') return t('login.demoStaff')
+    if (role === 'manager') return t('login.demoManager')
+    return t('login.demoCustomer')
   }
 
   return (
@@ -84,9 +110,33 @@ export function LoginPage() {
           <Link to="/register">{t('login.goRegister')}</Link>
         </p>
         <div className="hints">
+          <p className="login-demo-password">{t('login.hintPassword')}</p>
+          <p className="login-demo-caption">{t('login.demoFill')}</p>
+          <div className="login-demo-grid" role="group" aria-label={t('login.demoFill')}>
+            {DEMO_ACCOUNTS.map((account) => (
+              <button
+                key={account.email}
+                type="button"
+                className="btn ghost login-demo-chip"
+                onClick={() => fillDemo(account.email)}
+                title={account.email}
+              >
+                {roleLabel(account.role)} {account.locale}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="btn ghost login-demo-chip"
+              onClick={() => fillDemo('superadmin@bank.local')}
+              title="superadmin@bank.local"
+            >
+              SuperAdmin
+            </button>
+          </div>
           <p>{t('login.hintStaff')}</p>
           <p>{t('login.hintManager')}</p>
           <p>{t('login.hintCustomer')}</p>
+          <p>{t('login.hintSuperAdmin')}</p>
         </div>
       </div>
     </div>

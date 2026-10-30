@@ -32,13 +32,14 @@ Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, We
 
 ## Demo logins
 
-| Role         | Email                                                      | Password       |
-| ------------ | ---------------------------------------------------------- | -------------- |
-| Bank staff   | `staff@bank.local` (also `staff.tr` / `.en` / `.de`)       | `Staff123!`    |
-| Bank manager | `manager@bank.local`                                       | `Manager123!`  |
-| Customer     | `customer@bank.local` (also `customer.tr` / `.en` / `.de`) | `Customer123!` |
+| Role         | Email (locale variants)                                      | Password   |
+| ------------ | ------------------------------------------------------------ | ---------- |
+| Bank staff   | `staff.tr@` / `staff.de@` / `staff.en@bank.local` (+ legacy `staff@`, `.nyc`, `.chi`) | `Demo123!` |
+| Bank manager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` (+ legacy `manager@`, `.nyc`, `.chi`, `.ber`) | `Demo123!` |
+| SuperAdmin   | `superadmin@bank.local`                                      | `Demo123!` |
+| Customer     | `customer.tr@` / `customer.de@` / `customer.en@bank.local` (+ `customer@`) | `Demo123!` |
 
-Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff).
+Roles: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (manager also has BankStaff; SuperAdmin can CRUD branches).
 
 ---
 
@@ -57,6 +58,7 @@ Roles: **Customer**, **BankStaff**, **BankManager** (manager also has BankStaff)
 - **Decision letter email / SMS (lab)** — after approve/reject, queues `decision-letter` + `decision-letter-sms` → Seq/log (no SMTP/SMS gateway)
 - **Rate limiting** — policies `auth` / `write` / `fixed` (429); health + SignalR exempt
 - **Vault lab** — JWT `SecurityKey` overlay from `secret/bankapp` (Compose); env fallback
+- **Branch model** (Branches; staff BranchId; approve/reject decision-branch snapshot)
 - Application **document upload** (lab: identity / income / other; PDF/JPEG/PNG ≤5 MB; App_Data; not required for approval yet)
 - Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
 - Dashboard summary, staff user management, profile + avatar (≤ 2 MB)
@@ -431,7 +433,7 @@ Content-Type: application/json
 
 {
   "email": "staff@bank.local",
-  "password": "Staff123!"
+  "password": "Demo123!"
 }
 ```
 
