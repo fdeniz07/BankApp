@@ -1,6 +1,6 @@
 # 26 — Kredi başvurusu evrak yükleme (lab)
 
-[← Önceki](25-decision-letter-sms.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](25-decision-letter-sms.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](27-branch-model.tr.md)
 
 İlgili: [03 EF Core](03-ef-core-sql.tr.md) · [06 JWT / RBAC](06-jwt-rbac.tr.md) · profil avatar (aynı multipart deseni)
 
@@ -95,7 +95,8 @@ client/src/pages/ApplicationDetailPage.tsx
 
 ## Mini akış
 
-Pending başvuru detay → dosya seç + tür → `POST …/documents` → SQL + App_Data → liste → `GET …/download` (JWT).
+1. Müşteri **yeni başvuru** formunda (isteğe bağlı) dosya seçer → kayıt → `POST` create → ardından `POST …/documents` → detay sayfasına yönlenir.  
+2. Veya mevcut **Pending** başvuru detayında Evraklar paneli → yükle / liste / indir.
 
 ## Where useful
 

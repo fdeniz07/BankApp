@@ -78,5 +78,5 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Dokumenten-Upload beim Kreditantrag (Lab: PDF/JPEG/PNG, App_Data; noch nicht Pflicht für Genehmigung)
 - [x] Entscheidungsbriefe per E-Mail senden (Lab: Queue `decision-letter` + Seq-Log; UI-Vorlagen / Outbox)
 - [ ] Entscheidungsbriefe per SMS senden
-- [ ] Filial-/Branch-Modell + Entscheider-Filiale beim Kreditantrag
+- [x] Filial-/Branch-Modell + Entscheider-Filiale-Snapshot beim Kreditantrag (Lab)
 - [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)

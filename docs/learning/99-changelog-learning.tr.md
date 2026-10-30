@@ -15,3 +15,7 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-10-27 | `25-decision-letter-sms.tr.md` — onay/red SMS lab (`decision-letter-sms` → Seq) |
 | 2026-10-28 | `23-rate-limiting`: ortam ayrımı (prod-benzeri vs Development) + checklist; `19-vault-lab`: rotasyon / Raft “sonra” |
 | 2026-10-28 | `26-credit-application-documents.tr.md` — Pending başvuru evrak upload/list/download (App_Data) |
+| 2026-10-29 | `27-branch-model.tr.md` — şube entity, staff BranchId, karar snapshot |
+| 2026-10-29 | `28-branch-rbac-superadmin.tr.md` — Customer/Application BranchId, SuperAdmin, liste filtreleri, demo US şubeleri + sahte evrak |
+| 2026-10-30 | `29-decision-letter-templates.tr.md` — kullanıcı karar mektubu şablon CRUD; lab şifre `Demo123!` (Personel/Manager/Customer × TR/DE/EN); katalog locale şube zorlaması |
+| 2026-10-30 | `29` eklenti: soft evrak kapısı, `DecisionTemplateName` audit, doküman SignalR + eksik evrak rozeti/filtresi |

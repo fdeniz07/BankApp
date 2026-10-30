@@ -57,6 +57,9 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Lab / DX | İzleme araçları (Scalar, Seq, Insight, Grafana…) | [24](24-lab-tools.tr.md) |
 | Notification | Karar mektubu SMS (lab) | [25](25-decision-letter-sms.tr.md) |
 | Credit / UX | Başvuru evrak yükleme (lab) | [26](26-credit-application-documents.tr.md) |
+| Domain | Şube / branch modeli | [27](27-branch-model.tr.md) |
+| Security | Şube RBAC + SuperAdmin | [28](28-branch-rbac-superadmin.tr.md) |
+| Credit / UX | Karar mektubu şablon CRUD | [29](29-decision-letter-templates.tr.md) |
 
 Kitaplık güncelleme günlüğü: [99-changelog-learning.tr.md](99-changelog-learning.tr.md)
 

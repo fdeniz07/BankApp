@@ -76,7 +76,8 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [ ] OAuth (sosyal medya ile kayıt olma) mekanizması
 - [ ] Keycloak desteği
 - [x] Kredi başvurusunda evrak yükleme (lab: PDF/JPEG/PNG, App_Data; henüz onay için zorunlu değil)
-- [ ] Şube / branch modeli + karar veren personelde şube bilgisi
+- [x] Şube / branch modeli + karar veren personelde şube snapshot (lab)
+- [x] Şube RBAC + SuperAdmin (liste filtreleri, modify guard, NYC/CHI seed, şube CRUD)
 - [x] Karar mektubunu e-posta ile gönderme (lab: `decision-letter` kuyruk + Seq log; UI şablonları / Outbox)
 - [x] Karar mektubunu SMS ile gönderme (lab: `decision-letter-sms` kuyruk + Seq log; gateway yok)
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

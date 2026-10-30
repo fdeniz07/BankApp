@@ -78,5 +78,5 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] Credit application document upload (lab: PDF/JPEG/PNG, App_Data; not mandatory for approval yet)
 - [x] Send decision letters by email (lab: `decision-letter` queue + Seq log; UI templates / Outbox)
 - [ ] Send decision letters by SMS
-- [ ] Branch model + decision-maker branch on credit applications
+- [x] Branch model + decision-maker branch snapshot on credit applications (lab)
 - [ ] Chatbot (customer / staff support assistant)

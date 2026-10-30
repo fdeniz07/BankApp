@@ -2,6 +2,22 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-30 — Decision templates + demo login matrix + catalog locale
+
+- `DecisionLetterTemplates` + API CRUD; detail page system/user template picker (follows UI language).
+- List quick Approve/Reject removed (detail only).
+- Staff credit catalog locked to branch country (`CatalogLocaleService`); SuperAdmin sees all locales.
+- Demo accounts: Staff / Manager / Customer × TR/DE/EN; shared lab password `Demo123!`.
+- Learning: `29-decision-letter-templates.tr.md`.
+
+## 2026-10-29 — Branch model
+
+- `Branches` table + seed (IST-01, ANK-01, BER-01); demo staff `BranchId`.
+- Approve/reject: `DecisionBranchCode` / `DecisionBranchName` snapshot.
+- `GET /api/Branches`; branch on staff list / profile / application detail.
+- Learning: `27-branch-model.tr.md`.
+- Branch RBAC + SuperAdmin + Customer/Application `BranchId` (learning `28`).
+
 ## 2026-10-28 — Credit application document upload (lab)
 
 - `CreditApplicationDocuments` + disk `App_Data/credit-documents` (not wwwroot; JWT download).

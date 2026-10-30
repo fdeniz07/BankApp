@@ -2,6 +2,28 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-10-30 — Evrak soft-kapı + karar audit + doküman SignalR
+
+- Onay öncesi kimlik/gelir eksikse soft confirm (hard-block yok).
+- `DecisionTemplateName` + liste/detay karar audit satırı (kim · şube · şablon).
+- `CreditApplicationDocumentUploaded` → Outbox/SignalR toast; liste/detay kırmızı “evrak eksik” rozeti + filtre.
+
+## 2026-10-30 — Karar şablonları + demo giriş matrisi + katalog locale
+
+- `DecisionLetterTemplates` + API CRUD; başvuru detayında sistem/kullanıcı şablon seçici (UI diline göre otomatik).
+- Liste üzerinden hızlı Onayla/Reddet kaldırıldı (yalnızca detay).
+- Personel kredi kataloğu şube ülkesine kilitli (`CatalogLocaleService`); SuperAdmin tüm locale’leri görür.
+- Demo hesaplar: Personel / Yönetici / Müşteri × TR/DE/EN; ortak lab şifresi `Demo123!` (seed backfill).
+- Learning: `29-decision-letter-templates.tr.md`.
+
+## 2026-10-29 — Şube / branch modeli
+
+- `Branches` tablosu + seed (IST-01, ANK-01, BER-01); demo staff `BranchId`.
+- Onay/red: `DecisionBranchCode` / `DecisionBranchName` snapshot.
+- `GET /api/Branches`; personel listesi / profil / başvuru detayında şube.
+- Learning: `27-branch-model.tr.md`.
+- Şube RBAC + SuperAdmin + Customer/Application `BranchId` (ayrı dilim; learning `28`).
+
 ## 2026-10-28 — Başvuru evrak yükleme (lab)
 
 - `CreditApplicationDocuments` + disk `App_Data/credit-documents` (wwwroot değil; JWT ile download).

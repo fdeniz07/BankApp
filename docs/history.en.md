@@ -60,3 +60,4 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] OpenTelemetry + Grafana / Prometheus (OTLP → collector → Tempo/Prometheus/Grafana)
 - [x] Rate-limit environment split (strict base + Development lab) + Vault rotation/Raft notes
 - [x] Application document upload lab (App_Data + documents API; not mandatory yet)
+- [x] Branch model (Branches + staff BranchId + decision snapshot)

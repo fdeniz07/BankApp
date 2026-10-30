@@ -60,3 +60,8 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] OpenTelemetry + Grafana / Prometheus (OTLP → collector → Tempo/Prometheus/Grafana)
 - [x] Rate limit ortam ayrımı (sıkı base + Development lab) + Vault rotasyon/Raft notları
 - [x] Başvuru evrak yükleme lab (App_Data + documents API; henüz zorunlu değil)
+- [x] Şube modeli (Branches + staff BranchId + karar snapshot)
+- [x] Şube RBAC + SuperAdmin (Customer/Application BranchId, NYC/CHI seed, şube CRUD UI)
+- [x] Karar mektubu şablon CRUD + UI diline göre sistem şablonu; katalog ürünleri şube locale’ine kilitli (SuperAdmin hariç)
+- [x] Demo giriş matrisi Personel/Yönetici/Müşteri × TR/DE/EN; ortak lab şifresi `Demo123!`
+- [x] Onay soft-evrak uyarısı; karar audit (şube/şablon); evrak yükleme SignalR + eksik evrak rozeti/filtresi

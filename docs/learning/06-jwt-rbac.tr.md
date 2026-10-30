@@ -35,7 +35,7 @@ JWT üretimi CLI ile değil; test için:
 # API ayaktayken (örnek)
 curl -X POST http://localhost:8080/api/Auth/login `
   -H "Content-Type: application/json" `
-  -d "{\"email\":\"staff@bank.local\",\"password\":\"Staff123!\"}"
+  -d "{\"email\":\"staff.tr@bank.local\",\"password\":\"Demo123!\"}"
 ```
 
 Demo hesaplar: kök `README.md` / `README.tr.md`.

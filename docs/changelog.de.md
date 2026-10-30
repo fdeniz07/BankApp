@@ -2,6 +2,22 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-10-30 — Entscheidungsvorlagen + Demo-Login-Matrix + Katalog-Locale
+
+- `DecisionLetterTemplates` + API-CRUD; Detailseite System-/Benutzer-Vorlagen (folgt UI-Sprache).
+- Schnell-Genehmigung/-Ablehnung in der Liste entfernt (nur Detail).
+- Mitarbeiter-Kreditkatalog an Filialland gebunden (`CatalogLocaleService`); SuperAdmin sieht alle Locales.
+- Demo-Konten: Personal / Manager / Kunde × TR/DE/EN; gemeinsames Lab-Passwort `Demo123!`.
+- Learning: `29-decision-letter-templates.tr.md`.
+
+## 2026-10-29 — Filial-/Branch-Modell
+
+- Tabelle `Branches` + Seed (IST-01, ANK-01, BER-01); Demo-Personal `BranchId`.
+- Genehmigung/Ablehnung: Snapshot `DecisionBranchCode` / `DecisionBranchName`.
+- `GET /api/Branches`; Filiale in Personal-Liste / Profil / Antragsdetail.
+- Learning: `27-branch-model.tr.md`.
+- Filial-RBAC + SuperAdmin + Customer/Application `BranchId` (Learning `28`).
+
 ## 2026-10-28 — Kreditantrag-Dokumenten-Upload (Lab)
 
 - `CreditApplicationDocuments` + Disk `App_Data/credit-documents` (nicht wwwroot; JWT-Download).
