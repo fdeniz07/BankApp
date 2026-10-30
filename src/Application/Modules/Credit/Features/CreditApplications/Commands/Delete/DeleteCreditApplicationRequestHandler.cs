@@ -14,18 +14,18 @@ public class DeleteCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public DeleteCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<DeletedCreditApplicationResponse> Handle(
@@ -37,7 +37,7 @@ public class DeleteCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(creditApplication!, cancellationToken);
 
         if (creditApplication.Status == CreditApplicationStatus.Pending)
             creditApplication.Status = CreditApplicationStatus.Cancelled;

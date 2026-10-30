@@ -12,7 +12,10 @@ public class GetListCreditApplicationRequest : IRequest<GetListResponse<GetListC
     public string[] Roles => [GeneralOperationClaims.Customer, GeneralOperationClaims.BankStaff];
     public PageRequest PageRequest { get; set; } = new();
     public Guid? CustomerId { get; set; }
+    public Guid? BranchId { get; set; }
     public CreditApplicationStatus? Status { get; set; }
+    /// <summary>When true, only Pending applications missing IdentityDocument or IncomeProof.</summary>
+    public bool? MissingRequiredDocumentsOnly { get; set; }
     public string? SortBy { get; set; }
     public bool SortDesc { get; set; }
 }

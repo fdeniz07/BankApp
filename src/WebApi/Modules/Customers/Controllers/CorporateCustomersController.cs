@@ -21,12 +21,14 @@ public class CorporateCustomersController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] Guid? branchId = null)
     {
         GetListCorporateCustomerRequest request = new()
         {
             PageRequest = pageRequest,
-            IsActive = isActive
+            IsActive = isActive,
+            BranchId = branchId
         };
         GetListResponse<GetListCorporateCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);

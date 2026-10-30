@@ -1,10 +1,12 @@
 using System.Linq.Expressions;
+using Application.Modules.Credit.Features.CreditApplicationDocuments;
 using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Responses;
 using Core.Repositories;
 using Domain.Entities;
+using Domain.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,21 +18,27 @@ public class GetListCreditApplicationRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly ICreditSubTypeRepository _creditSubTypeRepository;
     private readonly ICreditTypeRepository _creditTypeRepository;
+    private readonly ICreditApplicationDocumentRepository _documentRepository;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public GetListCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         ICreditSubTypeRepository creditSubTypeRepository,
         ICreditTypeRepository creditTypeRepository,
+        ICreditApplicationDocumentRepository documentRepository,
         IMapper mapper,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _creditSubTypeRepository = creditSubTypeRepository;
         _creditTypeRepository = creditTypeRepository;
+        _documentRepository = documentRepository;
         _mapper = mapper;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<GetListResponse<GetListCreditApplicationListItemDto>> Handle(
@@ -40,7 +48,42 @@ public class GetListCreditApplicationRequestHandler
         if (_currentUserService.IsCustomer && !_currentUserService.IsBankStaff)
             request.CustomerId = _currentUserService.GetRequiredCustomerId();
 
-        Expression<Func<CreditApplication, bool>>? predicate = BuildPredicate(request);
+        if (_branchAuthorization.MustSeeNoBranchData)
+        {
+            return new GetListResponse<GetListCreditApplicationListItemDto>
+            {
+                Items = [],
+                Index = request.PageRequest.PageIndex,
+                Size = request.PageRequest.PageSize,
+                Count = 0,
+                Pages = 0,
+                From = 0
+            };
+        }
+
+        Guid? branchFilter = _branchAuthorization.ResolveListBranchFilter(request.BranchId);
+        HashSet<Guid>? missingDocOnlyIds = null;
+        if (request.MissingRequiredDocumentsOnly == true)
+        {
+            missingDocOnlyIds = await ResolveMissingRequiredDocumentApplicationIdsAsync(
+                request,
+                branchFilter,
+                cancellationToken);
+            if (missingDocOnlyIds.Count == 0)
+            {
+                return new GetListResponse<GetListCreditApplicationListItemDto>
+                {
+                    Items = [],
+                    Index = request.PageRequest.PageIndex,
+                    Size = request.PageRequest.PageSize,
+                    Count = 0,
+                    Pages = 0,
+                    From = 0
+                };
+            }
+        }
+
+        Expression<Func<CreditApplication, bool>>? predicate = BuildPredicate(request, branchFilter, missingDocOnlyIds);
         Func<IQueryable<CreditApplication>, IOrderedQueryable<CreditApplication>>? orderBy =
             BuildOrderBy(request.SortBy, request.SortDesc);
 
@@ -114,6 +157,26 @@ public class GetListCreditApplicationRequestHandler
         Dictionary<Guid, decimal?> approvedInterestById = entities
             .ToDictionary(e => e.Id, e => e.ApprovedInterestRate);
 
+        HashSet<Guid> pendingIds = entities
+            .Where(e => e.Status == CreditApplicationStatus.Pending)
+            .Select(e => e.Id)
+            .ToHashSet();
+
+        Dictionary<Guid, List<string>> docTypesByAppId = [];
+        if (pendingIds.Count > 0)
+        {
+            IPaginate<CreditApplicationDocument> docs = await _documentRepository.GetListAsync(
+                predicate: d => pendingIds.Contains(d.CreditApplicationId) && !d.IsDeleted,
+                size: Math.Max(pendingIds.Count * 10, 50),
+                cancellationToken: cancellationToken);
+
+            docTypesByAppId = docs.Items
+                .GroupBy(d => d.CreditApplicationId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(d => d.DocumentType.Name).ToList());
+        }
+
         foreach (GetListCreditApplicationListItemDto item in items)
         {
             item.CreditSubTypeName = subTypeNameById.TryGetValue(item.CreditSubTypeId, out string? name)
@@ -128,21 +191,69 @@ public class GetListCreditApplicationRequestHandler
             item.ApprovedInterestRate = approvedInterestById.TryGetValue(item.Id, out decimal? approvedRate)
                 ? approvedRate
                 : null;
+
+            CreditApplication? entity = entities.FirstOrDefault(e => e.Id == item.Id);
+            if (entity is not null)
+            {
+                item.DecisionBy = entity.DecisionBy;
+                item.DecisionBranchCode = entity.DecisionBranchCode;
+                item.DecisionBranchName = entity.DecisionBranchName;
+                item.DecisionTemplateName = entity.DecisionTemplateName;
+            }
+
+            if (item.Status == CreditApplicationStatus.Pending)
+            {
+                IEnumerable<string> types = docTypesByAppId.TryGetValue(item.Id, out List<string>? list)
+                    ? list
+                    : [];
+                item.MissingRequiredDocuments = RequiredCreditDocuments.IsMissingRequired(types);
+            }
         }
     }
 
-    private static Expression<Func<CreditApplication, bool>>? BuildPredicate(GetListCreditApplicationRequest request)
+    private async Task<HashSet<Guid>> ResolveMissingRequiredDocumentApplicationIdsAsync(
+        GetListCreditApplicationRequest request,
+        Guid? branchFilter,
+        CancellationToken cancellationToken)
     {
-        if (request.CustomerId.HasValue && request.Status is not null)
-            return c => c.CustomerId == request.CustomerId.Value && c.Status == request.Status;
+        IPaginate<CreditApplication> pending = await _creditApplicationRepository.GetListAsync(
+            predicate: c =>
+                c.Status == CreditApplicationStatus.Pending
+                && (!request.CustomerId.HasValue || c.CustomerId == request.CustomerId.Value)
+                && (!branchFilter.HasValue || c.BranchId == branchFilter.Value),
+            size: 500,
+            cancellationToken: cancellationToken);
 
-        if (request.CustomerId.HasValue)
-            return c => c.CustomerId == request.CustomerId.Value;
+        if (pending.Items.Count == 0)
+            return [];
 
-        if (request.Status is not null)
-            return c => c.Status == request.Status;
+        HashSet<Guid> pendingIds = pending.Items.Select(p => p.Id).ToHashSet();
+        IPaginate<CreditApplicationDocument> docs = await _documentRepository.GetListAsync(
+            predicate: d => pendingIds.Contains(d.CreditApplicationId) && !d.IsDeleted,
+            size: Math.Max(pendingIds.Count * 10, 50),
+            cancellationToken: cancellationToken);
 
-        return null;
+        Dictionary<Guid, List<string>> byApp = docs.Items
+            .GroupBy(d => d.CreditApplicationId)
+            .ToDictionary(g => g.Key, g => g.Select(d => d.DocumentType.Name).ToList());
+
+        return pendingIds
+            .Where(id =>
+                RequiredCreditDocuments.IsMissingRequired(
+                    byApp.TryGetValue(id, out List<string>? types) ? types : []))
+            .ToHashSet();
+    }
+
+    private static Expression<Func<CreditApplication, bool>>? BuildPredicate(
+        GetListCreditApplicationRequest request,
+        Guid? branchFilter,
+        HashSet<Guid>? missingDocOnlyIds)
+    {
+        return c =>
+            (!request.CustomerId.HasValue || c.CustomerId == request.CustomerId.Value)
+            && (request.Status == null || c.Status == request.Status)
+            && (!branchFilter.HasValue || c.BranchId == branchFilter.Value)
+            && (missingDocOnlyIds == null || missingDocOnlyIds.Contains(c.Id));
     }
 
     private static Func<IQueryable<CreditApplication>, IOrderedQueryable<CreditApplication>>? BuildOrderBy(

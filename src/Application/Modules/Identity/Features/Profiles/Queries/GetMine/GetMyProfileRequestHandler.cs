@@ -11,17 +11,20 @@ public class GetMyProfileRequestHandler : IRequestHandler<GetMyProfileRequest, G
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IIndividualCustomerRepository _individualCustomerRepository;
     private readonly ICorporateCustomerRepository _corporateCustomerRepository;
+    private readonly IBranchRepository _branchRepository;
     private readonly ICurrentUserService _currentUserService;
 
     public GetMyProfileRequestHandler(
         IApplicationUserRepository applicationUserRepository,
         IIndividualCustomerRepository individualCustomerRepository,
         ICorporateCustomerRepository corporateCustomerRepository,
+        IBranchRepository branchRepository,
         ICurrentUserService currentUserService)
     {
         _applicationUserRepository = applicationUserRepository;
         _individualCustomerRepository = individualCustomerRepository;
         _corporateCustomerRepository = corporateCustomerRepository;
+        _branchRepository = branchRepository;
         _currentUserService = currentUserService;
     }
 
@@ -42,6 +45,13 @@ public class GetMyProfileRequestHandler : IRequestHandler<GetMyProfileRequest, G
         List<string> roles = claims.Select(c => c.Name).Distinct().OrderBy(n => n).ToList();
 
         (string? firstName, string? lastName) = await ResolveNamesAsync(user, cancellationToken);
+        Branch? branch = null;
+        if (user.BranchId.HasValue)
+        {
+            branch = await _branchRepository.GetAsync(
+                b => b.Id == user.BranchId.Value,
+                cancellationToken: cancellationToken);
+        }
 
         return new GetMyProfileResponse
         {
@@ -53,6 +63,9 @@ public class GetMyProfileRequestHandler : IRequestHandler<GetMyProfileRequest, G
             Gender = user.Gender,
             DateOfBirth = user.DateOfBirth,
             Position = user.Position,
+            BranchId = user.BranchId,
+            BranchCode = branch?.Code,
+            BranchName = branch?.Name,
             ProfileImageUrl = user.ProfileImagePath,
             IsActive = user.IsActive,
             IsStaff = !user.CustomerId.HasValue,

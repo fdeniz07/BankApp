@@ -28,12 +28,14 @@ public class MappingProfiles : Profile
             .ForMember(d => d.CustomerCategory, opt => opt.Ignore())
             .ForMember(d => d.CreditSubTypeName, opt => opt.Ignore())
             .ForMember(d => d.CurrencyCode, opt => opt.Ignore())
+            .ForMember(d => d.MissingRequiredDocuments, opt => opt.Ignore())
             .ReverseMap()
             .ForMember(d => d.Customer, opt => opt.Ignore());
 
         CreateMap<CreditApplication, GetListCreditApplicationListItemDto>()
             .ForMember(d => d.CurrencyCode, opt => opt.Ignore())
             .ForMember(d => d.CreditSubTypeName, opt => opt.Ignore())
+            .ForMember(d => d.MissingRequiredDocuments, opt => opt.Ignore())
             .ReverseMap();
         CreateMap<CreateCreditApplicationRequest, CreditApplication>();
         CreateMap<UpdateCreditApplicationRequest, CreditApplication>();

@@ -10,7 +10,8 @@ public class GetListStaffUserRequest
     : IRequest<GetListResponse<GetListStaffUserListItemDto>>,
         ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.BankManager];
+    public string[] Roles => [GeneralOperationClaims.BankManager, GeneralOperationClaims.SuperAdmin];
     public PageRequest PageRequest { get; set; } = new();
     public bool? IsActive { get; set; }
+    public Guid? BranchId { get; set; }
 }

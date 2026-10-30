@@ -13,24 +13,30 @@ public class ApproveCreditApplicationRequestHandler
 {
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly IApplicationUserRepository _applicationUserRepository;
+    private readonly IBranchRepository _branchRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
     private readonly IAuditLogger _auditLogger;
 
     public ApproveCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         IApplicationUserRepository applicationUserRepository,
+        IBranchRepository branchRepository,
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
         ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization,
         IAuditLogger auditLogger)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _applicationUserRepository = applicationUserRepository;
+        _branchRepository = branchRepository;
         _mapper = mapper;
         _businessRules = businessRules;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
         _auditLogger = auditLogger;
     }
 
@@ -43,20 +49,25 @@ public class ApproveCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(creditApplication!, cancellationToken);
         await _businessRules.ApplicationShouldBePending(creditApplication!);
         await _businessRules.RequestShouldBeWithinCreditSubTypeLimits(
             creditApplication!.CreditSubTypeId,
             request.ApprovedAmount,
             request.ApprovedTermMonths);
 
-        string? decisionBy = await ResolveDecisionByEmailAsync(cancellationToken);
+        (string? decisionBy, string? branchCode, string? branchName) =
+            await ResolveDecisionMakerAsync(cancellationToken);
 
         creditApplication.Approve(
             request.ApprovedAmount,
             request.ApprovedTermMonths,
             request.ApprovedInterestRate,
             decisionBy,
-            request.Notes);
+            request.Notes,
+            branchCode,
+            branchName,
+            request.DecisionTemplateName);
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
 
@@ -71,21 +82,34 @@ public class ApproveCreditApplicationRequestHandler
             {
                 creditApplication.ApprovedAmount,
                 creditApplication.ApprovedTermMonths,
-                creditApplication.ApprovedInterestRate
+                creditApplication.ApprovedInterestRate,
+                creditApplication.DecisionTemplateName,
+                creditApplication.DecisionBranchCode
             });
 
         return _mapper.Map<ApprovedCreditApplicationResponse>(creditApplication);
     }
 
-    private async Task<string?> ResolveDecisionByEmailAsync(CancellationToken cancellationToken)
+    private async Task<(string? Email, string? BranchCode, string? BranchName)> ResolveDecisionMakerAsync(
+        CancellationToken cancellationToken)
     {
         if (!_currentUserService.UserId.HasValue)
-            return null;
+            return (null, null, null);
 
         ApplicationUser? user = await _applicationUserRepository.GetAsync(
             u => u.Id == _currentUserService.UserId.Value,
             cancellationToken: cancellationToken);
+        if (user is null)
+            return (null, null, null);
 
-        return string.IsNullOrWhiteSpace(user?.Email) ? null : user.Email;
+        string? email = string.IsNullOrWhiteSpace(user.Email) ? null : user.Email;
+        if (!user.BranchId.HasValue)
+            return (email, null, null);
+
+        Branch? branch = await _branchRepository.GetAsync(
+            b => b.Id == user.BranchId.Value,
+            cancellationToken: cancellationToken);
+
+        return (email, branch?.Code, branch?.Name);
     }
 }

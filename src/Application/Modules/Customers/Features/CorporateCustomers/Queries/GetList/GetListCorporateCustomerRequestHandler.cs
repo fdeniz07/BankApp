@@ -15,15 +15,18 @@ public class GetListCorporateCustomerRequestHandler
     private readonly ICorporateCustomerRepository _corporateCustomerRepository;
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public GetListCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
         IMapper mapper,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _mapper = mapper;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<GetListResponse<GetListCorporateCustomerListItemDto>> Handle(
@@ -32,6 +35,19 @@ public class GetListCorporateCustomerRequestHandler
     {
         if (request.OnlyDeleted || request.IsActive == false)
             _currentUserService.EnsureBankStaff();
+
+        if (_branchAuthorization.MustSeeNoBranchData)
+        {
+            return new GetListResponse<GetListCorporateCustomerListItemDto>
+            {
+                Items = [],
+                Index = request.PageRequest.PageIndex,
+                Size = request.PageRequest.PageSize,
+                Count = 0,
+                Pages = 0,
+                From = 0
+            };
+        }
 
         Expression<Func<CorporateCustomer, bool>>? predicate = BuildPredicate(request);
 
@@ -53,11 +69,18 @@ public class GetListCorporateCustomerRequestHandler
             return c => c.Id == customerId;
         }
 
+        Guid? branchFilter = _branchAuthorization.ResolveListBranchFilter(request.BranchId);
+
         if (request.OnlyDeleted)
-            return c => c.IsDeleted;
+            return c => c.IsDeleted && (!branchFilter.HasValue || c.BranchId == branchFilter.Value);
 
         if (request.IsActive.HasValue)
-            return c => c.IsActive == request.IsActive.Value;
+            return c =>
+                c.IsActive == request.IsActive.Value
+                && (!branchFilter.HasValue || c.BranchId == branchFilter.Value);
+
+        if (branchFilter.HasValue)
+            return c => c.BranchId == branchFilter.Value;
 
         return null;
     }

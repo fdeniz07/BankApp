@@ -14,6 +14,9 @@ public class GetListStaffUserListItemDto
     public Gender? Gender { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public StaffPosition? Position { get; set; }
+    public Guid? BranchId { get; set; }
+    public string? BranchCode { get; set; }
+    public string? BranchName { get; set; }
     public string? ProfileImageUrl { get; set; }
     public IList<string> Roles { get; set; } = [];
     public DateTimeOffset CreatedDate { get; set; }

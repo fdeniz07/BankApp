@@ -11,4 +11,6 @@ public class RejectCreditApplicationRequest : IRequest<RejectedCreditApplication
     public string RejectionReason { get; set; } = default!;
     public string? DecisionBy { get; set; }
     public string? Notes { get; set; }
+    /// <summary>Letter template label for decision audit (system or user-saved name).</summary>
+    public string? DecisionTemplateName { get; set; }
 }

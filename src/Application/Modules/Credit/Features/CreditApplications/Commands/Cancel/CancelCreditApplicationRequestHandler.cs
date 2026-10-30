@@ -15,6 +15,7 @@ public class CancelCreditApplicationRequestHandler
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
     private readonly IAuditLogger _auditLogger;
 
     public CancelCreditApplicationRequestHandler(
@@ -22,12 +23,14 @@ public class CancelCreditApplicationRequestHandler
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
         ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization,
         IAuditLogger auditLogger)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _mapper = mapper;
         _businessRules = businessRules;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
         _auditLogger = auditLogger;
     }
 
@@ -40,7 +43,7 @@ public class CancelCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(creditApplication!, cancellationToken);
         await _businessRules.ApplicationShouldBePendingForCancel(creditApplication);
 
         creditApplication.Cancel(request.Notes);

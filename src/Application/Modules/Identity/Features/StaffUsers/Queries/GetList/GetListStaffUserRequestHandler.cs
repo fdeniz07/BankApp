@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using Core.Application.Responses;
 using Core.Repositories;
@@ -13,27 +14,45 @@ public class GetListStaffUserRequestHandler
     : IRequestHandler<GetListStaffUserRequest, GetListResponse<GetListStaffUserListItemDto>>
 {
     private readonly IApplicationUserRepository _applicationUserRepository;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
-    public GetListStaffUserRequestHandler(IApplicationUserRepository applicationUserRepository)
+    public GetListStaffUserRequestHandler(
+        IApplicationUserRepository applicationUserRepository,
+        IBranchAuthorizationService branchAuthorization)
     {
         _applicationUserRepository = applicationUserRepository;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<GetListResponse<GetListStaffUserListItemDto>> Handle(
         GetListStaffUserRequest request,
         CancellationToken cancellationToken)
     {
-        Expression<Func<ApplicationUser, bool>> predicate = u => u.CustomerId == null;
-        if (request.IsActive.HasValue)
+        if (_branchAuthorization.MustSeeNoBranchData)
         {
-            bool isActive = request.IsActive.Value;
-            predicate = u => u.CustomerId == null && u.IsActive == isActive;
+            return new GetListResponse<GetListStaffUserListItemDto>
+            {
+                Items = [],
+                Index = request.PageRequest.PageIndex,
+                Size = request.PageRequest.PageSize,
+                Count = 0,
+                Pages = 0,
+                From = 0
+            };
         }
+
+        Guid? branchFilter = _branchAuthorization.ResolveListBranchFilter(request.BranchId);
+
+        Expression<Func<ApplicationUser, bool>> predicate = u =>
+            u.CustomerId == null
+            && (!request.IsActive.HasValue || u.IsActive == request.IsActive.Value)
+            && (!branchFilter.HasValue || u.BranchId == branchFilter.Value);
 
         IPaginate<ApplicationUser> users = await _applicationUserRepository.GetListAsync(
             predicate: predicate,
             orderBy: q => q.OrderBy(u => u.Email),
             include: q => q
+                .Include(u => u.Branch)
                 .Include(u => u.UserOperationClaims)
                 .ThenInclude(uoc => uoc.OperationClaim),
             index: request.PageRequest.PageIndex,
@@ -65,13 +84,17 @@ public class GetListStaffUserRequestHandler
             Id = user.Id,
             Email = user.Email,
             IsActive = user.IsActive,
-            IsManager = roles.Contains(GeneralOperationClaims.BankManager),
+            IsManager = roles.Contains(GeneralOperationClaims.BankManager)
+                || roles.Contains(GeneralOperationClaims.SuperAdmin),
             FirstName = user.FirstName,
             LastName = user.LastName,
             Title = user.Title,
             Gender = user.Gender,
             DateOfBirth = user.DateOfBirth,
             Position = user.Position,
+            BranchId = user.BranchId,
+            BranchCode = user.Branch?.Code,
+            BranchName = user.Branch?.Name,
             ProfileImageUrl = user.ProfileImagePath,
             Roles = roles,
             CreatedDate = user.CreatedDate

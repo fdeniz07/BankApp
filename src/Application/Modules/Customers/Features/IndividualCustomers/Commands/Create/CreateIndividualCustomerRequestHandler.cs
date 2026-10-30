@@ -2,6 +2,7 @@ using Application.Common.CustomerNumbers;
 using Application.Modules.Identity.Features.Auth.Rules;
 using Application.Modules.Customers.Features.Customers.Rules;
 using Application.Modules.Customers.Features.IndividualCustomers.Rules;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Security.Constants;
@@ -24,6 +25,7 @@ public class CreateIndividualCustomerRequestHandler
     private readonly IndividualCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
+    private readonly ICurrentUserService _currentUserService;
 
     public CreateIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -33,7 +35,8 @@ public class CreateIndividualCustomerRequestHandler
         IMapper mapper,
         IndividualCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
-        CustomerLifecycleBusinessRules lifecycleRules)
+        CustomerLifecycleBusinessRules lifecycleRules,
+        ICurrentUserService currentUserService)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -43,6 +46,7 @@ public class CreateIndividualCustomerRequestHandler
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
         _lifecycleRules = lifecycleRules;
+        _currentUserService = currentUserService;
     }
 
     public async Task<CreatedIndividualCustomerResponse> Handle(
@@ -58,6 +62,9 @@ public class CreateIndividualCustomerRequestHandler
         IndividualCustomer individualCustomer = _mapper.Map<IndividualCustomer>(request);
         individualCustomer.CustomerNumber = await AllocateIndividualNumberAsync(request.Locale, cancellationToken);
         individualCustomer.IsActive = true;
+        individualCustomer.BranchId = _currentUserService.IsSuperAdmin
+            ? request.BranchId ?? _currentUserService.BranchId
+            : _currentUserService.BranchId ?? request.BranchId;
         await _individualCustomerRepository.AddAsync(individualCustomer, cancellationToken);
 
         HashingHelper.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);

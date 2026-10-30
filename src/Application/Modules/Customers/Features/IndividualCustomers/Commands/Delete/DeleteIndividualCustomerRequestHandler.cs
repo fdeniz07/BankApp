@@ -17,6 +17,7 @@ public class DeleteIndividualCustomerRequestHandler
     private readonly IndividualCustomerBusinessRules _businessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public DeleteIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -24,7 +25,8 @@ public class DeleteIndividualCustomerRequestHandler
         IMapper mapper,
         IndividualCustomerBusinessRules businessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -32,6 +34,7 @@ public class DeleteIndividualCustomerRequestHandler
         _businessRules = businessRules;
         _lifecycleRules = lifecycleRules;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<DeletedIndividualCustomerResponse> Handle(
@@ -39,6 +42,7 @@ public class DeleteIndividualCustomerRequestHandler
         CancellationToken cancellationToken)
     {
         _currentUserService.EnsureBankStaff();
+        await _branchAuthorization.EnsureCanModifyCustomerAsync(request.Id, cancellationToken);
 
         IndividualCustomer? individualCustomer = await _individualCustomerRepository.GetAsync(
             predicate: c => c.Id == request.Id,

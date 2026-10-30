@@ -16,7 +16,7 @@ public class UpdateCorporateCustomerRequestHandler
     private readonly IMapper _mapper;
     private readonly CorporateCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public UpdateCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
@@ -24,21 +24,21 @@ public class UpdateCorporateCustomerRequestHandler
         IMapper mapper,
         CorporateCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
         _mapper = mapper;
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<UpdatedCorporateCustomerResponse> Handle(
         UpdateCorporateCustomerRequest request,
         CancellationToken cancellationToken)
     {
-        _currentUserService.EnsureCanAccessCustomer(request.Id);
+        await _branchAuthorization.EnsureCanModifyCustomerAsync(request.Id, cancellationToken);
 
         CorporateCustomer? corporateCustomer = await _corporateCustomerRepository.GetAsync(
             predicate: c => c.Id == request.Id,

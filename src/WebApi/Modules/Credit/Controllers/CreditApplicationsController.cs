@@ -32,7 +32,9 @@ public class CreditApplicationsController : BaseController
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
         [FromQuery] Guid? customerId,
+        [FromQuery] Guid? branchId,
         [FromQuery] string? status,
+        [FromQuery] bool? missingRequiredDocumentsOnly,
         [FromQuery] string? sortBy,
         [FromQuery] bool sortDesc = false)
     {
@@ -44,7 +46,9 @@ public class CreditApplicationsController : BaseController
         {
             PageRequest = pageRequest,
             CustomerId = customerId,
+            BranchId = branchId,
             Status = parsedStatus,
+            MissingRequiredDocumentsOnly = missingRequiredDocumentsOnly,
             SortBy = sortBy,
             SortDesc = sortDesc
         };

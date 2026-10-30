@@ -20,4 +20,6 @@ public class CreateIndividualCustomerRequest : IRequest<CreatedIndividualCustome
     public string? FatherName { get; set; }
     /// <summary>UI locale: tr | en | de — used in generated customer number.</summary>
     public string? Locale { get; set; }
+    /// <summary>Home branch. Staff default = own branch; SuperAdmin may set explicitly.</summary>
+    public Guid? BranchId { get; set; }
 }

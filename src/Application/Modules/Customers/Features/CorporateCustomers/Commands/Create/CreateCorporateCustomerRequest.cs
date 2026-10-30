@@ -25,4 +25,5 @@ public class CreateCorporateCustomerRequest : IRequest<CreatedCorporateCustomerR
     public DateTime? CompanyFoundationDate { get; set; }
     /// <summary>UI locale: tr | en | de — used in generated customer number.</summary>
     public string? Locale { get; set; }
+    public Guid? BranchId { get; set; }
 }

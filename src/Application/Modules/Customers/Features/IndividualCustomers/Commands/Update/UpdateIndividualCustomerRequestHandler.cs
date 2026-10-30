@@ -19,7 +19,7 @@ public class UpdateIndividualCustomerRequestHandler
     private readonly IndividualCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public UpdateIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -28,7 +28,7 @@ public class UpdateIndividualCustomerRequestHandler
         IndividualCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -36,14 +36,14 @@ public class UpdateIndividualCustomerRequestHandler
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
         _lifecycleRules = lifecycleRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<UpdatedIndividualCustomerResponse> Handle(
         UpdateIndividualCustomerRequest request,
         CancellationToken cancellationToken)
     {
-        _currentUserService.EnsureCanAccessCustomer(request.Id);
+        await _branchAuthorization.EnsureCanModifyCustomerAsync(request.Id, cancellationToken);
 
         IndividualCustomer? individualCustomer = await _individualCustomerRepository.GetAsync(
             predicate: c => c.Id == request.Id,

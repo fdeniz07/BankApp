@@ -19,26 +19,32 @@ public class UpdateStaffUserRequestHandler
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IOperationClaimRepository _operationClaimRepository;
     private readonly IUserOperationClaimRepository _userOperationClaimRepository;
+    private readonly IBranchRepository _branchRepository;
     private readonly StaffUserBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
     private readonly IAuditLogger _auditLogger;
 
     public UpdateStaffUserRequestHandler(
         IApplicationUserRepository applicationUserRepository,
         IOperationClaimRepository operationClaimRepository,
         IUserOperationClaimRepository userOperationClaimRepository,
+        IBranchRepository branchRepository,
         StaffUserBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
         ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization,
         IAuditLogger auditLogger)
     {
         _applicationUserRepository = applicationUserRepository;
         _operationClaimRepository = operationClaimRepository;
         _userOperationClaimRepository = userOperationClaimRepository;
+        _branchRepository = branchRepository;
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
         _auditLogger = auditLogger;
     }
 
@@ -54,16 +60,19 @@ public class UpdateStaffUserRequestHandler
         await _businessRules.UserShouldBeStaffAccount(user!);
 
         bool isSelf = _currentUserService.UserId.HasValue && _currentUserService.UserId.Value == user!.Id;
-        bool isManager = _currentUserService.IsBankManager;
+        bool isElevated = _currentUserService.IsBankManager || _currentUserService.IsSuperAdmin;
 
-        if (!isManager && !isSelf)
+        if (!isElevated && !isSelf)
             throw new AuthorizationException("You can only update your own staff profile.");
+
+        if (isElevated && !isSelf)
+            await _branchAuthorization.EnsureCanManageStaffUserAsync(user!, cancellationToken);
 
         bool currentIsManager = await _businessRules.UserHasManagerRoleAsync(user!.Id);
         bool nextIsActive = user.IsActive;
         bool nextIsManager = currentIsManager;
 
-        if (isManager)
+        if (isElevated)
         {
             nextIsActive = request.IsActive;
             nextIsManager = request.IsManager;
@@ -90,12 +99,30 @@ public class UpdateStaffUserRequestHandler
             changes["DateOfBirth"] = new { from = user.DateOfBirth, to = request.DateOfBirth };
         if (user.Position?.Name != request.Position?.Name)
             changes["Position"] = new { from = user.Position?.Name, to = request.Position?.Name };
-        if (isManager && user.IsActive != nextIsActive)
-            changes["IsActive"] = new { from = user.IsActive, to = nextIsActive };
-        if (isManager && currentIsManager != nextIsManager)
-            changes["IsManager"] = new { from = currentIsManager, to = nextIsManager };
+        Guid? nextBranchId = user.BranchId;
+        if (isElevated)
+        {
+            nextBranchId = _currentUserService.IsSuperAdmin
+                ? request.BranchId
+                : (_currentUserService.BranchId ?? request.BranchId);
+            if (user.BranchId != nextBranchId)
+                changes["BranchId"] = new { from = user.BranchId, to = nextBranchId };
+            if (user.IsActive != nextIsActive)
+                changes["IsActive"] = new { from = user.IsActive, to = nextIsActive };
+            if (currentIsManager != nextIsManager)
+                changes["IsManager"] = new { from = currentIsManager, to = nextIsManager };
+        }
         if (!string.IsNullOrWhiteSpace(request.NewPassword))
             changes["Password"] = new { changed = true };
+
+        if (isElevated && nextBranchId.HasValue)
+        {
+            Branch? branch = await _branchRepository.GetAsync(
+                b => b.Id == nextBranchId.Value && b.IsActive,
+                cancellationToken: cancellationToken);
+            if (branch is null)
+                throw new BusinessException(StaffUserMessages.BranchNotFoundOrInactive);
+        }
 
         user.Email = email;
         user.FirstName = TrimOrNull(request.FirstName);
@@ -104,6 +131,8 @@ public class UpdateStaffUserRequestHandler
         user.Gender = request.Gender;
         user.DateOfBirth = request.DateOfBirth;
         user.Position = request.Position;
+        if (isElevated)
+            user.BranchId = nextBranchId;
         user.IsActive = nextIsActive;
 
         if (!string.IsNullOrWhiteSpace(request.NewPassword))
@@ -115,11 +144,19 @@ public class UpdateStaffUserRequestHandler
 
         await _applicationUserRepository.UpdateAsync(user, cancellationToken);
 
-        if (isManager)
+        if (isElevated)
             await SyncManagerRoleAsync(user.Id, nextIsManager, cancellationToken);
 
         List<OperationClaim> claims = await _applicationUserRepository.GetClaimsAsync(user, cancellationToken);
         List<string> roles = claims.Select(c => c.Name).Distinct().OrderBy(n => n).ToList();
+
+        Branch? assignedBranch = null;
+        if (user.BranchId.HasValue)
+        {
+            assignedBranch = await _branchRepository.GetAsync(
+                b => b.Id == user.BranchId.Value,
+                cancellationToken: cancellationToken);
+        }
 
         _auditLogger.Log(
             AuditEventCategories.Staff,
@@ -142,6 +179,9 @@ public class UpdateStaffUserRequestHandler
             Gender = user.Gender,
             DateOfBirth = user.DateOfBirth,
             Position = user.Position,
+            BranchId = user.BranchId,
+            BranchCode = assignedBranch?.Code,
+            BranchName = assignedBranch?.Name,
             ProfileImageUrl = user.ProfileImagePath,
             Roles = roles
         };

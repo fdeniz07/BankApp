@@ -19,6 +19,7 @@ public class UploadCreditApplicationDocumentRequestHandler
     private readonly CreditApplicationBusinessRules _applicationRules;
     private readonly CreditApplicationDocumentBusinessRules _documentRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public UploadCreditApplicationDocumentRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
@@ -26,7 +27,8 @@ public class UploadCreditApplicationDocumentRequestHandler
         ICreditDocumentStorage documentStorage,
         CreditApplicationBusinessRules applicationRules,
         CreditApplicationDocumentBusinessRules documentRules,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _documentRepository = documentRepository;
@@ -34,6 +36,7 @@ public class UploadCreditApplicationDocumentRequestHandler
         _applicationRules = applicationRules;
         _documentRules = documentRules;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<UploadCreditApplicationDocumentResponse> Handle(
@@ -52,7 +55,7 @@ public class UploadCreditApplicationDocumentRequestHandler
             a => a.Id == request.CreditApplicationId,
             cancellationToken: cancellationToken);
         await _applicationRules.CreditApplicationShouldExistWhenSelected(application);
-        _currentUserService.EnsureCanAccessCustomer(application!.CustomerId);
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(application!, cancellationToken);
         await _documentRules.ApplicationShouldBePendingForUpload(application);
         await _documentRules.ApplicationShouldNotExceedDocumentLimit(application.Id);
 
@@ -86,6 +89,9 @@ public class UploadCreditApplicationDocumentRequestHandler
         document.StoragePath = storagePath;
 
         await _documentRepository.AddAsync(document, cancellationToken);
+
+        application.RecordDocumentUploaded(document.DocumentType.Name);
+        await _creditApplicationRepository.UpdateAsync(application, cancellationToken);
 
         return new UploadCreditApplicationDocumentResponse
         {

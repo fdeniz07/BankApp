@@ -20,12 +20,14 @@ public class IndividualCustomersController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] Guid? branchId = null)
     {
         GetListIndividualCustomerRequest request = new()
         {
             PageRequest = pageRequest,
-            IsActive = isActive
+            IsActive = isActive,
+            BranchId = branchId
         };
         GetListResponse<GetListIndividualCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);

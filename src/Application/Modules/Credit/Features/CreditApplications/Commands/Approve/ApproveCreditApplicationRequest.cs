@@ -13,4 +13,6 @@ public class ApproveCreditApplicationRequest : IRequest<ApprovedCreditApplicatio
     public decimal ApprovedInterestRate { get; set; }
     public string? DecisionBy { get; set; }
     public string? Notes { get; set; }
+    /// <summary>Letter template label for decision audit (system or user-saved name).</summary>
+    public string? DecisionTemplateName { get; set; }
 }

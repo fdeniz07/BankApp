@@ -7,7 +7,7 @@ namespace Application.Modules.Identity.Features.StaffUsers.Commands.Create;
 
 public class CreateStaffUserRequest : IRequest<CreatedStaffUserResponse>, ISecuredRequest
 {
-    public string[] Roles => [GeneralOperationClaims.BankManager];
+    public string[] Roles => [GeneralOperationClaims.BankManager, GeneralOperationClaims.SuperAdmin];
     public string Email { get; set; } = default!;
     public string Password { get; set; } = default!;
     public bool IsManager { get; set; }
@@ -17,4 +17,5 @@ public class CreateStaffUserRequest : IRequest<CreatedStaffUserResponse>, ISecur
     public Gender? Gender { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public StaffPosition? Position { get; set; }
+    public Guid? BranchId { get; set; }
 }

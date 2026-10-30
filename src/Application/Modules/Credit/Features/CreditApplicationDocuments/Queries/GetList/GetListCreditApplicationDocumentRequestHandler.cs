@@ -12,18 +12,18 @@ public class GetListCreditApplicationDocumentRequestHandler
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly ICreditApplicationDocumentRepository _documentRepository;
     private readonly CreditApplicationBusinessRules _applicationRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public GetListCreditApplicationDocumentRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
         ICreditApplicationDocumentRepository documentRepository,
         CreditApplicationBusinessRules applicationRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _documentRepository = documentRepository;
         _applicationRules = applicationRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<IReadOnlyList<GetListCreditApplicationDocumentItemDto>> Handle(
@@ -34,7 +34,7 @@ public class GetListCreditApplicationDocumentRequestHandler
             a => a.Id == request.CreditApplicationId,
             cancellationToken: cancellationToken);
         await _applicationRules.CreditApplicationShouldExistWhenSelected(application);
-        _currentUserService.EnsureCanAccessCustomer(application!.CustomerId);
+        await _branchAuthorization.EnsureCanViewApplicationAsync(application!, cancellationToken);
 
         var page = await _documentRepository.GetListAsync(
             predicate: d => d.CreditApplicationId == request.CreditApplicationId && !d.IsDeleted,

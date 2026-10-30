@@ -19,4 +19,6 @@ public class UpdateStaffUserRequest : IRequest<UpdatedStaffUserResponse>, ISecur
     public Gender? Gender { get; set; }
     public DateOnly? DateOfBirth { get; set; }
     public StaffPosition? Position { get; set; }
+    /// <summary>Optional bank branch; managers may assign.</summary>
+    public Guid? BranchId { get; set; }
 }

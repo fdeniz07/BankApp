@@ -1,3 +1,4 @@
+using Application.Modules.Credit.Features.CreditApplicationDocuments;
 using Application.Modules.Credit.Features.CreditApplications.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
@@ -16,9 +17,10 @@ public class GetByIdCreditApplicationRequestHandler
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly ICreditSubTypeRepository _creditSubTypeRepository;
     private readonly ICreditTypeRepository _creditTypeRepository;
+    private readonly ICreditApplicationDocumentRepository _documentRepository;
     private readonly IMapper _mapper;
     private readonly CreditApplicationBusinessRules _businessRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public GetByIdCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
@@ -26,18 +28,20 @@ public class GetByIdCreditApplicationRequestHandler
         IApplicationUserRepository applicationUserRepository,
         ICreditSubTypeRepository creditSubTypeRepository,
         ICreditTypeRepository creditTypeRepository,
+        ICreditApplicationDocumentRepository documentRepository,
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _customerRepository = customerRepository;
         _applicationUserRepository = applicationUserRepository;
         _creditSubTypeRepository = creditSubTypeRepository;
         _creditTypeRepository = creditTypeRepository;
+        _documentRepository = documentRepository;
         _mapper = mapper;
         _businessRules = businessRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<GetByIdCreditApplicationResponse> Handle(
@@ -49,7 +53,7 @@ public class GetByIdCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        _currentUserService.EnsureCanAccessCustomer(creditApplication!.CustomerId);
+        await _branchAuthorization.EnsureCanViewApplicationAsync(creditApplication!, cancellationToken);
 
         GetByIdCreditApplicationResponse response = _mapper.Map<GetByIdCreditApplicationResponse>(creditApplication);
 
@@ -68,6 +72,17 @@ public class GetByIdCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
         response.CreditSubTypeName = subType?.Name ?? string.Empty;
         response.CurrencyCode = await ResolveCurrencyCodeAsync(subType, cancellationToken);
+
+        if (creditApplication.Status == CreditApplicationStatus.Pending)
+        {
+            var docs = await _documentRepository.GetListAsync(
+                predicate: d => d.CreditApplicationId == creditApplication.Id && !d.IsDeleted,
+                size: 50,
+                cancellationToken: cancellationToken);
+            response.MissingRequiredDocuments = RequiredCreditDocuments.IsMissingRequired(
+                docs.Items.Select(d => d.DocumentType.Name));
+        }
+
         return response;
     }
 

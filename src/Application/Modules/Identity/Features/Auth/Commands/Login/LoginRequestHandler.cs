@@ -68,7 +68,13 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
                 : 10080)
             : null;
         AccessToken accessToken = _tokenHelper.CreateToken(
-            user!, claims, user!.CustomerId, displayName, customerCategory, expirationMinutes);
+            user!,
+            claims,
+            user!.CustomerId,
+            displayName,
+            customerCategory,
+            expirationMinutes,
+            user.BranchId);
 
         _auditLogger.Log(
             AuditEventCategories.Auth,
@@ -115,11 +121,15 @@ public class LoginRequestHandler : IRequestHandler<LoginRequest, LoggedResponse>
     private static string ResolveStaffDisplayName(string email) =>
         email.Trim().ToLowerInvariant() switch
         {
-            "staff.tr@bank.local" => "Ayşe Yılmaz",
-            "staff.en@bank.local" => "Jane Smith",
-            "staff.de@bank.local" => "Anna Müller",
-            "staff@bank.local" => "Bank Staff",
-            "manager@bank.local" => "Bank Manager",
+            "staff.tr@bank.local" => "Emre Kaya",
+            "staff.en@bank.local" => "Anna Miller",
+            "staff.de@bank.local" => "Jonas Weber",
+            "staff@bank.local" => "Selin Yılmaz",
+            "manager.tr@bank.local" => "Deniz Aydın",
+            "manager.en@bank.local" => "Alex Brooks",
+            "manager.de@bank.local" => "Lena Hoffmann",
+            "manager@bank.local" => "Deniz Aydın",
+            "superadmin@bank.local" => "Root Admin",
             _ => email.Contains('@') ? email.Split('@')[0] : email
         };
 }

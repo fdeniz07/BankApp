@@ -1,6 +1,7 @@
 using Application.Common.CustomerNumbers;
 using Application.Modules.Identity.Features.Auth.Rules;
 using Application.Modules.Customers.Features.CorporateCustomers.Rules;
+using Application.Services.Auth;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Security.Constants;
@@ -21,6 +22,7 @@ public class CreateCorporateCustomerRequestHandler
     private readonly IMapper _mapper;
     private readonly CorporateCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
+    private readonly ICurrentUserService _currentUserService;
 
     public CreateCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
@@ -29,7 +31,8 @@ public class CreateCorporateCustomerRequestHandler
         IUserOperationClaimRepository userOperationClaimRepository,
         IMapper mapper,
         CorporateCustomerBusinessRules businessRules,
-        AuthBusinessRules authBusinessRules)
+        AuthBusinessRules authBusinessRules,
+        ICurrentUserService currentUserService)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -38,6 +41,7 @@ public class CreateCorporateCustomerRequestHandler
         _mapper = mapper;
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
+        _currentUserService = currentUserService;
     }
 
     public async Task<CreatedCorporateCustomerResponse> Handle(
@@ -52,6 +56,9 @@ public class CreateCorporateCustomerRequestHandler
         CorporateCustomer corporateCustomer = _mapper.Map<CorporateCustomer>(request);
         corporateCustomer.CustomerNumber = await AllocateCorporateNumberAsync(request.Locale, cancellationToken);
         corporateCustomer.IsActive = true;
+        corporateCustomer.BranchId = _currentUserService.IsSuperAdmin
+            ? request.BranchId ?? _currentUserService.BranchId
+            : _currentUserService.BranchId ?? request.BranchId;
         await _corporateCustomerRepository.AddAsync(corporateCustomer, cancellationToken);
 
         HashingHelper.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);

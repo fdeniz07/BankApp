@@ -13,25 +13,25 @@ public class GetByIdIndividualCustomerRequestHandler
     private readonly IIndividualCustomerRepository _individualCustomerRepository;
     private readonly IMapper _mapper;
     private readonly IndividualCustomerBusinessRules _businessRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public GetByIdIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
         IMapper mapper,
         IndividualCustomerBusinessRules businessRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _mapper = mapper;
         _businessRules = businessRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<GetByIdIndividualCustomerResponse> Handle(
         GetByIdIndividualCustomerRequest request,
         CancellationToken cancellationToken)
     {
-        _currentUserService.EnsureCanAccessCustomer(request.Id);
+        await _branchAuthorization.EnsureCanViewCustomerAsync(request.Id, cancellationToken);
 
         IndividualCustomer? individualCustomer = await _individualCustomerRepository.GetAsync(
             predicate: c => c.Id == request.Id,

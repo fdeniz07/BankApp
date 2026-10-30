@@ -14,6 +14,7 @@ public class GetDashboardSummaryRequestHandler
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly ICreditApplicationRepository _creditApplicationRepository;
     private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public GetDashboardSummaryRequestHandler(
         ICustomerRepository customerRepository,
@@ -21,7 +22,8 @@ public class GetDashboardSummaryRequestHandler
         ICorporateCustomerRepository corporateCustomerRepository,
         ICreditTypeRepository creditTypeRepository,
         ICreditApplicationRepository creditApplicationRepository,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        IBranchAuthorizationService branchAuthorization)
     {
         _customerRepository = customerRepository;
         _individualCustomerRepository = individualCustomerRepository;
@@ -29,6 +31,7 @@ public class GetDashboardSummaryRequestHandler
         _creditTypeRepository = creditTypeRepository;
         _creditApplicationRepository = creditApplicationRepository;
         _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<GetDashboardSummaryResponse> Handle(
@@ -44,17 +47,21 @@ public class GetDashboardSummaryRequestHandler
 
     private async Task<GetDashboardSummaryResponse> BuildStaffSummaryAsync(CancellationToken cancellationToken)
     {
+        Guid? branchFilter = _branchAuthorization.MustSeeNoBranchData
+            ? Guid.Empty
+            : _branchAuthorization.ResolveListBranchFilter(requestedBranchId: null);
+
         int customerTotal = await _customerRepository.CountAsync(
-            c => c.IsActive,
+            c => c.IsActive && (!branchFilter.HasValue || c.BranchId == branchFilter.Value),
             cancellationToken: cancellationToken);
         int individualActive = await _individualCustomerRepository.CountAsync(
-            c => c.IsActive,
+            c => c.IsActive && (!branchFilter.HasValue || c.BranchId == branchFilter.Value),
             cancellationToken: cancellationToken);
         int corporateActive = await _corporateCustomerRepository.CountAsync(
-            c => c.IsActive,
+            c => c.IsActive && (!branchFilter.HasValue || c.BranchId == branchFilter.Value),
             cancellationToken: cancellationToken);
         int customerInactive = await _customerRepository.CountAsync(
-            c => !c.IsActive,
+            c => !c.IsActive && (!branchFilter.HasValue || c.BranchId == branchFilter.Value),
             cancellationToken: cancellationToken);
 
         int creditTypeTotal = await _creditTypeRepository.CountAsync(
@@ -67,7 +74,10 @@ public class GetDashboardSummaryRequestHandler
             c => c.IsActive && c.Category == CreditCategory.Corporate,
             cancellationToken: cancellationToken);
 
-        ApplicationCounts apps = await CountApplicationsAsync(customerId: null, cancellationToken);
+        ApplicationCounts apps = await CountApplicationsAsync(
+            customerId: null,
+            branchId: branchFilter,
+            cancellationToken);
 
         return new GetDashboardSummaryResponse
         {
@@ -91,7 +101,7 @@ public class GetDashboardSummaryRequestHandler
         Guid customerId,
         CancellationToken cancellationToken)
     {
-        ApplicationCounts apps = await CountApplicationsAsync(customerId, cancellationToken);
+        ApplicationCounts apps = await CountApplicationsAsync(customerId, branchId: null, cancellationToken);
 
         return new GetDashboardSummaryResponse
         {
@@ -106,26 +116,32 @@ public class GetDashboardSummaryRequestHandler
 
     private async Task<ApplicationCounts> CountApplicationsAsync(
         Guid? customerId,
+        Guid? branchId,
         CancellationToken cancellationToken)
     {
         int total = await _creditApplicationRepository.CountAsync(
-            a => !customerId.HasValue || a.CustomerId == customerId.Value,
+            a => (!customerId.HasValue || a.CustomerId == customerId.Value)
+                 && (!branchId.HasValue || a.BranchId == branchId.Value),
             cancellationToken: cancellationToken);
         int pending = await _creditApplicationRepository.CountAsync(
-            a => (!customerId.HasValue || a.CustomerId == customerId.Value) &&
-                 a.Status == CreditApplicationStatus.Pending,
+            a => (!customerId.HasValue || a.CustomerId == customerId.Value)
+                 && (!branchId.HasValue || a.BranchId == branchId.Value)
+                 && a.Status == CreditApplicationStatus.Pending,
             cancellationToken: cancellationToken);
         int approved = await _creditApplicationRepository.CountAsync(
-            a => (!customerId.HasValue || a.CustomerId == customerId.Value) &&
-                 a.Status == CreditApplicationStatus.Approved,
+            a => (!customerId.HasValue || a.CustomerId == customerId.Value)
+                 && (!branchId.HasValue || a.BranchId == branchId.Value)
+                 && a.Status == CreditApplicationStatus.Approved,
             cancellationToken: cancellationToken);
         int rejected = await _creditApplicationRepository.CountAsync(
-            a => (!customerId.HasValue || a.CustomerId == customerId.Value) &&
-                 a.Status == CreditApplicationStatus.Rejected,
+            a => (!customerId.HasValue || a.CustomerId == customerId.Value)
+                 && (!branchId.HasValue || a.BranchId == branchId.Value)
+                 && a.Status == CreditApplicationStatus.Rejected,
             cancellationToken: cancellationToken);
         int cancelled = await _creditApplicationRepository.CountAsync(
-            a => (!customerId.HasValue || a.CustomerId == customerId.Value) &&
-                 a.Status == CreditApplicationStatus.Cancelled,
+            a => (!customerId.HasValue || a.CustomerId == customerId.Value)
+                 && (!branchId.HasValue || a.BranchId == branchId.Value)
+                 && a.Status == CreditApplicationStatus.Cancelled,
             cancellationToken: cancellationToken);
 
         return new ApplicationCounts(total, pending, approved, rejected, cancelled);

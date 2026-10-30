@@ -7,6 +7,7 @@ public class GetByIdCreditApplicationResponse
     public Guid Id { get; set; }
     public string ApplicationNumber { get; set; } = default!;
     public Guid CustomerId { get; set; }
+    public Guid? BranchId { get; set; }
     public string CustomerName { get; set; } = default!;
     public CreditCategory? CustomerCategory { get; set; }
     /// <summary>Bank customer number (e.g. CUS-…).</summary>
@@ -35,6 +36,11 @@ public class GetByIdCreditApplicationResponse
     /// <summary>StaffPosition SmartEnum name when the decision maker is a staff user.</summary>
     public string? DecisionByPosition { get; set; }
     public string? DecisionByEmail { get; set; }
+    public string? DecisionBranchCode { get; set; }
+    public string? DecisionBranchName { get; set; }
+    public string? DecisionTemplateName { get; set; }
+    /// <summary>Pending only: true when IdentityDocument or IncomeProof is missing.</summary>
+    public bool MissingRequiredDocuments { get; set; }
     public bool IsDeleted { get; set; }
     public DateTimeOffset CreatedDate { get; set; }
     public DateTimeOffset? UpdatedDate { get; set; }

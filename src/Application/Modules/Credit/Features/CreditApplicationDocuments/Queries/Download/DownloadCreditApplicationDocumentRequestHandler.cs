@@ -16,7 +16,7 @@ public class DownloadCreditApplicationDocumentRequestHandler
     private readonly ICreditDocumentStorage _documentStorage;
     private readonly CreditApplicationBusinessRules _applicationRules;
     private readonly CreditApplicationDocumentBusinessRules _documentRules;
-    private readonly ICurrentUserService _currentUserService;
+    private readonly IBranchAuthorizationService _branchAuthorization;
 
     public DownloadCreditApplicationDocumentRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
@@ -24,14 +24,14 @@ public class DownloadCreditApplicationDocumentRequestHandler
         ICreditDocumentStorage documentStorage,
         CreditApplicationBusinessRules applicationRules,
         CreditApplicationDocumentBusinessRules documentRules,
-        ICurrentUserService currentUserService)
+        IBranchAuthorizationService branchAuthorization)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _documentRepository = documentRepository;
         _documentStorage = documentStorage;
         _applicationRules = applicationRules;
         _documentRules = documentRules;
-        _currentUserService = currentUserService;
+        _branchAuthorization = branchAuthorization;
     }
 
     public async Task<DownloadCreditApplicationDocumentResponse> Handle(
@@ -42,7 +42,7 @@ public class DownloadCreditApplicationDocumentRequestHandler
             a => a.Id == request.CreditApplicationId,
             cancellationToken: cancellationToken);
         await _applicationRules.CreditApplicationShouldExistWhenSelected(application);
-        _currentUserService.EnsureCanAccessCustomer(application!.CustomerId);
+        await _branchAuthorization.EnsureCanViewApplicationAsync(application!, cancellationToken);
 
         CreditApplicationDocument? document = await _documentRepository.GetAsync(
             d => d.Id == request.DocumentId

@@ -2,6 +2,8 @@ namespace Application.Modules.Identity.Features.StaffUsers.Constants;
 
 public static class StaffUserMessages
 {
+    public const string BranchNotFoundOrInactive = "Branch does not exist or is inactive.";
+
     public const string NotExists = "Staff user does not exist.";
     public const string NotStaffAccount = "User is not a staff account.";
     public const string CannotModifySelf = "You cannot deactivate your own staff account.";
