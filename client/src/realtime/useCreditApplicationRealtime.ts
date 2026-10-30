@@ -95,6 +95,9 @@ export function useCreditApplicationRealtime() {
         case 'CreditApplicationCancelled':
           toast.warning(message)
           break
+        case 'CreditApplicationDocumentUploaded':
+          toast.info(message)
+          break
         default:
           toast.info(message)
           break

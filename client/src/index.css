@@ -141,6 +141,45 @@ h2 {
   color: var(--muted);
 }
 
+.warn-text {
+  color: #a15c00;
+  margin: 0.35rem 0 0.75rem;
+  font-size: 0.9rem;
+}
+
+.documents-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.docs-missing-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  border-radius: 999px;
+  background: #c62828;
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.app-number-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.decision-audit-line {
+  font-size: 0.78rem;
+  margin-top: 0.25rem;
+}
+
 .error-text {
   color: var(--danger);
 }
@@ -512,6 +551,35 @@ a.btn:hover {
 
 .hints p {
   margin: 0.25rem 0;
+}
+
+.login-demo-password {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.login-demo-caption {
+  margin-top: 0.75rem !important;
+}
+
+.login-demo-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.4rem 0 0.75rem;
+}
+
+.login-demo-chip {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+}
+
+.row-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin: 0.5rem 0;
 }
 
 .table-wrap {
@@ -1035,6 +1103,20 @@ html[data-theme="dark"] .chip-btn.active {
   gap: 0.75rem;
   align-items: flex-end;
   margin: 0.75rem 0 1rem;
+}
+
+.documents-upload.create-documents {
+  width: 100%;
+  align-items: stretch;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  padding: 0.75rem;
+  margin: 0.5rem 0 1rem;
+}
+
+.documents-upload.create-documents legend {
+  padding: 0 0.35rem;
+  font-weight: 600;
 }
 
 .documents-upload label {

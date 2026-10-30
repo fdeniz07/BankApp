@@ -1,25 +1,26 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import {
-  approveApplication,
   cancelApplication,
   createApplication,
   exportPaymentPlan,
   getApplications,
   getPaymentPlan,
-  rejectApplication,
+  uploadApplicationDocument,
 } from '../api/applicationsApi'
 import { getCreditSubTypes } from '../api/creditSubTypesApi'
 import { getDashboardSummary } from '../api/dashboardApi'
 import { useAuth } from '../auth/AuthContext'
+import { BranchFilter } from '../components/BranchFilter'
 import { DASHBOARD_REFRESH_EVENT } from '../components/StatsStrip'
 import { CREDIT_APPLICATION_CHANGED_EVENT } from '../realtime/creditApplicationEvents'
 import type {
   ApplicationSortBy,
   CreditApplicationListItem,
   CreditApplicationStatus,
+  CreditDocumentType,
   CreditSubTypeListItem,
   DashboardSummary,
   GetListResponse,
@@ -39,11 +40,14 @@ const STATUS_OPTIONS: Array<CreditApplicationStatus | ''> = [
 
 export function ApplicationsPage() {
   const { t, i18n } = useTranslation()
+  const navigate = useNavigate()
   const { isStaff, user } = useAuth()
   const locale = (i18n.language || 'tr').slice(0, 2)
   const [data, setData] = useState<GetListResponse<CreditApplicationListItem> | null>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const [statusFilter, setStatusFilter] = useState<CreditApplicationStatus | ''>('')
+  const [branchFilter, setBranchFilter] = useState('')
+  const [missingDocsOnly, setMissingDocsOnly] = useState(false)
   const [sortBy, setSortBy] = useState<ApplicationSortBy>('applicationDate')
   const [sortDesc, setSortDesc] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -52,8 +56,6 @@ export function ApplicationsPage() {
   const [subTypes, setSubTypes] = useState<CreditSubTypeListItem[]>([])
   const [creating, setCreating] = useState(false)
   const [cancellingId, setCancellingId] = useState<string | null>(null)
-  const [decidingId, setDecidingId] = useState<string | null>(null)
-  const [decidingAction, setDecidingAction] = useState<'approve' | 'reject' | null>(null)
   const [paymentPlan, setPaymentPlan] = useState<PaymentPlanResponse | null>(null)
   const [planTableOpen, setPlanTableOpen] = useState(false)
   const [planExportBusy, setPlanExportBusy] = useState(false)
@@ -66,6 +68,9 @@ export function ApplicationsPage() {
     existingDebtAmount: '',
     purpose: '',
   })
+  const [createDocumentType, setCreateDocumentType] =
+    useState<CreditDocumentType>('IdentityDocument')
+  const [createDocumentFiles, setCreateDocumentFiles] = useState<File[]>([])
 
   const loadDashboard = useCallback(() => {
     return getDashboardSummary()
@@ -83,6 +88,8 @@ export function ApplicationsPage() {
       pageIndex,
       pageSize: isStaff ? 10 : 50,
       status: statusFilter,
+      branchId: branchFilter || null,
+      missingRequiredDocumentsOnly: missingDocsOnly,
       sortBy,
       sortDesc,
     })
@@ -93,7 +100,7 @@ export function ApplicationsPage() {
         toast.error(message)
       })
       .finally(() => setLoading(false))
-  }, [pageIndex, isStaff, statusFilter, sortBy, sortDesc, t])
+  }, [pageIndex, isStaff, statusFilter, branchFilter, missingDocsOnly, sortBy, sortDesc, t])
 
   useEffect(() => {
     let cancelled = false
@@ -282,7 +289,7 @@ export function ApplicationsPage() {
         setCreating(false)
         return
       }
-      await createApplication(
+      const created = await createApplication(
         {
           creditSubTypeId: form.creditSubTypeId,
           requestedAmount: Number(form.requestedAmount),
@@ -293,7 +300,15 @@ export function ApplicationsPage() {
         },
         idempotencyKey,
       )
-      // Toast comes from SignalR (creditApplicationChanged); avoid duplicate local toast.
+
+      if (createDocumentFiles.length > 0) {
+        for (const file of createDocumentFiles.slice(0, 10)) {
+          await uploadApplicationDocument(created.id, createDocumentType, file)
+        }
+        toast.success(t('applications.documentUploadSuccess'))
+      }
+
+      // Toast for create comes from SignalR; avoid duplicate local create toast.
       setSuccess(t('applications.createSuccess'))
       setForm((prev) => ({
         ...prev,
@@ -301,9 +316,12 @@ export function ApplicationsPage() {
         monthlyIncome: '',
         existingDebtAmount: '',
       }))
+      setCreateDocumentFiles([])
+      setCreateDocumentType('IdentityDocument')
       setPageIndex(0)
       await loadList()
       await loadDashboard()
+      navigate(`/applications/${created.id}`)
     } catch (err: unknown) {
       const message = mapApiError(err, t)
       setError(message)
@@ -331,73 +349,6 @@ export function ApplicationsPage() {
       toast.error(message)
     } finally {
       setCancellingId(null)
-    }
-  }
-
-  async function onQuickApprove(item: CreditApplicationListItem) {
-    if (!window.confirm(t('applications.confirmQuickApprove'))) return
-    setDecidingId(item.id)
-    setDecidingAction('approve')
-    setError(null)
-    setSuccess(null)
-    const idempotencyKey = crypto.randomUUID()
-    try {
-      await approveApplication(
-        item.id,
-        {
-          approvedAmount: item.requestedAmount,
-          approvedTermMonths: item.requestedTermMonths,
-          approvedInterestRate: item.interestRate,
-        },
-        idempotencyKey,
-      )
-      // Toast comes from SignalR (success); avoid duplicate local toast.
-      setSuccess(t('applications.approveSuccess'))
-      await loadList()
-      await loadDashboard()
-    } catch (err: unknown) {
-      const message = mapApiError(err, t)
-      setError(message)
-      toast.error(message)
-    } finally {
-      setDecidingId(null)
-      setDecidingAction(null)
-    }
-  }
-
-  async function onQuickReject(item: CreditApplicationListItem) {
-    const reason = window.prompt(t('applications.promptRejectReason'))
-    if (reason == null) return
-    const trimmed = reason.trim()
-    if (!trimmed) {
-      toast.error(t('applications.rejectReasonRequired'))
-      return
-    }
-    if (!window.confirm(t('applications.confirmReject'))) return
-    setDecidingId(item.id)
-    setDecidingAction('reject')
-    setError(null)
-    setSuccess(null)
-    const idempotencyKey = crypto.randomUUID()
-    try {
-      await rejectApplication(
-        item.id,
-        {
-          rejectionReason: trimmed,
-        },
-        idempotencyKey,
-      )
-      // Toast comes from SignalR (error); avoid duplicate local toast.
-      setSuccess(t('applications.rejectSuccess'))
-      await loadList()
-      await loadDashboard()
-    } catch (err: unknown) {
-      const message = mapApiError(err, t)
-      setError(message)
-      toast.error(message)
-    } finally {
-      setDecidingId(null)
-      setDecidingAction(null)
     }
   }
 
@@ -572,6 +523,47 @@ export function ApplicationsPage() {
                 }
               />
             </label>
+
+            <fieldset className="documents-upload create-documents">
+              <legend>{t('applications.documentsTitle')}</legend>
+              <p className="muted">{t('applications.createDocumentsHint')}</p>
+              <label>
+                {t('applications.documentType')}
+                <select
+                  value={createDocumentType}
+                  onChange={(e) =>
+                    setCreateDocumentType(e.target.value as CreditDocumentType)
+                  }
+                  disabled={creating}
+                >
+                  <option value="IdentityDocument">
+                    {t('applications.documentTypes.IdentityDocument')}
+                  </option>
+                  <option value="IncomeProof">
+                    {t('applications.documentTypes.IncomeProof')}
+                  </option>
+                  <option value="Other">{t('applications.documentTypes.Other')}</option>
+                </select>
+              </label>
+              <label>
+                {t('applications.documentFile')}
+                <input
+                  type="file"
+                  accept=".pdf,image/jpeg,image/png,application/pdf"
+                  multiple
+                  disabled={creating}
+                  onChange={(e) =>
+                    setCreateDocumentFiles(Array.from(e.target.files ?? []))
+                  }
+                />
+              </label>
+              {createDocumentFiles.length > 0 && (
+                <p className="muted">
+                  {createDocumentFiles.map((f) => f.name).join(', ')}
+                </p>
+              )}
+            </fieldset>
+
             <button type="submit" className="btn primary" disabled={creating || !form.creditSubTypeId}>
               {creating ? t('common.loading') : t('applications.create')}
             </button>
@@ -693,6 +685,24 @@ export function ApplicationsPage() {
             ))}
           </select>
         </label>
+        <BranchFilter
+          value={branchFilter}
+          onChange={(id) => {
+            setPageIndex(0)
+            setBranchFilter(id)
+          }}
+        />
+        <label className="checkbox-row filter-label">
+          <input
+            type="checkbox"
+            checked={missingDocsOnly}
+            onChange={(e) => {
+              setPageIndex(0)
+              setMissingDocsOnly(e.target.checked)
+            }}
+          />
+          <span>{t('applications.missingDocsFilter')}</span>
+        </label>
       </div>
 
       {loading && <p>{t('common.loading')}</p>}
@@ -753,7 +763,19 @@ export function ApplicationsPage() {
               <tbody>
                 {data.items.map((item) => (
                   <tr key={item.id}>
-                    <td className="col-number">{item.applicationNumber}</td>
+                    <td className="col-number">
+                      <span className="app-number-cell">
+                        {item.applicationNumber}
+                        {item.missingRequiredDocuments && (
+                          <span
+                            className="docs-missing-dot"
+                            title={t('applications.missingDocsBadge')}
+                          >
+                            !
+                          </span>
+                        )}
+                      </span>
+                    </td>
                     <td className="col-type">{item.creditSubTypeName || '—'}</td>
                     <td className="col-amount">
                       {formatMoney(item.requestedAmount, item.currencyCode, i18n.language)}
@@ -769,6 +791,13 @@ export function ApplicationsPage() {
                       <span className={`badge status-${item.status.toLowerCase()}`}>
                         {t(`status.${item.status}`, { defaultValue: item.status })}
                       </span>
+                      {(item.decisionBy || item.decisionBranchCode || item.decisionTemplateName) && (
+                        <div className="muted decision-audit-line">
+                          {[item.decisionBy, item.decisionBranchCode, item.decisionTemplateName]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </div>
+                      )}
                     </td>
                     <td className="col-date">
                       {new Date(item.applicationDate).toLocaleString(i18n.language, {
@@ -783,31 +812,6 @@ export function ApplicationsPage() {
                       <Link to={`/applications/${item.id}`} className="btn info">
                         {t('common.details')}
                       </Link>
-                      {isStaff && item.status === 'Pending' && (
-                        <>
-                          <button
-                            type="button"
-                            className="btn success"
-                            disabled={decidingId === item.id}
-                            title={t('applications.quickApproveHint')}
-                            onClick={() => onQuickApprove(item)}
-                          >
-                            {decidingId === item.id && decidingAction === 'approve'
-                              ? t('common.loading')
-                              : t('applications.approve')}
-                          </button>
-                          <button
-                            type="button"
-                            className="btn reject"
-                            disabled={decidingId === item.id}
-                            onClick={() => onQuickReject(item)}
-                          >
-                            {decidingId === item.id && decidingAction === 'reject'
-                              ? t('common.loading')
-                              : t('applications.reject')}
-                          </button>
-                        </>
-                      )}
                       {!isStaff && item.status === 'Pending' && (
                         <button
                           type="button"

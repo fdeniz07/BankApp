@@ -153,7 +153,8 @@ public sealed class DomainEventsConsumerHostedService : BackgroundService
             nameof(CreditApplicationCreated)
             or nameof(CreditApplicationApproved)
             or nameof(CreditApplicationRejected)
-            or nameof(CreditApplicationCancelled)))
+            or nameof(CreditApplicationCancelled)
+            or nameof(CreditApplicationDocumentUploaded)))
         {
             return null;
         }

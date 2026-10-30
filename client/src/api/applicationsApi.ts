@@ -21,6 +21,8 @@ export interface GetApplicationsParams {
   pageIndex?: number
   pageSize?: number
   status?: CreditApplicationStatus | ''
+  branchId?: string | null
+  missingRequiredDocumentsOnly?: boolean
   sortBy?: ApplicationSortBy
   sortDesc?: boolean
 }
@@ -29,6 +31,8 @@ export function getApplications({
   pageIndex = 0,
   pageSize = 10,
   status = '',
+  branchId = null,
+  missingRequiredDocumentsOnly = false,
   sortBy = 'applicationDate',
   sortDesc = true,
 }: GetApplicationsParams = {}) {
@@ -39,6 +43,8 @@ export function getApplications({
     SortDesc: String(sortDesc),
   })
   if (status) params.set('status', status)
+  if (branchId) params.set('branchId', branchId)
+  if (missingRequiredDocumentsOnly) params.set('missingRequiredDocumentsOnly', 'true')
 
   return apiRequest<GetListResponse<CreditApplicationListItem>>(
     `/api/CreditApplications?${params}`,
