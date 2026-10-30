@@ -24,7 +24,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "customer@bank.local", "Customer123!"));
+            await TestAuthHelper.LoginAsync(client, "customer@bank.local", "Demo123!"));
 
         HttpResponseMessage createResponse = await client.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
@@ -63,7 +63,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
         HttpClient staffClient = _factory.CreateClient();
         staffClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(staffClient, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(staffClient, "staff@bank.local", "Demo123!"));
 
         HttpResponseMessage createResponse = await staffClient.PostAsJsonWithIdempotencyAsync(
             "/api/CreditApplications",
@@ -83,7 +83,7 @@ public sealed class CustomerFlowTests : IClassFixture<CustomWebApplicationFactor
         HttpClient customerClient = _factory.CreateClient();
         customerClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(customerClient, "customer@bank.local", "Customer123!"));
+            await TestAuthHelper.LoginAsync(customerClient, "customer@bank.local", "Demo123!"));
 
         HttpResponseMessage approveResponse = await customerClient.PostAsJsonWithIdempotencyAsync(
             $"/api/CreditApplications/{applicationId}/approve",

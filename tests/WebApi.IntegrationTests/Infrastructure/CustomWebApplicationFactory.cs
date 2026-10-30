@@ -64,10 +64,35 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
         });
     }
 
+    /// <summary>Shared lab branch so staff JWT BranchId matches seeded customers/applications.</summary>
+    public async Task<Guid> EnsureTestBranchAsync()
+    {
+        using IServiceScope scope = Services.CreateScope();
+        BankingDbContext db = scope.ServiceProvider.GetRequiredService<BankingDbContext>();
+        await db.Database.EnsureCreatedAsync();
+
+        Branch? existing = await db.Branches.FirstOrDefaultAsync(b => b.Code == "TEST-01");
+        if (existing is not null)
+            return existing.Id;
+
+        Branch branch = new()
+        {
+            Code = "TEST-01",
+            Name = "Integration Test Branch",
+            City = "Test City",
+            IsActive = true
+        };
+        db.Branches.Add(branch);
+        await db.SaveChangesAsync();
+        return branch.Id;
+    }
+
     public async Task SeedStaffUserAsync(
         string email = "staff@bank.local",
-        string password = "Staff123!")
+        string password = "Demo123!")
     {
+        Guid branchId = await EnsureTestBranchAsync();
+
         using IServiceScope scope = Services.CreateScope();
         BankingDbContext db = scope.ServiceProvider.GetRequiredService<BankingDbContext>();
         await db.Database.EnsureCreatedAsync();
@@ -78,8 +103,17 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             await db.SaveChangesAsync();
         }
 
-        if (await db.Users.AnyAsync(u => u.Email == email))
+        ApplicationUser? existing = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
+        if (existing is not null)
+        {
+            if (existing.BranchId != branchId)
+            {
+                existing.BranchId = branchId;
+                db.Users.Update(existing);
+                await db.SaveChangesAsync();
+            }
             return;
+        }
 
         OperationClaim staffClaim = await db.OperationClaims
             .SingleAsync(c => c.Name == GeneralOperationClaims.BankStaff);
@@ -93,7 +127,8 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             IsActive = true,
             EmailConfirmed = true,
             FirstName = "Test",
-            LastName = "Staff"
+            LastName = "Staff",
+            BranchId = branchId
         };
 
         db.Users.Add(user);
@@ -110,6 +145,8 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     /// <summary>Seeds one active individual customer + credit type/sub-type for create/approve flows.</summary>
     public async Task<(Guid CustomerId, Guid CreditSubTypeId)> SeedCreditCatalogAsync()
     {
+        Guid branchId = await EnsureTestBranchAsync();
+
         using IServiceScope scope = Services.CreateScope();
         BankingDbContext db = scope.ServiceProvider.GetRequiredService<BankingDbContext>();
         await db.Database.EnsureCreatedAsync();
@@ -120,7 +157,15 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             .FirstOrDefaultAsync(c => c.Code == "CST-TEST-001");
 
         if (existingCustomer is not null && existingSubType is not null)
+        {
+            if (existingCustomer.BranchId != branchId)
+            {
+                existingCustomer.BranchId = branchId;
+                db.IndividualCustomers.Update(existingCustomer);
+                await db.SaveChangesAsync();
+            }
             return (existingCustomer.Id, existingSubType.Id);
+        }
 
         IndividualCustomer customer = new()
         {
@@ -132,7 +177,8 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
             FirstName = "Ada",
             LastName = "Applicant",
             NationalId = "10000000146",
-            Gender = Gender.Female.Name
+            Gender = Gender.Female.Name,
+            BranchId = branchId
         };
         db.IndividualCustomers.Add(customer);
 
@@ -170,7 +216,7 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
     public async Task SeedCustomerUserAsync(
         Guid customerId,
         string email = "customer@bank.local",
-        string password = "Customer123!")
+        string password = "Demo123!")
     {
         using IServiceScope scope = Services.CreateScope();
         BankingDbContext db = scope.ServiceProvider.GetRequiredService<BankingDbContext>();

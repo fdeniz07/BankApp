@@ -14,7 +14,7 @@ public class LoginRequestValidatorTests
         LoginRequest request = new()
         {
             Email = "staff@bank.local",
-            Password = "Staff123!"
+            Password = "Demo123!"
         };
 
         ValidationResult result = _sut.Validate(request);
@@ -23,8 +23,8 @@ public class LoginRequestValidatorTests
     }
 
     [Theory]
-    [InlineData("", "Staff123!")]
-    [InlineData("not-an-email", "Staff123!")]
+    [InlineData("", "Demo123!")]
+    [InlineData("not-an-email", "Demo123!")]
     [InlineData("staff@bank.local", "")]
     [InlineData("staff@bank.local", "12345")]
     public void Validate_WhenInvalid_Fails(string email, string password)

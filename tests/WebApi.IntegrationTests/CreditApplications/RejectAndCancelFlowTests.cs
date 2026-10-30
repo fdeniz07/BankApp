@@ -24,7 +24,7 @@ public sealed class RejectAndCancelFlowTests : IClassFixture<CustomWebApplicatio
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!"));
 
         Guid applicationId = await CreatePendingAsync(client, customerId, creditSubTypeId);
 
@@ -51,7 +51,7 @@ public sealed class RejectAndCancelFlowTests : IClassFixture<CustomWebApplicatio
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!"));
 
         Guid applicationId = await CreatePendingAsync(client, customerId, creditSubTypeId);
 

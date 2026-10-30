@@ -24,7 +24,7 @@ public sealed class CreateAndApproveFlowTests : IClassFixture<CustomWebApplicati
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!"));
 
         const decimal amount = 50_000m;
         const int termMonths = 24;

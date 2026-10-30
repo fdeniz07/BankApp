@@ -29,7 +29,7 @@ public sealed class IdempotencyKeyTests : IClassFixture<CustomWebApplicationFact
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!"));
 
         HttpResponseMessage response = await client.PostAsJsonAsync(
             "/api/CreditApplications",
@@ -56,7 +56,7 @@ public sealed class IdempotencyKeyTests : IClassFixture<CustomWebApplicationFact
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!"));
 
         string key = Guid.NewGuid().ToString("N");
         var body = new
@@ -104,7 +104,7 @@ public sealed class IdempotencyKeyTests : IClassFixture<CustomWebApplicationFact
         HttpClient client = _factory.CreateClient();
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
             "Bearer",
-            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!"));
+            await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!"));
 
         string key = Guid.NewGuid().ToString("N");
 

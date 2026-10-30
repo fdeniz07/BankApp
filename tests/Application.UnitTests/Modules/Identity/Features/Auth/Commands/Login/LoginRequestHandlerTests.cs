@@ -91,7 +91,7 @@ public class LoginRequestHandlerTests
     [Fact]
     public async Task Handle_WhenCredentialsValid_ReturnsAccessToken()
     {
-        const string password = "Staff123!";
+        const string password = "Demo123!";
         HashingHelper.CreatePasswordHash(password, out byte[] hash, out byte[] salt);
         ApplicationUser user = CreateUser("staff@bank.local", hash, salt);
         List<OperationClaim> claims = [new() { Id = Guid.NewGuid(), Name = "BankStaff" }];
@@ -112,7 +112,8 @@ public class LoginRequestHandlerTests
                 user.CustomerId,
                 It.IsAny<string?>(),
                 It.IsAny<string?>(),
-                It.IsAny<int?>()))
+                It.IsAny<int?>(),
+                It.IsAny<Guid?>()))
             .Returns(accessToken);
 
         LoginRequest request = new()
@@ -125,9 +126,9 @@ public class LoginRequestHandlerTests
 
         response.AccessToken.Should().NotBeNull();
         response.AccessToken.Token.Should().Be("jwt-token");
-        response.DisplayName.Should().Be("Bank Staff");
+        response.DisplayName.Should().Be("Selin Yılmaz");
         _tokenHelper.Verify(
-            t => t.CreateToken(user, claims, user.CustomerId, "Bank Staff", null, null),
+            t => t.CreateToken(user, claims, user.CustomerId, "Selin Yılmaz", null, null, user.BranchId),
             Times.Once);
     }
 

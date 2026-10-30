@@ -21,12 +21,14 @@ public class ApproveCreditApplicationRequestHandlerTests
 {
     private readonly Mock<ICreditApplicationRepository> _creditApplicationRepository = new();
     private readonly Mock<IApplicationUserRepository> _applicationUserRepository = new();
+    private readonly Mock<IBranchRepository> _branchRepository = new();
     private readonly Mock<ICustomerRepository> _customerRepository = new();
     private readonly Mock<IIndividualCustomerRepository> _individualCustomerRepository = new();
     private readonly Mock<ICorporateCustomerRepository> _corporateCustomerRepository = new();
     private readonly Mock<ICreditSubTypeRepository> _creditSubTypeRepository = new();
     private readonly Mock<ICreditTypeRepository> _creditTypeRepository = new();
     private readonly Mock<ICurrentUserService> _currentUserService = new();
+    private readonly Mock<IBranchAuthorizationService> _branchAuthorization = new();
     private readonly Mock<IAuditLogger> _auditLogger = new();
     private readonly IMapper _mapper;
     private readonly ApproveCreditApplicationRequestHandler _sut;
@@ -46,12 +48,18 @@ public class ApproveCreditApplicationRequestHandlerTests
             _creditSubTypeRepository.Object,
             _creditTypeRepository.Object);
 
+        _branchAuthorization
+            .Setup(s => s.EnsureCanModifyApplicationAsync(It.IsAny<CreditApplication>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.CompletedTask);
+
         _sut = new ApproveCreditApplicationRequestHandler(
             _creditApplicationRepository.Object,
             _applicationUserRepository.Object,
+            _branchRepository.Object,
             _mapper,
             businessRules,
             _currentUserService.Object,
+            _branchAuthorization.Object,
             _auditLogger.Object);
     }
 

@@ -20,7 +20,7 @@ public sealed class LoginEndpointTests : IClassFixture<CustomWebApplicationFacto
         await _factory.SeedStaffUserAsync();
         HttpClient client = _factory.CreateClient();
 
-        string token = await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Staff123!");
+        string token = await TestAuthHelper.LoginAsync(client, "staff@bank.local", "Demo123!");
         token.Should().NotBeNullOrWhiteSpace();
     }
 
