@@ -36,16 +36,17 @@ public class UpdateCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        await _branchAuthorization.EnsureCanModifyApplicationAsync(creditApplication!, cancellationToken);
-        await _businessRules.ApplicationShouldBePendingForUpdate(creditApplication);
+        CreditApplication entity = creditApplication!;
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(entity, cancellationToken);
+        await _businessRules.ApplicationShouldBePendingForUpdate(entity);
         await _businessRules.RequestShouldBeWithinCreditSubTypeLimits(
-            creditApplication.CreditSubTypeId,
+            entity.CreditSubTypeId,
             request.RequestedAmount,
             request.RequestedTermMonths);
 
-        creditApplication = _mapper.Map(request, creditApplication);
-        await _creditApplicationRepository.UpdateAsync(creditApplication!, cancellationToken);
+        entity = _mapper.Map(request, entity);
+        await _creditApplicationRepository.UpdateAsync(entity, cancellationToken);
 
-        return _mapper.Map<UpdatedCreditApplicationResponse>(creditApplication);
+        return _mapper.Map<UpdatedCreditApplicationResponse>(entity);
     }
 }

@@ -20,3 +20,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-10-30 | `29-decision-letter-templates.tr.md` — kullanıcı karar mektubu şablon CRUD; lab şifre `Demo123!` (Personel/Manager/Customer × TR/DE/EN); katalog locale şube zorlaması |
 | 2026-10-30 | `29` eklenti: soft evrak kapısı, `DecisionTemplateName` audit, doküman SignalR + eksik evrak rozeti/filtresi |
 | 2026-10-30 | `21-ci-github-actions`: checkout/setup-dotnet/setup-node **v5** (Node 24; Actions Node 20 deprecation uyarısı) |
+| 2026-10-30 | CI: `ubuntu-24.04` pin + nullable CS8602/CS8604 handler temizliği |

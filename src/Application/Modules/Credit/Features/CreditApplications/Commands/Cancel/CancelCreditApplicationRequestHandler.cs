@@ -43,12 +43,13 @@ public class CancelCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        await _branchAuthorization.EnsureCanModifyApplicationAsync(creditApplication!, cancellationToken);
-        await _businessRules.ApplicationShouldBePendingForCancel(creditApplication);
+        CreditApplication entity = creditApplication!;
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(entity, cancellationToken);
+        await _businessRules.ApplicationShouldBePendingForCancel(entity);
 
-        creditApplication.Cancel(request.Notes);
+        entity.Cancel(request.Notes);
 
-        await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
+        await _creditApplicationRepository.UpdateAsync(entity, cancellationToken);
 
         _auditLogger.Log(
             AuditEventCategories.Credit,
@@ -56,8 +57,8 @@ public class CancelCreditApplicationRequestHandler
             "Credit application cancelled.",
             actorUserId: _currentUserService.UserId,
             targetType: nameof(CreditApplication),
-            targetId: creditApplication.Id);
+            targetId: entity.Id);
 
-        return _mapper.Map<CancelledCreditApplicationResponse>(creditApplication);
+        return _mapper.Map<CancelledCreditApplicationResponse>(entity);
     }
 }

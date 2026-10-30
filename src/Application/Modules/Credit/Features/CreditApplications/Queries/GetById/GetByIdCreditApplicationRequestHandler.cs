@@ -53,30 +53,31 @@ public class GetByIdCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        await _branchAuthorization.EnsureCanViewApplicationAsync(creditApplication!, cancellationToken);
+        CreditApplication entity = creditApplication!;
+        await _branchAuthorization.EnsureCanViewApplicationAsync(entity, cancellationToken);
 
-        GetByIdCreditApplicationResponse response = _mapper.Map<GetByIdCreditApplicationResponse>(creditApplication);
+        GetByIdCreditApplicationResponse response = _mapper.Map<GetByIdCreditApplicationResponse>(entity);
 
         Customer? customer = await _customerRepository.GetAsync(
-            c => c.Id == creditApplication.CustomerId,
+            c => c.Id == entity.CustomerId,
             cancellationToken: cancellationToken);
 
         response.CustomerName = ResolveCustomerDisplayName(customer);
         response.CustomerCategory = ResolveCustomerCategory(customer);
         response.CustomerNumber = customer?.CustomerNumber;
         response.CustomerIdentityNumber = ResolveCustomerIdentityNumber(customer);
-        await PopulateDecisionMakerAsync(response, creditApplication.DecisionBy, cancellationToken);
+        await PopulateDecisionMakerAsync(response, entity.DecisionBy, cancellationToken);
 
         CreditSubType? subType = await _creditSubTypeRepository.GetAsync(
-            c => c.Id == creditApplication.CreditSubTypeId,
+            c => c.Id == entity.CreditSubTypeId,
             cancellationToken: cancellationToken);
         response.CreditSubTypeName = subType?.Name ?? string.Empty;
         response.CurrencyCode = await ResolveCurrencyCodeAsync(subType, cancellationToken);
 
-        if (creditApplication.Status == CreditApplicationStatus.Pending)
+        if (entity.Status == CreditApplicationStatus.Pending)
         {
             var docs = await _documentRepository.GetListAsync(
-                predicate: d => d.CreditApplicationId == creditApplication.Id && !d.IsDeleted,
+                predicate: d => d.CreditApplicationId == entity.Id && !d.IsDeleted,
                 size: 50,
                 cancellationToken: cancellationToken);
             response.MissingRequiredDocuments = RequiredCreditDocuments.IsMissingRequired(

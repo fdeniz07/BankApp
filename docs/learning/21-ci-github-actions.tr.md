@@ -59,6 +59,7 @@ Actions (Node 24 runtime — v4 Node 20 deprecation uyarısını temizler):
 - `actions/checkout@v5`
 - `actions/setup-dotnet@v5`
 - `actions/setup-node@v5`
+- Runner: `ubuntu-24.04` (`ubuntu-latest` → 26 bilgisini sabit sürümle susturur)
 
 ## Repoda nerede?
 

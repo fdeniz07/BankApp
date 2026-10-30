@@ -9,7 +9,7 @@ on:
 jobs:
   backend:
     name: Backend build & tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
 
@@ -32,7 +32,7 @@ jobs:
 
   frontend:
     name: Client build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: client

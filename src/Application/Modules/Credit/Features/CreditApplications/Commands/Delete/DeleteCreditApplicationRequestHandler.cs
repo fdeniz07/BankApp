@@ -37,13 +37,14 @@ public class DeleteCreditApplicationRequestHandler
             cancellationToken: cancellationToken);
 
         await _businessRules.CreditApplicationShouldExistWhenSelected(creditApplication);
-        await _branchAuthorization.EnsureCanModifyApplicationAsync(creditApplication!, cancellationToken);
+        CreditApplication entity = creditApplication!;
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(entity, cancellationToken);
 
-        if (creditApplication.Status == CreditApplicationStatus.Pending)
-            creditApplication.Status = CreditApplicationStatus.Cancelled;
+        if (entity.Status == CreditApplicationStatus.Pending)
+            entity.Status = CreditApplicationStatus.Cancelled;
 
-        await _creditApplicationRepository.DeleteAsync(creditApplication, cancellationToken: cancellationToken);
+        await _creditApplicationRepository.DeleteAsync(entity, cancellationToken: cancellationToken);
 
-        return _mapper.Map<DeletedCreditApplicationResponse>(creditApplication);
+        return _mapper.Map<DeletedCreditApplicationResponse>(entity);
     }
 }

@@ -55,9 +55,10 @@ public class UploadCreditApplicationDocumentRequestHandler
             a => a.Id == request.CreditApplicationId,
             cancellationToken: cancellationToken);
         await _applicationRules.CreditApplicationShouldExistWhenSelected(application);
-        await _branchAuthorization.EnsureCanModifyApplicationAsync(application!, cancellationToken);
-        await _documentRules.ApplicationShouldBePendingForUpload(application);
-        await _documentRules.ApplicationShouldNotExceedDocumentLimit(application.Id);
+        CreditApplication entity = application!;
+        await _branchAuthorization.EnsureCanModifyApplicationAsync(entity, cancellationToken);
+        await _documentRules.ApplicationShouldBePendingForUpload(entity);
+        await _documentRules.ApplicationShouldNotExceedDocumentLimit(entity.Id);
 
         await using MemoryStream buffer = new();
         if (request.Content.CanSeek)
@@ -71,7 +72,7 @@ public class UploadCreditApplicationDocumentRequestHandler
         CreditDocumentType documentType = CreditDocumentType.FromName(request.DocumentType.Trim(), ignoreCase: true);
         CreditApplicationDocument document = new()
         {
-            CreditApplicationId = application.Id,
+            CreditApplicationId = entity.Id,
             DocumentType = documentType,
             OriginalFileName = SanitizeFileName(request.OriginalFileName),
             ContentType = request.ContentType.Trim(),
@@ -81,7 +82,7 @@ public class UploadCreditApplicationDocumentRequestHandler
         };
 
         string storagePath = await _documentStorage.SaveAsync(
-            application.Id,
+            entity.Id,
             document.Id,
             buffer,
             request.ContentType,
@@ -90,8 +91,8 @@ public class UploadCreditApplicationDocumentRequestHandler
 
         await _documentRepository.AddAsync(document, cancellationToken);
 
-        application.RecordDocumentUploaded(document.DocumentType.Name);
-        await _creditApplicationRepository.UpdateAsync(application, cancellationToken);
+        entity.RecordDocumentUploaded(document.DocumentType.Name);
+        await _creditApplicationRepository.UpdateAsync(entity, cancellationToken);
 
         return new UploadCreditApplicationDocumentResponse
         {
