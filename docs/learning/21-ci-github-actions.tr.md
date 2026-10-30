@@ -54,13 +54,11 @@ gh run view <id> --log-failed
 
 ## Sınıflar, metotlar, paketler
 
-Actions:
+Actions (Node 24 runtime — v4 Node 20 deprecation uyarısını temizler):
 
-- `actions/checkout@v4`
-- `actions/setup-dotnet@v4`
-- `actions/setup-node@v4`
-
-(Node 20 deprecation uyarısı GitHub kaynaklı; kod hatası değil.)
+- `actions/checkout@v5`
+- `actions/setup-dotnet@v5`
+- `actions/setup-node@v5`
 
 ## Repoda nerede?
 
