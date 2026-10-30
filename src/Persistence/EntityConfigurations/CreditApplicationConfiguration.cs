@@ -14,6 +14,7 @@ public class CreditApplicationConfiguration : IEntityTypeConfiguration<CreditApp
         builder.Property(c => c.Id).HasColumnName("Id").IsRequired();
         builder.Property(c => c.ApplicationNumber).HasColumnName("ApplicationNumber").HasMaxLength(50).IsRequired();
         builder.Property(c => c.CustomerId).HasColumnName("CustomerId").IsRequired();
+        builder.Property(c => c.BranchId).HasColumnName("BranchId");
         builder.Property(c => c.CreditSubTypeId).HasColumnName("CreditSubTypeId").IsRequired();
         builder.Property(c => c.RequestedAmount).HasColumnName("RequestedAmount").HasPrecision(18, 2).IsRequired();
         builder.Property(c => c.RequestedTermMonths).HasColumnName("RequestedTermMonths").IsRequired();
@@ -35,6 +36,9 @@ public class CreditApplicationConfiguration : IEntityTypeConfiguration<CreditApp
         builder.Property(c => c.RejectionReason).HasColumnName("RejectionReason").HasMaxLength(500);
         builder.Property(c => c.Notes).HasColumnName("Notes").HasMaxLength(1000);
         builder.Property(c => c.DecisionBy).HasColumnName("DecisionBy").HasMaxLength(100);
+        builder.Property(c => c.DecisionBranchCode).HasColumnName("DecisionBranchCode").HasMaxLength(20);
+        builder.Property(c => c.DecisionBranchName).HasColumnName("DecisionBranchName").HasMaxLength(150);
+        builder.Property(c => c.DecisionTemplateName).HasColumnName("DecisionTemplateName").HasMaxLength(120);
         builder.Property(c => c.IsDeleted).HasColumnName("IsDeleted").IsRequired();
         builder.Property(c => c.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(c => c.UpdatedDate).HasColumnName("UpdatedDate");
@@ -42,12 +46,18 @@ public class CreditApplicationConfiguration : IEntityTypeConfiguration<CreditApp
 
         builder.HasIndex(c => c.ApplicationNumber).IsUnique();
         builder.HasIndex(c => c.CustomerId);
+        builder.HasIndex(c => c.BranchId);
         builder.HasIndex(c => c.CreditSubTypeId);
         builder.HasIndex(c => c.Status);
 
         builder.HasOne(c => c.Customer)
             .WithMany(c => c.CreditApplications)
             .HasForeignKey(c => c.CustomerId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(c => c.Branch)
+            .WithMany()
+            .HasForeignKey(c => c.BranchId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

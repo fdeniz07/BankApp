@@ -160,6 +160,58 @@ namespace Persistence.Migrations
                     b.ToTable("UserOperationClaims", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.Branch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("City")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("City");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("Code");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsActive");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("Name");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Code")
+                        .IsUnique();
+
+                    b.ToTable("Branches", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.CreditApplication", b =>
                 {
                     b.Property<Guid>("Id")
@@ -191,6 +243,10 @@ namespace Persistence.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ApprovedTermMonths");
 
+                    b.Property<Guid?>("BranchId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("BranchId");
+
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
@@ -203,6 +259,16 @@ namespace Persistence.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("CustomerId");
 
+                    b.Property<string>("DecisionBranchCode")
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("DecisionBranchCode");
+
+                    b.Property<string>("DecisionBranchName")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)")
+                        .HasColumnName("DecisionBranchName");
+
                     b.Property<string>("DecisionBy")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
@@ -211,6 +277,11 @@ namespace Persistence.Migrations
                     b.Property<DateTimeOffset?>("DecisionDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("DecisionDate");
+
+                    b.Property<string>("DecisionTemplateName")
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)")
+                        .HasColumnName("DecisionTemplateName");
 
                     b.Property<DateTimeOffset?>("DeletedDate")
                         .HasColumnType("datetimeoffset")
@@ -268,6 +339,8 @@ namespace Persistence.Migrations
 
                     b.HasIndex("ApplicationNumber")
                         .IsUnique();
+
+                    b.HasIndex("BranchId");
 
                     b.HasIndex("CreditSubTypeId");
 
@@ -635,6 +708,10 @@ namespace Persistence.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasColumnName("Address");
 
+                    b.Property<Guid?>("BranchId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("BranchId");
+
                     b.Property<DateTimeOffset>("CreatedDate")
                         .HasColumnType("datetimeoffset")
                         .HasColumnName("CreatedDate");
@@ -675,6 +752,8 @@ namespace Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("BranchId");
+
                     b.HasIndex("CustomerNumber")
                         .IsUnique();
 
@@ -684,6 +763,64 @@ namespace Persistence.Migrations
                     b.ToTable("Customers", (string)null);
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("Domain.Entities.DecisionLetterTemplate", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("Id");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)")
+                        .HasColumnName("Body");
+
+                    b.Property<DateTimeOffset>("CreatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("CreatedDate");
+
+                    b.Property<DateTimeOffset?>("DeletedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("DeletedDate");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit")
+                        .HasColumnName("IsDeleted");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)")
+                        .HasColumnName("Kind");
+
+                    b.Property<string>("Locale")
+                        .IsRequired()
+                        .HasMaxLength(5)
+                        .HasColumnType("nvarchar(5)")
+                        .HasColumnName("Locale");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)")
+                        .HasColumnName("Name");
+
+                    b.Property<DateTimeOffset?>("UpdatedDate")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("UpdatedDate");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("UserId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "Kind", "Locale");
+
+                    b.ToTable("DecisionLetterTemplates", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Entities.OutboxMessage", b =>
@@ -746,6 +883,10 @@ namespace Persistence.Migrations
                 {
                     b.HasBaseType("Core.Security.Entities.User");
 
+                    b.Property<Guid?>("BranchId")
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("BranchId");
+
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("CustomerId");
@@ -796,6 +937,8 @@ namespace Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)")
                         .HasColumnName("Title");
+
+                    b.HasIndex("BranchId");
 
                     b.HasIndex("CustomerId");
 
@@ -952,6 +1095,11 @@ namespace Persistence.Migrations
 
             modelBuilder.Entity("Domain.Entities.CreditApplication", b =>
                 {
+                    b.HasOne("Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("Domain.Entities.CreditSubType", "CreditSubType")
                         .WithMany("CreditApplications")
                         .HasForeignKey("CreditSubTypeId")
@@ -963,6 +1111,8 @@ namespace Persistence.Migrations
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Branch");
 
                     b.Navigation("CreditSubType");
 
@@ -991,12 +1141,29 @@ namespace Persistence.Migrations
                     b.Navigation("CreditType");
                 });
 
+            modelBuilder.Entity("Domain.Entities.Customer", b =>
+                {
+                    b.HasOne("Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
+                });
+
             modelBuilder.Entity("Domain.Entities.ApplicationUser", b =>
                 {
+                    b.HasOne("Domain.Entities.Branch", "Branch")
+                        .WithMany()
+                        .HasForeignKey("BranchId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.HasOne("Domain.Entities.Customer", "Customer")
                         .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Branch");
 
                     b.Navigation("Customer");
                 });

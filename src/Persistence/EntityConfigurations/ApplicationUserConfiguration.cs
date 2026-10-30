@@ -39,15 +39,22 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
                 name => string.IsNullOrWhiteSpace(name) || !StaffPosition.IsValidName(name)
                     ? null
                     : StaffPosition.FromName(name, ignoreCase: true));
+        builder.Property(u => u.BranchId).HasColumnName("BranchId");
         builder.Property(u => u.ProfileImagePath).HasColumnName("ProfileImagePath").HasMaxLength(500);
         builder.Property(u => u.EmailConfirmed).HasColumnName("EmailConfirmed").IsRequired();
         builder.Property(u => u.EmailConfirmationToken).HasColumnName("EmailConfirmationToken").HasMaxLength(128);
         builder.Property(u => u.EmailConfirmationTokenExpiresAt).HasColumnName("EmailConfirmationTokenExpiresAt");
         builder.HasIndex(u => u.EmailConfirmationToken);
+        builder.HasIndex(u => u.BranchId);
 
         builder.HasOne(u => u.Customer)
             .WithMany()
             .HasForeignKey(u => u.CustomerId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(u => u.Branch)
+            .WithMany()
+            .HasForeignKey(u => u.BranchId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }

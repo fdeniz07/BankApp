@@ -8,6 +8,8 @@ public class CreditApplication : AggregateRoot
 {
     public string ApplicationNumber { get; set; } = default!;
     public Guid CustomerId { get; set; }
+    /// <summary>Branch owning this application (copied from customer at create).</summary>
+    public Guid? BranchId { get; set; }
     public Guid CreditSubTypeId { get; set; }
     public decimal RequestedAmount { get; set; }
     public int RequestedTermMonths { get; set; }
@@ -23,8 +25,15 @@ public class CreditApplication : AggregateRoot
     public string? RejectionReason { get; set; }
     public string? Notes { get; set; }
     public string? DecisionBy { get; set; }
+    /// <summary>Branch code at decision time (snapshot; not a live FK).</summary>
+    public string? DecisionBranchCode { get; set; }
+    /// <summary>Branch display name at decision time (snapshot).</summary>
+    public string? DecisionBranchName { get; set; }
+    /// <summary>User/system letter template name used for the decision letter (audit).</summary>
+    public string? DecisionTemplateName { get; set; }
 
     public Customer Customer { get; set; } = default!;
+    public Branch? Branch { get; set; }
     public CreditSubType CreditSubType { get; set; } = default!;
 
     public void InitializeAsNewApplication(string applicationNumber)
@@ -48,7 +57,10 @@ public class CreditApplication : AggregateRoot
         int approvedTermMonths,
         decimal? approvedInterestRate,
         string? decisionBy,
-        string? notes)
+        string? notes,
+        string? decisionBranchCode = null,
+        string? decisionBranchName = null,
+        string? decisionTemplateName = null)
     {
         Status = CreditApplicationStatus.Approved;
         ApprovedAmount = approvedAmount;
@@ -56,6 +68,9 @@ public class CreditApplication : AggregateRoot
         ApprovedInterestRate = approvedInterestRate;
         DecisionDate = DateTimeOffset.UtcNow;
         DecisionBy = decisionBy;
+        DecisionBranchCode = decisionBranchCode;
+        DecisionBranchName = decisionBranchName;
+        DecisionTemplateName = TrimTemplate(decisionTemplateName);
         Notes = notes ?? Notes;
         RejectionReason = null;
 
@@ -70,12 +85,21 @@ public class CreditApplication : AggregateRoot
             DateTimeOffset.UtcNow));
     }
 
-    public void Reject(string rejectionReason, string? decisionBy, string? notes)
+    public void Reject(
+        string rejectionReason,
+        string? decisionBy,
+        string? notes,
+        string? decisionBranchCode = null,
+        string? decisionBranchName = null,
+        string? decisionTemplateName = null)
     {
         Status = CreditApplicationStatus.Rejected;
         RejectionReason = rejectionReason;
         DecisionDate = DateTimeOffset.UtcNow;
         DecisionBy = decisionBy;
+        DecisionBranchCode = decisionBranchCode;
+        DecisionBranchName = decisionBranchName;
+        DecisionTemplateName = TrimTemplate(decisionTemplateName);
         Notes = notes ?? Notes;
         ApprovedAmount = null;
         ApprovedTermMonths = null;
@@ -88,6 +112,25 @@ public class CreditApplication : AggregateRoot
             rejectionReason,
             decisionBy,
             DateTimeOffset.UtcNow));
+    }
+
+    /// <summary>Raises realtime/outbox event after a document is stored (aggregate stays source of truth for messaging).</summary>
+    public void RecordDocumentUploaded(string documentType)
+    {
+        Raise(new CreditApplicationDocumentUploaded(
+            Id,
+            ApplicationNumber,
+            CustomerId,
+            documentType,
+            DateTimeOffset.UtcNow));
+    }
+
+    private static string? TrimTemplate(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return null;
+        string trimmed = name.Trim();
+        return trimmed.Length > 120 ? trimmed[..120] : trimmed;
     }
 
     public void Cancel(string? notes)
