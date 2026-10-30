@@ -364,6 +364,7 @@
     "decisionAudit": "Decision audit",
     "decisionTemplate": "Letter template",
     "missingDocsFilter": "Missing required documents",
+    "presetPendingMissingDocs": "Pending + missing docs",
     "missingDocsBadge": "Docs missing",
     "missingDocsWarn": "Pending application: identity and/or income proof not uploaded yet.",
     "documentsTitle": "Documents",

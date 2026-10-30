@@ -364,6 +364,7 @@
     "decisionAudit": "Karar kaydı",
     "decisionTemplate": "Mektup şablonu",
     "missingDocsFilter": "Eksik zorunlu evrak",
+    "presetPendingMissingDocs": "Bekleyen + eksik evrak",
     "missingDocsBadge": "Evrak eksik",
     "missingDocsWarn": "Bekleyen başvuru: kimlik ve/veya gelir belgesi henüz yüklenmemiş.",
     "documentsTitle": "Evraklar",

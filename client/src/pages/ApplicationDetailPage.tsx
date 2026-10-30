@@ -20,6 +20,7 @@ import {
   type DecisionLetterTemplateItem,
   type DecisionTemplateKind,
 } from '../api/decisionTemplatesApi'
+import { getCreditDocumentsConfig } from '../api/creditDocumentsConfigApi'
 import { useAuth } from '../auth/AuthContext'
 import { canModifyBranchResource } from '../auth/token'
 import type {
@@ -76,6 +77,7 @@ export function ApplicationDetailPage() {
   const [documentType, setDocumentType] = useState<CreditDocumentType>('IdentityDocument')
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [documentBusy, setDocumentBusy] = useState(false)
+  const [softApproveGateEnabled, setSoftApproveGateEnabled] = useState(false)
 
   const uiLocale = (i18n.language || 'tr').slice(0, 2)
 
@@ -136,6 +138,24 @@ export function ApplicationDetailPage() {
     void load()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id])
+
+  useEffect(() => {
+    if (!isStaff) {
+      setSoftApproveGateEnabled(false)
+      return
+    }
+    let cancelled = false
+    getCreditDocumentsConfig()
+      .then((cfg) => {
+        if (!cancelled) setSoftApproveGateEnabled(!!cfg.softApproveGateEnabled)
+      })
+      .catch(() => {
+        if (!cancelled) setSoftApproveGateEnabled(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [isStaff])
 
   useEffect(() => {
     const onRealtime = (event: Event) => {
@@ -403,7 +423,8 @@ export function ApplicationDetailPage() {
   async function onApprove(e: FormEvent) {
     e.preventDefault()
     if (!id || !item) return
-    const missingDocs = hasMissingRequiredDocuments(documents)
+    const missingDocs =
+      softApproveGateEnabled && hasMissingRequiredDocuments(documents)
     if (missingDocs) {
       if (!window.confirm(t('applications.confirmApproveMissingDocs'))) return
     } else if (!window.confirm(t('applications.confirmApprove'))) {
@@ -639,7 +660,9 @@ export function ApplicationDetailPage() {
           )}
         </h2>
         <p className="muted">{t('applications.documentsHint')}</p>
-        {docsMissing && <p className="warn-text">{t('applications.missingDocsWarn')}</p>}
+        {softApproveGateEnabled && docsMissing && (
+          <p className="warn-text">{t('applications.missingDocsWarn')}</p>
+        )}
 
         {item.status === 'Pending' && (
           <form

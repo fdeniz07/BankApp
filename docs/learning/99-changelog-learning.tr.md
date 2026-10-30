@@ -21,3 +21,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-10-30 | `29` eklenti: soft evrak kapısı, `DecisionTemplateName` audit, doküman SignalR + eksik evrak rozeti/filtresi |
 | 2026-10-30 | `21-ci-github-actions`: checkout/setup-dotnet/setup-node **v5** (Node 24; Actions Node 20 deprecation uyarısı) |
 | 2026-10-30 | CI: `ubuntu-24.04` pin + nullable CS8602/CS8604 handler temizliği |
+| 2026-10-30 | `29`: `SoftApproveGateEnabled` (lab kapalı) + liste preset “Bekleyen + eksik evrak” |

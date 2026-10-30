@@ -65,3 +65,4 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Karar mektubu şablon CRUD + UI diline göre sistem şablonu; katalog ürünleri şube locale’ine kilitli (SuperAdmin hariç)
 - [x] Demo giriş matrisi Personel/Yönetici/Müşteri × TR/DE/EN; ortak lab şifresi `Demo123!`
 - [x] Onay soft-evrak uyarısı; karar audit (şube/şablon); evrak yükleme SignalR + eksik evrak rozeti/filtresi
+- [x] Soft onay kapısı config (`SoftApproveGateEnabled`; Development kapalı) + liste preset “Bekleyen + eksik evrak”

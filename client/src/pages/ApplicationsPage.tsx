@@ -703,6 +703,19 @@ export function ApplicationsPage() {
           />
           <span>{t('applications.missingDocsFilter')}</span>
         </label>
+        {isStaff && (
+          <button
+            type="button"
+            className="btn ghost"
+            onClick={() => {
+              setPageIndex(0)
+              setStatusFilter('Pending')
+              setMissingDocsOnly(true)
+            }}
+          >
+            {t('applications.presetPendingMissingDocs')}
+          </button>
+        )}
       </div>
 
       {loading && <p>{t('common.loading')}</p>}

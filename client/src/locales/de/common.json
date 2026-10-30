@@ -364,6 +364,7 @@
     "decisionAudit": "Entscheidungsprotokoll",
     "decisionTemplate": "Briefvorlage",
     "missingDocsFilter": "Fehlende Pflichtunterlagen",
+    "presetPendingMissingDocs": "Ausstehend + fehlende Unterlagen",
     "missingDocsBadge": "Unterlagen fehlen",
     "missingDocsWarn": "Ausstehender Antrag: Ausweis und/oder Einkommensnachweis noch nicht hochgeladen.",
     "documentsTitle": "Unterlagen",
