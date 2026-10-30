@@ -182,6 +182,7 @@ export interface CreditApplicationListItem {
   id: string
   applicationNumber: string
   customerId: string
+  branchId?: string | null
   creditSubTypeId: string
   creditSubTypeName: string
   currencyCode: string
@@ -191,6 +192,12 @@ export interface CreditApplicationListItem {
   approvedInterestRate?: number | null
   status: CreditApplicationStatus
   applicationDate: string
+  decisionBy?: string | null
+  decisionBranchCode?: string | null
+  decisionBranchName?: string | null
+  decisionTemplateName?: string | null
+  /** Pending: IdentityDocument or IncomeProof missing. */
+  missingRequiredDocuments?: boolean
   isDeleted: boolean
 }
 
@@ -213,6 +220,10 @@ export interface CreditApplicationDetail extends CreditApplicationListItem {
   decisionByName?: string | null
   decisionByPosition?: string | null
   decisionByEmail?: string | null
+  decisionBranchCode?: string | null
+  decisionBranchName?: string | null
+  decisionTemplateName?: string | null
+  missingRequiredDocuments?: boolean
   createdDate: string
   updatedDate?: string | null
 }
@@ -307,6 +318,14 @@ export type StaffPosition =
   | 'OperationsSpecialist'
   | 'BranchManager'
 
+export interface BranchListItem {
+  id: string
+  code: string
+  name: string
+  city?: string | null
+  isActive: boolean
+}
+
 export interface StaffUserListItem {
   id: string
   email: string
@@ -318,6 +337,9 @@ export interface StaffUserListItem {
   gender?: Gender | null
   dateOfBirth?: string | null
   position?: StaffPosition | null
+  branchId?: string | null
+  branchCode?: string | null
+  branchName?: string | null
   profileImageUrl?: string | null
   roles: string[]
   createdDate: string
@@ -333,6 +355,22 @@ export interface CreateStaffUserRequest {
   gender?: Gender | null
   dateOfBirth?: string | null
   position?: StaffPosition | null
+  branchId?: string | null
+}
+
+export interface CreateBranchRequest {
+  code: string
+  name: string
+  city?: string | null
+  isActive?: boolean
+}
+
+export interface UpdateBranchRequest {
+  id: string
+  code: string
+  name: string
+  city?: string | null
+  isActive: boolean
 }
 
 export interface UpdateStaffUserRequest {
@@ -347,6 +385,7 @@ export interface UpdateStaffUserRequest {
   gender?: Gender | null
   dateOfBirth?: string | null
   position?: StaffPosition | null
+  branchId?: string | null
 }
 
 export interface MyProfile {
@@ -358,6 +397,9 @@ export interface MyProfile {
   gender?: Gender | null
   dateOfBirth?: string | null
   position?: StaffPosition | null
+  branchId?: string | null
+  branchCode?: string | null
+  branchName?: string | null
   profileImageUrl?: string | null
   isActive: boolean
   isStaff: boolean
@@ -396,12 +438,14 @@ export interface ApproveRequest {
   approvedInterestRate: number
   decisionBy?: string
   notes?: string
+  decisionTemplateName?: string
 }
 
 export interface RejectRequest {
   rejectionReason: string
   decisionBy?: string
   notes?: string
+  decisionTemplateName?: string
 }
 
 export type ApplicationSortBy =

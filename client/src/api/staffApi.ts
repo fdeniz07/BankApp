@@ -6,7 +6,12 @@ import type {
 } from '../types/api'
 import { apiRequest } from './client'
 
-export function getStaffUsers(pageIndex = 0, pageSize = 10, isActive?: boolean | null) {
+export function getStaffUsers(
+  pageIndex = 0,
+  pageSize = 10,
+  isActive?: boolean | null,
+  branchId?: string | null,
+) {
   const params = new URLSearchParams({
     PageIndex: String(pageIndex),
     PageSize: String(pageSize),
@@ -14,6 +19,7 @@ export function getStaffUsers(pageIndex = 0, pageSize = 10, isActive?: boolean |
   if (isActive === true || isActive === false) {
     params.set('isActive', String(isActive))
   }
+  if (branchId) params.set('branchId', branchId)
 
   return apiRequest<GetListResponse<StaffUserListItem>>(`/api/StaffUsers?${params}`)
 }

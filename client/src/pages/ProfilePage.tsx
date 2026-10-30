@@ -378,6 +378,16 @@ export function ProfilePage() {
                 {staffProfile.roles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(', ')}
               </dd>
             </div>
+            <div>
+              <dt>{t('profile.branch')}</dt>
+              <dd>
+                {staffProfile.branchCode || staffProfile.branchName
+                  ? `${staffProfile.branchCode ?? ''}${
+                      staffProfile.branchCode && staffProfile.branchName ? ' · ' : ''
+                    }${staffProfile.branchName ?? ''}`
+                  : t('profile.branchUnset')}
+              </dd>
+            </div>
           </div>
           <button type="submit" className="btn" disabled={saving}>
             {saving ? t('common.loading') : t('common.save')}

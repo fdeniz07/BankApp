@@ -10,6 +10,7 @@ const NAME_CLAIM = 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameid
 const NAME_CLAIM_ALT = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/nameidentifier'
 const EMAIL_CLAIM = 'email'
 const CUSTOMER_CLAIM = 'customerId'
+const BRANCH_CLAIM = 'branchId'
 const DISPLAY_NAME_CLAIM = 'displayName'
 const CUSTOMER_CATEGORY_CLAIM = 'customerCategory'
 
@@ -22,6 +23,7 @@ export interface AuthUser {
   profileImageUrl?: string
   roles: string[]
   customerId?: string
+  branchId?: string
   customerCategory?: CustomerCategory
 }
 
@@ -135,6 +137,7 @@ export function getAuthUser(): AuthUser | null {
     ''
   const roles = claimValues(payload, ROLE_CLAIM)
   const customerId = claimValues(payload, CUSTOMER_CLAIM)[0]
+  const branchId = claimValues(payload, BRANCH_CLAIM)[0]
   const displayName = claimValues(payload, DISPLAY_NAME_CLAIM)[0]
   const categoryRaw = claimValues(payload, CUSTOMER_CATEGORY_CLAIM)[0]
   const customerCategory =
@@ -149,10 +152,22 @@ export function getAuthUser(): AuthUser | null {
     profileImageUrl: override?.profileImageUrl || undefined,
     roles,
     customerId,
+    branchId,
     customerCategory: override?.customerCategory || customerCategory,
   }
 }
 
 export function hasRole(user: AuthUser | null, role: string): boolean {
   return !!user?.roles.includes(role)
+}
+
+/** SuperAdmin may modify any branch; others only their own. */
+export function canModifyBranchResource(
+  user: AuthUser | null,
+  resourceBranchId?: string | null,
+): boolean {
+  if (!user) return false
+  if (hasRole(user, 'SuperAdmin')) return true
+  if (!user.branchId || !resourceBranchId) return false
+  return user.branchId === resourceBranchId
 }

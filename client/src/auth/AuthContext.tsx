@@ -33,6 +33,7 @@ interface AuthContextValue {
   isAuthenticated: boolean
   isStaff: boolean
   isManager: boolean
+  isSuperAdmin: boolean
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>
   registerIndividual: (body: RegisterIndividualRequest) => Promise<RegisteredIndividualResponse>
   logout: () => void
@@ -139,19 +140,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
+  const value = useMemo<AuthContextValue>(() => {
+    const isSuperAdmin = hasRole(user, 'SuperAdmin')
+    return {
       user,
       isAuthenticated: !!user,
-      isStaff: hasRole(user, 'BankStaff'),
-      isManager: hasRole(user, 'BankManager'),
+      isStaff:
+        hasRole(user, 'BankStaff') ||
+        hasRole(user, 'BankManager') ||
+        isSuperAdmin,
+      isManager: hasRole(user, 'BankManager') || isSuperAdmin,
+      isSuperAdmin,
       login,
       registerIndividual,
       logout,
       updateProfileLocal,
-    }),
-    [user, login, registerIndividual, logout, updateProfileLocal],
-  )
+    }
+  }, [user, login, registerIndividual, logout, updateProfileLocal])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

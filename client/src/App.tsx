@@ -12,6 +12,7 @@ import { ConfirmEmailPage } from './pages/ConfirmEmailPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
+import { BranchesPage } from './pages/BranchesPage'
 import { StaffPage } from './pages/StaffPage'
 
 export default function App() {
@@ -29,6 +30,7 @@ export default function App() {
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/customers/:kind/:id" element={<CustomerDetailPage />} />
             <Route path="/staff" element={<StaffPage />} />
+            <Route path="/branches" element={<BranchesPage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>

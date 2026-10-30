@@ -8,7 +8,7 @@ import { StatsStrip } from './StatsStrip'
 
 export function AppLayout() {
   const { t } = useTranslation()
-  const { user, isStaff, isManager, logout } = useAuth()
+  const { user, isStaff, isManager, isSuperAdmin, logout } = useAuth()
   useCreditApplicationRealtime()
   const initial = (user?.displayName || user?.email || '?').slice(0, 1).toUpperCase()
 
@@ -22,6 +22,7 @@ export function AppLayout() {
           {isStaff && <NavLink to="/customers">{t('nav.customers')}</NavLink>}
           {isStaff && <NavLink to="/credit-types">{t('nav.creditTypes')}</NavLink>}
           {isManager && <NavLink to="/staff">{t('nav.staff')}</NavLink>}
+          {isSuperAdmin && <NavLink to="/branches">{t('nav.branches')}</NavLink>}
           <NavLink to="/profile">{t('nav.profile')}</NavLink>
         </nav>
         <div className="topbar-right">

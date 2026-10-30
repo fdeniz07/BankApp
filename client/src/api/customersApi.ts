@@ -12,11 +12,18 @@ import { apiRequest } from './client'
 
 export type CustomerListScope = 'active' | 'inactive' | 'deleted'
 
-function listPath(base: string, scope: CustomerListScope, pageIndex: number, pageSize: number) {
+function listPath(
+  base: string,
+  scope: CustomerListScope,
+  pageIndex: number,
+  pageSize: number,
+  branchId?: string | null,
+) {
   const qs = new URLSearchParams({
     PageIndex: String(pageIndex),
     PageSize: String(pageSize),
   })
+  if (branchId) qs.set('branchId', branchId)
   if (scope === 'active') {
     qs.set('isActive', 'true')
     return `${base}?${qs}`
@@ -29,9 +36,10 @@ export function getIndividualCustomers(
   scope: CustomerListScope,
   pageIndex = 0,
   pageSize = 10,
+  branchId?: string | null,
 ) {
   return apiRequest<GetListResponse<IndividualCustomerListItem>>(
-    listPath('/api/IndividualCustomers', scope, pageIndex, pageSize),
+    listPath('/api/IndividualCustomers', scope, pageIndex, pageSize, branchId),
   )
 }
 
@@ -39,9 +47,10 @@ export function getCorporateCustomers(
   scope: CustomerListScope,
   pageIndex = 0,
   pageSize = 10,
+  branchId?: string | null,
 ) {
   return apiRequest<GetListResponse<CorporateCustomerListItem>>(
-    listPath('/api/CorporateCustomers', scope, pageIndex, pageSize),
+    listPath('/api/CorporateCustomers', scope, pageIndex, pageSize, branchId),
   )
 }
 

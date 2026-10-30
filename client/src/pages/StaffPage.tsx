@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
+import { getBranches } from '../api/branchesApi'
 import { createStaffUser, getStaffUsers, updateStaffUser } from '../api/staffApi'
 import { resolveProfileImageUrl } from '../api/profileApi'
 import { useAuth } from '../auth/AuthContext'
 import type {
+  BranchListItem,
   Gender,
   GetListResponse,
   PersonTitle,
@@ -36,6 +38,7 @@ const emptyCreate = {
   gender: '' as '' | Gender,
   dateOfBirth: '',
   position: '' as '' | StaffPosition,
+  branchId: '',
 }
 
 type EditForm = {
@@ -50,6 +53,7 @@ type EditForm = {
   gender: '' | Gender
   dateOfBirth: string
   position: '' | StaffPosition
+  branchId: string
 }
 
 function toEditForm(item: StaffUserListItem): EditForm {
@@ -65,6 +69,7 @@ function toEditForm(item: StaffUserListItem): EditForm {
     gender: item.gender || '',
     dateOfBirth: item.dateOfBirth || '',
     position: item.position || '',
+    branchId: item.branchId || '',
   }
 }
 
@@ -81,6 +86,7 @@ export function StaffPage() {
   const [form, setForm] = useState(emptyCreate)
   const [editing, setEditing] = useState<EditForm | null>(null)
   const [savingEdit, setSavingEdit] = useState(false)
+  const [branches, setBranches] = useState<BranchListItem[]>([])
 
   const loadList = useCallback(() => {
     if (!isManager) return Promise.resolve()
@@ -98,6 +104,13 @@ export function StaffPage() {
   useEffect(() => {
     void loadList()
   }, [loadList])
+
+  useEffect(() => {
+    if (!isManager) return
+    void getBranches(true)
+      .then(setBranches)
+      .catch(() => setBranches([]))
+  }, [isManager])
 
   if (!isManager) {
     return (
@@ -122,6 +135,7 @@ export function StaffPage() {
         gender: form.gender || null,
         dateOfBirth: form.dateOfBirth || null,
         position: form.position || null,
+        branchId: form.branchId || user?.branchId || null,
       })
       toast.success(t('staff.createSuccess'))
       setForm(emptyCreate)
@@ -152,6 +166,7 @@ export function StaffPage() {
         gender: editing.gender || null,
         dateOfBirth: editing.dateOfBirth || null,
         position: editing.position || null,
+        branchId: editing.branchId || null,
       })
       toast.success(t('staff.updateSuccess'))
       setEditing(null)
@@ -185,6 +200,7 @@ export function StaffPage() {
         gender: item.gender,
         dateOfBirth: item.dateOfBirth,
         position: item.position,
+        branchId: item.branchId,
       })
       toast.success(t('staff.updateSuccess'))
       await loadList()
@@ -219,6 +235,7 @@ export function StaffPage() {
         gender: item.gender,
         dateOfBirth: item.dateOfBirth,
         position: item.position,
+        branchId: item.branchId,
       })
       toast.success(t('staff.updateSuccess'))
       await loadList()
@@ -342,6 +359,20 @@ export function StaffPage() {
               ))}
             </select>
           </label>
+          <label>
+            {t('staff.branch')}
+            <select
+              value={form.branchId || user?.branchId || ''}
+              onChange={(e) => setForm((f) => ({ ...f, branchId: e.target.value }))}
+            >
+              <option value="">{t('staff.branchUnset')}</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.code} — {b.name}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="checkbox-row">
             <input
               type="checkbox"
@@ -448,6 +479,20 @@ export function StaffPage() {
             </select>
           </label>
           <label>
+            {t('profile.branch')}
+            <select
+              value={editing.branchId}
+              onChange={(e) => setEditing({ ...editing, branchId: e.target.value })}
+            >
+              <option value="">{t('profile.branchUnset')}</option>
+              {branches.map((b) => (
+                <option key={b.id} value={b.id}>
+                  {b.code} · {b.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label>
             {t('profile.newPassword')}
             <input
               type="password"
@@ -527,6 +572,7 @@ export function StaffPage() {
                   <th>{t('login.email')}</th>
                   <th>{t('profile.firstName')}</th>
                   <th>{t('profile.position')}</th>
+                  <th>{t('profile.branch')}</th>
                   <th>{t('staff.roles')}</th>
                   <th>{t('staff.status')}</th>
                   <th>{t('staff.created')}</th>
@@ -559,6 +605,13 @@ export function StaffPage() {
                       <td>
                         {item.position
                           ? t(`staffPosition.${item.position}`, { defaultValue: item.position })
+                          : '—'}
+                      </td>
+                      <td>
+                        {item.branchCode || item.branchName
+                          ? `${item.branchCode ?? ''}${
+                              item.branchCode && item.branchName ? ' · ' : ''
+                            }${item.branchName ?? ''}`
                           : '—'}
                       </td>
                       <td>

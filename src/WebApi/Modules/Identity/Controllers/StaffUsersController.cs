@@ -18,12 +18,14 @@ public class StaffUsersController : BaseController
     [HttpGet]
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] Guid? branchId = null)
     {
         GetListStaffUserRequest request = new()
         {
             PageRequest = pageRequest,
-            IsActive = isActive
+            IsActive = isActive,
+            BranchId = branchId
         };
         GetListResponse<GetListStaffUserListItemDto> response = await Mediator.Send(request);
         return Ok(response);
