@@ -37,4 +37,9 @@ public static class ClaimExtensions
         if (!string.IsNullOrWhiteSpace(customerCategory))
             claims.Add(new Claim(Constants.CustomClaimTypes.CustomerCategory, customerCategory));
     }
+
+    public static void AddBranchId(this ICollection<Claim> claims, Guid branchId)
+    {
+        claims.Add(new Claim(Constants.CustomClaimTypes.BranchId, branchId.ToString()));
+    }
 }

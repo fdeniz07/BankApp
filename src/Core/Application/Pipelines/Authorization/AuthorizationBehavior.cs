@@ -1,4 +1,5 @@
 using Core.CrossCuttingConcerns.Exceptions.Types;
+using Core.Security.Constants;
 using Core.Security.Extensions;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,9 @@ public class AuthorizationBehavior<TRequest, TResponse> : IPipelineBehavior<TReq
         List<string>? userRoles = _httpContextAccessor.HttpContext.User.ClaimRoles();
         if (userRoles is null || userRoles.Count == 0)
             throw new AuthorizationException("You are not authorized.");
+
+        if (userRoles.Contains(GeneralOperationClaims.SuperAdmin))
+            return await next();
 
         bool isAuthorized = request.Roles.Any(requiredRole => userRoles.Contains(requiredRole));
         if (!isAuthorized)

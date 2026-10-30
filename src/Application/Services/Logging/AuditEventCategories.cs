@@ -22,4 +22,5 @@ public static class AuditEventActions
     public const string Reject = "Reject";
     public const string Cancel = "Cancel";
     public const string Upload = "Upload";
+    public const string AccessDenied = "AccessDenied";
 }

@@ -26,4 +26,10 @@ public static class ClaimsPrincipalExtensions
         string? value = claimsPrincipal.FindFirst(CustomClaimTypes.CustomerId)?.Value;
         return Guid.TryParse(value, out Guid customerId) ? customerId : null;
     }
+
+    public static Guid? GetBranchId(this ClaimsPrincipal claimsPrincipal)
+    {
+        string? value = claimsPrincipal.FindFirst(CustomClaimTypes.BranchId)?.Value;
+        return Guid.TryParse(value, out Guid branchId) ? branchId : null;
+    }
 }

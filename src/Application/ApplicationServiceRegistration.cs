@@ -1,5 +1,7 @@
 using System.Reflection;
 using Application.Modules;
+using Application.Services.Auth;
+using Application.Services.Branches;
 using Application.Services.Logging;
 using Core.Application.Pipelines;
 using Core.Application.Pipelines.Authorization;
@@ -33,6 +35,8 @@ public static class ApplicationServiceRegistration
 
         services.AddScoped<ITokenHelper, JwtHelper>();
         services.AddScoped<IAuditLogger, SerilogAuditLogger>();
+        services.AddScoped<IBranchAuthorizationService, BranchAuthorizationService>();
+        services.AddScoped<ICatalogLocaleService, CatalogLocaleService>();
         services.AddSubClassesOfType(Assembly.GetExecutingAssembly(), typeof(BaseBusinessRules));
         services.AddApplicationModules();
 

@@ -18,14 +18,22 @@ public class CurrentUserService : ICurrentUserService
 
     public Guid? CustomerId => _httpContextAccessor.HttpContext?.User.GetCustomerId();
 
+    public Guid? BranchId => _httpContextAccessor.HttpContext?.User.GetBranchId();
+
     public bool IsAuthenticated =>
         _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated == true;
 
     public bool IsBankStaff =>
-        _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.BankStaff) == true;
+        _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.BankStaff) == true
+        || IsBankManager
+        || IsSuperAdmin;
 
     public bool IsBankManager =>
-        _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.BankManager) == true;
+        _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.BankManager) == true
+        || IsSuperAdmin;
+
+    public bool IsSuperAdmin =>
+        _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.SuperAdmin) == true;
 
     public bool IsCustomer =>
         _httpContextAccessor.HttpContext?.User.ClaimRoles()?.Contains(GeneralOperationClaims.Customer) == true;
@@ -43,6 +51,12 @@ public class CurrentUserService : ICurrentUserService
     {
         if (!IsBankStaff)
             throw new AuthorizationException("Only bank staff can perform this operation.");
+    }
+
+    public void EnsureSuperAdmin()
+    {
+        if (!IsSuperAdmin)
+            throw new AuthorizationException("Only SuperAdmin can perform this operation.");
     }
 
     public Guid GetRequiredCustomerId()

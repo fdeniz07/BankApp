@@ -10,5 +10,6 @@ public interface ITokenHelper
         Guid? customerId = null,
         string? displayName = null,
         string? customerCategory = null,
-        int? expirationMinutes = null);
+        int? expirationMinutes = null,
+        Guid? branchId = null);
 }

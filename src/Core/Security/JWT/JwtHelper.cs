@@ -25,7 +25,8 @@ public class JwtHelper : ITokenHelper
         Guid? customerId = null,
         string? displayName = null,
         string? customerCategory = null,
-        int? expirationMinutes = null)
+        int? expirationMinutes = null,
+        Guid? branchId = null)
     {
         int minutes = expirationMinutes is > 0
             ? expirationMinutes.Value
@@ -40,7 +41,8 @@ public class JwtHelper : ITokenHelper
             operationClaims,
             customerId,
             displayName,
-            customerCategory);
+            customerCategory,
+            branchId);
         JwtSecurityTokenHandler tokenHandler = new();
         string token = tokenHandler.WriteToken(jwt);
 
@@ -58,14 +60,15 @@ public class JwtHelper : ITokenHelper
         IList<OperationClaim> operationClaims,
         Guid? customerId,
         string? displayName,
-        string? customerCategory)
+        string? customerCategory,
+        Guid? branchId)
     {
         return new JwtSecurityToken(
             issuer: tokenOptions.Issuer,
             audience: tokenOptions.Audience,
             expires: _accessTokenExpiration,
             notBefore: DateTime.UtcNow,
-            claims: SetClaims(user, operationClaims, customerId, displayName, customerCategory),
+            claims: SetClaims(user, operationClaims, customerId, displayName, customerCategory, branchId),
             signingCredentials: signingCredentials);
     }
 
@@ -74,7 +77,8 @@ public class JwtHelper : ITokenHelper
         IList<OperationClaim> operationClaims,
         Guid? customerId,
         string? displayName,
-        string? customerCategory)
+        string? customerCategory,
+        Guid? branchId)
     {
         List<Claim> claims = [];
         claims.AddNameIdentifier(user.Id.ToString());
@@ -89,6 +93,9 @@ public class JwtHelper : ITokenHelper
 
         if (!string.IsNullOrWhiteSpace(customerCategory))
             claims.AddCustomerCategory(customerCategory);
+
+        if (branchId.HasValue)
+            claims.AddBranchId(branchId.Value);
 
         return claims;
     }
