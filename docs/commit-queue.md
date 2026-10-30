@@ -42,3 +42,4 @@ _(empty)_
 | 2026-10-27 | +3 | Decision SMS lab (feat → test → docs) |
 | 2026-10-28 | +2 | Rate-limit env split (feat → docs) |
 | 2026-10-28 | +4 | Credit document upload (feat API → feat UI → test → docs) |
+| 2026-10-30 | 11 | Branch RBAC → demo Demo123! → templates → soft docs/audit/SignalR → tests → docs |
