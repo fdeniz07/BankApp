@@ -40,7 +40,7 @@ const emptyCreate = {
 
 export function CreditTypesPage() {
   const { t } = useTranslation()
-  const { isStaff, isManager } = useAuth()
+  const { isStaff, isManager, isSuperAdmin } = useAuth()
   const [data, setData] = useState<GetListResponse<CreditTypeListItem> | null>(null)
   const [localeFilter, setLocaleFilter] = useState<LocaleCode | ''>('')
   const [categoryFilter, setCategoryFilter] = useState<CreditCategory | ''>('')
@@ -157,19 +157,21 @@ export function CreditTypesPage() {
               {showCreate ? t('common.cancel') : t('creditTypes.newType')}
             </button>
           )}
-          <label className="filter-label">
-            {t('creditTypes.locale')}
-            <select
-              value={localeFilter}
-              onChange={(e) => setLocaleFilter(e.target.value as LocaleCode | '')}
-            >
-              {LOCALE_FILTERS.map((locale) => (
-                <option key={locale || 'all'} value={locale}>
-                  {locale ? t(`locale.${locale}`) : t('creditTypes.allLocales')}
-                </option>
-              ))}
-            </select>
-          </label>
+          {isSuperAdmin && (
+            <label className="filter-label">
+              {t('creditTypes.locale')}
+              <select
+                value={localeFilter}
+                onChange={(e) => setLocaleFilter(e.target.value as LocaleCode | '')}
+              >
+                {LOCALE_FILTERS.map((locale) => (
+                  <option key={locale || 'all'} value={locale}>
+                    {locale ? t(`locale.${locale}`) : t('creditTypes.allLocales')}
+                  </option>
+                ))}
+              </select>
+            </label>
+          )}
         </div>
       </div>
 

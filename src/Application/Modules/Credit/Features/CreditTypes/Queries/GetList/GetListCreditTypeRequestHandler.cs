@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Application.Services.Branches;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Responses;
@@ -14,18 +15,26 @@ public class GetListCreditTypeRequestHandler
 {
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly IMapper _mapper;
+    private readonly ICatalogLocaleService _catalogLocale;
 
-    public GetListCreditTypeRequestHandler(ICreditTypeRepository creditTypeRepository, IMapper mapper)
+    public GetListCreditTypeRequestHandler(
+        ICreditTypeRepository creditTypeRepository,
+        IMapper mapper,
+        ICatalogLocaleService catalogLocale)
     {
         _creditTypeRepository = creditTypeRepository;
         _mapper = mapper;
+        _catalogLocale = catalogLocale;
     }
 
     public async Task<GetListResponse<GetListCreditTypeListItemDto>> Handle(
         GetListCreditTypeRequest request,
         CancellationToken cancellationToken)
     {
-        Expression<Func<CreditType, bool>>? predicate = BuildPredicate(request.Locale, request.Category);
+        string? forcedLocale = await _catalogLocale.ResolveForcedCatalogLocaleAsync(cancellationToken);
+        string? locale = forcedLocale ?? request.Locale;
+
+        Expression<Func<CreditType, bool>>? predicate = BuildPredicate(locale, request.Category);
 
         Func<IQueryable<CreditType>, IOrderedQueryable<CreditType>>? orderBy =
             BuildOrderBy(request.SortBy, request.SortDesc);

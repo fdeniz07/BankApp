@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Application.Services.Branches;
 using Application.Services.Repositories;
 using AutoMapper;
 using Core.Application.Responses;
@@ -16,29 +17,35 @@ public class GetListCreditSubTypeRequestHandler
     private readonly ICreditSubTypeRepository _creditSubTypeRepository;
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly IMapper _mapper;
+    private readonly ICatalogLocaleService _catalogLocale;
 
     public GetListCreditSubTypeRequestHandler(
         ICreditSubTypeRepository creditSubTypeRepository,
         ICreditTypeRepository creditTypeRepository,
-        IMapper mapper)
+        IMapper mapper,
+        ICatalogLocaleService catalogLocale)
     {
         _creditSubTypeRepository = creditSubTypeRepository;
         _creditTypeRepository = creditTypeRepository;
         _mapper = mapper;
+        _catalogLocale = catalogLocale;
     }
 
     public async Task<GetListResponse<GetListCreditSubTypeListItemDto>> Handle(
         GetListCreditSubTypeRequest request,
         CancellationToken cancellationToken)
     {
+        string? forcedLocale = await _catalogLocale.ResolveForcedCatalogLocaleAsync(cancellationToken);
+        string? effectiveLocale = forcedLocale ?? request.Locale;
+
         HashSet<Guid>? filteredTypeIds = null;
-        bool filterTypes = !string.IsNullOrWhiteSpace(request.Locale) || !string.IsNullOrWhiteSpace(request.Category);
+        bool filterTypes = !string.IsNullOrWhiteSpace(effectiveLocale) || !string.IsNullOrWhiteSpace(request.Category);
 
         if (filterTypes)
         {
-            string? locale = string.IsNullOrWhiteSpace(request.Locale)
+            string? locale = string.IsNullOrWhiteSpace(effectiveLocale)
                 ? null
-                : request.Locale.Trim().ToLowerInvariant();
+                : effectiveLocale.Trim().ToLowerInvariant();
             CreditCategory? category = TryParseCategory(request.Category);
 
             IPaginate<CreditType> types = await _creditTypeRepository.GetListAsync(
