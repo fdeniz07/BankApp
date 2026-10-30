@@ -2,6 +2,7 @@ using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Persistence.Contexts;
 
 namespace Persistence.Seed;
@@ -12,16 +13,22 @@ public static class BankingDbContextSeed
     {
         using IServiceScope scope = serviceProvider.CreateScope();
         BankingDbContext context = scope.ServiceProvider.GetRequiredService<BankingDbContext>();
+        IHostEnvironment hostEnvironment = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
+        await BranchSeed.SeedAsync(context);
         await SeedIndividualCustomersAsync(context);
         await SeedCorporateCustomersAsync(context);
+        await CustomerBranchAssignmentSeed.SeedAsync(context);
         await SeedCreditTypesAsync(context);
         await SyncCreditTypeCurrenciesAsync(context);
         await SeedCreditSubTypesAsync(context);
         await SyncCreditSubTypesAsync(context);
         await SeedCreditApplicationsAsync(context);
         await SyncCreditApplicationsAsync(context);
+        await ApplicationBranchAssignmentSeed.SeedAsync(context);
+        await ApplicationLocaleConsistencySeed.SeedAsync(context);
         await IdentitySeed.SeedAsync(context);
+        await CreditApplicationDocumentSeed.SeedAsync(context, hostEnvironment.ContentRootPath);
     }
 
     private static async Task SeedIndividualCustomersAsync(BankingDbContext context)

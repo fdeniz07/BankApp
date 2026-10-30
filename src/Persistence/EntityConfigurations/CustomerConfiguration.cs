@@ -17,6 +17,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         builder.Property(c => c.PhoneNumber).HasColumnName("PhoneNumber").HasMaxLength(20).IsRequired();
         builder.Property(c => c.Address).HasColumnName("Address").HasMaxLength(500).IsRequired();
         builder.Property(c => c.IsActive).HasColumnName("IsActive").IsRequired();
+        builder.Property(c => c.BranchId).HasColumnName("BranchId");
         builder.Property(c => c.IsDeleted).HasColumnName("IsDeleted").IsRequired();
         builder.Property(c => c.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(c => c.UpdatedDate).HasColumnName("UpdatedDate");
@@ -24,5 +25,11 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.HasIndex(c => c.CustomerNumber).IsUnique();
         builder.HasIndex(c => c.Email).IsUnique();
+        builder.HasIndex(c => c.BranchId);
+
+        builder.HasOne(c => c.Branch)
+            .WithMany()
+            .HasForeignKey(c => c.BranchId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

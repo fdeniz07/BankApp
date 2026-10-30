@@ -37,13 +37,6 @@ public static class CreditApplicationSeed
         List<(CreditSubType SubType, CreditCategory Category, string CurrencyCode, string Locale)> corporateSubTypes =
             subTypes.Where(s => s.Category == CreditCategory.Corporate).ToList();
 
-        List<IndividualCustomer> activeIndividuals = individualCustomers.Where(c => c.IsActive).ToList();
-        List<CorporateCustomer> activeCorporates = corporateCustomers.Where(c => c.IsActive).ToList();
-
-        if ((activeIndividuals.Count == 0 || individualSubTypes.Count == 0) &&
-            (activeCorporates.Count == 0 || corporateSubTypes.Count == 0))
-            return [];
-
         string[] locales = ["tr", "en", "de"];
         int sequence = startIndex;
         Random random = Random.Shared;
@@ -54,40 +47,46 @@ public static class CreditApplicationSeed
             string locale = locales[i % locales.Length];
             Faker faker = new(locale);
 
+            List<IndividualCustomer> localeIndividuals = activeByLocale(individualCustomers, locale, "@individual.");
+            List<CorporateCustomer> localeCorporates = activeByLocale(corporateCustomers, locale, "@corporate.");
+
             var localeIndividual = individualSubTypes.Where(s => s.Locale == locale).ToList();
             var localeCorporate = corporateSubTypes.Where(s => s.Locale == locale).ToList();
-            if (localeIndividual.Count == 0) localeIndividual = individualSubTypes;
-            if (localeCorporate.Count == 0) localeCorporate = corporateSubTypes;
 
             bool preferIndividual = faker.Random.Bool(0.55f);
             bool useIndividual =
                 preferIndividual
-                    ? activeIndividuals.Count > 0 && localeIndividual.Count > 0
-                    : !(activeCorporates.Count > 0 && localeCorporate.Count > 0)
-                      && activeIndividuals.Count > 0
+                    ? localeIndividuals.Count > 0 && localeIndividual.Count > 0
+                    : !(localeCorporates.Count > 0 && localeCorporate.Count > 0)
+                      && localeIndividuals.Count > 0
                       && localeIndividual.Count > 0;
 
-            if (!useIndividual && (activeCorporates.Count == 0 || localeCorporate.Count == 0))
+            if (!useIndividual && (localeCorporates.Count == 0 || localeCorporate.Count == 0))
             {
-                if (activeIndividuals.Count == 0 || localeIndividual.Count == 0)
-                    break;
+                if (localeIndividuals.Count == 0 || localeIndividual.Count == 0)
+                    continue;
                 useIndividual = true;
             }
 
             Guid customerId;
+            Guid? branchId;
             CreditSubType subType;
             string currencyCode;
 
             if (useIndividual)
             {
-                customerId = faker.PickRandom(activeIndividuals).Id;
+                IndividualCustomer customer = faker.PickRandom(localeIndividuals);
+                customerId = customer.Id;
+                branchId = customer.BranchId;
                 var picked = faker.PickRandom(localeIndividual);
                 subType = picked.SubType;
                 currencyCode = picked.CurrencyCode;
             }
             else
             {
-                customerId = faker.PickRandom(activeCorporates).Id;
+                CorporateCustomer customer = faker.PickRandom(localeCorporates);
+                customerId = customer.Id;
+                branchId = customer.BranchId;
                 var picked = faker.PickRandom(localeCorporate);
                 subType = picked.SubType;
                 currencyCode = picked.CurrencyCode;
@@ -108,6 +107,7 @@ public static class CreditApplicationSeed
             {
                 ApplicationNumber = $"APP-{(++sequence):D8}",
                 CustomerId = customerId,
+                BranchId = branchId,
                 CreditSubTypeId = subType.Id,
                 RequestedAmount = requestedAmount,
                 RequestedTermMonths = requestedTerm,
@@ -133,7 +133,6 @@ public static class CreditApplicationSeed
                 application.DecisionDate = applicationDate.AddDays(faker.Random.Int(1, 14));
                 application.ApprovedAmount = CreditSubTypeSeed.PickRoundAmount(
                     random, subType.MinAmount, requestedAmount, currencyCode);
-                // Prefer requested term; if shortened, only one package step down (never to min alone).
                 application.ApprovedTermMonths = PickApprovedTerm(
                     random, subType.MinTermMonths, requestedTerm);
                 application.ApprovedInterestRate = subType.InterestRate;
@@ -162,6 +161,12 @@ public static class CreditApplicationSeed
         return items;
     }
 
+    private static List<T> activeByLocale<T>(IReadOnlyList<T> customers, string locale, string marker)
+        where T : Customer =>
+        customers
+            .Where(c => c.IsActive && c.Email.Contains($"{marker}{locale}.", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
     public static int PickAllowedTerm(Random random, int minTerm, int maxTerm)
     {
         int[] candidates = CreditSubTypeSeed.GetAllowedTermsInRange(minTerm, maxTerm);
@@ -171,9 +176,6 @@ public static class CreditApplicationSeed
         return candidates[random.Next(candidates.Length)];
     }
 
-    /// <summary>
-    /// ~90% keep requested term; otherwise step down one allowed package term only.
-    /// </summary>
     public static int PickApprovedTerm(Random random, int minTerm, int requestedTerm)
     {
         int[] candidates = CreditSubTypeSeed.GetAllowedTermsInRange(minTerm, requestedTerm);
