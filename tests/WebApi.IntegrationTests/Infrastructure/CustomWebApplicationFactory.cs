@@ -46,7 +46,12 @@ public sealed class CustomWebApplicationFactory : WebApplicationFactory<Program>
                 ["RateLimiting:Auth:PermitLimit"] = "1000",
                 ["RateLimiting:Auth:WindowSeconds"] = "60",
                 ["RateLimiting:Write:PermitLimit"] = "1000",
-                ["RateLimiting:Write:WindowSeconds"] = "60"
+                ["RateLimiting:Write:WindowSeconds"] = "60",
+                // Base appsettings uses Hard gate + DoA; integration flows create apps without docs.
+                ["CreditDocuments:ApproveGateMode"] = "None",
+                ["ApprovalAuthority:Enabled"] = "false",
+                ["Elasticsearch:Enabled"] = "false",
+                ["Logstash:Enabled"] = "false"
             });
         });
 
