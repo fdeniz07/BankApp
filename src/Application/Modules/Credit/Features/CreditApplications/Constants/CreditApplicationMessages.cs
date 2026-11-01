@@ -17,4 +17,8 @@ public static class CreditApplicationMessages
     public const string OnlyPendingCanBeDecided = "Only pending applications can be approved or rejected.";
     public const string OnlyPendingCanBeUpdated = "Only pending applications can be updated.";
     public const string OnlyPendingCanBeCancelled = "Only pending applications can be cancelled.";
+    public const string MissingRequiredDocuments =
+        "Identity document and income proof are required before approval.";
+    public const string AmountExceedsApprovalAuthority =
+        "Approved amount exceeds your approval authority limit.";
 }

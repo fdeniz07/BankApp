@@ -1,15 +1,15 @@
 namespace Application.Modules.Credit.Features.CreditApplicationDocuments;
 
 /// <summary>
-/// Credit document UX flags (lab vs prod soft-approve gate).
+/// Credit document approval gate (lab vs prod).
 /// </summary>
 public sealed class CreditDocumentsOptions
 {
     public const string SectionName = "CreditDocuments";
 
     /// <summary>
-    /// When true, staff get a soft confirm + warning band if identity/income docs are missing on approve.
-    /// List badges and missing-docs filter stay available either way.
+    /// <see cref="ApproveDocumentGateMode.None"/> | Soft | Hard.
+    /// List badges and missing-docs filter stay available in all modes.
     /// </summary>
-    public bool SoftApproveGateEnabled { get; set; } = true;
+    public ApproveDocumentGateMode ApproveGateMode { get; set; } = ApproveDocumentGateMode.Hard;
 }

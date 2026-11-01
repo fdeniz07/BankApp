@@ -1,9 +1,14 @@
 import { apiRequest } from './client'
 
-export type CreditDocumentsConfig = {
+export type ApproveGateMode = 'None' | 'Soft' | 'Hard'
+
+export type CreditDecisionConfig = {
+  approveGateMode: ApproveGateMode | string
   softApproveGateEnabled: boolean
+  approvalAuthorityEnabled: boolean
+  maxApprovalAmount: number | null
 }
 
 export function getCreditDocumentsConfig() {
-  return apiRequest<CreditDocumentsConfig>('/api/CreditDocuments/config')
+  return apiRequest<CreditDecisionConfig>('/api/CreditDocuments/config')
 }

@@ -1,3 +1,5 @@
+using Application.Modules.Credit.Features.CreditApplicationDocuments;
+using Application.Modules.Credit.Features.CreditApplications.ApprovalAuthority;
 using Application.Modules.Credit.Features.CreditApplications.Rules;
 using Application.Services.Auth;
 using Application.Services.Logging;
@@ -5,6 +7,7 @@ using Application.Services.Repositories;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
+using Microsoft.Extensions.Options;
 
 namespace Application.Modules.Credit.Features.CreditApplications.Commands.Approve;
 
@@ -12,6 +15,7 @@ public class ApproveCreditApplicationRequestHandler
     : IRequestHandler<ApproveCreditApplicationRequest, ApprovedCreditApplicationResponse>
 {
     private readonly ICreditApplicationRepository _creditApplicationRepository;
+    private readonly ICreditApplicationDocumentRepository _documentRepository;
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IBranchRepository _branchRepository;
     private readonly IMapper _mapper;
@@ -19,18 +23,24 @@ public class ApproveCreditApplicationRequestHandler
     private readonly ICurrentUserService _currentUserService;
     private readonly IBranchAuthorizationService _branchAuthorization;
     private readonly IAuditLogger _auditLogger;
+    private readonly CreditDocumentsOptions _documentsOptions;
+    private readonly ApprovalAuthorityOptions _authorityOptions;
 
     public ApproveCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
+        ICreditApplicationDocumentRepository documentRepository,
         IApplicationUserRepository applicationUserRepository,
         IBranchRepository branchRepository,
         IMapper mapper,
         CreditApplicationBusinessRules businessRules,
         ICurrentUserService currentUserService,
         IBranchAuthorizationService branchAuthorization,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IOptions<CreditDocumentsOptions> documentsOptions,
+        IOptions<ApprovalAuthorityOptions> authorityOptions)
     {
         _creditApplicationRepository = creditApplicationRepository;
+        _documentRepository = documentRepository;
         _applicationUserRepository = applicationUserRepository;
         _branchRepository = branchRepository;
         _mapper = mapper;
@@ -38,6 +48,8 @@ public class ApproveCreditApplicationRequestHandler
         _currentUserService = currentUserService;
         _branchAuthorization = branchAuthorization;
         _auditLogger = auditLogger;
+        _documentsOptions = documentsOptions.Value;
+        _authorityOptions = authorityOptions.Value;
     }
 
     public async Task<ApprovedCreditApplicationResponse> Handle(
@@ -56,8 +68,28 @@ public class ApproveCreditApplicationRequestHandler
             request.ApprovedAmount,
             request.ApprovedTermMonths);
 
+        if (_documentsOptions.ApproveGateMode == ApproveDocumentGateMode.Hard)
+        {
+            var documents = await _documentRepository.GetListAsync(
+                predicate: d => d.CreditApplicationId == creditApplication.Id && !d.IsDeleted,
+                size: 50,
+                cancellationToken: cancellationToken);
+            IEnumerable<string> types = documents.Items.Select(d => d.DocumentType.Name);
+            await _businessRules.RequiredDocumentsShouldExistWhenHardGate(true, types);
+        }
+
+        ApplicationUser? actor = await LoadActorAsync(cancellationToken);
+        decimal? maxAmount = ApprovalAuthorityEvaluator.ResolveMaxAmount(
+            _authorityOptions,
+            _currentUserService.IsBankManager,
+            _currentUserService.IsSuperAdmin,
+            actor?.Position);
+        await _businessRules.ApprovedAmountShouldBeWithinApprovalAuthority(
+            request.ApprovedAmount,
+            maxAmount);
+
         (string? decisionBy, string? branchCode, string? branchName) =
-            await ResolveDecisionMakerAsync(cancellationToken);
+            await ResolveDecisionMakerAsync(actor, cancellationToken);
 
         creditApplication.Approve(
             request.ApprovedAmount,
@@ -90,15 +122,20 @@ public class ApproveCreditApplicationRequestHandler
         return _mapper.Map<ApprovedCreditApplicationResponse>(creditApplication);
     }
 
-    private async Task<(string? Email, string? BranchCode, string? BranchName)> ResolveDecisionMakerAsync(
-        CancellationToken cancellationToken)
+    private async Task<ApplicationUser?> LoadActorAsync(CancellationToken cancellationToken)
     {
         if (!_currentUserService.UserId.HasValue)
-            return (null, null, null);
+            return null;
 
-        ApplicationUser? user = await _applicationUserRepository.GetAsync(
+        return await _applicationUserRepository.GetAsync(
             u => u.Id == _currentUserService.UserId.Value,
             cancellationToken: cancellationToken);
+    }
+
+    private async Task<(string? Email, string? BranchCode, string? BranchName)> ResolveDecisionMakerAsync(
+        ApplicationUser? user,
+        CancellationToken cancellationToken)
+    {
         if (user is null)
             return (null, null, null);
 

@@ -20,7 +20,10 @@ import {
   type DecisionLetterTemplateItem,
   type DecisionTemplateKind,
 } from '../api/decisionTemplatesApi'
-import { getCreditDocumentsConfig } from '../api/creditDocumentsConfigApi'
+import {
+  getCreditDocumentsConfig,
+  type ApproveGateMode,
+} from '../api/creditDocumentsConfigApi'
 import { useAuth } from '../auth/AuthContext'
 import { canModifyBranchResource } from '../auth/token'
 import type {
@@ -77,7 +80,9 @@ export function ApplicationDetailPage() {
   const [documentType, setDocumentType] = useState<CreditDocumentType>('IdentityDocument')
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [documentBusy, setDocumentBusy] = useState(false)
-  const [softApproveGateEnabled, setSoftApproveGateEnabled] = useState(false)
+  const [approveGateMode, setApproveGateMode] = useState<ApproveGateMode>('None')
+  const [maxApprovalAmount, setMaxApprovalAmount] = useState<number | null>(null)
+  const [approvalAuthorityEnabled, setApprovalAuthorityEnabled] = useState(false)
 
   const uiLocale = (i18n.language || 'tr').slice(0, 2)
 
@@ -141,16 +146,30 @@ export function ApplicationDetailPage() {
 
   useEffect(() => {
     if (!isStaff) {
-      setSoftApproveGateEnabled(false)
+      setApproveGateMode('None')
+      setMaxApprovalAmount(null)
+      setApprovalAuthorityEnabled(false)
       return
     }
     let cancelled = false
     getCreditDocumentsConfig()
       .then((cfg) => {
-        if (!cancelled) setSoftApproveGateEnabled(!!cfg.softApproveGateEnabled)
+        if (cancelled) return
+        const mode = (cfg.approveGateMode || 'None') as ApproveGateMode
+        setApproveGateMode(mode === 'Soft' || mode === 'Hard' || mode === 'None' ? mode : 'None')
+        setApprovalAuthorityEnabled(!!cfg.approvalAuthorityEnabled)
+        setMaxApprovalAmount(
+          cfg.maxApprovalAmount === null || cfg.maxApprovalAmount === undefined
+            ? null
+            : Number(cfg.maxApprovalAmount),
+        )
       })
       .catch(() => {
-        if (!cancelled) setSoftApproveGateEnabled(false)
+        if (!cancelled) {
+          setApproveGateMode('None')
+          setMaxApprovalAmount(null)
+          setApprovalAuthorityEnabled(false)
+        }
       })
     return () => {
       cancelled = true
@@ -423,9 +442,21 @@ export function ApplicationDetailPage() {
   async function onApprove(e: FormEvent) {
     e.preventDefault()
     if (!id || !item) return
-    const missingDocs =
-      softApproveGateEnabled && hasMissingRequiredDocuments(documents)
-    if (missingDocs) {
+    const missingDocs = hasMissingRequiredDocuments(documents)
+    if (approveGateMode === 'Hard' && missingDocs) {
+      setError(t('applications.hardGateBlock'))
+      return
+    }
+    const amount = Number(approvedAmount)
+    if (
+      approvalAuthorityEnabled &&
+      maxApprovalAmount !== null &&
+      amount > maxApprovalAmount
+    ) {
+      setError(t('applications.authorityExceeded'))
+      return
+    }
+    if (approveGateMode === 'Soft' && missingDocs) {
       if (!window.confirm(t('applications.confirmApproveMissingDocs'))) return
     } else if (!window.confirm(t('applications.confirmApprove'))) {
       return
@@ -491,6 +522,11 @@ export function ApplicationDetailPage() {
   const docsMissing =
     item.status === 'Pending' &&
     (item.missingRequiredDocuments || hasMissingRequiredDocuments(documents))
+  const hardGateBlocks = approveGateMode === 'Hard' && docsMissing
+  const authorityBlocks =
+    approvalAuthorityEnabled &&
+    maxApprovalAmount !== null &&
+    Number(approvedAmount) > maxApprovalAmount
   const money = (value: number | null | undefined) =>
     formatMoney(value, item.currencyCode ?? 'USD', i18n.language)
   const amountOptions = subType?.amountOptions?.length
@@ -660,8 +696,11 @@ export function ApplicationDetailPage() {
           )}
         </h2>
         <p className="muted">{t('applications.documentsHint')}</p>
-        {softApproveGateEnabled && docsMissing && (
+        {approveGateMode === 'Soft' && docsMissing && (
           <p className="warn-text">{t('applications.missingDocsWarn')}</p>
+        )}
+        {approveGateMode === 'Hard' && docsMissing && (
+          <p className="error-text">{t('applications.hardGateBlock')}</p>
         )}
 
         {item.status === 'Pending' && (
@@ -883,6 +922,16 @@ export function ApplicationDetailPage() {
               />
             </label>
             <p className="field-hint">{t('applications.customerMessageHint')}</p>
+            {approvalAuthorityEnabled && maxApprovalAmount !== null && (
+              <p className="muted">
+                {t('applications.authorityLimit', {
+                  amount: formatMoney(maxApprovalAmount, item.currencyCode, i18n.language),
+                })}
+              </p>
+            )}
+            {authorityBlocks && (
+              <p className="error-text">{t('applications.authorityExceeded')}</p>
+            )}
             <div className="row-actions">
               <button
                 type="button"
@@ -917,7 +966,11 @@ export function ApplicationDetailPage() {
                   </button>
                 )}
             </div>
-            <button type="submit" className="btn success decision-btn" disabled={busy}>
+            <button
+              type="submit"
+              className="btn success decision-btn"
+              disabled={busy || hardGateBlocks || authorityBlocks}
+            >
               {t('applications.approve')}
             </button>
           </form>

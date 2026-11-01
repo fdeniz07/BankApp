@@ -1,3 +1,4 @@
+using Application.Modules.Credit.Features.CreditApplicationDocuments;
 using Application.Modules.Credit.Features.CreditApplications.Constants;
 using Application.Services.Repositories;
 using Core.Application.Pipelines;
@@ -151,6 +152,32 @@ public class CreditApplicationBusinessRules : BaseBusinessRules
     {
         if (creditApplication.Status != CreditApplicationStatus.Pending)
             throw new BusinessException(CreditApplicationMessages.OnlyPendingCanBeCancelled);
+
+        return Task.CompletedTask;
+    }
+
+    public Task RequiredDocumentsShouldExistWhenHardGate(
+        bool hardGateEnabled,
+        IEnumerable<string> presentDocumentTypeNames)
+    {
+        if (!hardGateEnabled)
+            return Task.CompletedTask;
+
+        if (RequiredCreditDocuments.IsMissingRequired(presentDocumentTypeNames))
+            throw new BusinessException(CreditApplicationMessages.MissingRequiredDocuments);
+
+        return Task.CompletedTask;
+    }
+
+    public Task ApprovedAmountShouldBeWithinApprovalAuthority(
+        decimal approvedAmount,
+        decimal? maxApprovalAmount)
+    {
+        if (!maxApprovalAmount.HasValue)
+            return Task.CompletedTask;
+
+        if (approvedAmount > maxApprovalAmount.Value)
+            throw new BusinessException(CreditApplicationMessages.AmountExceedsApprovalAuthority);
 
         return Task.CompletedTask;
     }
