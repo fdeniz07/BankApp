@@ -60,7 +60,7 @@ Actions (Node 24 runtime — v4 Node 20 deprecation uyarısını temizler):
 - `actions/checkout@v5`
 - `actions/setup-dotnet@v5`
 - `actions/setup-node@v5` (`cache: npm`)
-- `actions/cache@v4` (NuGet `~/.nuget/packages`, key = csproj/slnx hash)
+- `actions/cache@v5` (NuGet `~/.nuget/packages`, key = csproj/slnx hash; Node 24)
 - Runner: `ubuntu-24.04`
 
 ## Repoda nerede?
