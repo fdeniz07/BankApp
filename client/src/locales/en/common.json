@@ -366,6 +366,8 @@
     "onlyPending": "Only pending applications can be decided.",
     "decisionAudit": "Decision audit",
     "decisionTemplate": "Letter template",
+    "search": "Search",
+    "searchPlaceholder": "Number, notes, purpose, decision by… (live)",
     "missingDocsFilter": "Missing required documents",
     "presetPendingMissingDocs": "Pending + missing docs",
     "missingDocsBadge": "Docs missing",

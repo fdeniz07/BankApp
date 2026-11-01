@@ -16,6 +16,8 @@ public class GetListCreditApplicationRequest : IRequest<GetListResponse<GetListC
     public CreditApplicationStatus? Status { get; set; }
     /// <summary>When true, only Pending applications missing IdentityDocument or IncomeProof.</summary>
     public bool? MissingRequiredDocumentsOnly { get; set; }
+    /// <summary>Live search text — prefers Elasticsearch when enabled; SQL fallback.</summary>
+    public string? SearchText { get; set; }
     public string? SortBy { get; set; }
     public bool SortDesc { get; set; }
 }

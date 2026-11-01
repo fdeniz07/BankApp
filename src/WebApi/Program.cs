@@ -35,6 +35,20 @@ try
 
     await DatabaseInitializer.InitializeAsync(app.Services, runMigrations, runSeed);
 
+    // Lab: warm Elasticsearch credit-applications index after SQL seed
+    try
+    {
+        using IServiceScope scope = app.Services.CreateScope();
+        Application.Services.Search.ICreditApplicationSearchService search =
+            scope.ServiceProvider.GetRequiredService<Application.Services.Search.ICreditApplicationSearchService>();
+        if (search.IsAvailable)
+            await search.ReindexAllAsync();
+    }
+    catch (Exception ex)
+    {
+        Log.Warning(ex, "Elasticsearch reindex skipped (SQL list still works)");
+    }
+
     app.UseWebApiInfrastructure();
 
     app.Run();

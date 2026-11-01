@@ -6,7 +6,10 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 
 | Service | Host URL | Notes |
 |---------|----------|--------|
-| Seq | http://localhost:5341 | volume `bankapp-seq-data`; Compose **healthcheck** |
+| Seq | http://localhost:5341 | volume `bankapp-seq-data`; Compose **healthcheck**; primary .NET log UX |
+| Elasticsearch | http://localhost:9200 | credit search + log indexes; volume `bankapp-elasticsearch-data` |
+| Logstash | host `:8081` (HTTP) / `:50000` (TCP) | Serilog → ES pipeline; see learning 31 |
+| Kibana | http://localhost:5601 | Discover / data views for `bankapp-logs-*` |
 | Redis | `localhost:6379` | volume `bankapp-redis-data`; Compose **healthcheck** |
 | Redis Insight | http://localhost:5540 | official UI; add DB **host `redis`**, port **6379** (no password); volume `bankapp-redis-insight-data` |
 

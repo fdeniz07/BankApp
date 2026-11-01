@@ -4,6 +4,7 @@ using Application.Modules.Credit.Features.CreditApplications.Rules;
 using Application.Services.Auth;
 using Application.Services.Logging;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -25,6 +26,7 @@ public class ApproveCreditApplicationRequestHandler
     private readonly IAuditLogger _auditLogger;
     private readonly CreditDocumentsOptions _documentsOptions;
     private readonly ApprovalAuthorityOptions _authorityOptions;
+    private readonly ICreditApplicationSearchService _search;
 
     public ApproveCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
@@ -37,7 +39,8 @@ public class ApproveCreditApplicationRequestHandler
         IBranchAuthorizationService branchAuthorization,
         IAuditLogger auditLogger,
         IOptions<CreditDocumentsOptions> documentsOptions,
-        IOptions<ApprovalAuthorityOptions> authorityOptions)
+        IOptions<ApprovalAuthorityOptions> authorityOptions,
+        ICreditApplicationSearchService search)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _documentRepository = documentRepository;
@@ -50,6 +53,7 @@ public class ApproveCreditApplicationRequestHandler
         _auditLogger = auditLogger;
         _documentsOptions = documentsOptions.Value;
         _authorityOptions = authorityOptions.Value;
+        _search = search;
     }
 
     public async Task<ApprovedCreditApplicationResponse> Handle(
@@ -102,6 +106,7 @@ public class ApproveCreditApplicationRequestHandler
             request.DecisionTemplateName);
 
         await _creditApplicationRepository.UpdateAsync(creditApplication, cancellationToken);
+        await _search.UpsertFromApplicationAsync(creditApplication, cancellationToken);
 
         _auditLogger.Log(
             AuditEventCategories.Credit,

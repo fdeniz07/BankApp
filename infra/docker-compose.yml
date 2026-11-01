@@ -10,9 +10,73 @@
 #
 # Vault (dev mode): UI http://localhost:8200 | vault-seed writes KV secret/bankapp
 # WebApi overlays TokenOptions:SecurityKey from Vault when Vault__Enabled=true (Compose default).
-# Observability: Grafana http://localhost:3001 (default admin/admin) — Seq remains for logs
+# Observability: Grafana http://localhost:3001 (default admin/admin) — Seq remains for .NET log UX
+# ELK lab: Elasticsearch (search + logs index) + Logstash (Serilog HTTP/TCP) + Kibana
 
 services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.3
+    container_name: bankapp-elasticsearch
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      xpack.security.http.ssl.enabled: "false"
+      ES_JAVA_OPTS: "${ELASTIC_JAVA_OPTS:--Xms512m -Xmx512m}"
+      cluster.name: bankapp-lab
+    ports:
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://127.0.0.1:9200 >/dev/null || exit 1"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 60s
+    restart: unless-stopped
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.15.3
+    container_name: bankapp-logstash
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+    ports:
+      - "${LOGSTASH_HTTP_PORT:-8081}:8080"
+      - "${LOGSTASH_TCP_PORT:-50000}:50000"
+    environment:
+      LS_JAVA_OPTS: "${LOGSTASH_JAVA_OPTS:--Xms256m -Xmx256m}"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://127.0.0.1:9600 >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+    restart: unless-stopped
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.3
+    container_name: bankapp-kibana
+    environment:
+      ELASTICSEARCH_HOSTS: "http://elasticsearch:9200"
+      XPACK_SECURITY_ENABLED: "false"
+      SERVER_HOST: "0.0.0.0"
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://127.0.0.1:5601/api/status >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 12
+      start_period: 90s
+    restart: unless-stopped
+
   seq:
     image: datalust/seq:2024.3
     container_name: bankapp-seq
@@ -230,6 +294,11 @@ services:
       OpenTelemetry__Enabled: "true"
       OpenTelemetry__ServiceName: "bankapp-webapi"
       OpenTelemetry__OtlpEndpoint: "http://otel-collector:4317"
+      Elasticsearch__Enabled: "true"
+      Elasticsearch__Nodes__0: "http://elasticsearch:9200"
+      Elasticsearch__ApplicationsIndex: "bankapp-credit-applications"
+      Logstash__Enabled: "true"
+      Logstash__HttpUrl: "http://logstash:8080"
     volumes:
       - profile-uploads:/app/wwwroot/uploads
       - credit-document-uploads:/app/App_Data/credit-documents
@@ -245,6 +314,10 @@ services:
       vault-seed:
         condition: service_completed_successfully
       otel-collector:
+        condition: service_started
+      elasticsearch:
+        condition: service_healthy
+      logstash:
         condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
@@ -275,6 +348,8 @@ services:
     restart: unless-stopped
 
 volumes:
+  elasticsearch-data:
+    name: bankapp-elasticsearch-data
   seq-data:
     name: bankapp-seq-data
   redis-data:

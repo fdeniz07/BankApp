@@ -48,6 +48,8 @@ export function ApplicationsPage() {
   const [statusFilter, setStatusFilter] = useState<CreditApplicationStatus | ''>('')
   const [branchFilter, setBranchFilter] = useState('')
   const [missingDocsOnly, setMissingDocsOnly] = useState(false)
+  const [searchInput, setSearchInput] = useState('')
+  const [searchText, setSearchText] = useState('')
   const [sortBy, setSortBy] = useState<ApplicationSortBy>('applicationDate')
   const [sortDesc, setSortDesc] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -90,6 +92,7 @@ export function ApplicationsPage() {
       status: statusFilter,
       branchId: branchFilter || null,
       missingRequiredDocumentsOnly: missingDocsOnly,
+      searchText,
       sortBy,
       sortDesc,
     })
@@ -100,7 +103,16 @@ export function ApplicationsPage() {
         toast.error(message)
       })
       .finally(() => setLoading(false))
-  }, [pageIndex, isStaff, statusFilter, branchFilter, missingDocsOnly, sortBy, sortDesc, t])
+  }, [pageIndex, isStaff, statusFilter, branchFilter, missingDocsOnly, searchText, sortBy, sortDesc, t])
+
+  // Live search: debounce keystrokes (~300ms) so each character feels instant without flooding the API
+  useEffect(() => {
+    const handle = window.setTimeout(() => {
+      setPageIndex(0)
+      setSearchText(searchInput)
+    }, 300)
+    return () => window.clearTimeout(handle)
+  }, [searchInput])
 
   useEffect(() => {
     let cancelled = false
@@ -669,6 +681,16 @@ export function ApplicationsPage() {
 
       <div className="list-toolbar">
         <h1 className={isStaff ? undefined : 'section-title'}>{t('applications.title')}</h1>
+        <label className="filter-label search-label">
+          {t('applications.search')}
+          <input
+            type="search"
+            value={searchInput}
+            placeholder={t('applications.searchPlaceholder')}
+            onChange={(e) => setSearchInput(e.target.value)}
+            autoComplete="off"
+          />
+        </label>
         <label className="filter-label">
           {t('applications.status')}
           <select

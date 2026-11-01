@@ -8,6 +8,7 @@ using Application.Modules.Credit.Features.CreditApplications.Rules;
 using Application.Services.Auth;
 using Application.Services.Logging;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Core.CrossCuttingConcerns.Exceptions.Types;
 using Core.Repositories;
@@ -72,7 +73,8 @@ public class ApproveCreditApplicationRequestHandlerTests
             _branchAuthorization.Object,
             _auditLogger.Object,
             Options.Create(_documentsOptions),
-            Options.Create(_authorityOptions));
+            Options.Create(_authorityOptions),
+            new NullCreditApplicationSearchService());
     }
 
     [Fact]

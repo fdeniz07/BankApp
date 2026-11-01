@@ -366,6 +366,8 @@
     "onlyPending": "Yalnızca beklemedeki başvurular karara bağlanabilir.",
     "decisionAudit": "Karar kaydı",
     "decisionTemplate": "Mektup şablonu",
+    "search": "Ara",
+    "searchPlaceholder": "No, not, amaç, karar veren… (yazdıkça arar)",
     "missingDocsFilter": "Eksik zorunlu evrak",
     "presetPendingMissingDocs": "Bekleyen + eksik evrak",
     "missingDocsBadge": "Evrak eksik",

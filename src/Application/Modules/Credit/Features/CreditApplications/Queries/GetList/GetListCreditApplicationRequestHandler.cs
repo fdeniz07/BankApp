@@ -2,6 +2,7 @@ using System.Linq.Expressions;
 using Application.Modules.Credit.Features.CreditApplicationDocuments;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Core.Application.Responses;
 using Core.Repositories;
@@ -22,6 +23,7 @@ public class GetListCreditApplicationRequestHandler
     private readonly IMapper _mapper;
     private readonly ICurrentUserService _currentUserService;
     private readonly IBranchAuthorizationService _branchAuthorization;
+    private readonly ICreditApplicationSearchService _search;
 
     public GetListCreditApplicationRequestHandler(
         ICreditApplicationRepository creditApplicationRepository,
@@ -30,7 +32,8 @@ public class GetListCreditApplicationRequestHandler
         ICreditApplicationDocumentRepository documentRepository,
         IMapper mapper,
         ICurrentUserService currentUserService,
-        IBranchAuthorizationService branchAuthorization)
+        IBranchAuthorizationService branchAuthorization,
+        ICreditApplicationSearchService search)
     {
         _creditApplicationRepository = creditApplicationRepository;
         _creditSubTypeRepository = creditSubTypeRepository;
@@ -39,6 +42,7 @@ public class GetListCreditApplicationRequestHandler
         _mapper = mapper;
         _currentUserService = currentUserService;
         _branchAuthorization = branchAuthorization;
+        _search = search;
     }
 
     public async Task<GetListResponse<GetListCreditApplicationListItemDto>> Handle(
@@ -62,6 +66,26 @@ public class GetListCreditApplicationRequestHandler
         }
 
         Guid? branchFilter = _branchAuthorization.ResolveListBranchFilter(request.BranchId);
+
+        if (!string.IsNullOrWhiteSpace(request.SearchText) && _search.IsAvailable)
+        {
+            GetListResponse<GetListCreditApplicationListItemDto>? es =
+                await _search.SearchAsync(
+                    new CreditApplicationSearchQuery
+                    {
+                        Text = request.SearchText,
+                        PageIndex = request.PageRequest.PageIndex,
+                        PageSize = request.PageRequest.PageSize,
+                        Status = request.Status?.Name,
+                        BranchId = request.BranchId,
+                        MissingRequiredDocumentsOnly = request.MissingRequiredDocumentsOnly,
+                        RequiredBranchScope = _currentUserService.IsSuperAdmin ? null : branchFilter,
+                        AllowCrossBranchFilters = _currentUserService.IsSuperAdmin || _currentUserService.IsBankManager
+                    },
+                    cancellationToken);
+            if (es is not null)
+                return es;
+        }
         HashSet<Guid>? missingDocOnlyIds = null;
         if (request.MissingRequiredDocumentsOnly == true)
         {
@@ -249,11 +273,20 @@ public class GetListCreditApplicationRequestHandler
         Guid? branchFilter,
         HashSet<Guid>? missingDocOnlyIds)
     {
+        string? q = string.IsNullOrWhiteSpace(request.SearchText)
+            ? null
+            : request.SearchText.Trim();
+
         return c =>
             (!request.CustomerId.HasValue || c.CustomerId == request.CustomerId.Value)
             && (request.Status == null || c.Status == request.Status)
             && (!branchFilter.HasValue || c.BranchId == branchFilter.Value)
-            && (missingDocOnlyIds == null || missingDocOnlyIds.Contains(c.Id));
+            && (missingDocOnlyIds == null || missingDocOnlyIds.Contains(c.Id))
+            && (q == null
+                || c.ApplicationNumber.Contains(q)
+                || (c.Notes != null && c.Notes.Contains(q))
+                || (c.Purpose != null && c.Purpose.Contains(q))
+                || (c.DecisionBy != null && c.DecisionBy.Contains(q)));
     }
 
     private static Func<IQueryable<CreditApplication>, IOrderedQueryable<CreditApplication>>? BuildOrderBy(

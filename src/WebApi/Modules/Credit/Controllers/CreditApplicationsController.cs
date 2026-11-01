@@ -35,6 +35,7 @@ public class CreditApplicationsController : BaseController
         [FromQuery] Guid? branchId,
         [FromQuery] string? status,
         [FromQuery] bool? missingRequiredDocumentsOnly,
+        [FromQuery] string? searchText,
         [FromQuery] string? sortBy,
         [FromQuery] bool sortDesc = false)
     {
@@ -49,6 +50,7 @@ public class CreditApplicationsController : BaseController
             BranchId = branchId,
             Status = parsedStatus,
             MissingRequiredDocumentsOnly = missingRequiredDocumentsOnly,
+            SearchText = searchText,
             SortBy = sortBy,
             SortDesc = sortDesc
         };

@@ -366,6 +366,8 @@
     "onlyPending": "Nur ausstehende Anträge können entschieden werden.",
     "decisionAudit": "Entscheidungsprotokoll",
     "decisionTemplate": "Briefvorlage",
+    "search": "Suche",
+    "searchPlaceholder": "Nr., Notiz, Zweck, Entscheider… (live)",
     "missingDocsFilter": "Fehlende Pflichtunterlagen",
     "presetPendingMissingDocs": "Ausstehend + fehlende Unterlagen",
     "missingDocsBadge": "Unterlagen fehlen",
