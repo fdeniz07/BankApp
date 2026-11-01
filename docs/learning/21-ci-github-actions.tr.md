@@ -27,8 +27,9 @@ Yeşil CI = main’e güven.
 | **Workflow** | YAML dosyası |
 | **Job** | Paralel çalışabilen iş (backend / client) |
 | **Step** | Job içi adım |
-| **Runner** | `ubuntu-latest` sanal makine |
+| **Runner** | `ubuntu-24.04` sanal makine |
 | **Badge / check** | PR’da geçti/kaldı işareti |
+| **Cache** | Client: `setup-node` `cache: npm`; Backend: `actions/cache` → `~/.nuget/packages` |
 
 ## Komutlar
 
@@ -58,8 +59,9 @@ Actions (Node 24 runtime — v4 Node 20 deprecation uyarısını temizler):
 
 - `actions/checkout@v5`
 - `actions/setup-dotnet@v5`
-- `actions/setup-node@v5`
-- Runner: `ubuntu-24.04` (`ubuntu-latest` → 26 bilgisini sabit sürümle susturur)
+- `actions/setup-node@v5` (`cache: npm`)
+- `actions/cache@v4` (NuGet `~/.nuget/packages`, key = csproj/slnx hash)
+- Runner: `ubuntu-24.04`
 
 ## Repoda nerede?
 
