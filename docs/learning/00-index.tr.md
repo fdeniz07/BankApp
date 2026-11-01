@@ -60,6 +60,9 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Domain | Şube / branch modeli | [27](27-branch-model.tr.md) |
 | Security | Şube RBAC + SuperAdmin | [28](28-branch-rbac-superadmin.tr.md) |
 | Credit / UX | Karar mektubu şablon CRUD | [29](29-decision-letter-templates.tr.md) |
+| Credit / Security | Onay evrak kapısı + DoA yetki tavanı | [30](30-approve-gate-authority.tr.md) |
+
+Gereksinim (BRD/FRD): [docs/requirements/00-index.tr.md](../requirements/00-index.tr.md)
 
 Kitaplık güncelleme günlüğü: [99-changelog-learning.tr.md](99-changelog-learning.tr.md)
 

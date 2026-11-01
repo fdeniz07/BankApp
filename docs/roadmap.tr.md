@@ -36,6 +36,7 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 - [x] Şube / branch modeli + karar snapshot (`DecisionBy` / şube / şablon adı)
 - [x] Kredi başvurusunda evrak yükleme (lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft onay kapısı config (`SoftApproveGateEnabled`; Development kapalı) + eksik evrak rozeti/filtre/liste preset
+- [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, base Hard) + pozisyon bazlı onay yetkisi (DoA)
 - [x] Karar mektubu şablon CRUD (kullanıcı); UI diline göre sistem şablonu
 - [x] BankManager kredi türü ekleme / aktif-pasif; müşteri silme kuralları
 
@@ -66,6 +67,7 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 
 - [x] Sıfırdan tech öğrenme kitaplığı (`docs/learning/`) + Cursor kuralı `tech-learning-library`
 - [x] Yol haritası / geçmiş / mimari notlar (TR / EN / DE)
+- [x] BRD + kredi kararı FRD (`docs/requirements/`)
 
 ## Yapılacak
 

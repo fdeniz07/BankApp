@@ -77,10 +77,9 @@ Lab: migration yoksa API 500 verebilir — `AddDecisionLetterTemplates` / `AddDe
 
 ## İlgili UX (aynı dilim)
 
-- Soft onay kapısı config ile: `CreditDocuments:SoftApproveGateEnabled` (`appsettings` true; Development lab’de false)
-  - Açıkken: eksik kimlik/gelir → soft `confirm` + sarı uyarı bandı
-  - Kapalıyken: soft confirm/band yok; liste rozeti + “Eksik zorunlu evrak” filtresi kalır
-  - Client: `GET /api/CreditDocuments/config` → `softApproveGateEnabled`
+- Evrak onay kapısı: `CreditDocuments:ApproveGateMode` (`None` / `Soft` / `Hard`) — ayrıntı [30](30-approve-gate-authority.tr.md)
+- Onay yetkisi (DoA): `ApprovalAuthority` — ayrıntı [30](30-approve-gate-authority.tr.md)
+- Client: `GET /api/CreditDocuments/config` → `approveGateMode`, `maxApprovalAmount`
 - Liste preset (personel): “Bekleyen + eksik evrak” → `Pending` + `missingRequiredDocumentsOnly`
 - Karar audit: `DecisionBy` · `DecisionBranch*` · `DecisionTemplateName`
 - Evrak yükleme → `CreditApplicationDocumentUploaded` SignalR toast + liste/detay kırmızı rozet

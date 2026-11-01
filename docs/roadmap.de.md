@@ -36,6 +36,7 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 - [x] Filial-/Branch-Modell + Entscheidungs-Snapshot (`DecisionBy` / Filiale / Vorlagenname)
 - [x] Dokumenten-Upload beim Kreditantrag (Lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft-Genehmigungs-Gate (`SoftApproveGateEnabled`; in Development aus) + fehlende-Unterlagen-Badge/Filter/Listen-Preset
+- [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, Basis Hard) + positionsbasierte Genehmigungsbefugnis (DoA)
 - [x] Entscheidungsbrief-Vorlagen-CRUD (Benutzer); Systemvorlagen folgen der UI-Sprache
 - [x] BankManager: Kreditarten anlegen / aktivieren-deaktivieren; Kunden-Löschregeln
 
@@ -66,6 +67,7 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 
 - [x] Einsteiger-Tech-Lernbibliothek (`docs/learning/`) + Cursor-Regel `tech-learning-library`
 - [x] Roadmap / Historie / Architektur-Notizen (TR / EN / DE)
+- [x] BRD + Kreditentscheidungs-FRD (`docs/requirements/`, TR primär)
 
 ## Offen
 

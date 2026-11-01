@@ -36,6 +36,7 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 - [x] Branch model + decision snapshot (`DecisionBy` / branch / template name)
 - [x] Credit application document upload (lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft approve gate config (`SoftApproveGateEnabled`; off in Development) + missing-docs badge/filter/list preset
+- [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, base Hard) + position-based approval authority (DoA)
 - [x] Decision letter template CRUD (user); system templates follow UI language
 - [x] BankManager credit type create / activate-deactivate; customer delete rules
 
@@ -66,6 +67,7 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 
 - [x] Beginner tech learning library (`docs/learning/`) + Cursor rule `tech-learning-library`
 - [x] Roadmap / history / architecture notes (TR / EN / DE)
+- [x] BRD + credit-decision FRD (`docs/requirements/`, Turkish primary)
 
 ## Todo
 
