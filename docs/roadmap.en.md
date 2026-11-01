@@ -71,7 +71,8 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 
 ## Todo
 
-- [ ] Elasticsearch for staff GET endpoints
+- [x] Elasticsearch for staff GET endpoints (ELK lab + live search; Seq kept)
+- [ ] Manager/Admin advanced ES filter panel (aggregations)
 - [ ] Admin welcome dashboard (Tailwind CSS + bundle compression / performance)
 - [ ] Kubernetes / ArgoCD deployment
 - [ ] Raft Vault / secret rotation (production; beyond Compose dev-mode — learning 19)

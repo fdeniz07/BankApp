@@ -71,7 +71,8 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 
 ## Yapılacak
 
-- [ ] Personel GET’leri için Elasticsearch
+- [x] Personel GET’leri için Elasticsearch (ELK lab + canlı arama; Seq kalır)
+- [ ] Manager/Admin gelişmiş ES filtre paneli (aggregations)
 - [ ] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
 - [ ] Kubernetes / ArgoCD dağıtımı
 - [ ] Raft Vault / secret rotasyonu (üretim; Compose dev-mode dışı — learning 19)
