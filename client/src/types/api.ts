@@ -324,6 +324,7 @@ export interface BranchListItem {
   name: string
   city?: string | null
   isActive: boolean
+  maxApprovalAmount?: number | null
 }
 
 export interface StaffUserListItem {
@@ -363,6 +364,7 @@ export interface CreateBranchRequest {
   name: string
   city?: string | null
   isActive?: boolean
+  maxApprovalAmount?: number | null
 }
 
 export interface UpdateBranchRequest {
@@ -371,6 +373,7 @@ export interface UpdateBranchRequest {
   name: string
   city?: string | null
   isActive: boolean
+  maxApprovalAmount?: number | null
 }
 
 export interface UpdateStaffUserRequest {

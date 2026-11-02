@@ -82,6 +82,8 @@ export function ApplicationDetailPage() {
   const [documentBusy, setDocumentBusy] = useState(false)
   const [approveGateMode, setApproveGateMode] = useState<ApproveGateMode>('None')
   const [maxApprovalAmount, setMaxApprovalAmount] = useState<number | null>(null)
+  const [positionMaxApprovalAmount, setPositionMaxApprovalAmount] = useState<number | null>(null)
+  const [branchMaxApprovalAmount, setBranchMaxApprovalAmount] = useState<number | null>(null)
   const [approvalAuthorityEnabled, setApprovalAuthorityEnabled] = useState(false)
 
   const uiLocale = (i18n.language || 'tr').slice(0, 2)
@@ -148,6 +150,8 @@ export function ApplicationDetailPage() {
     if (!isStaff) {
       setApproveGateMode('None')
       setMaxApprovalAmount(null)
+      setPositionMaxApprovalAmount(null)
+      setBranchMaxApprovalAmount(null)
       setApprovalAuthorityEnabled(false)
       return
     }
@@ -163,11 +167,23 @@ export function ApplicationDetailPage() {
             ? null
             : Number(cfg.maxApprovalAmount),
         )
+        setPositionMaxApprovalAmount(
+          cfg.positionMaxApprovalAmount === null || cfg.positionMaxApprovalAmount === undefined
+            ? null
+            : Number(cfg.positionMaxApprovalAmount),
+        )
+        setBranchMaxApprovalAmount(
+          cfg.branchMaxApprovalAmount === null || cfg.branchMaxApprovalAmount === undefined
+            ? null
+            : Number(cfg.branchMaxApprovalAmount),
+        )
       })
       .catch(() => {
         if (!cancelled) {
           setApproveGateMode('None')
           setMaxApprovalAmount(null)
+          setPositionMaxApprovalAmount(null)
+          setBranchMaxApprovalAmount(null)
           setApprovalAuthorityEnabled(false)
         }
       })
@@ -927,6 +943,24 @@ export function ApplicationDetailPage() {
                 {t('applications.authorityLimit', {
                   amount: formatMoney(maxApprovalAmount, item.currencyCode, i18n.language),
                 })}
+                {(positionMaxApprovalAmount !== null || branchMaxApprovalAmount !== null) && (
+                  <>
+                    {' '}
+                    (
+                    {t('applications.authorityLimitBreakdown', {
+                      position:
+                        positionMaxApprovalAmount === null
+                          ? t('applications.authorityLimitUnlimited')
+                          : formatMoney(positionMaxApprovalAmount, item.currencyCode, i18n.language),
+                      branch:
+                        branchMaxApprovalAmount === null
+                          ? t('applications.authorityLimitUnlimited')
+                          : formatMoney(branchMaxApprovalAmount, item.currencyCode, i18n.language),
+                      applied: formatMoney(maxApprovalAmount, item.currencyCode, i18n.language),
+                    })}
+                    )
+                  </>
+                )}
               </p>
             )}
             {authorityBlocks && (

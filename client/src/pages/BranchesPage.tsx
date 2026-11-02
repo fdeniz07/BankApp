@@ -5,6 +5,13 @@ import { useAuth } from '../auth/AuthContext'
 import type { BranchListItem } from '../types/api'
 import { mapApiError } from '../utils/mapApiError'
 
+function parseOptionalAmount(raw: string): number | null {
+  const trimmed = raw.trim()
+  if (!trimmed) return null
+  const n = Number(trimmed.replace(',', '.'))
+  return Number.isFinite(n) && n > 0 ? n : null
+}
+
 export function BranchesPage() {
   const { t } = useTranslation()
   const { isSuperAdmin } = useAuth()
@@ -12,8 +19,15 @@ export function BranchesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [form, setForm] = useState({ code: '', name: '', city: '', isActive: true })
+  const [form, setForm] = useState({
+    code: '',
+    name: '',
+    city: '',
+    isActive: true,
+    maxApprovalAmount: '',
+  })
   const [editing, setEditing] = useState<BranchListItem | null>(null)
+  const [editMaxApproval, setEditMaxApproval] = useState('')
 
   const load = useCallback(() => {
     if (!isSuperAdmin) return Promise.resolve()
@@ -47,8 +61,9 @@ export function BranchesPage() {
         name: form.name.trim(),
         city: form.city.trim() || null,
         isActive: form.isActive,
+        maxApprovalAmount: parseOptionalAmount(form.maxApprovalAmount),
       })
-      setForm({ code: '', name: '', city: '', isActive: true })
+      setForm({ code: '', name: '', city: '', isActive: true, maxApprovalAmount: '' })
       setSuccess(t('branches.createSuccess'))
       await load()
     } catch (err) {
@@ -68,13 +83,31 @@ export function BranchesPage() {
         name: editing.name.trim(),
         city: editing.city?.trim() || null,
         isActive: editing.isActive,
+        maxApprovalAmount: parseOptionalAmount(editMaxApproval),
       })
       setEditing(null)
+      setEditMaxApproval('')
       setSuccess(t('branches.updateSuccess'))
       await load()
     } catch (err) {
       setError(mapApiError(err, t))
     }
+  }
+
+  function startEdit(item: BranchListItem) {
+    setEditing(item)
+    setEditMaxApproval(
+      item.maxApprovalAmount != null && item.maxApprovalAmount > 0
+        ? String(item.maxApprovalAmount)
+        : '',
+    )
+  }
+
+  function formatCap(value?: number | null) {
+    if (value == null || value <= 0) return t('branches.noCap')
+    return new Intl.NumberFormat(undefined, {
+      maximumFractionDigits: 2,
+    }).format(value)
   }
 
   return (
@@ -110,6 +143,17 @@ export function BranchesPage() {
             value={form.city}
             onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
             maxLength={100}
+          />
+        </label>
+        <label>
+          {t('branches.maxApprovalAmount')}
+          <input
+            type="number"
+            min={0}
+            step="0.01"
+            value={form.maxApprovalAmount}
+            onChange={(e) => setForm((f) => ({ ...f, maxApprovalAmount: e.target.value }))}
+            placeholder={t('branches.maxApprovalPlaceholder')}
           />
         </label>
         <label className="checkbox-row">
@@ -151,6 +195,17 @@ export function BranchesPage() {
               onChange={(e) => setEditing({ ...editing, city: e.target.value })}
             />
           </label>
+          <label>
+            {t('branches.maxApprovalAmount')}
+            <input
+              type="number"
+              min={0}
+              step="0.01"
+              value={editMaxApproval}
+              onChange={(e) => setEditMaxApproval(e.target.value)}
+              placeholder={t('branches.maxApprovalPlaceholder')}
+            />
+          </label>
           <label className="checkbox-row">
             <input
               type="checkbox"
@@ -163,7 +218,14 @@ export function BranchesPage() {
             <button type="submit" className="btn primary">
               {t('common.save')}
             </button>
-            <button type="button" className="btn ghost" onClick={() => setEditing(null)}>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => {
+                setEditing(null)
+                setEditMaxApproval('')
+              }}
+            >
               {t('common.cancel')}
             </button>
           </div>
@@ -179,6 +241,7 @@ export function BranchesPage() {
               <th>{t('branches.code')}</th>
               <th>{t('branches.name')}</th>
               <th>{t('branches.city')}</th>
+              <th>{t('branches.maxApprovalAmount')}</th>
               <th>{t('branches.status')}</th>
               <th>{t('common.actions')}</th>
             </tr>
@@ -189,9 +252,10 @@ export function BranchesPage() {
                 <td>{item.code}</td>
                 <td>{item.name}</td>
                 <td>{item.city || '—'}</td>
+                <td>{formatCap(item.maxApprovalAmount)}</td>
                 <td>{item.isActive ? t('branches.active') : t('branches.inactive')}</td>
                 <td>
-                  <button type="button" className="btn ghost" onClick={() => setEditing(item)}>
+                  <button type="button" className="btn ghost" onClick={() => startEdit(item)}>
                     {t('common.edit')}
                   </button>
                 </td>

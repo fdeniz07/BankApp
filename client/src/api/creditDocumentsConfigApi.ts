@@ -7,6 +7,8 @@ export type CreditDecisionConfig = {
   softApproveGateEnabled: boolean
   approvalAuthorityEnabled: boolean
   maxApprovalAmount: number | null
+  positionMaxApprovalAmount?: number | null
+  branchMaxApprovalAmount?: number | null
 }
 
 export function getCreditDocumentsConfig() {
