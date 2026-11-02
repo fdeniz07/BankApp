@@ -26,6 +26,7 @@ import {
 } from '../api/creditDocumentsConfigApi'
 import { useAuth } from '../auth/AuthContext'
 import { canModifyBranchResource } from '../auth/token'
+import { FilePicker } from '../components/FilePicker'
 import type {
   CreditApplicationDetail,
   CreditApplicationDocumentItem,
@@ -743,11 +744,11 @@ export function ApplicationDetailPage() {
             </label>
             <label>
               {t('applications.documentFile')}
-              <input
-                type="file"
+              <FilePicker
                 accept=".pdf,image/jpeg,image/png,application/pdf"
                 disabled={documentBusy}
-                onChange={(e) => setDocumentFile(e.target.files?.[0] ?? null)}
+                file={documentFile}
+                onFileChange={setDocumentFile}
               />
             </label>
             <button type="submit" className="btn" disabled={documentBusy || !documentFile}>

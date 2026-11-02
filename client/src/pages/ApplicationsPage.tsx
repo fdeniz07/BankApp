@@ -15,6 +15,7 @@ import { getCreditSubTypes } from '../api/creditSubTypesApi'
 import { getDashboardSummary } from '../api/dashboardApi'
 import { useAuth } from '../auth/AuthContext'
 import { BranchFilter } from '../components/BranchFilter'
+import { FilePicker } from '../components/FilePicker'
 import { DASHBOARD_REFRESH_EVENT } from '../components/StatsStrip'
 import { CREDIT_APPLICATION_CHANGED_EVENT } from '../realtime/creditApplicationEvents'
 import type {
@@ -625,21 +626,14 @@ export function ApplicationsPage() {
               </label>
               <label>
                 {t('applications.documentFile')}
-                <input
-                  type="file"
+                <FilePicker
                   accept=".pdf,image/jpeg,image/png,application/pdf"
                   multiple
                   disabled={creating}
-                  onChange={(e) =>
-                    setCreateDocumentFiles(Array.from(e.target.files ?? []))
-                  }
+                  files={createDocumentFiles}
+                  onFilesChange={setCreateDocumentFiles}
                 />
               </label>
-              {createDocumentFiles.length > 0 && (
-                <p className="muted">
-                  {createDocumentFiles.map((f) => f.name).join(', ')}
-                </p>
-              )}
             </fieldset>
 
             <button type="submit" className="btn primary" disabled={creating || !form.creditSubTypeId}>

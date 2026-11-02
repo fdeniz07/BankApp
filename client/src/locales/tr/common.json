@@ -1,6 +1,11 @@
 {
   "appName": "BankApp",
   "language": "Dil",
+  "filePicker": {
+    "chooseFile": "Dosya seç",
+    "chooseFiles": "Dosya seç",
+    "noneSelected": "Dosya seçilmedi"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "applications": "Kredi Başvuruları",

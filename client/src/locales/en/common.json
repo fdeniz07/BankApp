@@ -1,6 +1,11 @@
 {
   "appName": "BankApp",
   "language": "Language",
+  "filePicker": {
+    "chooseFile": "Choose file",
+    "chooseFiles": "Choose files",
+    "noneSelected": "No file selected"
+  },
   "nav": {
     "dashboard": "Dashboard",
     "applications": "Credit Applications",
