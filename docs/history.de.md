@@ -62,3 +62,4 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Antrags-Dokumenten-Upload-Lab (App_Data + documents-API; noch nicht Pflicht)
 - [x] Filialmodell (Branches + Personal-BranchId + Entscheidungs-Snapshot)
 - [x] Manager/Admin ES-Facettenpanel (Terms + Betrags-Range-Aggregationen; SQL-Fallback)
+- [x] Admin-Tailwind-Dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static

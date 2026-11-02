@@ -70,3 +70,4 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Şube onay tavanı (`Branch.MaxApprovalAmount`); efektif limit = min(pozisyon, şube); UI kaynak kırılımı
 - [x] ELK lab (Elasticsearch + Logstash + Kibana) + başvuru canlı arama (`searchText`); Seq log UX korunur
 - [x] Manager/Admin ES facet paneli (terms + tutar range aggregations; SQL fallback; `amountMin`/`currencyCode`)
+- [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static

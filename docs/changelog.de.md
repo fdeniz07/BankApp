@@ -2,6 +2,12 @@
 
 [Türkçe](changelog.tr.md) · [English](changelog.en.md)
 
+## 2026-11-02 — Admin-Tailwind-Dashboard + Bundle-Kompression
+
+- Manager/SuperAdmin `/dashboard` (Tailwind-KPIs + Shortcuts); rollenbasierte Startseite nach Login.
+- Vite `manualChunks` + `vite-plugin-compression` + nginx `gzip_static`.
+- Learning: `32-admin-tailwind-dashboard.tr.md`.
+
 ## 2026-11-02 — Manager-ES-Facettenpanel (Aggregationen)
 
 - `GET /api/CreditApplications/facets` (BankManager/SuperAdmin): Status / Filiale / Währung / fehlende Unterlagen / Betrags-Buckets.

@@ -62,3 +62,4 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] Application document upload lab (App_Data + documents API; not mandatory yet)
 - [x] Branch model (Branches + staff BranchId + decision snapshot)
 - [x] Manager/Admin ES facet panel (terms + amount range aggregations; SQL fallback)
+- [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static

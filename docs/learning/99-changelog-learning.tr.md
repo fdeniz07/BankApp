@@ -28,3 +28,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-01 | `21`: `actions/cache` **v5** (Node 20 deprecation uyarısı) |
 | 2026-11-02 | `30`: `Branch.MaxApprovalAmount` + efektif `min(pozisyon, şube)`; config kırılımı; şube CRUD UI |
 | 2026-11-02 | `31`: Manager/Admin ES facet paneli (terms + amount range aggregations; SQL fallback) |
+| 2026-11-02 | `32`: Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + gzip_static |

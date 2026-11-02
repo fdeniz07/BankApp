@@ -2,6 +2,12 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-11-02 — Admin Tailwind dashboard + paket sıkıştırma
+
+- Manager/SuperAdmin `/dashboard` (Tailwind KPI + hızlı linkler); giriş yönlendirmesi role göre.
+- Vite `manualChunks` (react/router/i18n/signalr) + `vite-plugin-compression` + nginx `gzip_static`.
+- Learning: `32-admin-tailwind-dashboard.tr.md`.
+
 ## 2026-11-02 — Manager ES facet paneli (aggregations)
 
 - `GET /api/CreditApplications/facets` (BankManager/SuperAdmin): durum / şube / para birimi / eksik evrak / tutar bucket sayaçları.
