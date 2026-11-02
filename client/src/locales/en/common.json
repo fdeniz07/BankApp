@@ -2,6 +2,7 @@
   "appName": "BankApp",
   "language": "Language",
   "nav": {
+    "dashboard": "Dashboard",
     "applications": "Credit Applications",
     "customers": "Customers",
     "creditTypes": "Credit Types",
@@ -9,6 +10,12 @@
     "branches": "Branches",
     "profile": "Profile",
     "logout": "Log out"
+  },
+  "adminDashboard": {
+    "welcome": "Admin panel — welcome, {{name}}",
+    "subtitle": "Summary KPIs and shortcuts. Use Applications plus the facet panel for deep search.",
+    "quickActions": "Quick actions",
+    "openPending": "Pending applications ({{count}})"
   },
   "branches": {
     "title": "Branch management",

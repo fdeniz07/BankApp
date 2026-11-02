@@ -2,6 +2,7 @@
   "appName": "BankApp",
   "language": "Dil",
   "nav": {
+    "dashboard": "Dashboard",
     "applications": "Kredi Başvuruları",
     "customers": "Müşteriler",
     "creditTypes": "Kredi Türleri",
@@ -9,6 +10,12 @@
     "branches": "Şubeler",
     "profile": "Profil",
     "logout": "Çıkış"
+  },
+  "adminDashboard": {
+    "welcome": "Yönetici paneli — hoş geldiniz, {{name}}",
+    "subtitle": "Özet KPI’lar ve hızlı kısayollar. Ayrıntılı arama için başvurular ve facet paneli.",
+    "quickActions": "Hızlı işlemler",
+    "openPending": "Bekleyen başvurular ({{count}})"
   },
   "branches": {
     "title": "Şube yönetimi",

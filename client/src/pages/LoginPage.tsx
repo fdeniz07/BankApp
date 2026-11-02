@@ -2,9 +2,15 @@ import { useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
-import { getRememberedEmail } from '../auth/token'
+import { getAuthUser, getRememberedEmail } from '../auth/token'
 import { LanguageSwitcher } from '../components/LanguageSwitcher'
+import { homePath } from '../utils/homePath'
 import { mapApiError } from '../utils/mapApiError'
+
+function isManagerUser(): boolean {
+  const u = getAuthUser()
+  return !!u?.roles.some((r) => r === 'BankManager' || r === 'SuperAdmin')
+}
 
 /** Unified lab password — matches IdentitySeed / BranchLocaleMap.DemoPassword */
 const DEMO_PASSWORD = 'Demo123!'
@@ -24,7 +30,7 @@ const DEMO_ACCOUNTS = [
 
 export function LoginPage() {
   const { t } = useTranslation()
-  const { login, isAuthenticated } = useAuth()
+  const { login, isAuthenticated, isManager } = useAuth()
   const navigate = useNavigate()
   const remembered = getRememberedEmail()
   const [email, setEmail] = useState(remembered || DEFAULT_EMAIL)
@@ -33,7 +39,7 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  if (isAuthenticated) return <Navigate to="/applications" replace />
+  if (isAuthenticated) return <Navigate to={homePath(isManager)} replace />
 
   function fillDemo(demoEmail: string) {
     setEmail(demoEmail)
@@ -47,7 +53,7 @@ export function LoginPage() {
     setLoading(true)
     try {
       await login(email, password, rememberMe)
-      navigate('/applications', { replace: true })
+      navigate(homePath(isManagerUser()), { replace: true })
     } catch (err) {
       const mapped = mapApiError(err, t)
       setError(mapped === t('common.error') ? t('login.error') : mapped)

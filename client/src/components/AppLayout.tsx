@@ -18,6 +18,7 @@ export function AppLayout() {
       <header className="topbar">
         <div className="brand">{t('appName')}</div>
         <nav className="nav">
+          {isManager && <NavLink to="/dashboard">{t('nav.dashboard')}</NavLink>}
           <NavLink to="/applications">{t('nav.applications')}</NavLink>
           {isStaff && <NavLink to="/customers">{t('nav.customers')}</NavLink>}
           {isStaff && <NavLink to="/credit-types">{t('nav.creditTypes')}</NavLink>}

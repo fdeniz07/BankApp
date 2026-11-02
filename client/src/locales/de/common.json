@@ -2,6 +2,7 @@
   "appName": "BankApp",
   "language": "Sprache",
   "nav": {
+    "dashboard": "Dashboard",
     "applications": "Kreditanträge",
     "customers": "Kunden",
     "creditTypes": "Kreditarten",
@@ -9,6 +10,12 @@
     "branches": "Filialen",
     "profile": "Profil",
     "logout": "Abmelden"
+  },
+  "adminDashboard": {
+    "welcome": "Admin-Bereich — willkommen, {{name}}",
+    "subtitle": "KPI-Übersicht und Schnellaktionen. Für die Detailsuche: Anträge und Facettenpanel.",
+    "quickActions": "Schnellaktionen",
+    "openPending": "Ausstehende Anträge ({{count}})"
   },
   "branches": {
     "title": "Filialverwaltung",

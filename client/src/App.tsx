@@ -1,8 +1,10 @@
-import { Navigate, Route, Routes } from 'react-router-dom'
+import { Route, Routes } from 'react-router-dom'
 import { AccessibilityToolbar } from './components/AccessibilityToolbar'
 import { AppLayout } from './components/AppLayout'
 import { ConsentBanner } from './components/ConsentBanner'
+import { HomeRedirect } from './components/HomeRedirect'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { AdminDashboardPage } from './pages/AdminDashboardPage'
 import { ApplicationDetailPage } from './pages/ApplicationDetailPage'
 import { ApplicationsPage } from './pages/ApplicationsPage'
 import { CreditTypesPage } from './pages/CreditTypesPage'
@@ -24,6 +26,7 @@ export default function App() {
         <Route path="/confirm-email" element={<ConfirmEmailPage />} />
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
+            <Route path="/dashboard" element={<AdminDashboardPage />} />
             <Route path="/applications" element={<ApplicationsPage />} />
             <Route path="/applications/:id" element={<ApplicationDetailPage />} />
             <Route path="/credit-types" element={<CreditTypesPage />} />
@@ -34,7 +37,7 @@ export default function App() {
             <Route path="/profile" element={<ProfilePage />} />
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to="/applications" replace />} />
+        <Route path="*" element={<HomeRedirect />} />
       </Routes>
       <AccessibilityToolbar />
       <ConsentBanner />

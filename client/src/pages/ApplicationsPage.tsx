@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import {
@@ -44,11 +44,15 @@ export function ApplicationsPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { isStaff, isManager, user } = useAuth()
+  const [searchParams] = useSearchParams()
   const locale = (i18n.language || 'tr').slice(0, 2)
   const [data, setData] = useState<GetListResponse<CreditApplicationListItem> | null>(null)
   const [facets, setFacets] = useState<CreditApplicationFacets | null>(null)
   const [pageIndex, setPageIndex] = useState(0)
-  const [statusFilter, setStatusFilter] = useState<CreditApplicationStatus | ''>('')
+  const initialStatus = (searchParams.get('status') ?? '') as CreditApplicationStatus | ''
+  const [statusFilter, setStatusFilter] = useState<CreditApplicationStatus | ''>(
+    STATUS_OPTIONS.includes(initialStatus) ? initialStatus : '',
+  )
   const [branchFilter, setBranchFilter] = useState('')
   const [missingDocsOnly, setMissingDocsOnly] = useState(false)
   const [currencyFilter, setCurrencyFilter] = useState('')
@@ -426,68 +430,70 @@ export function ApplicationsPage() {
 
   return (
     <section>
-      <div className="welcome-panel">
-        <h1>{t('dashboard.welcome', { name: welcomeName })}</h1>
-        <p className="muted">
-          {isStaff ? t('dashboard.subtitleStaff') : t('dashboard.subtitle')}
-        </p>
-        {dashboard && (
-          <div className="summary-grid">
-            {isStaff && (
-              <>
-                <article className="summary-card">
-                  <span>{t('dashboard.customers')}</span>
-                  <strong>{dashboard.customerTotal ?? 0}</strong>
-                </article>
-                <article className="summary-card">
-                  <span>{t('dashboard.individualActive')}</span>
-                  <strong>{dashboard.individualActive ?? 0}</strong>
-                </article>
-                <article className="summary-card">
-                  <span>{t('dashboard.corporateActive')}</span>
-                  <strong>{dashboard.corporateActive ?? 0}</strong>
-                </article>
-                <article className="summary-card">
-                  <span>{t('dashboard.customerInactive')}</span>
-                  <strong>{dashboard.customerInactive ?? 0}</strong>
-                </article>
-                <article className="summary-card">
-                  <span>{t('dashboard.creditTypes')}</span>
-                  <strong>{dashboard.creditTypeTotal ?? 0}</strong>
-                </article>
-                <article className="summary-card">
-                  <span>{t('dashboard.creditTypeIndividual')}</span>
-                  <strong>{dashboard.creditTypeIndividual ?? 0}</strong>
-                </article>
-                <article className="summary-card">
-                  <span>{t('dashboard.creditTypeCorporate')}</span>
-                  <strong>{dashboard.creditTypeCorporate ?? 0}</strong>
-                </article>
-              </>
-            )}
-            <article className="summary-card">
-              <span>{t('dashboard.applications')}</span>
-              <strong>{dashboard.applicationTotal}</strong>
-            </article>
-            <article className="summary-card">
-              <span>{t('status.Pending')}</span>
-              <strong>{dashboard.applicationPending}</strong>
-            </article>
-            <article className="summary-card">
-              <span>{t('status.Approved')}</span>
-              <strong>{dashboard.applicationApproved}</strong>
-            </article>
-            <article className="summary-card">
-              <span>{t('status.Rejected')}</span>
-              <strong>{dashboard.applicationRejected}</strong>
-            </article>
-            <article className="summary-card">
-              <span>{t('status.Cancelled')}</span>
-              <strong>{dashboard.applicationCancelled}</strong>
-            </article>
-          </div>
-        )}
-      </div>
+      {!isManager && (
+        <div className="welcome-panel">
+          <h1>{t('dashboard.welcome', { name: welcomeName })}</h1>
+          <p className="muted">
+            {isStaff ? t('dashboard.subtitleStaff') : t('dashboard.subtitle')}
+          </p>
+          {dashboard && (
+            <div className="summary-grid">
+              {isStaff && (
+                <>
+                  <article className="summary-card">
+                    <span>{t('dashboard.customers')}</span>
+                    <strong>{dashboard.customerTotal ?? 0}</strong>
+                  </article>
+                  <article className="summary-card">
+                    <span>{t('dashboard.individualActive')}</span>
+                    <strong>{dashboard.individualActive ?? 0}</strong>
+                  </article>
+                  <article className="summary-card">
+                    <span>{t('dashboard.corporateActive')}</span>
+                    <strong>{dashboard.corporateActive ?? 0}</strong>
+                  </article>
+                  <article className="summary-card">
+                    <span>{t('dashboard.customerInactive')}</span>
+                    <strong>{dashboard.customerInactive ?? 0}</strong>
+                  </article>
+                  <article className="summary-card">
+                    <span>{t('dashboard.creditTypes')}</span>
+                    <strong>{dashboard.creditTypeTotal ?? 0}</strong>
+                  </article>
+                  <article className="summary-card">
+                    <span>{t('dashboard.creditTypeIndividual')}</span>
+                    <strong>{dashboard.creditTypeIndividual ?? 0}</strong>
+                  </article>
+                  <article className="summary-card">
+                    <span>{t('dashboard.creditTypeCorporate')}</span>
+                    <strong>{dashboard.creditTypeCorporate ?? 0}</strong>
+                  </article>
+                </>
+              )}
+              <article className="summary-card">
+                <span>{t('dashboard.applications')}</span>
+                <strong>{dashboard.applicationTotal}</strong>
+              </article>
+              <article className="summary-card">
+                <span>{t('status.Pending')}</span>
+                <strong>{dashboard.applicationPending}</strong>
+              </article>
+              <article className="summary-card">
+                <span>{t('status.Approved')}</span>
+                <strong>{dashboard.applicationApproved}</strong>
+              </article>
+              <article className="summary-card">
+                <span>{t('status.Rejected')}</span>
+                <strong>{dashboard.applicationRejected}</strong>
+              </article>
+              <article className="summary-card">
+                <span>{t('status.Cancelled')}</span>
+                <strong>{dashboard.applicationCancelled}</strong>
+              </article>
+            </div>
+          )}
+        </div>
+      )}
 
       {!isStaff && (
         <div className="panel create-panel">
