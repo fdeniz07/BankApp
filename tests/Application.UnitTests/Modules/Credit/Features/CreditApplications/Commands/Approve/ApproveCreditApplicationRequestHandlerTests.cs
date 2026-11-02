@@ -213,6 +213,79 @@ public class ApproveCreditApplicationRequestHandlerTests
     }
 
     [Fact]
+    public async Task Handle_WhenAmountExceedsBranchCap_Throws()
+    {
+        _authorityOptions = new ApprovalAuthorityOptions
+        {
+            Enabled = true,
+            LimitsByPosition = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
+            {
+                [StaffPosition.CreditAnalyst.Name] = 100_000m
+            },
+            UnlimitedRoles = ["BankManager", "SuperAdmin"]
+        };
+
+        Guid applicationId = Guid.NewGuid();
+        Guid subTypeId = Guid.NewGuid();
+        Guid staffUserId = Guid.NewGuid();
+        Guid branchId = Guid.NewGuid();
+
+        SetupGetApplication(new CreditApplication
+        {
+            Id = applicationId,
+            ApplicationNumber = "APP-BRANCH-CAP",
+            CreditSubTypeId = subTypeId,
+            Status = CreditApplicationStatus.Pending
+        });
+        SetupCreditSubType(subTypeId, minAmount: 10_000, maxAmount: 200_000, minTerm: 6, maxTerm: 48);
+
+        _currentUserService.Setup(s => s.UserId).Returns(staffUserId);
+        _currentUserService.Setup(s => s.IsBankManager).Returns(false);
+        _currentUserService.Setup(s => s.IsSuperAdmin).Returns(false);
+        _applicationUserRepository
+            .Setup(r => r.GetAsync(
+                It.IsAny<Expression<Func<ApplicationUser, bool>>>(),
+                It.IsAny<Func<IQueryable<ApplicationUser>, IIncludableQueryable<ApplicationUser, object>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new ApplicationUser
+            {
+                Id = staffUserId,
+                Email = "analyst@bank.local",
+                Position = StaffPosition.CreditAnalyst,
+                BranchId = branchId
+            });
+        _branchRepository
+            .Setup(r => r.GetAsync(
+                It.IsAny<Expression<Func<Branch, bool>>>(),
+                It.IsAny<Func<IQueryable<Branch>, IIncludableQueryable<Branch, object>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new Branch
+            {
+                Id = branchId,
+                Code = "IST-01",
+                Name = "Test",
+                MaxApprovalAmount = 15_000m
+            });
+
+        ApproveCreditApplicationRequest request = new()
+        {
+            Id = applicationId,
+            ApprovedAmount = 25_000,
+            ApprovedTermMonths = 24,
+            ApprovedInterestRate = 1.9m
+        };
+
+        Func<Task> act = () => CreateSut().Handle(request, CancellationToken.None);
+
+        await act.Should().ThrowAsync<BusinessException>()
+            .WithMessage(CreditApplicationMessages.AmountExceedsApprovalAuthority);
+    }
+
+    [Fact]
     public async Task Handle_WhenPendingAndWithinLimits_ApprovesApplication()
     {
         Guid applicationId = Guid.NewGuid();
