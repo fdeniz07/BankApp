@@ -6,30 +6,38 @@ namespace Persistence.Seed;
 
 public static class BranchSeed
 {
-    public static readonly (string Code, string Name, string City)[] DemoBranches =
+    public static readonly (string Code, string Name, string City, decimal MaxApprovalAmount)[] DemoBranches =
     [
-        ("IST-01", "İstanbul Kadıköy", "İstanbul"),
-        ("ANK-01", "Ankara Kızılay", "Ankara"),
-        ("BER-01", "Berlin Mitte", "Berlin"),
-        ("NYC-01", "New York Manhattan", "New York"),
-        ("CHI-01", "Chicago Loop", "Chicago")
+        ("IST-01", "İstanbul Kadıköy", "İstanbul", 200_000m),
+        ("ANK-01", "Ankara Kızılay", "Ankara", 250_000m),
+        ("BER-01", "Berlin Mitte", "Berlin", 180_000m),
+        ("NYC-01", "New York Manhattan", "New York", 150_000m),
+        ("CHI-01", "Chicago Loop", "Chicago", 120_000m)
     ];
 
     public static async Task SeedAsync(BankingDbContext context)
     {
         foreach (var demo in DemoBranches)
         {
-            bool exists = await context.Branches.AnyAsync(b => b.Code == demo.Code && !b.IsDeleted);
-            if (exists)
-                continue;
-
-            await context.Branches.AddAsync(new Branch
+            Branch? existing = await context.Branches.FirstOrDefaultAsync(b => b.Code == demo.Code && !b.IsDeleted);
+            if (existing is null)
             {
-                Code = demo.Code,
-                Name = demo.Name,
-                City = demo.City,
-                IsActive = true
-            });
+                await context.Branches.AddAsync(new Branch
+                {
+                    Code = demo.Code,
+                    Name = demo.Name,
+                    City = demo.City,
+                    IsActive = true,
+                    MaxApprovalAmount = demo.MaxApprovalAmount
+                });
+                continue;
+            }
+
+            if (!existing.MaxApprovalAmount.HasValue)
+            {
+                existing.MaxApprovalAmount = demo.MaxApprovalAmount;
+                context.Branches.Update(existing);
+            }
         }
 
         await context.SaveChangesAsync();

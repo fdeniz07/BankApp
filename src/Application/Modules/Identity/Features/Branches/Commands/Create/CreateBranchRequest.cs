@@ -11,4 +11,5 @@ public class CreateBranchRequest : IRequest<CreatedBranchResponse>, ISecuredRequ
     public string Name { get; set; } = default!;
     public string? City { get; set; }
     public bool IsActive { get; set; } = true;
+    public decimal? MaxApprovalAmount { get; set; }
 }

@@ -15,6 +15,9 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
         builder.Property(b => b.Name).HasColumnName("Name").HasMaxLength(150).IsRequired();
         builder.Property(b => b.City).HasColumnName("City").HasMaxLength(100);
         builder.Property(b => b.IsActive).HasColumnName("IsActive").IsRequired();
+        builder.Property(b => b.MaxApprovalAmount)
+            .HasColumnName("MaxApprovalAmount")
+            .HasPrecision(18, 2);
         builder.Property(b => b.IsDeleted).HasColumnName("IsDeleted").IsRequired();
         builder.Property(b => b.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(b => b.UpdatedDate).HasColumnName("UpdatedDate");

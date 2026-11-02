@@ -42,7 +42,8 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, C
             Code = code,
             Name = request.Name.Trim(),
             City = string.IsNullOrWhiteSpace(request.City) ? null : request.City.Trim(),
-            IsActive = request.IsActive
+            IsActive = request.IsActive,
+            MaxApprovalAmount = request.MaxApprovalAmount is > 0 ? request.MaxApprovalAmount : null
         };
         await _branchRepository.AddAsync(branch, cancellationToken);
 
@@ -53,7 +54,7 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, C
             actorUserId: _currentUser.UserId,
             targetType: nameof(Branch),
             targetId: branch.Id,
-            changes: new { branch.Code, branch.Name, branch.City });
+            changes: new { branch.Code, branch.Name, branch.City, branch.MaxApprovalAmount });
 
         return new CreatedBranchResponse
         {
@@ -61,7 +62,8 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, C
             Code = branch.Code,
             Name = branch.Name,
             City = branch.City,
-            IsActive = branch.IsActive
+            IsActive = branch.IsActive,
+            MaxApprovalAmount = branch.MaxApprovalAmount
         };
     }
 }

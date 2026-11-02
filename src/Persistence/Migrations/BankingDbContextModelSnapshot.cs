@@ -194,6 +194,11 @@ namespace Persistence.Migrations
                         .HasColumnType("bit")
                         .HasColumnName("IsDeleted");
 
+                    b.Property<decimal?>("MaxApprovalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("MaxApprovalAmount");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)

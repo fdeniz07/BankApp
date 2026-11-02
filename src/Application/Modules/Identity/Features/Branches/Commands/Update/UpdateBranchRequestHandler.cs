@@ -47,6 +47,7 @@ public class UpdateBranchRequestHandler : IRequestHandler<UpdateBranchRequest, U
         branch.Name = request.Name.Trim();
         branch.City = string.IsNullOrWhiteSpace(request.City) ? null : request.City.Trim();
         branch.IsActive = request.IsActive;
+        branch.MaxApprovalAmount = request.MaxApprovalAmount is > 0 ? request.MaxApprovalAmount : null;
 
         await _branchRepository.UpdateAsync(branch, cancellationToken);
 
@@ -57,7 +58,14 @@ public class UpdateBranchRequestHandler : IRequestHandler<UpdateBranchRequest, U
             actorUserId: _currentUser.UserId,
             targetType: nameof(Branch),
             targetId: branch.Id,
-            changes: new { branch.Code, branch.Name, branch.City, branch.IsActive });
+            changes: new
+            {
+                branch.Code,
+                branch.Name,
+                branch.City,
+                branch.IsActive,
+                branch.MaxApprovalAmount
+            });
 
         return new UpdatedBranchResponse
         {
@@ -65,7 +73,8 @@ public class UpdateBranchRequestHandler : IRequestHandler<UpdateBranchRequest, U
             Code = branch.Code,
             Name = branch.Name,
             City = branch.City,
-            IsActive = branch.IsActive
+            IsActive = branch.IsActive,
+            MaxApprovalAmount = branch.MaxApprovalAmount
         };
     }
 }
