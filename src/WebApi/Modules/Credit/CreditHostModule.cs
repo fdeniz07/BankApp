@@ -21,11 +21,17 @@ public static class CreditHostModule
         services.Configure<LogstashOptions>(configuration.GetSection(LogstashOptions.SectionName));
         services.AddScoped<IdempotencyKeyFilter>();
 
-        ElasticsearchOptions es = configuration.GetSection(ElasticsearchOptions.SectionName).Get<ElasticsearchOptions>()
-            ?? new ElasticsearchOptions();
+        IConfigurationSection esSection = configuration.GetSection(ElasticsearchOptions.SectionName);
+        ElasticsearchOptions es = esSection.Get<ElasticsearchOptions>() ?? new ElasticsearchOptions();
+        // Compose sets Elasticsearch__Nodes__0; JSON array bind can stick to appsettings localhost — prefer indexed key.
+        string? node0 = esSection["Nodes:0"];
+        if (!string.IsNullOrWhiteSpace(node0))
+            es.Nodes = [node0.Trim()];
+
         if (es.Enabled && es.Nodes is { Length: > 0 })
         {
-            var settings = new ElasticsearchClientSettings(new Uri(es.Nodes[0]));
+            string node = es.Nodes[0];
+            var settings = new ElasticsearchClientSettings(new Uri(node));
             services.AddSingleton(new ElasticsearchClient(settings));
             services.AddScoped<ICreditApplicationSearchService, ElasticCreditApplicationSearchService>();
         }
