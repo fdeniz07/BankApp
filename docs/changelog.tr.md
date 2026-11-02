@@ -2,6 +2,13 @@
 
 [English](changelog.en.md) · [Deutsch](changelog.de.md)
 
+## 2026-11-02 — Manager ES facet paneli (aggregations)
+
+- `GET /api/CreditApplications/facets` (BankManager/SuperAdmin): durum / şube / para birimi / eksik evrak / tutar bucket sayaçları.
+- ES `terms` + `range` aggregations; ES kapalıysa SQL GroupBy fallback (`source` alanı).
+- Liste: `amountMin` / `amountMax` / `currencyCode`; ApplicationsPage Manager facet chip UI.
+- Learning: `31-elk-elasticsearch` güncellendi.
+
 ## 2026-10-30 — Evrak soft-kapı + karar audit + doküman SignalR
 
 - Onay öncesi kimlik/gelir eksikse soft confirm (hard-block yok).

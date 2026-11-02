@@ -73,7 +73,7 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 ## Offen
 
 - [x] Elasticsearch für Mitarbeiter-GET-Endpunkte (ELK-Lab + Live-Suche; Seq bleibt)
-- [ ] Manager/Admin erweitertes ES-Filterpanel (Aggregationen)
+- [x] Manager/Admin erweitertes ES-Filterpanel (Aggregationen)
 - [ ] Admin-Welcome-Dashboard (Tailwind CSS + Bundle-Kompression / Performance)
 - [ ] Kubernetes / ArgoCD Deployment
 - [ ] Raft-Vault / Secret-Rotation (Produktion; jenseits Compose-Dev-Mode — Learning 19)

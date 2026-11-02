@@ -128,7 +128,7 @@ Durum: **Yapıldı** | **Kısmi** | **Planlı**
 | BR-PL-04 | Unit + integration testler; GitHub Actions CI | Yapıldı |
 | BR-PL-05 | Saga / process manager kredi yaşam döngüsü | Yapıldı |
 | BR-PL-06 | Elasticsearch personel/arama (ELK lab + canlı kutu; Seq kalır) | Yapıldı |
-| BR-PL-06b | Manager/Admin gelişmiş ES filtre paneli | Planlı |
+| BR-PL-06b | Manager/Admin gelişmiş ES filtre paneli | Tamamlandı |
 | BR-PL-07 | Kubernetes / ArgoCD | Planlı |
 | BR-PL-08 | Raft Vault / secret rotasyonu (üretim) | Planlı |
 

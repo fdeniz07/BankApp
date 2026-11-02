@@ -155,4 +155,4 @@ Daha geniş eğitim sırası: Outbox → SignalR → OTel → Decision letter �
 
 ## Tekrar bakılacak
 
-Faz 6 ana dilimler + OTel + rate-limit + evrak + şube lab tamam. İsteğe bağlı sonraki: **Keycloak**, Elasticsearch, **Raft Vault / secret rotasyonu** (İleride listesi).
+Faz 6 ana dilimler + OTel + rate-limit + evrak + şube + ELK canlı arama + Manager facet aggregations tamam. İsteğe bağlı sonraki: **Keycloak**, Admin Tailwind dashboard, **Raft Vault / secret rotasyonu** (İleride listesi).

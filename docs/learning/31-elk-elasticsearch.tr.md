@@ -21,7 +21,9 @@ BankApp lab’de ELK **iki iş** için kullanılır:
 
 - Personel listesinde yazdıkça arama (`searchText`, ~300 ms debounce)
 - Staff: şube scoped; Manager/SuperAdmin: daha geniş filtre
-- ES kapalıysa SQL `Contains` fallback
+- **Manager/SuperAdmin facet paneli:** durum / şube / para birimi / eksik evrak / tutar aralığı sayaçları (`GET …/facets`; ES aggregations, SQL GroupBy fallback)
+- Liste tutar/para birimi filtresi (`amountMin`/`amountMax`/`currencyCode`)
+- ES kapalıysa SQL `Contains` / GroupBy fallback
 - Compose: `elasticsearch` :9200, `logstash` :8081/:50000, `kibana` :5601
 
 ## Ne zaman eklendi?
@@ -34,8 +36,10 @@ Faz 6 — Soft/Hard kapı + DoA sonrasında (roadmap: personel GET araması).
 |--------|--------|
 | Index | Tablo benzeri belge koleksiyonu (`bankapp-credit-applications`, `bankapp-logs-YYYY.MM.dd`) |
 | Document | Tek JSON kayıt (başvuru veya log olayı) |
-| Mapping | Alan tipleri (text / keyword / date…) — lab’de çoğu dinamik |
-| Query | `multi_match`, `term`, `bool` filtre |
+| Mapping | Alan tipleri (text / keyword / date…) — lab’de index create’te keyword/boolean/number |
+| Query | `multi_match`, `term`, `bool` filtre, `range` (tutar) |
+| Aggregation | `terms` (status/branch/currency) + `range` (requestedAmount bucket’ları) |
+| Facet | Sayaçlı filtre; tıklanınca liste query’sine yazılır |
 | Pipeline | Logstash input → filter → output |
 | Discover | Kibana’da index pattern ile log/arama gezintisi |
 
@@ -105,13 +109,26 @@ curl.exe -s "http://localhost:8080/api/CreditApplications?PageIndex=0&PageSize=1
   -H "Authorization: Bearer <token>"
 ```
 
+### Manager facet aggregations
+
+Yönetici JWT ile çalıştır. Ne yapar: aktif filtre bağlamında ES `terms`/`range` sayaçları döner (`source: Elasticsearch` veya SQL fallback).
+
+```powershell
+curl.exe -s "http://localhost:8080/api/CreditApplications/facets" `
+  -H "Authorization: Bearer <manager-or-superadmin-token>"
+```
+
+Doğrula: JSON’da `statuses`, `branches`, `currencies`, `missingRequiredDocuments`, `amountBuckets`.  
+Listeyi daraltmak: aynı parametreleri `GET /api/CreditApplications?amountMin=0&amountMax=50000&currencyCode=USD` ile kullan.
+
 ## Sınıflar, metotlar, paketler
 
 - `ElasticsearchOptions`, `LogstashOptions`
 - `ICreditApplicationSearchService` / `ElasticCreditApplicationSearchService` / `Null…`
-- `GetListCreditApplicationRequest.SearchText`
+- `GetFacetsAsync`, `CreditApplicationAmountBuckets`, `GetCreditApplicationFacetsRequest`
+- `GetListCreditApplicationRequest.SearchText` / `AmountMin` / `AmountMax` / `CurrencyCode`
 - NuGet: `Elastic.Clients.Elasticsearch`, `Serilog.Sinks.Http`, `Serilog.Sinks.Elasticsearch` (Logstash kapalıyken doğrudan ES)
-- Client: `ApplicationsPage` debounce + `getApplications({ searchText })`
+- Client: `ApplicationsPage` debounce + facet paneli (`isManager`) + `getApplicationFacets`
 
 ## Repoda nerede?
 
@@ -120,23 +137,26 @@ curl.exe -s "http://localhost:8080/api/CreditApplications?PageIndex=0&PageSize=1
 - `infra/logstash/config/logstash.yml`
 - `src/WebApi/Modules/Credit/Search/`
 - `src/Application/Services/Search/`
+- `src/Application/Modules/Credit/Features/CreditApplications/Queries/GetFacets/`
 - `src/Core/Logging/SerilogHostBuilderExtensions.cs`
 - `client/src/pages/ApplicationsPage.tsx`
 
 ## Mini akış
 
 1. Compose ES+Logstash+Kibana  
-2. WebApi start → `ReindexAllAsync` → başvurular index  
+2. WebApi start → `ReindexAllAsync` → başvurular index (keyword mapping)  
 3. Personel listede yazar → 300 ms sonra `searchText` → ES `multi_match` (yoksa SQL)  
-4. Serilog → Logstash HTTP → `bankapp-logs-*` → Kibana Discover  
+4. Manager facet chip → `GET /facets` aggregations → liste `amountMin`/`status`/… ile daralır  
+5. Serilog → Logstash HTTP → `bankapp-logs-*` → Kibana Discover  
 
 ## Where useful
 
 - [ ] `curl localhost:9200` cevap veriyor  
 - [ ] Kibana açılıyor; log data view oluşturulabiliyor  
 - [ ] Listede arama kutusu yazdıkça sonuç yenileniyor  
-- [ ] ES durunca liste SQL fallback ile çalışıyor  
-- [ ] Staff şube dışı sonuç görmüyor  
+- [ ] Manager’da facet paneli sayaç gösteriyor; chip listeyi daraltıyor  
+- [ ] ES durunca liste + facets SQL fallback ile çalışıyor  
+- [ ] Staff şube dışı sonuç görmüyor; Staff facet panelini görmüyor  
 
 ### Felaket / kurtarma (az yıkıcı → çok)
 

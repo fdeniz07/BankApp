@@ -2,6 +2,13 @@
 
 [Türkçe](changelog.tr.md) · [Deutsch](changelog.de.md)
 
+## 2026-11-02 — Manager ES facet panel (aggregations)
+
+- `GET /api/CreditApplications/facets` (BankManager/SuperAdmin): status / branch / currency / missing-docs / amount bucket counts.
+- ES `terms` + `range` aggregations; SQL GroupBy fallback when ES is down (`source` field).
+- List filters: `amountMin` / `amountMax` / `currencyCode`; Manager facet chips on ApplicationsPage.
+- Learning: `31-elk-elasticsearch` updated.
+
 ## 2026-10-30 — Decision templates + demo login matrix + catalog locale
 
 - `DecisionLetterTemplates` + API CRUD; detail page system/user template picker (follows UI language).
