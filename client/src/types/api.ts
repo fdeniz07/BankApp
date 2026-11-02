@@ -201,6 +201,27 @@ export interface CreditApplicationListItem {
   isDeleted: boolean
 }
 
+export interface FacetBucket {
+  key: string
+  label?: string | null
+  count: number
+}
+
+export interface AmountFacetBucket {
+  from: number
+  to?: number | null
+  count: number
+}
+
+export interface CreditApplicationFacets {
+  source: 'Elasticsearch' | 'Sql' | string
+  statuses: FacetBucket[]
+  branches: FacetBucket[]
+  currencies: FacetBucket[]
+  missingRequiredDocuments: { true: number; false: number }
+  amountBuckets: AmountFacetBucket[]
+}
+
 export interface CreditApplicationDetail extends CreditApplicationListItem {
   customerName: string
   customerCategory?: CreditCategory | null

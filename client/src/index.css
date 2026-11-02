@@ -886,6 +886,38 @@ th {
   margin: 0.75rem 0 1rem;
 }
 
+.facet-panel {
+  margin: 0 0 1.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.facet-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+.facet-group {
+  margin-top: 0.35rem;
+}
+
+.facet-group-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted, #666);
+  margin-bottom: 0.15rem;
+}
+
+.facet-group .chip-row {
+  margin: 0.25rem 0 0.5rem;
+}
+
 .chip-btn {
   border: 1px solid var(--line);
   background: var(--surface);

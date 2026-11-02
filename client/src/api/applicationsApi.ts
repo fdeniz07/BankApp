@@ -4,6 +4,7 @@ import type {
   CreateApplicationRequest,
   CreditApplicationDetail,
   CreditApplicationDocumentItem,
+  CreditApplicationFacets,
   CreditApplicationListItem,
   CreditApplicationStatus,
   CreditDocumentType,
@@ -24,8 +25,21 @@ export interface GetApplicationsParams {
   branchId?: string | null
   missingRequiredDocumentsOnly?: boolean
   searchText?: string
+  currencyCode?: string | null
+  amountMin?: number | null
+  amountMax?: number | null
   sortBy?: ApplicationSortBy
   sortDesc?: boolean
+}
+
+export interface GetApplicationFacetsParams {
+  status?: CreditApplicationStatus | ''
+  branchId?: string | null
+  missingRequiredDocumentsOnly?: boolean
+  searchText?: string
+  currencyCode?: string | null
+  amountMin?: number | null
+  amountMax?: number | null
 }
 
 export function getApplications({
@@ -35,6 +49,9 @@ export function getApplications({
   branchId = null,
   missingRequiredDocumentsOnly = false,
   searchText = '',
+  currencyCode = null,
+  amountMin = null,
+  amountMax = null,
   sortBy = 'applicationDate',
   sortDesc = true,
 }: GetApplicationsParams = {}) {
@@ -48,9 +65,35 @@ export function getApplications({
   if (branchId) params.set('branchId', branchId)
   if (missingRequiredDocumentsOnly) params.set('missingRequiredDocumentsOnly', 'true')
   if (searchText.trim()) params.set('searchText', searchText.trim())
+  if (currencyCode) params.set('currencyCode', currencyCode)
+  if (amountMin != null) params.set('amountMin', String(amountMin))
+  if (amountMax != null) params.set('amountMax', String(amountMax))
 
   return apiRequest<GetListResponse<CreditApplicationListItem>>(
     `/api/CreditApplications?${params}`,
+  )
+}
+
+export function getApplicationFacets({
+  status = '',
+  branchId = null,
+  missingRequiredDocumentsOnly = false,
+  searchText = '',
+  currencyCode = null,
+  amountMin = null,
+  amountMax = null,
+}: GetApplicationFacetsParams = {}) {
+  const params = new URLSearchParams()
+  if (status) params.set('status', status)
+  if (branchId) params.set('branchId', branchId)
+  if (missingRequiredDocumentsOnly) params.set('missingRequiredDocumentsOnly', 'true')
+  if (searchText.trim()) params.set('searchText', searchText.trim())
+  if (currencyCode) params.set('currencyCode', currencyCode)
+  if (amountMin != null) params.set('amountMin', String(amountMin))
+  if (amountMax != null) params.set('amountMax', String(amountMax))
+  const qs = params.toString()
+  return apiRequest<CreditApplicationFacets>(
+    `/api/CreditApplications/facets${qs ? `?${qs}` : ''}`,
   )
 }
 

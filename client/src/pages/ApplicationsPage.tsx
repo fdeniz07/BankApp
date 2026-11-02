@@ -6,6 +6,7 @@ import {
   cancelApplication,
   createApplication,
   exportPaymentPlan,
+  getApplicationFacets,
   getApplications,
   getPaymentPlan,
   uploadApplicationDocument,
@@ -18,6 +19,7 @@ import { DASHBOARD_REFRESH_EVENT } from '../components/StatsStrip'
 import { CREDIT_APPLICATION_CHANGED_EVENT } from '../realtime/creditApplicationEvents'
 import type {
   ApplicationSortBy,
+  CreditApplicationFacets,
   CreditApplicationListItem,
   CreditApplicationStatus,
   CreditDocumentType,
@@ -41,13 +43,17 @@ const STATUS_OPTIONS: Array<CreditApplicationStatus | ''> = [
 export function ApplicationsPage() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
-  const { isStaff, user } = useAuth()
+  const { isStaff, isManager, user } = useAuth()
   const locale = (i18n.language || 'tr').slice(0, 2)
   const [data, setData] = useState<GetListResponse<CreditApplicationListItem> | null>(null)
+  const [facets, setFacets] = useState<CreditApplicationFacets | null>(null)
   const [pageIndex, setPageIndex] = useState(0)
   const [statusFilter, setStatusFilter] = useState<CreditApplicationStatus | ''>('')
   const [branchFilter, setBranchFilter] = useState('')
   const [missingDocsOnly, setMissingDocsOnly] = useState(false)
+  const [currencyFilter, setCurrencyFilter] = useState('')
+  const [amountMin, setAmountMin] = useState<number | null>(null)
+  const [amountMax, setAmountMax] = useState<number | null>(null)
   const [searchInput, setSearchInput] = useState('')
   const [searchText, setSearchText] = useState('')
   const [sortBy, setSortBy] = useState<ApplicationSortBy>('applicationDate')
@@ -93,6 +99,9 @@ export function ApplicationsPage() {
       branchId: branchFilter || null,
       missingRequiredDocumentsOnly: missingDocsOnly,
       searchText,
+      currencyCode: currencyFilter || null,
+      amountMin,
+      amountMax,
       sortBy,
       sortDesc,
     })
@@ -103,7 +112,47 @@ export function ApplicationsPage() {
         toast.error(message)
       })
       .finally(() => setLoading(false))
-  }, [pageIndex, isStaff, statusFilter, branchFilter, missingDocsOnly, searchText, sortBy, sortDesc, t])
+  }, [
+    pageIndex,
+    isStaff,
+    statusFilter,
+    branchFilter,
+    missingDocsOnly,
+    searchText,
+    currencyFilter,
+    amountMin,
+    amountMax,
+    sortBy,
+    sortDesc,
+    t,
+  ])
+
+  const loadFacets = useCallback(() => {
+    if (!isManager) {
+      setFacets(null)
+      return Promise.resolve()
+    }
+    return getApplicationFacets({
+      status: statusFilter,
+      branchId: branchFilter || null,
+      missingRequiredDocumentsOnly: missingDocsOnly,
+      searchText,
+      currencyCode: currencyFilter || null,
+      amountMin,
+      amountMax,
+    })
+      .then((res) => setFacets(res))
+      .catch(() => setFacets(null))
+  }, [
+    isManager,
+    statusFilter,
+    branchFilter,
+    missingDocsOnly,
+    searchText,
+    currencyFilter,
+    amountMin,
+    amountMax,
+  ])
 
   // Live search: debounce keystrokes (~300ms) so each character feels instant without flooding the API
   useEffect(() => {
@@ -125,13 +174,24 @@ export function ApplicationsPage() {
   }, [loadList])
 
   useEffect(() => {
+    let cancelled = false
+    loadFacets().then(() => {
+      if (cancelled) return
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [loadFacets])
+
+  useEffect(() => {
     const onRealtime = () => {
       void loadList()
+      void loadFacets()
       void loadDashboard()
     }
     window.addEventListener(CREDIT_APPLICATION_CHANGED_EVENT, onRealtime)
     return () => window.removeEventListener(CREDIT_APPLICATION_CHANGED_EVENT, onRealtime)
-  }, [loadList, loadDashboard])
+  }, [loadList, loadFacets, loadDashboard])
 
   useEffect(() => {
     void loadDashboard()
@@ -739,6 +799,186 @@ export function ApplicationsPage() {
           </button>
         )}
       </div>
+
+      {isManager && facets && (
+        <section className="facet-panel" aria-label={t('applications.facetsTitle')}>
+          <div className="facet-panel-header">
+            <strong>{t('applications.facetsTitle')}</strong>
+            <span className="muted">{t('applications.facetsSource', { source: facets.source })}</span>
+            {(statusFilter ||
+              branchFilter ||
+              missingDocsOnly ||
+              currencyFilter ||
+              amountMin != null ||
+              amountMax != null) && (
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => {
+                  setPageIndex(0)
+                  setStatusFilter('')
+                  setBranchFilter('')
+                  setMissingDocsOnly(false)
+                  setCurrencyFilter('')
+                  setAmountMin(null)
+                  setAmountMax(null)
+                }}
+              >
+                {t('applications.facetsClearAll')}
+              </button>
+            )}
+          </div>
+
+          {facets.statuses.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('applications.facetsStatus')}</span>
+              <div className="chip-row">
+                {facets.statuses.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    className={`chip-btn${statusFilter === b.key ? ' active' : ''}`}
+                    onClick={() => {
+                      setPageIndex(0)
+                      setStatusFilter((prev) =>
+                        prev === b.key ? '' : (b.key as CreditApplicationStatus),
+                      )
+                    }}
+                  >
+                    {t(`status.${b.key}`, { defaultValue: b.key })} ({b.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {facets.branches.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('applications.facetsBranch')}</span>
+              <div className="chip-row">
+                {facets.branches.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    className={`chip-btn${branchFilter === b.key ? ' active' : ''}`}
+                    onClick={() => {
+                      setPageIndex(0)
+                      setBranchFilter((prev) => (prev === b.key ? '' : b.key))
+                    }}
+                  >
+                    {b.label || b.key} ({b.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {facets.currencies.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('applications.facetsCurrency')}</span>
+              <div className="chip-row">
+                {facets.currencies.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    className={`chip-btn${currencyFilter === b.key ? ' active' : ''}`}
+                    onClick={() => {
+                      setPageIndex(0)
+                      setCurrencyFilter((prev) => (prev === b.key ? '' : b.key))
+                    }}
+                  >
+                    {b.key} ({b.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="facet-group">
+            <span className="facet-group-label">{t('applications.facetsMissingDocs')}</span>
+            <div className="chip-row">
+              <button
+                type="button"
+                className={`chip-btn${missingDocsOnly ? ' active' : ''}`}
+                onClick={() => {
+                  setPageIndex(0)
+                  setMissingDocsOnly((prev) => !prev)
+                }}
+              >
+                {t('applications.facetsMissingDocsYes', {
+                  count: facets.missingRequiredDocuments.true,
+                })}
+              </button>
+              <button
+                type="button"
+                className="chip-btn"
+                disabled
+                title={t('applications.facetsMissingDocsNo', {
+                  count: facets.missingRequiredDocuments.false,
+                })}
+              >
+                {t('applications.facetsMissingDocsNo', {
+                  count: facets.missingRequiredDocuments.false,
+                })}
+              </button>
+            </div>
+          </div>
+
+          {facets.amountBuckets.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('applications.facetsAmount')}</span>
+              <div className="chip-row">
+                {facets.amountBuckets.map((b) => {
+                  const active =
+                    amountMin === b.from &&
+                    (b.to == null ? amountMax == null : amountMax === b.to)
+                  return (
+                    <button
+                      key={`${b.from}-${b.to ?? 'open'}`}
+                      type="button"
+                      className={`chip-btn${active ? ' active' : ''}`}
+                      onClick={() => {
+                        setPageIndex(0)
+                        if (active) {
+                          setAmountMin(null)
+                          setAmountMax(null)
+                        } else {
+                          setAmountMin(b.from)
+                          setAmountMax(b.to ?? null)
+                        }
+                      }}
+                    >
+                      {b.to == null
+                        ? t('applications.facetsAmountBucketOpen', {
+                            from: b.from.toLocaleString(),
+                            count: b.count,
+                          })
+                        : t('applications.facetsAmountBucket', {
+                            from: b.from.toLocaleString(),
+                            to: b.to.toLocaleString(),
+                            count: b.count,
+                          })}
+                    </button>
+                  )
+                })}
+                {(amountMin != null || amountMax != null) && (
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    onClick={() => {
+                      setPageIndex(0)
+                      setAmountMin(null)
+                      setAmountMax(null)
+                    }}
+                  >
+                    {t('applications.facetsClearAmount')}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {loading && <p>{t('common.loading')}</p>}
       {error && <p className="error-text">{error}</p>}
