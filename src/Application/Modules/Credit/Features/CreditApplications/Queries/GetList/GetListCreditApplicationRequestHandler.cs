@@ -67,18 +67,29 @@ public class GetListCreditApplicationRequestHandler
 
         Guid? branchFilter = _branchAuthorization.ResolveListBranchFilter(request.BranchId);
 
-        if (!string.IsNullOrWhiteSpace(request.SearchText) && _search.IsAvailable)
+        bool preferSearch = _search.IsAvailable
+            && (!string.IsNullOrWhiteSpace(request.SearchText)
+                || !string.IsNullOrWhiteSpace(request.CurrencyCode)
+                || request.AmountMin.HasValue
+                || request.AmountMax.HasValue);
+
+        if (preferSearch)
         {
             GetListResponse<GetListCreditApplicationListItemDto>? es =
                 await _search.SearchAsync(
                     new CreditApplicationSearchQuery
                     {
-                        Text = request.SearchText,
+                        Text = request.SearchText ?? "",
                         PageIndex = request.PageRequest.PageIndex,
                         PageSize = request.PageRequest.PageSize,
                         Status = request.Status?.Name,
                         BranchId = request.BranchId,
                         MissingRequiredDocumentsOnly = request.MissingRequiredDocumentsOnly,
+                        CurrencyCode = request.CurrencyCode,
+                        AmountMin = request.AmountMin,
+                        AmountMax = request.AmountMax,
+                        SortBy = request.SortBy,
+                        SortDesc = request.SortDesc,
                         RequiredBranchScope = _currentUserService.IsSuperAdmin ? null : branchFilter,
                         AllowCrossBranchFilters = _currentUserService.IsSuperAdmin || _currentUserService.IsBankManager
                     },
@@ -107,7 +118,28 @@ public class GetListCreditApplicationRequestHandler
             }
         }
 
-        Expression<Func<CreditApplication, bool>>? predicate = BuildPredicate(request, branchFilter, missingDocOnlyIds);
+        HashSet<Guid>? currencySubTypeIds = null;
+        if (!string.IsNullOrWhiteSpace(request.CurrencyCode))
+        {
+            currencySubTypeIds = await ResolveSubTypeIdsForCurrencyAsync(
+                request.CurrencyCode,
+                cancellationToken);
+            if (currencySubTypeIds.Count == 0)
+            {
+                return new GetListResponse<GetListCreditApplicationListItemDto>
+                {
+                    Items = [],
+                    Index = request.PageRequest.PageIndex,
+                    Size = request.PageRequest.PageSize,
+                    Count = 0,
+                    Pages = 0,
+                    From = 0
+                };
+            }
+        }
+
+        Expression<Func<CreditApplication, bool>>? predicate =
+            BuildPredicate(request, branchFilter, missingDocOnlyIds, currencySubTypeIds);
         Func<IQueryable<CreditApplication>, IOrderedQueryable<CreditApplication>>? orderBy =
             BuildOrderBy(request.SortBy, request.SortDesc);
 
@@ -268,10 +300,31 @@ public class GetListCreditApplicationRequestHandler
             .ToHashSet();
     }
 
+    private async Task<HashSet<Guid>> ResolveSubTypeIdsForCurrencyAsync(
+        string currencyCode,
+        CancellationToken cancellationToken)
+    {
+        string code = currencyCode.Trim().ToUpperInvariant();
+        IPaginate<CreditType> types = await _creditTypeRepository.GetListAsync(
+            predicate: t => t.CurrencyCode == code,
+            size: 100,
+            cancellationToken: cancellationToken);
+        HashSet<Guid> typeIds = types.Items.Select(t => t.Id).ToHashSet();
+        if (typeIds.Count == 0)
+            return [];
+
+        IPaginate<CreditSubType> subTypes = await _creditSubTypeRepository.GetListAsync(
+            predicate: s => typeIds.Contains(s.CreditTypeId),
+            size: 200,
+            cancellationToken: cancellationToken);
+        return subTypes.Items.Select(s => s.Id).ToHashSet();
+    }
+
     private static Expression<Func<CreditApplication, bool>>? BuildPredicate(
         GetListCreditApplicationRequest request,
         Guid? branchFilter,
-        HashSet<Guid>? missingDocOnlyIds)
+        HashSet<Guid>? missingDocOnlyIds,
+        HashSet<Guid>? currencySubTypeIds)
     {
         string? q = string.IsNullOrWhiteSpace(request.SearchText)
             ? null
@@ -282,6 +335,9 @@ public class GetListCreditApplicationRequestHandler
             && (request.Status == null || c.Status == request.Status)
             && (!branchFilter.HasValue || c.BranchId == branchFilter.Value)
             && (missingDocOnlyIds == null || missingDocOnlyIds.Contains(c.Id))
+            && (currencySubTypeIds == null || currencySubTypeIds.Contains(c.CreditSubTypeId))
+            && (!request.AmountMin.HasValue || c.RequestedAmount >= request.AmountMin.Value)
+            && (!request.AmountMax.HasValue || c.RequestedAmount < request.AmountMax.Value)
             && (q == null
                 || c.ApplicationNumber.Contains(q)
                 || (c.Notes != null && c.Notes.Contains(q))

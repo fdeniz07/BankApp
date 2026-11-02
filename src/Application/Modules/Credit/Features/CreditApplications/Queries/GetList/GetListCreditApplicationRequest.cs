@@ -18,6 +18,12 @@ public class GetListCreditApplicationRequest : IRequest<GetListResponse<GetListC
     public bool? MissingRequiredDocumentsOnly { get; set; }
     /// <summary>Live search text — prefers Elasticsearch when enabled; SQL fallback.</summary>
     public string? SearchText { get; set; }
+    /// <summary>Filter by product currency (Manager facet).</summary>
+    public string? CurrencyCode { get; set; }
+    /// <summary>Inclusive lower bound for RequestedAmount (Manager facet / advanced filter).</summary>
+    public decimal? AmountMin { get; set; }
+    /// <summary>Exclusive upper bound for RequestedAmount.</summary>
+    public decimal? AmountMax { get; set; }
     public string? SortBy { get; set; }
     public bool SortDesc { get; set; }
 }

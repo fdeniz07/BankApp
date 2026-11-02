@@ -1,10 +1,11 @@
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetFacets;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetList;
 using Core.Application.Responses;
 using Domain.Entities;
 
 namespace Application.Services.Search;
 
-/// <summary>No-op search when Elasticsearch is disabled (SQL list remains).</summary>
+/// <summary>No-op search when Elasticsearch is disabled (SQL list / facets remain).</summary>
 public sealed class NullCreditApplicationSearchService : ICreditApplicationSearchService
 {
     public bool IsAvailable => false;
@@ -26,4 +27,9 @@ public sealed class NullCreditApplicationSearchService : ICreditApplicationSearc
         CreditApplicationSearchQuery query,
         CancellationToken cancellationToken = default) =>
         Task.FromResult<GetListResponse<GetListCreditApplicationListItemDto>?>(null);
+
+    public Task<CreditApplicationFacetsResponse?> GetFacetsAsync(
+        CreditApplicationSearchQuery query,
+        CancellationToken cancellationToken = default) =>
+        Task.FromResult<CreditApplicationFacetsResponse?>(null);
 }

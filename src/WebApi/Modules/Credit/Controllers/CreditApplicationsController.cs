@@ -8,6 +8,7 @@ using Application.Modules.Credit.Features.CreditApplications.Commands.Delete;
 using Application.Modules.Credit.Features.CreditApplications.Commands.Reject;
 using Application.Modules.Credit.Features.CreditApplications.Commands.Update;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetById;
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetFacets;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetList;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetPaymentPlan;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetPaymentPlanExport;
@@ -36,6 +37,9 @@ public class CreditApplicationsController : BaseController
         [FromQuery] string? status,
         [FromQuery] bool? missingRequiredDocumentsOnly,
         [FromQuery] string? searchText,
+        [FromQuery] string? currencyCode,
+        [FromQuery] decimal? amountMin,
+        [FromQuery] decimal? amountMax,
         [FromQuery] string? sortBy,
         [FromQuery] bool sortDesc = false)
     {
@@ -51,10 +55,42 @@ public class CreditApplicationsController : BaseController
             Status = parsedStatus,
             MissingRequiredDocumentsOnly = missingRequiredDocumentsOnly,
             SearchText = searchText,
+            CurrencyCode = currencyCode,
+            AmountMin = amountMin,
+            AmountMax = amountMax,
             SortBy = sortBy,
             SortDesc = sortDesc
         };
         GetListResponse<GetListCreditApplicationListItemDto> response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
+    /// <summary>Manager/SuperAdmin facet aggregations (ES preferred; SQL GroupBy fallback).</summary>
+    [HttpGet("facets")]
+    public async Task<IActionResult> GetFacets(
+        [FromQuery] Guid? branchId,
+        [FromQuery] string? status,
+        [FromQuery] bool? missingRequiredDocumentsOnly,
+        [FromQuery] string? searchText,
+        [FromQuery] string? currencyCode,
+        [FromQuery] decimal? amountMin,
+        [FromQuery] decimal? amountMax)
+    {
+        CreditApplicationStatus? parsedStatus = null;
+        if (!string.IsNullOrWhiteSpace(status))
+            parsedStatus = CreditApplicationStatus.FromName(status, ignoreCase: true);
+
+        CreditApplicationFacetsResponse response = await Mediator.Send(
+            new GetCreditApplicationFacetsRequest
+            {
+                BranchId = branchId,
+                Status = parsedStatus,
+                MissingRequiredDocumentsOnly = missingRequiredDocumentsOnly,
+                SearchText = searchText,
+                CurrencyCode = currencyCode,
+                AmountMin = amountMin,
+                AmountMax = amountMax
+            });
         return Ok(response);
     }
 

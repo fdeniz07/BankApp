@@ -1,4 +1,5 @@
 using Application.Modules.Credit.Features.CreditApplicationDocuments;
+using Application.Modules.Credit.Features.CreditApplications.Queries.GetFacets;
 using Application.Modules.Credit.Features.CreditApplications.Queries.GetList;
 using Application.Services.Repositories;
 using Application.Services.Search;
@@ -6,6 +7,9 @@ using Core.Application.Responses;
 using Domain.Entities;
 using Domain.Enums;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Clients.Elasticsearch.Aggregations;
+using Elastic.Clients.Elasticsearch.Mapping;
+using Elastic.Clients.Elasticsearch.QueryDsl;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
@@ -52,7 +56,30 @@ public sealed class ElasticCreditApplicationSearchService : ICreditApplicationSe
         if (exists.Exists)
             return;
 
-        var created = await _client.Indices.CreateAsync(IndexName, cancellationToken);
+        var created = await _client.Indices.CreateAsync(IndexName, c => c
+            .Mappings(m => m
+                .Properties(new Properties
+                {
+                    { "id", new KeywordProperty() },
+                    { "applicationNumber", new TextProperty { Fields = new Properties { { "keyword", new KeywordProperty() } } } },
+                    { "status", new KeywordProperty() },
+                    { "branchId", new KeywordProperty() },
+                    { "customerId", new KeywordProperty() },
+                    { "creditSubTypeId", new KeywordProperty() },
+                    { "creditSubTypeName", new TextProperty { Fields = new Properties { { "keyword", new KeywordProperty() } } } },
+                    { "currencyCode", new KeywordProperty() },
+                    { "interestRate", new DoubleNumberProperty() },
+                    { "requestedAmount", new DoubleNumberProperty() },
+                    { "requestedTermMonths", new IntegerNumberProperty() },
+                    { "notes", new TextProperty() },
+                    { "purpose", new TextProperty() },
+                    { "decisionBy", new TextProperty { Fields = new Properties { { "keyword", new KeywordProperty() } } } },
+                    { "decisionBranchCode", new KeywordProperty() },
+                    { "missingRequiredDocuments", new BooleanProperty() },
+                    { "applicationDate", new DateProperty() },
+                    { "updatedDate", new DateProperty() }
+                })), cancellationToken);
+
         if (!created.IsValidResponse)
             _logger.LogWarning("Elasticsearch index create issue: {Error}", created.DebugInformation);
     }
@@ -123,47 +150,33 @@ public sealed class ElasticCreditApplicationSearchService : ICreditApplicationSe
         CreditApplicationSearchQuery query,
         CancellationToken cancellationToken = default)
     {
-        if (!IsAvailable || string.IsNullOrWhiteSpace(query.Text))
+        if (!IsAvailable)
+            return null;
+
+        bool hasText = !string.IsNullOrWhiteSpace(query.Text);
+        bool hasFilters = !string.IsNullOrWhiteSpace(query.Status)
+            || query.BranchId.HasValue
+            || query.RequiredBranchScope.HasValue
+            || query.MissingRequiredDocumentsOnly == true
+            || !string.IsNullOrWhiteSpace(query.CurrencyCode)
+            || query.AmountMin.HasValue
+            || query.AmountMax.HasValue;
+
+        if (!hasText && !hasFilters)
             return null;
 
         try
         {
             await EnsureIndexAsync(cancellationToken);
 
-            string text = query.Text.Trim();
-            string? branchScope = query.RequiredBranchScope?.ToString()
-                ?? (query.AllowCrossBranchFilters ? query.BranchId?.ToString() : null);
-            string? status = query.Status;
-            bool missingOnly = query.MissingRequiredDocumentsOnly == true;
-
             int from = Math.Max(query.PageIndex, 0) * Math.Max(query.PageSize, 1);
+            BoolQuery boolQuery = BuildBoolQuery(query);
 
             SearchResponse<CreditApplicationSearchDocument> response =
                 await _client.SearchAsync<CreditApplicationSearchDocument>(s =>
                 {
                     s.Index(IndexName).From(from).Size(query.PageSize);
-                    s.Query(q => q.Bool(b =>
-                    {
-                        b.Must(m => m.MultiMatch(mm => mm
-                            .Query(text)
-                            .Fields(new[]
-                            {
-                                "applicationNumber^3",
-                                "creditSubTypeName^2",
-                                "notes",
-                                "purpose",
-                                "decisionBy",
-                                "decisionBranchCode"
-                            })
-                            .Fuzziness(new Fuzziness("AUTO"))));
-
-                        if (!string.IsNullOrEmpty(branchScope))
-                            b.Filter(f => f.Term(t => t.Field(new Field("branchId")).Value(branchScope)));
-                        if (!string.IsNullOrEmpty(status))
-                            b.Filter(f => f.Term(t => t.Field(new Field("status")).Value(status)));
-                        if (missingOnly)
-                            b.Filter(f => f.Term(t => t.Field(new Field("missingRequiredDocuments")).Value(true)));
-                    }));
+                    s.Query(q => q.Bool(boolQuery));
                 }, cancellationToken);
 
             if (!response.IsValidResponse)
@@ -192,6 +205,172 @@ public sealed class ElasticCreditApplicationSearchService : ICreditApplicationSe
             _logger.LogWarning(ex, "Elasticsearch search unavailable; caller should fall back to SQL");
             return null;
         }
+    }
+
+    public async Task<CreditApplicationFacetsResponse?> GetFacetsAsync(
+        CreditApplicationSearchQuery query,
+        CancellationToken cancellationToken = default)
+    {
+        if (!IsAvailable)
+            return null;
+
+        try
+        {
+            await EnsureIndexAsync(cancellationToken);
+            BoolQuery boolQuery = BuildBoolQuery(query);
+
+            var ranges = CreditApplicationAmountBuckets.Ranges
+                .Select(r => new AggregationRange
+                {
+                    From = (double)r.From,
+                    To = r.To.HasValue ? (double)r.To.Value : null
+                })
+                .ToList();
+
+            SearchResponse<CreditApplicationSearchDocument> response =
+                await _client.SearchAsync<CreditApplicationSearchDocument>(s =>
+                {
+                    s.Index(IndexName).Size(0);
+                    s.Query(q => q.Bool(boolQuery));
+                    s.Aggregations(a =>
+                    {
+                        a.Add("statuses", agg => agg.Terms(t => t.Field("status").Size(20)));
+                        a.Add("branches", agg => agg.Terms(t => t.Field("branchId").Size(50)));
+                        a.Add("currencies", agg => agg.Terms(t => t.Field("currencyCode").Size(20)));
+                        a.Add("missingDocs", agg => agg.Terms(t => t.Field("missingRequiredDocuments").Size(2)));
+                        a.Add("amounts", agg => agg.Range(r => r.Field("requestedAmount").Ranges(ranges.ToArray())));
+                        return a;
+                    });
+                }, cancellationToken);
+
+            if (!response.IsValidResponse || response.Aggregations is null)
+            {
+                _logger.LogWarning("Elasticsearch facets failed: {Info}", response.DebugInformation);
+                return null;
+            }
+
+            CreditApplicationFacetsResponse result = new() { Source = "Elasticsearch" };
+
+            if (response.Aggregations.TryGetValue("statuses", out IAggregate? statusAgg)
+                && statusAgg is StringTermsAggregate statusTerms)
+            {
+                result.Statuses = statusTerms.Buckets
+                    .Select(b => new FacetBucketDto { Key = b.Key.ToString(), Count = b.DocCount })
+                    .ToList();
+            }
+
+            if (response.Aggregations.TryGetValue("branches", out IAggregate? branchAgg)
+                && branchAgg is StringTermsAggregate branchTerms)
+            {
+                result.Branches = branchTerms.Buckets
+                    .Select(b => new FacetBucketDto { Key = b.Key.ToString(), Count = b.DocCount })
+                    .ToList();
+            }
+
+            if (response.Aggregations.TryGetValue("currencies", out IAggregate? currencyAgg)
+                && currencyAgg is StringTermsAggregate currencyTerms)
+            {
+                result.Currencies = currencyTerms.Buckets
+                    .Select(b => new FacetBucketDto { Key = b.Key.ToString(), Count = b.DocCount })
+                    .ToList();
+            }
+
+            if (response.Aggregations.TryGetValue("missingDocs", out IAggregate? missingAgg))
+            {
+                if (missingAgg is LongTermsAggregate longTerms)
+                {
+                    foreach (LongTermsBucket b in longTerms.Buckets)
+                    {
+                        if (b.Key == 1) result.MissingRequiredDocuments.True = b.DocCount;
+                        else if (b.Key == 0) result.MissingRequiredDocuments.False = b.DocCount;
+                    }
+                }
+                else if (missingAgg is StringTermsAggregate stringTerms)
+                {
+                    foreach (StringTermsBucket b in stringTerms.Buckets)
+                    {
+                        string key = b.Key.ToString();
+                        if (key is "true" or "1") result.MissingRequiredDocuments.True = b.DocCount;
+                        else if (key is "false" or "0") result.MissingRequiredDocuments.False = b.DocCount;
+                    }
+                }
+            }
+
+            if (response.Aggregations.TryGetValue("amounts", out IAggregate? amountAgg)
+                && amountAgg is RangeAggregate rangeAgg)
+            {
+                result.AmountBuckets = rangeAgg.Buckets
+                    .Select(b => new AmountBucketDto
+                    {
+                        From = (decimal)(b.From ?? 0),
+                        To = b.To.HasValue ? (decimal)b.To.Value : null,
+                        Count = b.DocCount
+                    })
+                    .ToList();
+            }
+
+            return result;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Elasticsearch facets unavailable; caller should fall back to SQL");
+            return null;
+        }
+    }
+
+    private static BoolQuery BuildBoolQuery(CreditApplicationSearchQuery query)
+    {
+        List<Query> must = [];
+        List<Query> filter = [];
+
+        if (!string.IsNullOrWhiteSpace(query.Text))
+        {
+            string text = query.Text.Trim();
+            must.Add(new MultiMatchQuery
+            {
+                Query = text,
+                Fields = new[]
+                {
+                    "applicationNumber^3",
+                    "creditSubTypeName^2",
+                    "notes",
+                    "purpose",
+                    "decisionBy",
+                    "decisionBranchCode"
+                },
+                Fuzziness = new Fuzziness("AUTO")
+            });
+        }
+
+        string? branchScope = query.RequiredBranchScope?.ToString()
+            ?? (query.AllowCrossBranchFilters ? query.BranchId?.ToString() : null);
+        if (!string.IsNullOrEmpty(branchScope))
+            filter.Add(new TermQuery(new Field("branchId")) { Value = branchScope });
+
+        if (!string.IsNullOrEmpty(query.Status))
+            filter.Add(new TermQuery(new Field("status")) { Value = query.Status });
+
+        if (query.MissingRequiredDocumentsOnly == true)
+            filter.Add(new TermQuery(new Field("missingRequiredDocuments")) { Value = true });
+
+        if (!string.IsNullOrWhiteSpace(query.CurrencyCode))
+            filter.Add(new TermQuery(new Field("currencyCode")) { Value = query.CurrencyCode.Trim().ToUpperInvariant() });
+
+        if (query.AmountMin.HasValue || query.AmountMax.HasValue)
+        {
+            var nr = new NumberRangeQuery(new Field("requestedAmount"));
+            if (query.AmountMin.HasValue)
+                nr.Gte = (double)query.AmountMin.Value;
+            if (query.AmountMax.HasValue)
+                nr.Lt = (double)query.AmountMax.Value;
+            filter.Add(nr);
+        }
+
+        return new BoolQuery
+        {
+            Must = must.Count > 0 ? must : null,
+            Filter = filter.Count > 0 ? filter : null
+        };
     }
 
     private async Task<CreditApplicationSearchDocument> BuildDocumentAsync(
