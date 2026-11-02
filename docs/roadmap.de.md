@@ -37,6 +37,7 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 - [x] Dokumenten-Upload beim Kreditantrag (Lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft-Genehmigungs-Gate (`SoftApproveGateEnabled`; in Development aus) + fehlende-Unterlagen-Badge/Filter/Listen-Preset
 - [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, Basis Hard) + positionsbasierte Genehmigungsbefugnis (DoA)
+- [x] Filial-Obergrenze (`Branch.MaxApprovalAmount`); effektiv = min(Position, Filiale)
 - [x] Entscheidungsbrief-Vorlagen-CRUD (Benutzer); Systemvorlagen folgen der UI-Sprache
 - [x] BankManager: Kreditarten anlegen / aktivieren-deaktivieren; Kunden-Löschregeln
 

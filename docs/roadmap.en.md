@@ -37,6 +37,7 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 - [x] Credit application document upload (lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft approve gate config (`SoftApproveGateEnabled`; off in Development) + missing-docs badge/filter/list preset
 - [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, base Hard) + position-based approval authority (DoA)
+- [x] Branch approval ceiling (`Branch.MaxApprovalAmount`); effective = min(position, branch)
 - [x] Decision letter template CRUD (user); system templates follow UI language
 - [x] BankManager credit type create / activate-deactivate; customer delete rules
 

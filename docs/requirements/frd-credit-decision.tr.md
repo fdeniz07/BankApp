@@ -4,7 +4,7 @@
 |------|--------|
 | Üst BRD | [brd.tr.md](brd.tr.md) — BR-CR-07, BR-CR-08 |
 | Modüller | Credit (Application / WebApi / client) |
-| Son güncelleme | 2026-11-01 |
+| Son güncelleme | 2026-11-02 |
 
 ---
 
@@ -64,11 +64,13 @@ Zorunlu tipler: `IdentityDocument`, `IncomeProof` (`RequiredCreditDocuments`).
 | Durum | Davranış |
 |--------|----------|
 | `Enabled: false` | Limit yok (Development varsayılanı) |
-| Rol `UnlimitedRoles` içinde | Limit yok (`maxApprovalAmount: null`) |
-| Pozisyon limit tablosunda | Tavan = değer; aşım → hata |
-| Pozisyon yok / tanımsız | Tavan = 0 → pratikte onay engeli |
+| Rol `UnlimitedRoles` içinde | Limit yok (`maxApprovalAmount: null`); şube tavanı da bypass |
+| Pozisyon limit tablosunda | PositionMax = değer |
+| `Branch.MaxApprovalAmount` dolu | BranchMax = değer; AppliedMax = `min(PositionMax, BranchMax)` |
+| Şube tavanı null / ≤0 | Yalnızca pozisyon tavanı |
+| Pozisyon yok / tanımsız | PositionMax = 0 → pratikte onay engeli |
 
-Development: `Enabled: false`.
+Development: `Enabled: false`. Şube tavanı SuperAdmin `Branches` API/UI ile yönetilir.
 
 ---
 
@@ -83,7 +85,9 @@ Yanıt (camelCase):
 | `approveGateMode` | string | `None` \| `Soft` \| `Hard` |
 | `softApproveGateEnabled` | bool | `mode == Soft` (geriye dönük) |
 | `approvalAuthorityEnabled` | bool | Options.Enabled |
-| `maxApprovalAmount` | number \| null | Bu kullanıcı için tavan; null = sınırsız / kapalı |
+| `maxApprovalAmount` | number \| null | AppliedMax; null = sınırsız / kapalı |
+| `positionMaxApprovalAmount` | number \| null | Pozisyon tavanı (bilgi) |
+| `branchMaxApprovalAmount` | number \| null | Şube tavanı (bilgi) |
 
 ### 3.2 `POST .../Approve` (mevcut)
 
@@ -100,7 +104,7 @@ Ek kontroller (sırayla, mevcut kurallardan sonra):
 |--------|----------|
 | Soft + eksik evrak | Sarı uyarı; onayda ekstra confirm |
 | Hard + eksik evrak | Kırmızı mesaj; submit disabled |
-| DoA açık | Limit metni; aşımda kırmızı mesaj + submit disabled |
+| DoA açık | Limit metni + pozisyon/şube → uygulanır kırılımı; aşımda kırmızı + submit disabled |
 | API hata mesajı | Mevcut `mapApiError` / toast |
 
 ---
@@ -110,8 +114,9 @@ Ek kontroller (sırayla, mevcut kurallardan sonra):
 - [ ] Development: Soft confirm çalışır; Hard blok uygulanmaz; DoA kapalıyken yüksek tutar onaylanır  
 - [ ] Base config (veya test override): Hard’da evraksız Approve 400/iş kuralı  
 - [ ] CreditAnalyst limiti aşımında Approve reddedilir; BankManager aşabilir  
-- [ ] Unit: Hard missing docs + authority exceeded  
-- [ ] `GET .../config` staff oturumunda doğru mode/limit döner  
+- [ ] Şube tavanı pozisyondan düşükse Approve o tavana göre reddedilir  
+- [ ] Unit: Hard missing docs + authority exceeded + branch min  
+- [ ] `GET .../config` staff oturumunda doğru mode/limit/kırılım döner  
 
 ---
 
@@ -120,6 +125,7 @@ Ek kontroller (sırayla, mevcut kurallardan sonra):
 - Options: `CreditDocumentsOptions`, `ApprovalAuthorityOptions`
 - Evaluate: `ApprovalAuthorityEvaluator`
 - Handler: `ApproveCreditApplicationRequestHandler`
+- Entity: `Branch.MaxApprovalAmount`
 - Controller: `CreditDocumentsController.GetConfig`
-- Client: `creditDocumentsConfigApi.ts`, `ApplicationDetailPage.tsx`
+- Client: `creditDocumentsConfigApi.ts`, `ApplicationDetailPage.tsx`, `BranchesPage.tsx`
 - Learning: [30-approve-gate-authority.tr.md](../learning/30-approve-gate-authority.tr.md)

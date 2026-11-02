@@ -5,7 +5,7 @@
 | Ürün | BankApp — eğitim / kurumsal lab bankacılık uygulaması |
 | Durum | Canlı (lab); Continuous documentation |
 | Dil | Türkçe (birincil) |
-| Son güncelleme | 2026-11-01 |
+| Son güncelleme | 2026-11-02 |
 | İlgili | [roadmap](../roadmap.tr.md) · [history](../history.tr.md) · [FRD kredi kararı](frd-credit-decision.tr.md) |
 
 ---
@@ -97,7 +97,7 @@ Durum: **Yapıldı** | **Kısmi** | **Planlı**
 | BR-BR-01 | Şube entity; personel/müşteri/başvuru BranchId | Yapıldı |
 | BR-BR-02 | Liste ve modify şube guard; SuperAdmin tüm şubeler | Yapıldı |
 | BR-BR-03 | Demo şubeler (IST/ANK/NYC/CHI/BER vb.) | Yapıldı |
-| BR-BR-04 | Şube tavan onay tutarı (Branch.MaxApprovalAmount) | Planlı (sonraki) |
+| BR-BR-04 | Şube tavan onay tutarı (Branch.MaxApprovalAmount); efektif = min(pozisyon, şube) | Tamamlandı |
 
 ### 3.5 Bildirim ve gerçek zamanlı
 
@@ -180,3 +180,4 @@ Ayrıntılı davranış: [frd-credit-decision.tr.md](frd-credit-decision.tr.md).
 | Tarih | Değişiklik |
 |-------|------------|
 | 2026-11-01 | İlk tam BRD; BR-CR-07/08 (evrak kapısı + DoA) eklendi |
+| 2026-11-02 | BR-BR-04 şube tavanı tamamlandı; efektif = min(pozisyon, şube) |

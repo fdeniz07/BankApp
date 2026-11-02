@@ -10,7 +10,7 @@
 
 ## Bu projede ne işe yarar?
 
-- Tablo `Branches` (Code, Name, City, IsActive).
+- Tablo `Branches` (Code, Name, City, IsActive, MaxApprovalAmount — isteğe bağlı DoA şube tavanı; ayrıntı [30](30-approve-gate-authority.tr.md)).
 - `ApplicationUser.BranchId` — demo staff seed ile atanır.
 - Onay/red → `DecisionBranchCode` / `DecisionBranchName` başvuru üzerinde.
 - API: `GET /api/Branches`; personel listesi / profil / başvuru detayında görünür.

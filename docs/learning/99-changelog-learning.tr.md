@@ -26,3 +26,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-01 | `31`: ELK Compose (ES+Logstash+Kibana), başvuru canlı arama, Seq ile yan yana |
 | 2026-11-01 | `21`: CI NuGet `actions/cache` (csproj hash); npm cache zaten vardı |
 | 2026-11-01 | `21`: `actions/cache` **v5** (Node 20 deprecation uyarısı) |
+| 2026-11-02 | `30`: `Branch.MaxApprovalAmount` + efektif `min(pozisyon, şube)`; config kırılımı; şube CRUD UI |
