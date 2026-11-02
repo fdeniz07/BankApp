@@ -1,0 +1,5 @@
+/* Tailwind v4 — preflight off so legacy index.css layout stays intact. */
+@layer theme, base, components, utilities;
+
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
