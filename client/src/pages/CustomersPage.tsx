@@ -7,16 +7,19 @@ import {
   createIndividualCustomer,
   getCorporateCustomerCatalog,
   getCorporateCustomers,
+  getCustomerFacets,
   getIndividualCustomers,
   type CustomerListScope,
 } from '../api/customersApi'
 import { useAuth } from '../auth/AuthContext'
+import { BranchFilter } from '../components/BranchFilter'
 import { SuggestInput } from '../components/SuggestInput'
 import type {
   CorporateCustomerCatalog,
   CorporateCustomerListItem,
   CreateCorporateCustomerRequest,
   CreateIndividualCustomerRequest,
+  CustomerFacets,
   Gender,
   GetListResponse,
   IndividualCustomerListItem,
@@ -74,10 +77,14 @@ function currentLocale(lang: string): 'tr' | 'en' | 'de' {
 
 export function CustomersPage() {
   const { t, i18n } = useTranslation()
-  const { isStaff } = useAuth()
+  const { isStaff, isManager } = useAuth()
   const [category, setCategory] = useState<CategoryTab>('Individual')
   const [scope, setScope] = useState<CustomerListScope>('active')
   const [pageIndex, setPageIndex] = useState(0)
+  const [branchFilter, setBranchFilter] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [facets, setFacets] = useState<CustomerFacets | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
@@ -94,13 +101,14 @@ export function CustomersPage() {
     if (!isStaff) return Promise.resolve()
     setLoading(true)
     setError(null)
+    const branchId = branchFilter || null
     const loader =
       category === 'Individual'
-        ? getIndividualCustomers(scope, pageIndex, 10).then((res) => {
+        ? getIndividualCustomers(scope, pageIndex, 10, branchId, search).then((res) => {
             setIndividualData(res)
             setCorporateData(null)
           })
-        : getCorporateCustomers(scope, pageIndex, 10).then((res) => {
+        : getCorporateCustomers(scope, pageIndex, 10, branchId, search).then((res) => {
             setCorporateData(res)
             setIndividualData(null)
           })
@@ -112,11 +120,35 @@ export function CustomersPage() {
         toast.error(message)
       })
       .finally(() => setLoading(false))
-  }, [category, scope, pageIndex, isStaff, t])
+  }, [category, scope, pageIndex, branchFilter, search, isStaff, t])
 
   useEffect(() => {
     void loadList()
   }, [loadList])
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => setSearch(searchInput.trim()), 350)
+    return () => window.clearTimeout(handle)
+  }, [searchInput])
+
+  useEffect(() => {
+    setPageIndex(0)
+  }, [search, branchFilter, category, scope])
+
+  useEffect(() => {
+    if (!isManager) {
+      setFacets(null)
+      return
+    }
+    void getCustomerFacets({
+      kind: category,
+      scope,
+      branchId: branchFilter || null,
+      search: search || null,
+    })
+      .then(setFacets)
+      .catch(() => setFacets(null))
+  }, [isManager, category, scope, branchFilter, search])
 
   useEffect(() => {
     if (!isStaff || !showCreate || category !== 'Corporate') return
@@ -255,6 +287,59 @@ export function CustomersPage() {
           </button>
         ))}
       </div>
+
+      <div className="staff-filters">
+        <label className="staff-search">
+          {t('customers.search')}
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder={t('customers.searchPlaceholder')}
+            autoComplete="off"
+          />
+        </label>
+        <BranchFilter value={branchFilter} onChange={setBranchFilter} allowAll />
+      </div>
+
+      {isManager && facets && (
+        <section className="facet-panel" aria-label={t('customers.facetsTitle')}>
+          <div className="facet-panel-header">
+            <strong>{t('customers.facetsTitle')}</strong>
+            <span className="muted">
+              {t('customers.facetsSource', { source: facets.source })}
+            </span>
+            {branchFilter && (
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setBranchFilter('')}
+              >
+                {t('customers.facetsClear')}
+              </button>
+            )}
+          </div>
+          {facets.branches.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('customers.facetsBranch')}</span>
+              <div className="chip-row">
+                {facets.branches.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    className={`chip-btn${branchFilter === b.key ? ' active' : ''}`}
+                    onClick={() =>
+                      setBranchFilter((prev) => (prev === b.key ? '' : b.key))
+                    }
+                  >
+                    {b.label || b.key} ({b.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {showCreate && category === 'Individual' && (
         <form className="form create-panel" onSubmit={onCreateIndividual}>
@@ -546,6 +631,7 @@ export function CustomersPage() {
                   <th>{t('customers.name')}</th>
                   <th>{t('login.email')}</th>
                   <th>{t('profile.phone')}</th>
+                  <th>{t('profile.branch')}</th>
                   <th>{t('customers.active')}</th>
                   <th>{t('common.actions')}</th>
                 </tr>
@@ -560,6 +646,13 @@ export function CustomersPage() {
                       </td>
                       <td>{row.email}</td>
                       <td>{row.phoneNumber}</td>
+                      <td>
+                        {row.branchCode || row.branchName
+                          ? `${row.branchCode ?? ''}${
+                              row.branchCode && row.branchName ? ' · ' : ''
+                            }${row.branchName ?? ''}`
+                          : '—'}
+                      </td>
                       <td>{row.isActive ? t('common.yes') : t('common.no')}</td>
                       <td>
                         <Link
@@ -578,6 +671,13 @@ export function CustomersPage() {
                       <td>{row.companyName}</td>
                       <td>{row.email}</td>
                       <td>{row.phoneNumber}</td>
+                      <td>
+                        {row.branchCode || row.branchName
+                          ? `${row.branchCode ?? ''}${
+                              row.branchCode && row.branchName ? ' · ' : ''
+                            }${row.branchName ?? ''}`
+                          : '—'}
+                      </td>
                       <td>{row.isActive ? t('common.yes') : t('common.no')}</td>
                       <td>
                         <Link

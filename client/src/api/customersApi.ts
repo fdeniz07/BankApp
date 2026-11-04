@@ -4,6 +4,7 @@ import type {
   CorporateCustomerListItem,
   CreateCorporateCustomerRequest,
   CreateIndividualCustomerRequest,
+  CustomerFacets,
   GetListResponse,
   IndividualCustomerDetail,
   IndividualCustomerListItem,
@@ -18,12 +19,14 @@ function listPath(
   pageIndex: number,
   pageSize: number,
   branchId?: string | null,
+  search?: string | null,
 ) {
   const qs = new URLSearchParams({
     PageIndex: String(pageIndex),
     PageSize: String(pageSize),
   })
   if (branchId) qs.set('branchId', branchId)
+  if (search?.trim()) qs.set('search', search.trim())
   if (scope === 'active') {
     qs.set('isActive', 'true')
     return `${base}?${qs}`
@@ -37,9 +40,10 @@ export function getIndividualCustomers(
   pageIndex = 0,
   pageSize = 10,
   branchId?: string | null,
+  search?: string | null,
 ) {
   return apiRequest<GetListResponse<IndividualCustomerListItem>>(
-    listPath('/api/IndividualCustomers', scope, pageIndex, pageSize, branchId),
+    listPath('/api/IndividualCustomers', scope, pageIndex, pageSize, branchId, search),
   )
 }
 
@@ -48,14 +52,38 @@ export function getCorporateCustomers(
   pageIndex = 0,
   pageSize = 10,
   branchId?: string | null,
+  search?: string | null,
 ) {
   return apiRequest<GetListResponse<CorporateCustomerListItem>>(
-    listPath('/api/CorporateCustomers', scope, pageIndex, pageSize, branchId),
+    listPath('/api/CorporateCustomers', scope, pageIndex, pageSize, branchId, search),
   )
+}
+
+export function getCustomerFacets(params: {
+  kind: 'Individual' | 'Corporate'
+  scope: CustomerListScope
+  branchId?: string | null
+  search?: string | null
+}) {
+  const qs = new URLSearchParams({ kind: params.kind })
+  if (params.branchId) qs.set('branchId', params.branchId)
+  if (params.search?.trim()) qs.set('search', params.search.trim())
+  if (params.scope === 'active') qs.set('isActive', 'true')
+  else if (params.scope === 'inactive') qs.set('isActive', 'false')
+  else qs.set('onlyDeleted', 'true')
+  return apiRequest<CustomerFacets>(`/api/Customers/facets?${qs}`)
 }
 
 export function getIndividualCustomer(id: string) {
   return apiRequest<IndividualCustomerDetail>(`/api/IndividualCustomers/${id}`)
+}
+
+export function getCorporateCustomer(id: string) {
+  return apiRequest<CorporateCustomerDetail>(`/api/CorporateCustomers/${id}`)
+}
+
+export function getCorporateCustomerCatalog() {
+  return apiRequest<CorporateCustomerCatalog>('/api/CorporateCustomers/catalog')
 }
 
 export function createIndividualCustomer(body: CreateIndividualCustomerRequest) {
@@ -76,14 +104,6 @@ export function deleteIndividualCustomer(id: string) {
   return apiRequest<IndividualCustomerDetail>(`/api/IndividualCustomers/${id}`, {
     method: 'DELETE',
   })
-}
-
-export function getCorporateCustomer(id: string) {
-  return apiRequest<CorporateCustomerDetail>(`/api/CorporateCustomers/${id}`)
-}
-
-export function getCorporateCustomerCatalog() {
-  return apiRequest<CorporateCustomerCatalog>('/api/CorporateCustomers/catalog')
 }
 
 export function createCorporateCustomer(body: CreateCorporateCustomerRequest) {
