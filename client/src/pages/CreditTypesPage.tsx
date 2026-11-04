@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import {
   createCreditType,
+  getCreditTypeFacets,
   getCreditTypes,
   setCreditTypeActive,
   type CreditTypeSortBy,
@@ -12,6 +13,7 @@ import { useAuth } from '../auth/AuthContext'
 import type {
   CreditCategory,
   CreditRiskLevel,
+  CreditTypeFacets,
   CreditTypeListItem,
   GetListResponse,
   LocaleCode,
@@ -44,6 +46,11 @@ export function CreditTypesPage() {
   const [data, setData] = useState<GetListResponse<CreditTypeListItem> | null>(null)
   const [localeFilter, setLocaleFilter] = useState<LocaleCode | ''>('')
   const [categoryFilter, setCategoryFilter] = useState<CreditCategory | ''>('')
+  const [currencyFilter, setCurrencyFilter] = useState<(typeof CURRENCIES)[number] | ''>('')
+  const [riskFilter, setRiskFilter] = useState<CreditRiskLevel | ''>('')
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
+  const [facets, setFacets] = useState<CreditTypeFacets | null>(null)
   const [sortBy, setSortBy] = useState<CreditTypeSortBy>('name')
   const [sortDesc, setSortDesc] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -60,6 +67,9 @@ export function CreditTypesPage() {
     return getCreditTypes(0, 50, {
       locale: localeFilter || undefined,
       category: categoryFilter || undefined,
+      search: search || undefined,
+      currencyCode: currencyFilter || undefined,
+      riskLevel: riskFilter || undefined,
       sortBy,
       sortDesc,
     })
@@ -69,11 +79,42 @@ export function CreditTypesPage() {
         toast.error(mapApiError(err, t))
       })
       .finally(() => setLoading(false))
-  }, [isStaff, t, localeFilter, categoryFilter, sortBy, sortDesc])
+  }, [
+    isStaff,
+    t,
+    localeFilter,
+    categoryFilter,
+    search,
+    currencyFilter,
+    riskFilter,
+    sortBy,
+    sortDesc,
+  ])
 
   useEffect(() => {
     void loadList()
   }, [loadList])
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => setSearch(searchInput.trim()), 350)
+    return () => window.clearTimeout(handle)
+  }, [searchInput])
+
+  useEffect(() => {
+    if (!isManager) {
+      setFacets(null)
+      return
+    }
+    void getCreditTypeFacets({
+      search: search || undefined,
+      locale: localeFilter || undefined,
+      category: categoryFilter || undefined,
+      currencyCode: currencyFilter || undefined,
+      riskLevel: riskFilter || undefined,
+    })
+      .then(setFacets)
+      .catch(() => setFacets(null))
+  }, [isManager, search, localeFilter, categoryFilter, currencyFilter, riskFilter])
 
   function toggleSort(column: CreditTypeSortBy) {
     if (sortBy === column) {
@@ -172,6 +213,46 @@ export function CreditTypesPage() {
               </select>
             </label>
           )}
+          <label className="filter-label search-label">
+            {t('creditTypes.search')}
+            <input
+              type="search"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={t('creditTypes.searchPlaceholder')}
+              autoComplete="off"
+            />
+          </label>
+          <label className="filter-label">
+            {t('creditTypes.currency')}
+            <select
+              value={currencyFilter}
+              onChange={(e) =>
+                setCurrencyFilter(e.target.value as (typeof CURRENCIES)[number] | '')
+              }
+            >
+              <option value="">{t('creditTypes.allCurrencies')}</option>
+              {CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="filter-label">
+            {t('creditTypes.risk')}
+            <select
+              value={riskFilter}
+              onChange={(e) => setRiskFilter(e.target.value as CreditRiskLevel | '')}
+            >
+              <option value="">{t('creditTypes.allRisks')}</option>
+              {RISKS.map((r) => (
+                <option key={r} value={r}>
+                  {t(`risk.${r}`)}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
       </div>
 
@@ -181,6 +262,75 @@ export function CreditTypesPage() {
           count,
         })}
       </p>
+
+      {isManager && facets && (
+        <section className="facet-panel" aria-label={t('creditTypes.facetsTitle')}>
+          <div className="facet-panel-header">
+            <strong>{t('creditTypes.facetsTitle')}</strong>
+            <span className="muted">
+              {t('creditTypes.facetsSource', { source: facets.source })}
+            </span>
+            {(localeFilter || categoryFilter || currencyFilter || riskFilter || search) && (
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => {
+                  setLocaleFilter('')
+                  setCategoryFilter('')
+                  setCurrencyFilter('')
+                  setRiskFilter('')
+                  setSearchInput('')
+                  setSearch('')
+                }}
+              >
+                {t('creditTypes.facetsClear')}
+              </button>
+            )}
+          </div>
+          {facets.currencies.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('creditTypes.facetsCurrency')}</span>
+              <div className="chip-row">
+                {facets.currencies.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    className={`chip-btn${currencyFilter === b.key ? ' active' : ''}`}
+                    onClick={() =>
+                      setCurrencyFilter((prev) =>
+                        prev === b.key ? '' : (b.key as (typeof CURRENCIES)[number]),
+                      )
+                    }
+                  >
+                    {b.key} ({b.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          {facets.riskLevels.length > 0 && (
+            <div className="facet-group">
+              <span className="facet-group-label">{t('creditTypes.facetsRisk')}</span>
+              <div className="chip-row">
+                {facets.riskLevels.map((b) => (
+                  <button
+                    key={b.key}
+                    type="button"
+                    className={`chip-btn${riskFilter === b.key ? ' active' : ''}`}
+                    onClick={() =>
+                      setRiskFilter((prev) =>
+                        prev === b.key ? '' : (b.key as CreditRiskLevel),
+                      )
+                    }
+                  >
+                    {t(`risk.${b.key}`, { defaultValue: b.key })} ({b.count})
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
 
       {isManager && showCreate && (
         <form className="panel form" onSubmit={onCreate}>
