@@ -170,7 +170,7 @@ Ayrıntılı davranış: [frd-credit-decision.tr.md](frd-credit-decision.tr.md).
 | Varsayım / risk | Not |
 |-----------------|-----|
 | Lab ≠ üretim bankası | Gateway, KVKK süreçleri, gerçek Vault HA yok |
-| Tutar limitleri ürün para birimiyle aynı kabul | Çok para birimli DoA yok |
+| DoA limitleri PB etiketli; eşleşmeyen PB’de uygulanmaz (FX yok) | Çapraz kur / çok-PB dönüşümü yok |
 | Hard kapı zorunlu tipleri sabit | Identity + IncomeProof (`RequiredCreditDocuments`) |
 
 ---

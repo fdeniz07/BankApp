@@ -10,18 +10,22 @@
 | **Logstash** | Veriyi alır (HTTP/TCP/Beats), dönüştürür, ES’e yazar |
 | **Kibana** | Index keşfi, Discover, dashboard UI |
 
-BankApp lab’de ELK **iki iş** için kullanılır:
+BankApp lab’de ELK **beş iş** için kullanılır:
 
 1. **Kredi başvurusu araması** (ürün read-model → ES; React canlı arama kutusu)  
-2. **Uygulama logları** (Serilog → Logstash HTTP → `bankapp-logs-*`; Kibana’da aranabilir)
+2. **Personel listesi araması** (`bankapp-staff`; şube / metin / yönetici filtresi; SQL fallback)  
+3. **Müşteri listesi** (`bankapp-customers`; şube / metin; facet şube sayaçları)  
+4. **Kredi türleri** (`bankapp-credit-types`; metin / locale / kategori / currency / risk + facets)  
+5. **Uygulama logları** (Serilog → Logstash HTTP → `bankapp-logs-*`; Kibana’da aranabilir)
 
 **Seq silinmedi.** Seq .NET yapısal log için hızlı lab UX’tir; ELK ise arama motoru + Kibana’dır. İkisi yan yana çalışır.
 
 ## Bu projede ne işe yarar?
 
-- Personel listesinde yazdıkça arama (`searchText`, ~300 ms debounce)
-- Staff: şube scoped; Manager/SuperAdmin: daha geniş filtre
-- **Manager/SuperAdmin facet paneli:** durum / şube / para birimi / eksik evrak / tutar aralığı sayaçları (`GET …/facets`; ES aggregations, SQL GroupBy fallback)
+- Başvuru listesinde yazdıkça arama (`searchText`, ~300 ms debounce)
+- **Personel sayfası:** `search` + `BranchFilter` + yönetici/aktif chip; SuperAdmin tüm şubeler
+- Staff başvuru listesi: şube scoped; Manager/SuperAdmin: daha geniş filtre
+- **Manager/SuperAdmin facet paneli (başvurular):** durum / şube / para birimi / eksik evrak / tutar aralığı (`GET …/facets`)
 - Liste tutar/para birimi filtresi (`amountMin`/`amountMax`/`currencyCode`)
 - ES kapalıysa SQL `Contains` / GroupBy fallback
 - Compose: `elasticsearch` :9200, `logstash` :8081/:50000, `kibana` :5601
@@ -34,7 +38,7 @@ Faz 6 — Soft/Hard kapı + DoA sonrasında (roadmap: personel GET araması).
 
 | Kavram | Anlam |
 |--------|--------|
-| Index | Tablo benzeri belge koleksiyonu (`bankapp-credit-applications`, `bankapp-logs-YYYY.MM.dd`) |
+| Index | Tablo benzeri belge koleksiyonu (`bankapp-credit-applications`, `bankapp-staff`, `bankapp-customers`, `bankapp-credit-types`, `bankapp-logs-YYYY.MM.dd`) |
 | Document | Tek JSON kayıt (başvuru veya log olayı) |
 | Mapping | Alan tipleri (text / keyword / date…) — lab’de index create’te keyword/boolean/number |
 | Query | `multi_match`, `term`, `bool` filtre, `range` (tutar) |
@@ -82,7 +86,7 @@ Beklenen: `status` green/yellow (tek düğümde yellow normal olabilir).
 curl.exe -s http://localhost:9200/_cat/indices?v
 ```
 
-WebApi ayağa kalkınca `bankapp-credit-applications` ve (log geldikçe) `bankapp-logs-*` görünür.
+WebApi ayağa kalkınca `bankapp-credit-applications`, `bankapp-staff`, `bankapp-customers`, `bankapp-credit-types` ve (log geldikçe) `bankapp-logs-*` görünür.
 
 ### Logstash’e test (TCP json_lines)
 
@@ -109,6 +113,15 @@ curl.exe -s "http://localhost:8080/api/CreditApplications?PageIndex=0&PageSize=1
   -H "Authorization: Bearer <token>"
 ```
 
+### Personel ES filtresi (SuperAdmin / Manager)
+
+```powershell
+curl.exe -s "http://localhost:8080/api/StaffUsers?PageIndex=0&PageSize=10&search=manager&isManager=true&branchId=<guid>" `
+  -H "Authorization: Bearer <superadmin-or-manager-token>"
+```
+
+Doğrula: şube / metin / `isManager` daraltması; ES yoksa SQL fallback. UI: Personel sayfası arama + şube select + rol chip’leri; düzenleme modal.
+
 ### Manager facet aggregations
 
 Yönetici JWT ile çalıştır. Ne yapar: aktif filtre bağlamında ES `terms`/`range` sayaçları döner (`source: Elasticsearch` veya SQL fallback).
@@ -125,10 +138,14 @@ Listeyi daraltmak: aynı parametreleri `GET /api/CreditApplications?amountMin=0&
 
 - `ElasticsearchOptions`, `LogstashOptions`
 - `ICreditApplicationSearchService` / `ElasticCreditApplicationSearchService` / `Null…`
+- `IStaffUserSearchService` / `ElasticStaffUserSearchService` / `NullStaffUserSearchService` (`StaffIndex`)
+- `ICustomerSearchService` / `ElasticCustomerSearchService` (`CustomersIndex`) + `GET /api/Customers/facets`
+- `ICreditTypeSearchService` / `ElasticCreditTypeSearchService` (`CreditTypesIndex`) + `GET /api/CreditTypes/facets`
 - `GetFacetsAsync`, `CreditApplicationAmountBuckets`, `GetCreditApplicationFacetsRequest`
 - `GetListCreditApplicationRequest.SearchText` / `AmountMin` / `AmountMax` / `CurrencyCode`
+- `GetListStaffUserRequest.Search` / `BranchId` / `IsManager`
 - NuGet: `Elastic.Clients.Elasticsearch`, `Serilog.Sinks.Http`, `Serilog.Sinks.Elasticsearch` (Logstash kapalıyken doğrudan ES)
-- Client: `ApplicationsPage` debounce + facet paneli (`isManager`) + `getApplicationFacets`
+- Client: `ApplicationsPage` / `StaffPage` / `CustomersPage` / `CreditTypesPage` arama + filtre + facet
 
 ## Repoda nerede?
 
@@ -136,27 +153,34 @@ Listeyi daraltmak: aynı parametreleri `GET /api/CreditApplications?amountMin=0&
 - `infra/logstash/pipeline/logstash.conf`
 - `infra/logstash/config/logstash.yml`
 - `src/WebApi/Modules/Credit/Search/`
+- `src/WebApi/Modules/Identity/Search/`
 - `src/Application/Services/Search/`
 - `src/Application/Modules/Credit/Features/CreditApplications/Queries/GetFacets/`
 - `src/Core/Logging/SerilogHostBuilderExtensions.cs`
-- `client/src/pages/ApplicationsPage.tsx`
+- `client/src/pages/ApplicationsPage.tsx`, `StaffPage.tsx`, `CustomersPage.tsx`, `CreditTypesPage.tsx`
 
 ## Mini akış
 
 1. Compose ES+Logstash+Kibana  
-2. WebApi start → `ReindexAllAsync` → başvurular index (keyword mapping)  
-3. Personel listede yazar → 300 ms sonra `searchText` → ES `multi_match` (yoksa SQL)  
-4. Manager facet chip → `GET /facets` aggregations → liste `amountMin`/`status`/… ile daralır  
-5. Serilog → Logstash HTTP → `bankapp-logs-*` → Kibana Discover  
+2. WebApi start → credit + staff + customers + credit-types `ReindexAllAsync`  
+3. Başvuru listede yazar → 300 ms sonra `searchText` → ES `multi_match` (yoksa SQL)  
+4. Personel: şube / arama / yönetici filtresi → `bankapp-staff` (yoksa SQL); Düzenle → modal  
+5. Müşteri: arama + BranchFilter → `bankapp-customers`; Manager şube facet  
+6. Kredi türü: arama + currency/risk (+ locale/category) → `bankapp-credit-types`; Manager facets  
+7. Manager facet chip → `GET /facets` aggregations → liste daralır  
+8. Serilog → Logstash HTTP → `bankapp-logs-*` → Kibana Discover  
 
 ## Where useful
 
 - [ ] `curl localhost:9200` cevap veriyor  
 - [ ] Kibana açılıyor; log data view oluşturulabiliyor  
-- [ ] Listede arama kutusu yazdıkça sonuç yenileniyor  
+- [ ] Başvuru listesinde arama kutusu yazdıkça sonuç yenileniyor  
+- [ ] Personel sayfasında şube + metin + yönetici filtresi; Düzenle modal ortada açılıyor  
+- [ ] Müşteri / kredi türü sayfalarında arama + filtre; Manager’da facet sayaçları  
 - [ ] Manager’da facet paneli sayaç gösteriyor; chip listeyi daraltıyor  
-- [ ] ES durunca liste + facets SQL fallback ile çalışıyor  
-- [ ] Staff şube dışı sonuç görmüyor; Staff facet panelini görmüyor  
+- [ ] ES durunca liste + facets + personel/müşteri/kredi türü SQL fallback ile çalışıyor  
+- [ ] Staff şube dışı başvuru sonucu görmüyor; Staff facet panelini görmüyor  
+
 
 ### Felaket / kurtarma (az yıkıcı → çok)
 

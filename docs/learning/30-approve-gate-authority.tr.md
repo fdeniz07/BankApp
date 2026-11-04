@@ -6,7 +6,7 @@
 
 1. **ApproveGateMode** — eksik kimlik/gelir için `None` / `Soft` / `Hard`
 2. **ApprovalAuthority** — personel pozisyonuna göre max onay tutarı
-3. **Branch.MaxApprovalAmount** — isteğe bağlı şube tavanı; efektif limit = `min(pozisyon, şube)`
+3. **Branch.MaxApprovalAmount + MaxApprovalCurrencyCode** — isteğe bağlı şube tavanı (PB etiketli); efektif = `min(pozisyon, şube)` yalnız **aynı para biriminde**
 
 ## Bu projede ne işe yarar?
 
@@ -23,7 +23,8 @@ Soft boolean kapıdan hemen sonra (Faz 6 UX / güvenlik).
 | Soft | Uyarı + confirm; API onaylar |
 | Hard | API + UI blok |
 | DoA | Delegation of authority — pozisyon + şube limiti |
-| AppliedMax | `min(PositionMax, BranchMax)` (set olanlar) |
+| AppliedMax | `min(PositionMax, BranchMax)` (set + PB eşleşenler); eşleşme yoksa `0` |
+| CurrencyCode | `ApprovalAuthority:CurrencyCode` (pozisyon); şube kendi `MaxApprovalCurrencyCode` |
 | UnlimitedRoles | BankManager / SuperAdmin — pozisyon ve şube tavanını bypass |
 
 ## Komutlar
@@ -36,7 +37,7 @@ curl.exe -s http://localhost:8080/api/CreditDocuments/config `
   -H "Authorization: Bearer <token>"
 ```
 
-Doğrulama: `approveGateMode`, `approvalAuthorityEnabled`, `maxApprovalAmount`, `positionMaxApprovalAmount`, `branchMaxApprovalAmount`.
+Doğrulama: `approveGateMode`, `approvalAuthorityEnabled`, `authorityCurrencyCode`, `maxApprovalAmount`, `positionMaxApprovalAmount` / `positionCurrencyCode`, `branchMaxApprovalAmount` / `branchCurrencyCode`. İsteğe bağlı `?currencyCode=EUR` başvuru PB’sine göre filtreler.
 
 Development’ta Soft’u Hard yapmak için `appsettings.Development.json` içinde `ApproveGateMode` değerini değiştirip API’yi yeniden başlatın.
 
@@ -48,7 +49,7 @@ Development’ta Soft’u Hard yapmak için `appsettings.Development.json` için
 - `CreditApplicationBusinessRules.ApprovedAmountShouldBeWithinApprovalAuthority`
 - `ApproveCreditApplicationRequestHandler`
 - `CreditDocumentsController.GetConfig`
-- `Branch.MaxApprovalAmount`, şube Create/Update/GetList
+- `Branch.MaxApprovalAmount` / `MaxApprovalCurrencyCode`, şube Create/Update/GetList
 
 ## Repoda nerede?
 
@@ -70,7 +71,9 @@ Personel detayı açar → `GET config` → Soft ise eksik evrakta confirm; Hard
 - [ ] Development Soft: evraksız onay confirm ile geçer
 - [ ] Hard override: evraksız Approve iş kuralı hatası
 - [ ] DoA Enabled + CreditAnalyst düşük limit: yüksek tutar reddedilir
-- [ ] Şube tavanı pozisyondan düşükse: efektif = şube; UI kırılımı doğru
+- [ ] Şube tavanı pozisyondan düşükse: efektif = şube; UI kırılımı doğru (+ PB sembolü)
+- [ ] Şube formu/tabloda para birimi seçilir/görünür
+- [ ] Başvuru PB’si şube/pozisyon PB’sinden farklıysa o kaynak “Bu para biriminde yok”; AppliedMax=0
 - [ ] Manager rolü: `maxApprovalAmount` null (şube tavanı bypass)
 
-Lab: limitler paket para birimiyle aynı kabul edilir (çok PB DoA yok).
+Lab: FX yok; PB etiketli tek-PB limitler.

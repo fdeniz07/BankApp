@@ -27,5 +27,9 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-01 | `21`: CI NuGet `actions/cache` (csproj hash); npm cache zaten vardı |
 | 2026-11-01 | `21`: `actions/cache` **v5** (Node 20 deprecation uyarısı) |
 | 2026-11-02 | `30`: `Branch.MaxApprovalAmount` + efektif `min(pozisyon, şube)`; config kırılımı; şube CRUD UI |
+| 2026-11-02 | `30`: Şube/pozisyon DoA para birimi (`MaxApprovalCurrencyCode`, `ApprovalAuthority:CurrencyCode`) |
 | 2026-11-02 | `31`: Manager/Admin ES facet paneli (terms + amount range aggregations; SQL fallback) |
 | 2026-11-02 | `32`: Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + gzip_static |
+| 2026-11-02 | `28`: Manager personel RBAC — başka manager’a dokunma yok; IsManager yalnız SuperAdmin (API + StaffPage) |
+| 2026-11-02 | `31`: Personel ES indeksi (`bankapp-staff`) + StaffPage şube/metin/rol filtre + düzenleme modal |
+| 2026-11-02 | `31`: Müşteri (`bankapp-customers`) + kredi türü (`bankapp-credit-types`) ES filtre/facet |
