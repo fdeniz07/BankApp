@@ -37,13 +37,18 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, C
         if (existing is not null)
             throw new BusinessException($"Branch code '{code}' already exists.");
 
+        (decimal? capAmount, string? capCurrency) = BranchApprovalCap.Normalize(
+            request.MaxApprovalAmount,
+            request.MaxApprovalCurrencyCode);
+
         Branch branch = new()
         {
             Code = code,
             Name = request.Name.Trim(),
             City = string.IsNullOrWhiteSpace(request.City) ? null : request.City.Trim(),
             IsActive = request.IsActive,
-            MaxApprovalAmount = request.MaxApprovalAmount is > 0 ? request.MaxApprovalAmount : null
+            MaxApprovalAmount = capAmount,
+            MaxApprovalCurrencyCode = capCurrency
         };
         await _branchRepository.AddAsync(branch, cancellationToken);
 
@@ -54,7 +59,14 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, C
             actorUserId: _currentUser.UserId,
             targetType: nameof(Branch),
             targetId: branch.Id,
-            changes: new { branch.Code, branch.Name, branch.City, branch.MaxApprovalAmount });
+            changes: new
+            {
+                branch.Code,
+                branch.Name,
+                branch.City,
+                branch.MaxApprovalAmount,
+                branch.MaxApprovalCurrencyCode
+            });
 
         return new CreatedBranchResponse
         {
@@ -63,7 +75,8 @@ public class CreateBranchRequestHandler : IRequestHandler<CreateBranchRequest, C
             Name = branch.Name,
             City = branch.City,
             IsActive = branch.IsActive,
-            MaxApprovalAmount = branch.MaxApprovalAmount
+            MaxApprovalAmount = branch.MaxApprovalAmount,
+            MaxApprovalCurrencyCode = branch.MaxApprovalCurrencyCode
         };
     }
 }

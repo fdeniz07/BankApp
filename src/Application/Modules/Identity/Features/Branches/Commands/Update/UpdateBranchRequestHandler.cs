@@ -43,11 +43,16 @@ public class UpdateBranchRequestHandler : IRequestHandler<UpdateBranchRequest, U
         if (duplicate is not null)
             throw new BusinessException($"Branch code '{code}' already exists.");
 
+        (decimal? capAmount, string? capCurrency) = BranchApprovalCap.Normalize(
+            request.MaxApprovalAmount,
+            request.MaxApprovalCurrencyCode);
+
         branch.Code = code;
         branch.Name = request.Name.Trim();
         branch.City = string.IsNullOrWhiteSpace(request.City) ? null : request.City.Trim();
         branch.IsActive = request.IsActive;
-        branch.MaxApprovalAmount = request.MaxApprovalAmount is > 0 ? request.MaxApprovalAmount : null;
+        branch.MaxApprovalAmount = capAmount;
+        branch.MaxApprovalCurrencyCode = capCurrency;
 
         await _branchRepository.UpdateAsync(branch, cancellationToken);
 
@@ -64,7 +69,8 @@ public class UpdateBranchRequestHandler : IRequestHandler<UpdateBranchRequest, U
                 branch.Name,
                 branch.City,
                 branch.IsActive,
-                branch.MaxApprovalAmount
+                branch.MaxApprovalAmount,
+                branch.MaxApprovalCurrencyCode
             });
 
         return new UpdatedBranchResponse
@@ -74,7 +80,8 @@ public class UpdateBranchRequestHandler : IRequestHandler<UpdateBranchRequest, U
             Name = branch.Name,
             City = branch.City,
             IsActive = branch.IsActive,
-            MaxApprovalAmount = branch.MaxApprovalAmount
+            MaxApprovalAmount = branch.MaxApprovalAmount,
+            MaxApprovalCurrencyCode = branch.MaxApprovalCurrencyCode
         };
     }
 }

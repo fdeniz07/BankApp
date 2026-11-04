@@ -9,7 +9,13 @@ public sealed class ApprovalAuthorityOptions
 
     public bool Enabled { get; set; }
 
-    /// <summary>Position name → max approved amount (same currency as application package).</summary>
+    /// <summary>
+    /// ISO currency for <see cref="LimitsByPosition"/> (no FX). Default TRY.
+    /// Position cap applies only when the application package uses this currency.
+    /// </summary>
+    public string CurrencyCode { get; set; } = "TRY";
+
+    /// <summary>Position name → max approved amount in <see cref="CurrencyCode"/>.</summary>
     public Dictionary<string, decimal> LimitsByPosition { get; set; } =
         new(StringComparer.OrdinalIgnoreCase);
 

@@ -8,4 +8,5 @@ public class GetListBranchListItemDto
     public string? City { get; set; }
     public bool IsActive { get; set; }
     public decimal? MaxApprovalAmount { get; set; }
+    public string? MaxApprovalCurrencyCode { get; set; }
 }

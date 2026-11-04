@@ -199,6 +199,11 @@ namespace Persistence.Migrations
                         .HasColumnType("decimal(18,2)")
                         .HasColumnName("MaxApprovalAmount");
 
+                    b.Property<string>("MaxApprovalCurrencyCode")
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)")
+                        .HasColumnName("MaxApprovalCurrencyCode");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(150)

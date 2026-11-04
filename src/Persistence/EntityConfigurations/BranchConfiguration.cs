@@ -18,6 +18,9 @@ public class BranchConfiguration : IEntityTypeConfiguration<Branch>
         builder.Property(b => b.MaxApprovalAmount)
             .HasColumnName("MaxApprovalAmount")
             .HasPrecision(18, 2);
+        builder.Property(b => b.MaxApprovalCurrencyCode)
+            .HasColumnName("MaxApprovalCurrencyCode")
+            .HasMaxLength(3);
         builder.Property(b => b.IsDeleted).HasColumnName("IsDeleted").IsRequired();
         builder.Property(b => b.CreatedDate).HasColumnName("CreatedDate").IsRequired();
         builder.Property(b => b.UpdatedDate).HasColumnName("UpdatedDate");

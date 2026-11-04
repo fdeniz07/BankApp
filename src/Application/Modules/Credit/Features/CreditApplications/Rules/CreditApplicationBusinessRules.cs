@@ -181,4 +181,22 @@ public class CreditApplicationBusinessRules : BaseBusinessRules
 
         return Task.CompletedTask;
     }
+
+    public async Task<string> ResolvePackageCurrencyCodeAsync(
+        Guid creditSubTypeId,
+        CancellationToken cancellationToken = default)
+    {
+        CreditSubType? creditSubType = await _creditSubTypeRepository.GetAsync(
+            c => c.Id == creditSubTypeId,
+            cancellationToken: cancellationToken);
+        if (creditSubType is null)
+            return "USD";
+
+        CreditType? creditType = await _creditTypeRepository.GetAsync(
+            c => c.Id == creditSubType.CreditTypeId,
+            cancellationToken: cancellationToken);
+        return string.IsNullOrWhiteSpace(creditType?.CurrencyCode)
+            ? "USD"
+            : creditType.CurrencyCode.Trim().ToUpperInvariant();
+    }
 }

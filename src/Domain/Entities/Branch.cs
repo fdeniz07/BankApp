@@ -12,7 +12,11 @@ public class Branch : Entity
 
     /// <summary>
     /// Optional branch approval ceiling (DoA). Null = no branch cap.
-    /// Effective staff limit = min(position limit, this) when authority is enabled.
+    /// Effective staff limit = min(position limit, this) when authority is enabled
+    /// and the application currency matches <see cref="MaxApprovalCurrencyCode"/>.
     /// </summary>
     public decimal? MaxApprovalAmount { get; set; }
+
+    /// <summary>ISO currency for <see cref="MaxApprovalAmount"/> (e.g. TRY). Null when no cap.</summary>
+    public string? MaxApprovalCurrencyCode { get; set; }
 }

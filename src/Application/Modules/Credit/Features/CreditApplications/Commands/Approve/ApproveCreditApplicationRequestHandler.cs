@@ -84,20 +84,28 @@ public class ApproveCreditApplicationRequestHandler
 
         ApplicationUser? actor = await LoadActorAsync(cancellationToken);
         decimal? branchCap = null;
+        string? branchCapCurrency = null;
         if (actor?.BranchId is Guid actorBranchId)
         {
             Branch? actorBranch = await _branchRepository.GetAsync(
                 b => b.Id == actorBranchId,
                 cancellationToken: cancellationToken);
             branchCap = actorBranch?.MaxApprovalAmount;
+            branchCapCurrency = actorBranch?.MaxApprovalCurrencyCode;
         }
+
+        string applicationCurrency = await _businessRules.ResolvePackageCurrencyCodeAsync(
+            creditApplication!.CreditSubTypeId,
+            cancellationToken);
 
         decimal? maxAmount = ApprovalAuthorityEvaluator.ResolveMaxAmount(
             _authorityOptions,
             _currentUserService.IsBankManager,
             _currentUserService.IsSuperAdmin,
             actor?.Position,
-            branchCap);
+            branchCap,
+            branchCapCurrency,
+            applicationCurrency);
         await _businessRules.ApprovedAmountShouldBeWithinApprovalAuthority(
             request.ApprovedAmount,
             maxAmount);

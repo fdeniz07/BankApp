@@ -32,7 +32,8 @@ public class GetListBranchRequestHandler
                 Name = b.Name,
                 City = b.City,
                 IsActive = b.IsActive,
-                MaxApprovalAmount = b.MaxApprovalAmount
+                MaxApprovalAmount = b.MaxApprovalAmount,
+                MaxApprovalCurrencyCode = b.MaxApprovalCurrencyCode
             })
             .ToList();
     }

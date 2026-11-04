@@ -38,9 +38,12 @@ public class CreditDocumentsController : BaseController
 
     /// <summary>Staff decision UX: document gate mode + approval authority for the current user.</summary>
     [HttpGet("config")]
-    public async Task<IActionResult> GetConfig(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetConfig(
+        [FromQuery] string? currencyCode,
+        CancellationToken cancellationToken)
     {
         ApprovalAuthorityLimit limit = new();
+        string? branchCurrency = null;
         if (_authorityOptions.Enabled && _currentUser.UserId.HasValue)
         {
             ApplicationUser? user = await _users.GetAsync(
@@ -53,6 +56,7 @@ public class CreditDocumentsController : BaseController
                     b => b.Id == branchId,
                     cancellationToken: cancellationToken);
                 branchCap = branch?.MaxApprovalAmount;
+                branchCurrency = branch?.MaxApprovalCurrencyCode;
             }
 
             limit = ApprovalAuthorityEvaluator.Resolve(
@@ -60,23 +64,34 @@ public class CreditDocumentsController : BaseController
                 _currentUser.IsBankManager,
                 _currentUser.IsSuperAdmin,
                 user?.Position,
-                branchCap);
+                branchCap,
+                branchCurrency,
+                currencyCode);
         }
+
+        string authorityCurrency = ApprovalAuthorityEvaluator.NormalizeCurrencyCode(
+            _authorityOptions.CurrencyCode);
 
         return Ok(new CreditDecisionConfigResponse(
             ApproveGateMode: _documentsOptions.ApproveGateMode.ToString(),
             SoftApproveGateEnabled: _documentsOptions.ApproveGateMode == ApproveDocumentGateMode.Soft,
             ApprovalAuthorityEnabled: _authorityOptions.Enabled,
+            AuthorityCurrencyCode: authorityCurrency,
             MaxApprovalAmount: limit.AppliedMax,
             PositionMaxApprovalAmount: limit.PositionMax,
-            BranchMaxApprovalAmount: limit.BranchMax));
+            PositionCurrencyCode: limit.PositionCurrencyCode ?? authorityCurrency,
+            BranchMaxApprovalAmount: limit.BranchMax,
+            BranchCurrencyCode: limit.BranchCurrencyCode ?? branchCurrency));
     }
 
     public sealed record CreditDecisionConfigResponse(
         string ApproveGateMode,
         bool SoftApproveGateEnabled,
         bool ApprovalAuthorityEnabled,
+        string AuthorityCurrencyCode,
         decimal? MaxApprovalAmount,
         decimal? PositionMaxApprovalAmount,
-        decimal? BranchMaxApprovalAmount);
+        string? PositionCurrencyCode,
+        decimal? BranchMaxApprovalAmount,
+        string? BranchCurrencyCode);
 }

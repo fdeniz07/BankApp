@@ -9,62 +9,112 @@ public sealed class ApprovalAuthorityLimit
 
     public decimal? PositionMax { get; init; }
     public decimal? BranchMax { get; init; }
+
+    public string? PositionCurrencyCode { get; init; }
+    public string? BranchCurrencyCode { get; init; }
+    public string? AppliedCurrencyCode { get; init; }
 }
 
 public static class ApprovalAuthorityEvaluator
 {
+    public const string DefaultCurrencyCode = "TRY";
+
+    public static string NormalizeCurrencyCode(string? code) =>
+        string.IsNullOrWhiteSpace(code)
+            ? DefaultCurrencyCode
+            : code.Trim().ToUpperInvariant();
+
     /// <summary>
-    /// Effective max = min(position, branch) among values that are set.
-    /// Unlimited roles bypass both position and branch caps.
+    /// Effective max = min(position, branch) among caps that match
+    /// <paramref name="applicationCurrencyCode"/> (no FX). If DoA is enabled and
+    /// no cap matches the application currency, AppliedMax = 0 (deny).
+    /// Unlimited roles bypass AppliedMax.
     /// </summary>
     public static ApprovalAuthorityLimit Resolve(
         ApprovalAuthorityOptions options,
         bool isBankManager,
         bool isSuperAdmin,
         StaffPosition? position,
-        decimal? branchMaxApprovalAmount)
+        decimal? branchMaxApprovalAmount,
+        string? branchMaxApprovalCurrencyCode = null,
+        string? applicationCurrencyCode = null)
     {
         if (!options.Enabled)
             return new ApprovalAuthorityLimit();
 
-        decimal? branchMax = branchMaxApprovalAmount is > 0 ? branchMaxApprovalAmount : null;
+        string appCc = NormalizeCurrencyCode(applicationCurrencyCode);
+        string positionCc = NormalizeCurrencyCode(options.CurrencyCode);
+
+        decimal? rawBranchMax = branchMaxApprovalAmount is > 0 ? branchMaxApprovalAmount : null;
+        string? branchCc = rawBranchMax.HasValue
+            ? NormalizeCurrencyCode(branchMaxApprovalCurrencyCode)
+            : null;
 
         if (IsUnlimited(options, isBankManager, isSuperAdmin))
             return new ApprovalAuthorityLimit
             {
                 PositionMax = null,
-                BranchMax = branchMax,
-                AppliedMax = null
+                PositionCurrencyCode = null,
+                BranchMax = rawBranchMax,
+                BranchCurrencyCode = branchCc,
+                AppliedMax = null,
+                AppliedCurrencyCode = null
             };
 
         decimal? positionMax = null;
-        if (position is null)
-            positionMax = 0m;
-        else if (options.LimitsByPosition.TryGetValue(position.Name, out decimal limit))
-            positionMax = limit;
-        else
-            positionMax = 0m;
+        if (string.Equals(appCc, positionCc, StringComparison.OrdinalIgnoreCase))
+        {
+            if (position is null)
+                positionMax = 0m;
+            else if (options.LimitsByPosition.TryGetValue(position.Name, out decimal limit))
+                positionMax = limit;
+            else
+                positionMax = 0m;
+        }
 
-        decimal? applied = positionMax;
-        if (branchMax.HasValue)
-            applied = applied.HasValue ? Math.Min(applied.Value, branchMax.Value) : branchMax;
+        decimal? branchMax = null;
+        if (rawBranchMax.HasValue &&
+            branchCc is not null &&
+            string.Equals(appCc, branchCc, StringComparison.OrdinalIgnoreCase))
+        {
+            branchMax = rawBranchMax;
+        }
+
+        decimal? applied;
+        if (!positionMax.HasValue && !branchMax.HasValue)
+            applied = 0m;
+        else if (positionMax.HasValue && branchMax.HasValue)
+            applied = Math.Min(positionMax.Value, branchMax.Value);
+        else
+            applied = positionMax ?? branchMax;
 
         return new ApprovalAuthorityLimit
         {
             PositionMax = positionMax,
+            PositionCurrencyCode = positionMax.HasValue ? positionCc : null,
             BranchMax = branchMax,
-            AppliedMax = applied
+            BranchCurrencyCode = branchMax.HasValue ? branchCc : null,
+            AppliedMax = applied,
+            AppliedCurrencyCode = applied.HasValue ? appCc : null
         };
     }
 
-    /// <summary>Returns null when unlimited; otherwise the max amount the actor may approve.</summary>
     public static decimal? ResolveMaxAmount(
         ApprovalAuthorityOptions options,
         bool isBankManager,
         bool isSuperAdmin,
         StaffPosition? position,
-        decimal? branchMaxApprovalAmount = null) =>
-        Resolve(options, isBankManager, isSuperAdmin, position, branchMaxApprovalAmount).AppliedMax;
+        decimal? branchMaxApprovalAmount = null,
+        string? branchMaxApprovalCurrencyCode = null,
+        string? applicationCurrencyCode = null) =>
+        Resolve(
+            options,
+            isBankManager,
+            isSuperAdmin,
+            position,
+            branchMaxApprovalAmount,
+            branchMaxApprovalCurrencyCode,
+            applicationCurrencyCode).AppliedMax;
 
     public static bool IsUnlimited(
         ApprovalAuthorityOptions options,

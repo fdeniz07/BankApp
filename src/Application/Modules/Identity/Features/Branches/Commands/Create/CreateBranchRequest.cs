@@ -12,4 +12,5 @@ public class CreateBranchRequest : IRequest<CreatedBranchResponse>, ISecuredRequ
     public string? City { get; set; }
     public bool IsActive { get; set; } = true;
     public decimal? MaxApprovalAmount { get; set; }
+    public string? MaxApprovalCurrencyCode { get; set; }
 }
