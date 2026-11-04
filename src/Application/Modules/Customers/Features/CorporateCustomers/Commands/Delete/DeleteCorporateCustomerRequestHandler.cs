@@ -2,6 +2,7 @@ using Application.Modules.Customers.Features.CorporateCustomers.Rules;
 using Application.Modules.Customers.Features.Customers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -18,6 +19,7 @@ public class DeleteCorporateCustomerRequestHandler
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly ICurrentUserService _currentUserService;
     private readonly IBranchAuthorizationService _branchAuthorization;
+    private readonly ICustomerSearchService _customerSearch;
 
     public DeleteCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
@@ -26,7 +28,8 @@ public class DeleteCorporateCustomerRequestHandler
         CorporateCustomerBusinessRules businessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
         ICurrentUserService currentUserService,
-        IBranchAuthorizationService branchAuthorization)
+        IBranchAuthorizationService branchAuthorization,
+        ICustomerSearchService customerSearch)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -35,6 +38,7 @@ public class DeleteCorporateCustomerRequestHandler
         _lifecycleRules = lifecycleRules;
         _currentUserService = currentUserService;
         _branchAuthorization = branchAuthorization;
+        _customerSearch = customerSearch;
     }
 
     public async Task<DeletedCorporateCustomerResponse> Handle(
@@ -64,6 +68,7 @@ public class DeleteCorporateCustomerRequestHandler
 
         corporateCustomer.IsActive = false;
         await _corporateCustomerRepository.DeleteAsync(corporateCustomer, cancellationToken: cancellationToken);
+        await _customerSearch.UpsertFromCorporateAsync(corporateCustomer, cancellationToken);
 
         return _mapper.Map<DeletedCorporateCustomerResponse>(corporateCustomer);
     }

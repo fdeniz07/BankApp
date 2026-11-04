@@ -18,7 +18,9 @@ public class MappingProfiles : Profile
         CreateMap<IndividualCustomer, UpdatedIndividualCustomerResponse>().ReverseMap();
         CreateMap<IndividualCustomer, DeletedIndividualCustomerResponse>().ReverseMap();
         CreateMap<IndividualCustomer, GetByIdIndividualCustomerResponse>().ReverseMap();
-        CreateMap<IndividualCustomer, GetListIndividualCustomerListItemDto>().ReverseMap();
+        CreateMap<IndividualCustomer, GetListIndividualCustomerListItemDto>()
+            .ForMember(d => d.BranchCode, o => o.MapFrom(s => s.Branch != null ? s.Branch.Code : null))
+            .ForMember(d => d.BranchName, o => o.MapFrom(s => s.Branch != null ? s.Branch.Name : null));
         CreateMap<CreateIndividualCustomerRequest, IndividualCustomer>()
             .ForMember(d => d.Id, opt => opt.Ignore())
             .ForMember(d => d.CustomerNumber, opt => opt.Ignore())

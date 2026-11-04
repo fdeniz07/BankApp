@@ -3,6 +3,7 @@ using Application.Modules.Identity.Features.Auth.Rules;
 using Application.Modules.Customers.Features.CorporateCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Core.Security.Constants;
 using Core.Security.Entities;
@@ -23,6 +24,7 @@ public class CreateCorporateCustomerRequestHandler
     private readonly CorporateCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ICustomerSearchService _customerSearch;
 
     public CreateCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
@@ -32,7 +34,8 @@ public class CreateCorporateCustomerRequestHandler
         IMapper mapper,
         CorporateCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICustomerSearchService customerSearch)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -42,6 +45,7 @@ public class CreateCorporateCustomerRequestHandler
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
         _currentUserService = currentUserService;
+        _customerSearch = customerSearch;
     }
 
     public async Task<CreatedCorporateCustomerResponse> Handle(
@@ -87,6 +91,8 @@ public class CreateCorporateCustomerRequestHandler
                 OperationClaimId = customerClaim.Id
             },
             cancellationToken);
+
+        await _customerSearch.UpsertFromCorporateAsync(corporateCustomer, cancellationToken);
 
         CreatedCorporateCustomerResponse response = _mapper.Map<CreatedCorporateCustomerResponse>(corporateCustomer);
         response.UserId = applicationUser.Id;

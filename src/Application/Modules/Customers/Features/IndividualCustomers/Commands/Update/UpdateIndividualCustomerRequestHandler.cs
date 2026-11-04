@@ -3,6 +3,7 @@ using Application.Modules.Customers.Features.Customers.Rules;
 using Application.Modules.Customers.Features.IndividualCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Enums;
@@ -20,6 +21,7 @@ public class UpdateIndividualCustomerRequestHandler
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly IBranchAuthorizationService _branchAuthorization;
+    private readonly ICustomerSearchService _customerSearch;
 
     public UpdateIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -28,7 +30,8 @@ public class UpdateIndividualCustomerRequestHandler
         IndividualCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
-        IBranchAuthorizationService branchAuthorization)
+        IBranchAuthorizationService branchAuthorization,
+        ICustomerSearchService customerSearch)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -37,6 +40,7 @@ public class UpdateIndividualCustomerRequestHandler
         _authBusinessRules = authBusinessRules;
         _lifecycleRules = lifecycleRules;
         _branchAuthorization = branchAuthorization;
+        _customerSearch = customerSearch;
     }
 
     public async Task<UpdatedIndividualCustomerResponse> Handle(
@@ -71,6 +75,7 @@ public class UpdateIndividualCustomerRequestHandler
 
         individualCustomer = _mapper.Map(request, individualCustomer);
         await _individualCustomerRepository.UpdateAsync(individualCustomer!, cancellationToken);
+        await _customerSearch.UpsertFromIndividualAsync(individualCustomer!, cancellationToken);
 
         return _mapper.Map<UpdatedIndividualCustomerResponse>(individualCustomer);
     }

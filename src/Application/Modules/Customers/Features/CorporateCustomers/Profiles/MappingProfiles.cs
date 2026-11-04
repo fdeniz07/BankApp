@@ -18,7 +18,9 @@ public class MappingProfiles : Profile
         CreateMap<CorporateCustomer, UpdatedCorporateCustomerResponse>().ReverseMap();
         CreateMap<CorporateCustomer, DeletedCorporateCustomerResponse>().ReverseMap();
         CreateMap<CorporateCustomer, GetByIdCorporateCustomerResponse>().ReverseMap();
-        CreateMap<CorporateCustomer, GetListCorporateCustomerListItemDto>().ReverseMap();
+        CreateMap<CorporateCustomer, GetListCorporateCustomerListItemDto>()
+            .ForMember(d => d.BranchCode, o => o.MapFrom(s => s.Branch != null ? s.Branch.Code : null))
+            .ForMember(d => d.BranchName, o => o.MapFrom(s => s.Branch != null ? s.Branch.Name : null));
         CreateMap<CreateCorporateCustomerRequest, CorporateCustomer>()
             .ForMember(d => d.Id, opt => opt.Ignore())
             .ForMember(d => d.CustomerNumber, opt => opt.Ignore())

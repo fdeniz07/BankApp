@@ -14,4 +14,5 @@ public class GetListCorporateCustomerRequest : IRequest<GetListResponse<GetListC
     public bool? IsActive { get; set; }
     public bool OnlyDeleted { get; set; }
     public Guid? BranchId { get; set; }
+    public string? Search { get; set; }
 }

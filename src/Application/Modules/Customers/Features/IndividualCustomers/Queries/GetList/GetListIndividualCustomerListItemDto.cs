@@ -11,4 +11,7 @@ public class GetListIndividualCustomerListItemDto
     public string NationalId { get; set; } = default!;
     public bool IsActive { get; set; }
     public bool IsDeleted { get; set; }
+    public Guid? BranchId { get; set; }
+    public string? BranchCode { get; set; }
+    public string? BranchName { get; set; }
 }

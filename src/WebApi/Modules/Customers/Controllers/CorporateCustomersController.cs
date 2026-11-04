@@ -22,37 +22,49 @@ public class CorporateCustomersController : BaseController
     public async Task<IActionResult> GetList(
         [FromQuery] PageRequest pageRequest,
         [FromQuery] bool? isActive = null,
-        [FromQuery] Guid? branchId = null)
+        [FromQuery] Guid? branchId = null,
+        [FromQuery] string? search = null)
     {
         GetListCorporateCustomerRequest request = new()
         {
             PageRequest = pageRequest,
             IsActive = isActive,
-            BranchId = branchId
+            BranchId = branchId,
+            Search = search
         };
         GetListResponse<GetListCorporateCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);
     }
 
     [HttpGet("inactive")]
-    public async Task<IActionResult> GetInactiveList([FromQuery] PageRequest pageRequest)
+    public async Task<IActionResult> GetInactiveList(
+        [FromQuery] PageRequest pageRequest,
+        [FromQuery] Guid? branchId = null,
+        [FromQuery] string? search = null)
     {
         GetListCorporateCustomerRequest request = new()
         {
             PageRequest = pageRequest,
-            IsActive = false
+            IsActive = false,
+            BranchId = branchId,
+            Search = search
         };
         GetListResponse<GetListCorporateCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);
     }
 
     [HttpGet("deleted")]
-    public async Task<IActionResult> GetDeletedList([FromQuery] PageRequest pageRequest)
+    public async Task<IActionResult> GetDeletedList(
+        [FromQuery] PageRequest pageRequest,
+        [FromQuery] Guid? branchId = null,
+        [FromQuery] string? search = null)
     {
         GetListCorporateCustomerRequest request = new()
         {
             PageRequest = pageRequest,
-            OnlyDeleted = true
+            OnlyDeleted = true,
+            BranchId = branchId,
+            Search = search
         };
         GetListResponse<GetListCorporateCustomerListItemDto> response = await Mediator.Send(request);
         return Ok(response);

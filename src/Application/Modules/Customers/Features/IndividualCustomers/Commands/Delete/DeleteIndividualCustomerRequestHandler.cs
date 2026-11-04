@@ -2,6 +2,7 @@ using Application.Modules.Customers.Features.Customers.Rules;
 using Application.Modules.Customers.Features.IndividualCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -18,6 +19,7 @@ public class DeleteIndividualCustomerRequestHandler
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly ICurrentUserService _currentUserService;
     private readonly IBranchAuthorizationService _branchAuthorization;
+    private readonly ICustomerSearchService _customerSearch;
 
     public DeleteIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -26,7 +28,8 @@ public class DeleteIndividualCustomerRequestHandler
         IndividualCustomerBusinessRules businessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
         ICurrentUserService currentUserService,
-        IBranchAuthorizationService branchAuthorization)
+        IBranchAuthorizationService branchAuthorization,
+        ICustomerSearchService customerSearch)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -35,6 +38,7 @@ public class DeleteIndividualCustomerRequestHandler
         _lifecycleRules = lifecycleRules;
         _currentUserService = currentUserService;
         _branchAuthorization = branchAuthorization;
+        _customerSearch = customerSearch;
     }
 
     public async Task<DeletedIndividualCustomerResponse> Handle(
@@ -64,6 +68,7 @@ public class DeleteIndividualCustomerRequestHandler
 
         individualCustomer.IsActive = false;
         await _individualCustomerRepository.DeleteAsync(individualCustomer, cancellationToken: cancellationToken);
+        await _customerSearch.UpsertFromIndividualAsync(individualCustomer, cancellationToken);
 
         return _mapper.Map<DeletedIndividualCustomerResponse>(individualCustomer);
     }

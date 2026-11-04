@@ -2,6 +2,7 @@ using Application.Modules.Identity.Features.Auth.Rules;
 using Application.Modules.Customers.Features.CorporateCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -17,6 +18,7 @@ public class UpdateCorporateCustomerRequestHandler
     private readonly CorporateCustomerBusinessRules _businessRules;
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly IBranchAuthorizationService _branchAuthorization;
+    private readonly ICustomerSearchService _customerSearch;
 
     public UpdateCorporateCustomerRequestHandler(
         ICorporateCustomerRepository corporateCustomerRepository,
@@ -24,7 +26,8 @@ public class UpdateCorporateCustomerRequestHandler
         IMapper mapper,
         CorporateCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
-        IBranchAuthorizationService branchAuthorization)
+        IBranchAuthorizationService branchAuthorization,
+        ICustomerSearchService customerSearch)
     {
         _corporateCustomerRepository = corporateCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -32,6 +35,7 @@ public class UpdateCorporateCustomerRequestHandler
         _businessRules = businessRules;
         _authBusinessRules = authBusinessRules;
         _branchAuthorization = branchAuthorization;
+        _customerSearch = customerSearch;
     }
 
     public async Task<UpdatedCorporateCustomerResponse> Handle(
@@ -64,6 +68,7 @@ public class UpdateCorporateCustomerRequestHandler
 
         corporateCustomer = _mapper.Map(request, corporateCustomer);
         await _corporateCustomerRepository.UpdateAsync(corporateCustomer!, cancellationToken);
+        await _customerSearch.UpsertFromCorporateAsync(corporateCustomer!, cancellationToken);
 
         return _mapper.Map<UpdatedCorporateCustomerResponse>(corporateCustomer);
     }

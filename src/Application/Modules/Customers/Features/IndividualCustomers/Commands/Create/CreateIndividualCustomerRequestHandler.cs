@@ -4,6 +4,7 @@ using Application.Modules.Customers.Features.Customers.Rules;
 using Application.Modules.Customers.Features.IndividualCustomers.Rules;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Core.Security.Constants;
 using Core.Security.Entities;
@@ -26,6 +27,7 @@ public class CreateIndividualCustomerRequestHandler
     private readonly AuthBusinessRules _authBusinessRules;
     private readonly CustomerLifecycleBusinessRules _lifecycleRules;
     private readonly ICurrentUserService _currentUserService;
+    private readonly ICustomerSearchService _customerSearch;
 
     public CreateIndividualCustomerRequestHandler(
         IIndividualCustomerRepository individualCustomerRepository,
@@ -36,7 +38,8 @@ public class CreateIndividualCustomerRequestHandler
         IndividualCustomerBusinessRules businessRules,
         AuthBusinessRules authBusinessRules,
         CustomerLifecycleBusinessRules lifecycleRules,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ICustomerSearchService customerSearch)
     {
         _individualCustomerRepository = individualCustomerRepository;
         _applicationUserRepository = applicationUserRepository;
@@ -47,6 +50,7 @@ public class CreateIndividualCustomerRequestHandler
         _authBusinessRules = authBusinessRules;
         _lifecycleRules = lifecycleRules;
         _currentUserService = currentUserService;
+        _customerSearch = customerSearch;
     }
 
     public async Task<CreatedIndividualCustomerResponse> Handle(
@@ -93,6 +97,8 @@ public class CreateIndividualCustomerRequestHandler
                 OperationClaimId = customerClaim.Id
             },
             cancellationToken);
+
+        await _customerSearch.UpsertFromIndividualAsync(individualCustomer, cancellationToken);
 
         CreatedIndividualCustomerResponse response = _mapper.Map<CreatedIndividualCustomerResponse>(individualCustomer);
         response.UserId = applicationUser.Id;
