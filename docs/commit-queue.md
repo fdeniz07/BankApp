@@ -43,3 +43,4 @@ _(empty)_
 | 2026-10-28 | +2 | Rate-limit env split (feat → docs) |
 | 2026-10-28 | +4 | Credit document upload (feat API → feat UI → test → docs) |
 | 2026-10-30 | 11 | Branch RBAC → demo Demo123! → templates → soft docs/audit/SignalR → tests → docs |
+| 2026-11-04 | 15 | Staff ES+RBAC → customer/credit-type ES → DoA currency → i18n/docs |
