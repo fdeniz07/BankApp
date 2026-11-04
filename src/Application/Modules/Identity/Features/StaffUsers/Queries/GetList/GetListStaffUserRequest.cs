@@ -13,5 +13,7 @@ public class GetListStaffUserRequest
     public string[] Roles => [GeneralOperationClaims.BankManager, GeneralOperationClaims.SuperAdmin];
     public PageRequest PageRequest { get; set; } = new();
     public bool? IsActive { get; set; }
+    public bool? IsManager { get; set; }
     public Guid? BranchId { get; set; }
+    public string? Search { get; set; }
 }

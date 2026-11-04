@@ -1,8 +1,10 @@
 using Application.Modules.Identity.Features.Auth.Rules;
 using Application.Modules.Identity.Features.StaffUsers.Constants;
+using Application.Modules.Identity.Features.StaffUsers.Rules;
 using Application.Services.Auth;
 using Application.Services.Logging;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using Core.CrossCuttingConcerns.Exceptions.Types;
 using Core.Security.Constants;
 using Core.Security.Entities;
@@ -20,9 +22,11 @@ public class CreateStaffUserRequestHandler
     private readonly IUserOperationClaimRepository _userOperationClaimRepository;
     private readonly IBranchRepository _branchRepository;
     private readonly AuthBusinessRules _authBusinessRules;
+    private readonly StaffUserBusinessRules _staffUserBusinessRules;
     private readonly ICurrentUserService _currentUserService;
     private readonly IBranchAuthorizationService _branchAuthorization;
     private readonly IAuditLogger _auditLogger;
+    private readonly IStaffUserSearchService _staffSearch;
 
     public CreateStaffUserRequestHandler(
         IApplicationUserRepository applicationUserRepository,
@@ -30,24 +34,32 @@ public class CreateStaffUserRequestHandler
         IUserOperationClaimRepository userOperationClaimRepository,
         IBranchRepository branchRepository,
         AuthBusinessRules authBusinessRules,
+        StaffUserBusinessRules staffUserBusinessRules,
         ICurrentUserService currentUserService,
         IBranchAuthorizationService branchAuthorization,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IStaffUserSearchService staffSearch)
     {
         _applicationUserRepository = applicationUserRepository;
         _operationClaimRepository = operationClaimRepository;
         _userOperationClaimRepository = userOperationClaimRepository;
         _branchRepository = branchRepository;
         _authBusinessRules = authBusinessRules;
+        _staffUserBusinessRules = staffUserBusinessRules;
         _currentUserService = currentUserService;
         _branchAuthorization = branchAuthorization;
         _auditLogger = auditLogger;
+        _staffSearch = staffSearch;
     }
 
     public async Task<CreatedStaffUserResponse> Handle(
         CreateStaffUserRequest request,
         CancellationToken cancellationToken)
     {
+        await _staffUserBusinessRules.OnlySuperAdminMayCreateManager(
+            _currentUserService.IsSuperAdmin,
+            request.IsManager);
+
         string email = request.Email.Trim();
         await _authBusinessRules.EmailShouldBeUnique(email);
 
@@ -130,6 +142,9 @@ public class CreateStaffUserRequestHandler
             targetType: nameof(ApplicationUser),
             targetId: user.Id,
             changes: new { user.Email, request.IsManager, user.FirstName, user.LastName, user.Position, user.BranchId });
+
+        user.Branch = assignedBranch;
+        await _staffSearch.UpsertFromUserAsync(user, cancellationToken);
 
         return new CreatedStaffUserResponse
         {

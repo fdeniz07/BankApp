@@ -4,6 +4,8 @@ using Application.Services.Search;
 using Elastic.Clients.Elasticsearch;
 using WebApi.Modules.Credit.Idempotency;
 using WebApi.Modules.Credit.Search;
+using WebApi.Modules.Customers.Search;
+using WebApi.Modules.Identity.Search;
 
 namespace WebApi.Modules.Credit;
 
@@ -34,10 +36,16 @@ public static class CreditHostModule
             var settings = new ElasticsearchClientSettings(new Uri(node));
             services.AddSingleton(new ElasticsearchClient(settings));
             services.AddScoped<ICreditApplicationSearchService, ElasticCreditApplicationSearchService>();
+            services.AddScoped<IStaffUserSearchService, ElasticStaffUserSearchService>();
+            services.AddScoped<ICustomerSearchService, ElasticCustomerSearchService>();
+            services.AddScoped<ICreditTypeSearchService, ElasticCreditTypeSearchService>();
         }
         else
         {
             services.AddSingleton<ICreditApplicationSearchService, Application.Services.Search.NullCreditApplicationSearchService>();
+            services.AddSingleton<IStaffUserSearchService, NullStaffUserSearchService>();
+            services.AddSingleton<ICustomerSearchService, NullCustomerSearchService>();
+            services.AddSingleton<ICreditTypeSearchService, NullCreditTypeSearchService>();
         }
 
         return services;

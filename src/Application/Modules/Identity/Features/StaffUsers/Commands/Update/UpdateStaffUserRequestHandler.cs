@@ -4,6 +4,7 @@ using Application.Modules.Identity.Features.StaffUsers.Rules;
 using Application.Services.Auth;
 using Application.Services.Logging;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using Core.CrossCuttingConcerns.Exceptions.Types;
 using Core.Security.Constants;
 using Core.Security.Entities;
@@ -25,6 +26,7 @@ public class UpdateStaffUserRequestHandler
     private readonly ICurrentUserService _currentUserService;
     private readonly IBranchAuthorizationService _branchAuthorization;
     private readonly IAuditLogger _auditLogger;
+    private readonly IStaffUserSearchService _staffSearch;
 
     public UpdateStaffUserRequestHandler(
         IApplicationUserRepository applicationUserRepository,
@@ -35,7 +37,8 @@ public class UpdateStaffUserRequestHandler
         AuthBusinessRules authBusinessRules,
         ICurrentUserService currentUserService,
         IBranchAuthorizationService branchAuthorization,
-        IAuditLogger auditLogger)
+        IAuditLogger auditLogger,
+        IStaffUserSearchService staffSearch)
     {
         _applicationUserRepository = applicationUserRepository;
         _operationClaimRepository = operationClaimRepository;
@@ -46,6 +49,7 @@ public class UpdateStaffUserRequestHandler
         _currentUserService = currentUserService;
         _branchAuthorization = branchAuthorization;
         _auditLogger = auditLogger;
+        _staffSearch = staffSearch;
     }
 
     public async Task<UpdatedStaffUserResponse> Handle(
@@ -60,10 +64,14 @@ public class UpdateStaffUserRequestHandler
         await _businessRules.UserShouldBeStaffAccount(user!);
 
         bool isSelf = _currentUserService.UserId.HasValue && _currentUserService.UserId.Value == user!.Id;
-        bool isElevated = _currentUserService.IsBankManager || _currentUserService.IsSuperAdmin;
+        bool isSuperAdmin = _currentUserService.IsSuperAdmin;
+        bool isBankManager = _currentUserService.IsBankManager;
+        bool isElevated = isBankManager || isSuperAdmin;
 
         if (!isElevated && !isSelf)
             throw new AuthorizationException("You can only update your own staff profile.");
+
+        await _businessRules.EnsureBankManagerMayMutateTargetAsync(isSuperAdmin, isSelf, user!.Id);
 
         if (isElevated && !isSelf)
             await _branchAuthorization.EnsureCanManageStaffUserAsync(user!, cancellationToken);
@@ -72,13 +80,26 @@ public class UpdateStaffUserRequestHandler
         bool nextIsActive = user.IsActive;
         bool nextIsManager = currentIsManager;
 
-        if (isElevated)
+        // SuperAdmin: full control. BankManager (non-self): active flag on non-managers only.
+        // Self: profile fields only — never apply IsActive / IsManager from the request.
+        if (isSuperAdmin)
         {
             nextIsActive = request.IsActive;
             nextIsManager = request.IsManager;
             await _businessRules.CannotDeactivateSelf(user.Id, _currentUserService.UserId, nextIsActive);
             await _businessRules.CannotDeactivateLastActiveManager(user, nextIsActive);
+            await _businessRules.OnlySuperAdminMayAssignManagerRole(isSuperAdmin, currentIsManager, nextIsManager);
             await _businessRules.CannotDemoteLastActiveManager(user, nextIsManager);
+        }
+        else if (isBankManager && !isSelf)
+        {
+            nextIsActive = request.IsActive;
+            await _businessRules.CannotDeactivateSelf(user.Id, _currentUserService.UserId, nextIsActive);
+            await _businessRules.OnlySuperAdminMayAssignManagerRole(isSuperAdmin, currentIsManager, request.IsManager);
+        }
+        else if (isBankManager && isSelf)
+        {
+            await _businessRules.OnlySuperAdminMayAssignManagerRole(isSuperAdmin, currentIsManager, request.IsManager);
         }
 
         string email = request.Email.Trim();
@@ -100,22 +121,23 @@ public class UpdateStaffUserRequestHandler
         if (user.Position?.Name != request.Position?.Name)
             changes["Position"] = new { from = user.Position?.Name, to = request.Position?.Name };
         Guid? nextBranchId = user.BranchId;
-        if (isElevated)
+        bool canManageBranchAndStatus = isSuperAdmin || (isBankManager && !isSelf);
+        if (canManageBranchAndStatus)
         {
-            nextBranchId = _currentUserService.IsSuperAdmin
+            nextBranchId = isSuperAdmin
                 ? request.BranchId
                 : (_currentUserService.BranchId ?? request.BranchId);
             if (user.BranchId != nextBranchId)
                 changes["BranchId"] = new { from = user.BranchId, to = nextBranchId };
             if (user.IsActive != nextIsActive)
                 changes["IsActive"] = new { from = user.IsActive, to = nextIsActive };
-            if (currentIsManager != nextIsManager)
-                changes["IsManager"] = new { from = currentIsManager, to = nextIsManager };
         }
+        if (isSuperAdmin && currentIsManager != nextIsManager)
+            changes["IsManager"] = new { from = currentIsManager, to = nextIsManager };
         if (!string.IsNullOrWhiteSpace(request.NewPassword))
             changes["Password"] = new { changed = true };
 
-        if (isElevated && nextBranchId.HasValue)
+        if (canManageBranchAndStatus && nextBranchId.HasValue)
         {
             Branch? branch = await _branchRepository.GetAsync(
                 b => b.Id == nextBranchId.Value && b.IsActive,
@@ -131,7 +153,7 @@ public class UpdateStaffUserRequestHandler
         user.Gender = request.Gender;
         user.DateOfBirth = request.DateOfBirth;
         user.Position = request.Position;
-        if (isElevated)
+        if (canManageBranchAndStatus)
             user.BranchId = nextBranchId;
         user.IsActive = nextIsActive;
 
@@ -144,7 +166,7 @@ public class UpdateStaffUserRequestHandler
 
         await _applicationUserRepository.UpdateAsync(user, cancellationToken);
 
-        if (isElevated)
+        if (isSuperAdmin)
             await SyncManagerRoleAsync(user.Id, nextIsManager, cancellationToken);
 
         List<OperationClaim> claims = await _applicationUserRepository.GetClaimsAsync(user, cancellationToken);
@@ -166,6 +188,9 @@ public class UpdateStaffUserRequestHandler
             targetType: nameof(ApplicationUser),
             targetId: user.Id,
             changes: changes.Count == 0 ? null : changes);
+
+        user.Branch = assignedBranch;
+        await _staffSearch.UpsertFromUserAsync(user, cancellationToken);
 
         return new UpdatedStaffUserResponse
         {

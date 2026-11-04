@@ -10,4 +10,10 @@ public sealed class ElasticsearchOptions
     public string[] Nodes { get; set; } = ["http://localhost:9200"];
 
     public string ApplicationsIndex { get; set; } = "bankapp-credit-applications";
+
+    public string StaffIndex { get; set; } = "bankapp-staff";
+
+    public string CustomersIndex { get; set; } = "bankapp-customers";
+
+    public string CreditTypesIndex { get; set; } = "bankapp-credit-types";
 }

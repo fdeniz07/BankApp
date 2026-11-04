@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Services.Auth;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using Core.Application.Responses;
 using Core.Repositories;
 using Core.Security.Constants;
@@ -15,13 +16,19 @@ public class GetListStaffUserRequestHandler
 {
     private readonly IApplicationUserRepository _applicationUserRepository;
     private readonly IBranchAuthorizationService _branchAuthorization;
+    private readonly ICurrentUserService _currentUser;
+    private readonly IStaffUserSearchService _search;
 
     public GetListStaffUserRequestHandler(
         IApplicationUserRepository applicationUserRepository,
-        IBranchAuthorizationService branchAuthorization)
+        IBranchAuthorizationService branchAuthorization,
+        ICurrentUserService currentUser,
+        IStaffUserSearchService search)
     {
         _applicationUserRepository = applicationUserRepository;
         _branchAuthorization = branchAuthorization;
+        _currentUser = currentUser;
+        _search = search;
     }
 
     public async Task<GetListResponse<GetListStaffUserListItemDto>> Handle(
@@ -43,10 +50,57 @@ public class GetListStaffUserRequestHandler
 
         Guid? branchFilter = _branchAuthorization.ResolveListBranchFilter(request.BranchId);
 
+        bool preferSearch = _search.IsAvailable
+            && (!string.IsNullOrWhiteSpace(request.Search)
+                || request.BranchId.HasValue
+                || request.IsManager.HasValue);
+
+        if (preferSearch)
+        {
+            GetListResponse<GetListStaffUserListItemDto>? es = await _search.SearchAsync(
+                new StaffUserSearchQuery
+                {
+                    Text = request.Search ?? "",
+                    PageIndex = request.PageRequest.PageIndex,
+                    PageSize = request.PageRequest.PageSize,
+                    IsActive = request.IsActive,
+                    IsManager = request.IsManager,
+                    BranchId = request.BranchId,
+                    RequiredBranchScope = _currentUser.IsSuperAdmin ? null : branchFilter,
+                    AllowCrossBranchFilters = _currentUser.IsSuperAdmin || _currentUser.IsBankManager
+                },
+                cancellationToken);
+            if (es is not null)
+                return es;
+        }
+
+        string? search = string.IsNullOrWhiteSpace(request.Search) ? null : request.Search.Trim();
+        bool? wantManager = request.IsManager;
+        string managerRole = GeneralOperationClaims.BankManager;
+        string superAdminRole = GeneralOperationClaims.SuperAdmin;
+
         Expression<Func<ApplicationUser, bool>> predicate = u =>
             u.CustomerId == null
             && (!request.IsActive.HasValue || u.IsActive == request.IsActive.Value)
-            && (!branchFilter.HasValue || u.BranchId == branchFilter.Value);
+            && (!branchFilter.HasValue || u.BranchId == branchFilter.Value)
+            && (search == null
+                || (u.Email != null && u.Email.Contains(search))
+                || (u.FirstName != null && u.FirstName.Contains(search))
+                || (u.LastName != null && u.LastName.Contains(search)))
+            && (!wantManager.HasValue
+                || (wantManager.Value
+                    ? u.UserOperationClaims.Any(uoc =>
+                        !uoc.IsDeleted
+                        && uoc.OperationClaim != null
+                        && !uoc.OperationClaim.IsDeleted
+                        && (uoc.OperationClaim.Name == managerRole
+                            || uoc.OperationClaim.Name == superAdminRole))
+                    : !u.UserOperationClaims.Any(uoc =>
+                        !uoc.IsDeleted
+                        && uoc.OperationClaim != null
+                        && !uoc.OperationClaim.IsDeleted
+                        && (uoc.OperationClaim.Name == managerRole
+                            || uoc.OperationClaim.Name == superAdminRole))));
 
         IPaginate<ApplicationUser> users = await _applicationUserRepository.GetListAsync(
             predicate: predicate,

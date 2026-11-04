@@ -297,6 +297,9 @@ services:
       Elasticsearch__Enabled: "true"
       Elasticsearch__Nodes__0: "http://elasticsearch:9200"
       Elasticsearch__ApplicationsIndex: "bankapp-credit-applications"
+      Elasticsearch__StaffIndex: "bankapp-staff"
+      Elasticsearch__CustomersIndex: "bankapp-customers"
+      Elasticsearch__CreditTypesIndex: "bankapp-credit-types"
       Logstash__Enabled: "true"
       Logstash__HttpUrl: "http://logstash:8080"
     volumes:

@@ -35,14 +35,29 @@ try
 
     await DatabaseInitializer.InitializeAsync(app.Services, runMigrations, runSeed);
 
-    // Lab: warm Elasticsearch credit-applications index after SQL seed
+    // Lab: warm Elasticsearch indexes after SQL seed
     try
     {
         using IServiceScope scope = app.Services.CreateScope();
-        Application.Services.Search.ICreditApplicationSearchService search =
+        Application.Services.Search.ICreditApplicationSearchService creditSearch =
             scope.ServiceProvider.GetRequiredService<Application.Services.Search.ICreditApplicationSearchService>();
-        if (search.IsAvailable)
-            await search.ReindexAllAsync();
+        if (creditSearch.IsAvailable)
+            await creditSearch.ReindexAllAsync();
+
+        Application.Services.Search.IStaffUserSearchService staffSearch =
+            scope.ServiceProvider.GetRequiredService<Application.Services.Search.IStaffUserSearchService>();
+        if (staffSearch.IsAvailable)
+            await staffSearch.ReindexAllAsync();
+
+        Application.Services.Search.ICustomerSearchService customerSearch =
+            scope.ServiceProvider.GetRequiredService<Application.Services.Search.ICustomerSearchService>();
+        if (customerSearch.IsAvailable)
+            await customerSearch.ReindexAllAsync();
+
+        Application.Services.Search.ICreditTypeSearchService creditTypeSearch =
+            scope.ServiceProvider.GetRequiredService<Application.Services.Search.ICreditTypeSearchService>();
+        if (creditTypeSearch.IsAvailable)
+            await creditTypeSearch.ReindexAllAsync();
     }
     catch (Exception ex)
     {
