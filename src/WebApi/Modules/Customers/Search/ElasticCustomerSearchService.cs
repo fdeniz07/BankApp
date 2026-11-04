@@ -130,7 +130,7 @@ public sealed class ElasticCustomerSearchService : ICustomerSearchService
         await EnsureIndexAsync(cancellationToken);
 
         var individuals = await _individuals.GetListAsync(
-            include: q => q.Include(c => c.Branch),
+            include: q => q.Include(c => c.Branch!),
             withDeleted: true,
             index: 0,
             size: 500,
@@ -139,7 +139,7 @@ public sealed class ElasticCustomerSearchService : ICustomerSearchService
             await UpsertFromIndividualAsync(c, cancellationToken);
 
         var corporates = await _corporates.GetListAsync(
-            include: q => q.Include(c => c.Branch),
+            include: q => q.Include(c => c.Branch!),
             withDeleted: true,
             index: 0,
             size: 500,

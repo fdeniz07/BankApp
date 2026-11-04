@@ -95,7 +95,7 @@ public class GetListCorporateCustomerRequestHandler
 
         IPaginate<CorporateCustomer> corporateCustomers = await _corporateCustomerRepository.GetListAsync(
             predicate: predicate,
-            include: q => q.Include(c => c.Branch),
+            include: q => q.Include(c => c.Branch!),
             index: request.PageRequest.PageIndex,
             size: request.PageRequest.PageSize,
             withDeleted: request.OnlyDeleted,
