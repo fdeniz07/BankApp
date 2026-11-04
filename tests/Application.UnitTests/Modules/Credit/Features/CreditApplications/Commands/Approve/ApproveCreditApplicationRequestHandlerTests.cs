@@ -161,6 +161,7 @@ public class ApproveCreditApplicationRequestHandlerTests
         _authorityOptions = new ApprovalAuthorityOptions
         {
             Enabled = true,
+            CurrencyCode = "USD",
             LimitsByPosition = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
             {
                 [StaffPosition.CreditAnalyst.Name] = 20_000m
@@ -218,6 +219,7 @@ public class ApproveCreditApplicationRequestHandlerTests
         _authorityOptions = new ApprovalAuthorityOptions
         {
             Enabled = true,
+            CurrencyCode = "USD",
             LimitsByPosition = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
             {
                 [StaffPosition.CreditAnalyst.Name] = 100_000m
@@ -268,7 +270,8 @@ public class ApproveCreditApplicationRequestHandlerTests
                 Id = branchId,
                 Code = "IST-01",
                 Name = "Test",
-                MaxApprovalAmount = 15_000m
+                MaxApprovalAmount = 15_000m,
+                MaxApprovalCurrencyCode = "USD"
             });
 
         ApproveCreditApplicationRequest request = new()
@@ -385,6 +388,7 @@ public class ApproveCreditApplicationRequestHandlerTests
 
     private void SetupCreditSubType(Guid subTypeId, decimal minAmount, decimal maxAmount, int minTerm, int maxTerm)
     {
+        Guid creditTypeId = Guid.NewGuid();
         _creditSubTypeRepository
             .Setup(r => r.GetAsync(
                 It.IsAny<Expression<Func<CreditSubType, bool>>>(),
@@ -395,10 +399,24 @@ public class ApproveCreditApplicationRequestHandlerTests
             .ReturnsAsync(new CreditSubType
             {
                 Id = subTypeId,
+                CreditTypeId = creditTypeId,
                 MinAmount = minAmount,
                 MaxAmount = maxAmount,
                 MinTermMonths = minTerm,
                 MaxTermMonths = maxTerm,
+                IsActive = true
+            });
+        _creditTypeRepository
+            .Setup(r => r.GetAsync(
+                It.IsAny<Expression<Func<CreditType, bool>>>(),
+                It.IsAny<Func<IQueryable<CreditType>, IIncludableQueryable<CreditType, object>>>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>(),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new CreditType
+            {
+                Id = creditTypeId,
+                CurrencyCode = "USD",
                 IsActive = true
             });
     }

@@ -6,9 +6,10 @@ namespace Application.UnitTests.Features.CreditApplications.ApprovalAuthority;
 
 public class ApprovalAuthorityEvaluatorTests
 {
-    private static ApprovalAuthorityOptions EnabledOptions() => new()
+    private static ApprovalAuthorityOptions EnabledOptions(string currency = "TRY") => new()
     {
         Enabled = true,
+        CurrencyCode = currency,
         LimitsByPosition = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase)
         {
             [StaffPosition.CreditAnalyst.Name] = 50_000m,
@@ -25,7 +26,9 @@ public class ApprovalAuthorityEvaluatorTests
             isBankManager: false,
             isSuperAdmin: false,
             StaffPosition.CreditAnalyst,
-            branchMaxApprovalAmount: 10_000m);
+            branchMaxApprovalAmount: 10_000m,
+            branchMaxApprovalCurrencyCode: "TRY",
+            applicationCurrencyCode: "TRY");
 
         limit.AppliedMax.Should().BeNull();
         limit.PositionMax.Should().BeNull();
@@ -40,11 +43,14 @@ public class ApprovalAuthorityEvaluatorTests
             isBankManager: false,
             isSuperAdmin: false,
             StaffPosition.CreditAnalyst,
-            branchMaxApprovalAmount: 20_000m);
+            branchMaxApprovalAmount: 20_000m,
+            branchMaxApprovalCurrencyCode: "TRY",
+            applicationCurrencyCode: "TRY");
 
         limit.PositionMax.Should().Be(50_000m);
         limit.BranchMax.Should().Be(20_000m);
         limit.AppliedMax.Should().Be(20_000m);
+        limit.AppliedCurrencyCode.Should().Be("TRY");
     }
 
     [Fact]
@@ -55,7 +61,9 @@ public class ApprovalAuthorityEvaluatorTests
             isBankManager: false,
             isSuperAdmin: false,
             StaffPosition.CreditAnalyst,
-            branchMaxApprovalAmount: 200_000m);
+            branchMaxApprovalAmount: 200_000m,
+            branchMaxApprovalCurrencyCode: "TRY",
+            applicationCurrencyCode: "TRY");
 
         limit.AppliedMax.Should().Be(50_000m);
         limit.BranchMax.Should().Be(200_000m);
@@ -69,7 +77,8 @@ public class ApprovalAuthorityEvaluatorTests
             isBankManager: false,
             isSuperAdmin: false,
             StaffPosition.CreditAnalyst,
-            branchMaxApprovalAmount: null);
+            branchMaxApprovalAmount: null,
+            applicationCurrencyCode: "TRY");
 
         limit.BranchMax.Should().BeNull();
         limit.AppliedMax.Should().Be(50_000m);
@@ -83,10 +92,47 @@ public class ApprovalAuthorityEvaluatorTests
             isBankManager: true,
             isSuperAdmin: false,
             StaffPosition.CreditAnalyst,
-            branchMaxApprovalAmount: 10_000m);
+            branchMaxApprovalAmount: 10_000m,
+            branchMaxApprovalCurrencyCode: "TRY",
+            applicationCurrencyCode: "TRY");
 
         limit.AppliedMax.Should().BeNull();
         limit.PositionMax.Should().BeNull();
         limit.BranchMax.Should().Be(10_000m);
+    }
+
+    [Fact]
+    public void Resolve_WhenApplicationCurrencyDiffers_IgnoresMismatchedCaps()
+    {
+        ApprovalAuthorityLimit limit = ApprovalAuthorityEvaluator.Resolve(
+            EnabledOptions("TRY"),
+            isBankManager: false,
+            isSuperAdmin: false,
+            StaffPosition.CreditAnalyst,
+            branchMaxApprovalAmount: 20_000m,
+            branchMaxApprovalCurrencyCode: "TRY",
+            applicationCurrencyCode: "EUR");
+
+        limit.PositionMax.Should().BeNull();
+        limit.BranchMax.Should().BeNull();
+        limit.AppliedMax.Should().Be(0m);
+    }
+
+    [Fact]
+    public void Resolve_WhenOnlyBranchCurrencyMatches_UsesBranch()
+    {
+        ApprovalAuthorityLimit limit = ApprovalAuthorityEvaluator.Resolve(
+            EnabledOptions("TRY"),
+            isBankManager: false,
+            isSuperAdmin: false,
+            StaffPosition.CreditAnalyst,
+            branchMaxApprovalAmount: 30_000m,
+            branchMaxApprovalCurrencyCode: "EUR",
+            applicationCurrencyCode: "EUR");
+
+        limit.PositionMax.Should().BeNull();
+        limit.BranchMax.Should().Be(30_000m);
+        limit.AppliedMax.Should().Be(30_000m);
+        limit.BranchCurrencyCode.Should().Be("EUR");
     }
 }
