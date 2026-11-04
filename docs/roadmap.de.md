@@ -37,9 +37,10 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 - [x] Dokumenten-Upload beim Kreditantrag (Lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft-Genehmigungs-Gate (`SoftApproveGateEnabled`; in Development aus) + fehlende-Unterlagen-Badge/Filter/Listen-Preset
 - [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, Basis Hard) + positionsbasierte Genehmigungsbefugnis (DoA)
-- [x] Filial-Obergrenze (`Branch.MaxApprovalAmount`); effektiv = min(Position, Filiale)
+- [x] Filial-Obergrenze (`Branch.MaxApprovalAmount` + Währung); effektiv = min(Position, Filiale) bei gleicher Währung
 - [x] Entscheidungsbrief-Vorlagen-CRUD (Benutzer); Systemvorlagen folgen der UI-Sprache
 - [x] BankManager: Kreditarten anlegen / aktivieren-deaktivieren; Kunden-Löschregeln
+- [x] Manager-Personal-RBAC (eigene Filiale; `IsManager` nur SuperAdmin)
 
 ### UX / Client
 
@@ -75,6 +76,7 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 - [x] Elasticsearch für Mitarbeiter-GET-Endpunkte (ELK-Lab + Live-Suche; Seq bleibt)
 - [x] Manager/Admin erweitertes ES-Filterpanel (Aggregationen)
 - [x] Admin-Welcome-Dashboard (Tailwind CSS + Bundle-Kompression / Performance)
+- [x] Kunden- + Kreditarten-ES Suche/Filter/Facetten (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD Deployment
 - [ ] Raft-Vault / Secret-Rotation (Produktion; jenseits Compose-Dev-Mode — Learning 19)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)

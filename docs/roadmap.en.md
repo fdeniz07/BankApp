@@ -37,9 +37,10 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 - [x] Credit application document upload (lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft approve gate config (`SoftApproveGateEnabled`; off in Development) + missing-docs badge/filter/list preset
 - [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, base Hard) + position-based approval authority (DoA)
-- [x] Branch approval ceiling (`Branch.MaxApprovalAmount`); effective = min(position, branch)
+- [x] Branch approval ceiling (`Branch.MaxApprovalAmount` + currency); effective = min(position, branch) when currencies match
 - [x] Decision letter template CRUD (user); system templates follow UI language
 - [x] BankManager credit type create / activate-deactivate; customer delete rules
+- [x] Manager staff RBAC (own branch; `IsManager` SuperAdmin-only)
 
 ### UX / client
 
@@ -75,6 +76,7 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 - [x] Elasticsearch for staff GET endpoints (ELK lab + live search; Seq kept)
 - [x] Manager/Admin advanced ES filter panel (aggregations)
 - [x] Admin welcome dashboard (Tailwind CSS + bundle compression / performance)
+- [x] Customer + credit-type ES search/filter/facets (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD deployment
 - [ ] Raft Vault / secret rotation (production; beyond Compose dev-mode — learning 19)
 - [ ] OAuth (social sign-up / login)

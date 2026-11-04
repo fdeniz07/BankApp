@@ -60,8 +60,8 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Domain | Şube / branch modeli | [27](27-branch-model.tr.md) |
 | Security | Şube RBAC + SuperAdmin | [28](28-branch-rbac-superadmin.tr.md) |
 | Credit / UX | Karar mektubu şablon CRUD | [29](29-decision-letter-templates.tr.md) |
-| Credit / Security | Onay evrak kapısı + DoA yetki tavanı | [30](30-approve-gate-authority.tr.md) |
-| Search / Observability | ELK + canlı arama + Manager facet aggregations | [31](31-elk-elasticsearch.tr.md) |
+| Credit / Security | Onay evrak kapısı + DoA (şube/pozisyon PB etiketli) | [30](30-approve-gate-authority.tr.md) |
+| Search / Observability | ELK + başvuru/personel/müşteri/kredi türü arama + facets | [31](31-elk-elasticsearch.tr.md) |
 | UX / DevOps | Admin Tailwind dashboard + Vite chunk/gzip | [32](32-admin-tailwind-dashboard.tr.md) |
 
 Gereksinim (BRD/FRD): [docs/requirements/00-index.tr.md](../requirements/00-index.tr.md)

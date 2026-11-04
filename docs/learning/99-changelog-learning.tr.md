@@ -33,3 +33,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-02 | `28`: Manager personel RBAC — başka manager’a dokunma yok; IsManager yalnız SuperAdmin (API + StaffPage) |
 | 2026-11-02 | `31`: Personel ES indeksi (`bankapp-staff`) + StaffPage şube/metin/rol filtre + düzenleme modal |
 | 2026-11-02 | `31`: Müşteri (`bankapp-customers`) + kredi türü (`bankapp-credit-types`) ES filtre/facet |
+| 2026-11-04 | `00` + history/roadmap (TR/EN/DE): ES indeksleri + DoA PB ile senkron |

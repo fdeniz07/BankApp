@@ -37,9 +37,10 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 - [x] Kredi başvurusunda evrak yükleme (lab: PDF/JPEG/PNG, App_Data)
 - [x] Soft onay kapısı config (`SoftApproveGateEnabled`; Development kapalı) + eksik evrak rozeti/filtre/liste preset
 - [x] `ApproveGateMode` (None/Soft/Hard; Dev Soft, base Hard) + pozisyon bazlı onay yetkisi (DoA)
-- [x] Şube onay tavanı (`Branch.MaxApprovalAmount`); efektif = min(pozisyon, şube)
+- [x] Şube onay tavanı (`Branch.MaxApprovalAmount` + PB); efektif = min(pozisyon, şube) aynı para biriminde
 - [x] Karar mektubu şablon CRUD (kullanıcı); UI diline göre sistem şablonu
 - [x] BankManager kredi türü ekleme / aktif-pasif; müşteri silme kuralları
+- [x] Manager personel RBAC (şube içi; `IsManager` yalnız SuperAdmin)
 
 ### UX / istemci
 
@@ -75,6 +76,7 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 - [x] Personel GET’leri için Elasticsearch (ELK lab + canlı arama; Seq kalır)
 - [x] Manager/Admin gelişmiş ES filtre paneli (aggregations)
 - [x] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
+- [x] Müşteri + kredi türü ES arama/filtre/facet (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD dağıtımı
 - [ ] Raft Vault / secret rotasyonu (üretim; Compose dev-mode dışı — learning 19)
 - [ ] OAuth (sosyal medya ile kayıt / giriş)

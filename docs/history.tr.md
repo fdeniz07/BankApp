@@ -67,7 +67,9 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Onay soft-evrak uyarısı; karar audit (şube/şablon); evrak yükleme SignalR + eksik evrak rozeti/filtresi
 - [x] Soft onay kapısı config (`SoftApproveGateEnabled`; Development kapalı) + liste preset “Bekleyen + eksik evrak”
 - [x] `ApproveGateMode` (None/Soft/Hard) + pozisyon bazlı onay yetkisi (DoA); tam BRD/FRD (`docs/requirements/`)
-- [x] Şube onay tavanı (`Branch.MaxApprovalAmount`); efektif limit = min(pozisyon, şube); UI kaynak kırılımı
+- [x] Şube onay tavanı (`Branch.MaxApprovalAmount` + `MaxApprovalCurrencyCode`); efektif = min(pozisyon, şube) yalnız aynı PB; UI kaynak kırılımı
 - [x] ELK lab (Elasticsearch + Logstash + Kibana) + başvuru canlı arama (`searchText`); Seq log UX korunur
 - [x] Manager/Admin ES facet paneli (terms + tutar range aggregations; SQL fallback; `amountMin`/`currencyCode`)
 - [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
+- [x] Manager personel RBAC (başka manager’a dokunma yok; `IsManager` yalnız SuperAdmin) + StaffPage düzenleme modal
+- [x] Personel ES (`bankapp-staff`) + müşteri (`bankapp-customers`) + kredi türü (`bankapp-credit-types`) canlı arama/filtre/facet; SQL fallback

@@ -63,3 +63,5 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] Branch model (Branches + staff BranchId + decision snapshot)
 - [x] Manager/Admin ES facet panel (terms + amount range aggregations; SQL fallback)
 - [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
+- [x] Branch approval ceiling currency (`MaxApprovalCurrencyCode` + `ApprovalAuthority:CurrencyCode`); apply only when currencies match
+- [x] Manager staff RBAC + StaffPage edit modal; staff/customer/credit-type ES indexes (`bankapp-staff` / `customers` / `credit-types`)
