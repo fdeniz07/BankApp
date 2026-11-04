@@ -1,5 +1,6 @@
 using Application.Modules.Credit.Features.CreditTypes.Rules;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Domain.Entities;
 using MediatR;
@@ -11,15 +12,18 @@ public class DeleteCreditTypeRequestHandler : IRequestHandler<DeleteCreditTypeRe
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly IMapper _mapper;
     private readonly CreditTypeBusinessRules _businessRules;
+    private readonly ICreditTypeSearchService _search;
 
     public DeleteCreditTypeRequestHandler(
         ICreditTypeRepository creditTypeRepository,
         IMapper mapper,
-        CreditTypeBusinessRules businessRules)
+        CreditTypeBusinessRules businessRules,
+        ICreditTypeSearchService search)
     {
         _creditTypeRepository = creditTypeRepository;
         _mapper = mapper;
         _businessRules = businessRules;
+        _search = search;
     }
 
     public async Task<DeletedCreditTypeResponse> Handle(
@@ -34,6 +38,7 @@ public class DeleteCreditTypeRequestHandler : IRequestHandler<DeleteCreditTypeRe
 
         creditType!.IsActive = false;
         await _creditTypeRepository.DeleteAsync(creditType, cancellationToken: cancellationToken);
+        await _search.DeleteAsync(creditType.Id, cancellationToken);
 
         return _mapper.Map<DeletedCreditTypeResponse>(creditType);
     }

@@ -1,5 +1,6 @@
 using Application.Modules.Credit.Features.CreditTypes.Rules;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using Domain.Entities;
 using MediatR;
 
@@ -10,13 +11,16 @@ public class SetCreditTypeActiveRequestHandler
 {
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly CreditTypeBusinessRules _businessRules;
+    private readonly ICreditTypeSearchService _search;
 
     public SetCreditTypeActiveRequestHandler(
         ICreditTypeRepository creditTypeRepository,
-        CreditTypeBusinessRules businessRules)
+        CreditTypeBusinessRules businessRules,
+        ICreditTypeSearchService search)
     {
         _creditTypeRepository = creditTypeRepository;
         _businessRules = businessRules;
+        _search = search;
     }
 
     public async Task<SetCreditTypeActiveResponse> Handle(
@@ -31,6 +35,7 @@ public class SetCreditTypeActiveRequestHandler
 
         creditType!.IsActive = request.IsActive;
         await _creditTypeRepository.UpdateAsync(creditType, cancellationToken);
+        await _search.UpsertFromCreditTypeAsync(creditType, cancellationToken);
 
         return new SetCreditTypeActiveResponse
         {

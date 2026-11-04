@@ -3,7 +3,9 @@ using Application.Modules.Credit.Features.CreditTypes.Commands.Delete;
 using Application.Modules.Credit.Features.CreditTypes.Commands.SetActive;
 using Application.Modules.Credit.Features.CreditTypes.Commands.Update;
 using Application.Modules.Credit.Features.CreditTypes.Queries.GetById;
+using Application.Modules.Credit.Features.CreditTypes.Queries.GetFacets;
 using Application.Modules.Credit.Features.CreditTypes.Queries.GetList;
+using Application.Services.Search;
 using Core.Application.Requests;
 using Core.Application.Responses;
 using Microsoft.AspNetCore.Mvc;
@@ -23,6 +25,10 @@ public class CreditTypesController : BaseController
         [FromQuery] PageRequest pageRequest,
         [FromQuery] string? locale,
         [FromQuery] string? category,
+        [FromQuery] string? search,
+        [FromQuery] string? currencyCode,
+        [FromQuery] string? riskLevel,
+        [FromQuery] bool? isActive,
         [FromQuery] string? sortBy,
         [FromQuery] bool sortDesc = false)
     {
@@ -31,10 +37,35 @@ public class CreditTypesController : BaseController
             PageRequest = pageRequest,
             Locale = locale,
             Category = category,
+            Search = search,
+            CurrencyCode = currencyCode,
+            RiskLevel = riskLevel,
+            IsActive = isActive,
             SortBy = sortBy,
             SortDesc = sortDesc
         };
         GetListResponse<GetListCreditTypeListItemDto> response = await Mediator.Send(request);
+        return Ok(response);
+    }
+
+    [HttpGet("facets")]
+    public async Task<IActionResult> GetFacets(
+        [FromQuery] string? search,
+        [FromQuery] string? locale,
+        [FromQuery] string? category,
+        [FromQuery] string? currencyCode,
+        [FromQuery] string? riskLevel,
+        [FromQuery] bool? isActive)
+    {
+        CreditTypeFacetsResponse response = await Mediator.Send(new GetCreditTypeFacetsRequest
+        {
+            Search = search,
+            Locale = locale,
+            Category = category,
+            CurrencyCode = currencyCode,
+            RiskLevel = riskLevel,
+            IsActive = isActive
+        });
         return Ok(response);
     }
 

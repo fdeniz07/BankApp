@@ -1,6 +1,7 @@
 using System.Linq.Expressions;
 using Application.Services.Branches;
 using Application.Services.Repositories;
+using Application.Services.Search;
 using AutoMapper;
 using Core.Application.Responses;
 using Core.Repositories;
@@ -16,15 +17,18 @@ public class GetListCreditTypeRequestHandler
     private readonly ICreditTypeRepository _creditTypeRepository;
     private readonly IMapper _mapper;
     private readonly ICatalogLocaleService _catalogLocale;
+    private readonly ICreditTypeSearchService _search;
 
     public GetListCreditTypeRequestHandler(
         ICreditTypeRepository creditTypeRepository,
         IMapper mapper,
-        ICatalogLocaleService catalogLocale)
+        ICatalogLocaleService catalogLocale,
+        ICreditTypeSearchService search)
     {
         _creditTypeRepository = creditTypeRepository;
         _mapper = mapper;
         _catalogLocale = catalogLocale;
+        _search = search;
     }
 
     public async Task<GetListResponse<GetListCreditTypeListItemDto>> Handle(
@@ -34,7 +38,42 @@ public class GetListCreditTypeRequestHandler
         string? forcedLocale = await _catalogLocale.ResolveForcedCatalogLocaleAsync(cancellationToken);
         string? locale = forcedLocale ?? request.Locale;
 
-        Expression<Func<CreditType, bool>>? predicate = BuildPredicate(locale, request.Category);
+        bool preferSearch = _search.IsAvailable
+            && (!string.IsNullOrWhiteSpace(request.Search)
+                || !string.IsNullOrWhiteSpace(request.CurrencyCode)
+                || !string.IsNullOrWhiteSpace(request.RiskLevel)
+                || !string.IsNullOrWhiteSpace(locale)
+                || !string.IsNullOrWhiteSpace(request.Category)
+                || request.IsActive.HasValue);
+
+        if (preferSearch)
+        {
+            GetListResponse<GetListCreditTypeListItemDto>? es = await _search.SearchAsync(
+                new CreditTypeSearchQuery
+                {
+                    Text = request.Search ?? "",
+                    PageIndex = request.PageRequest.PageIndex,
+                    PageSize = request.PageRequest.PageSize,
+                    Locale = locale,
+                    Category = request.Category,
+                    CurrencyCode = request.CurrencyCode,
+                    RiskLevel = request.RiskLevel,
+                    IsActive = request.IsActive,
+                    SortBy = request.SortBy,
+                    SortDesc = request.SortDesc
+                },
+                cancellationToken);
+            if (es is not null)
+                return es;
+        }
+
+        Expression<Func<CreditType, bool>>? predicate = BuildPredicate(
+            locale,
+            request.Category,
+            request.Search,
+            request.CurrencyCode,
+            request.RiskLevel,
+            request.IsActive);
 
         Func<IQueryable<CreditType>, IOrderedQueryable<CreditType>>? orderBy =
             BuildOrderBy(request.SortBy, request.SortDesc);
@@ -49,23 +88,33 @@ public class GetListCreditTypeRequestHandler
         return _mapper.Map<GetListResponse<GetListCreditTypeListItemDto>>(creditTypes);
     }
 
-    private static Expression<Func<CreditType, bool>>? BuildPredicate(string? localeRaw, string? categoryRaw)
+    private static Expression<Func<CreditType, bool>>? BuildPredicate(
+        string? localeRaw,
+        string? categoryRaw,
+        string? searchRaw,
+        string? currencyRaw,
+        string? riskRaw,
+        bool? isActive)
     {
-        string? locale = string.IsNullOrWhiteSpace(localeRaw)
-            ? null
-            : localeRaw.Trim().ToLowerInvariant();
+        string? locale = string.IsNullOrWhiteSpace(localeRaw) ? null : localeRaw.Trim().ToLowerInvariant();
         CreditCategory? category = TryParseCategory(categoryRaw);
+        string? search = string.IsNullOrWhiteSpace(searchRaw) ? null : searchRaw.Trim();
+        string? currency = string.IsNullOrWhiteSpace(currencyRaw) ? null : currencyRaw.Trim().ToUpperInvariant();
+        CreditRiskLevel? risk = TryParseRisk(riskRaw);
 
-        if (locale is null && category is null)
+        if (locale is null && category is null && search is null && currency is null && risk is null && !isActive.HasValue)
             return null;
 
-        if (locale is not null && category is not null)
-            return c => c.Locale == locale && c.Category == category;
-
-        if (locale is not null)
-            return c => c.Locale == locale;
-
-        return c => c.Category == category!;
+        return c =>
+            (locale == null || c.Locale == locale)
+            && (category == null || c.Category == category)
+            && (currency == null || c.CurrencyCode == currency)
+            && (risk == null || c.RiskLevel == risk)
+            && (!isActive.HasValue || c.IsActive == isActive.Value)
+            && (search == null
+                || c.Name.Contains(search)
+                || c.Code.Contains(search)
+                || (c.Description != null && c.Description.Contains(search)));
     }
 
     private static CreditCategory? TryParseCategory(string? category)
@@ -74,6 +123,16 @@ public class GetListCreditTypeRequestHandler
             return null;
 
         return CreditCategory.TryFromName(category.Trim(), ignoreCase: true, out CreditCategory? parsed)
+            ? parsed
+            : null;
+    }
+
+    private static CreditRiskLevel? TryParseRisk(string? risk)
+    {
+        if (string.IsNullOrWhiteSpace(risk))
+            return null;
+
+        return CreditRiskLevel.TryFromName(risk.Trim(), ignoreCase: true, out CreditRiskLevel? parsed)
             ? parsed
             : null;
     }
@@ -101,9 +160,6 @@ public class GetListCreditTypeRequestHandler
             "risklevel" or "risk" => sortDesc
                 ? q => q.OrderByDescending(c => c.RiskLevel)
                 : q => q.OrderBy(c => c.RiskLevel),
-            "isactive" or "active" => sortDesc
-                ? q => q.OrderByDescending(c => c.IsActive)
-                : q => q.OrderBy(c => c.IsActive),
             _ => sortDesc
                 ? q => q.OrderByDescending(c => c.Name)
                 : q => q.OrderBy(c => c.Name)

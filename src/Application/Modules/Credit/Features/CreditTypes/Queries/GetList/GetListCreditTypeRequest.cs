@@ -17,18 +17,19 @@ public class GetListCreditTypeRequest
     public PageRequest PageRequest { get; set; } = new();
     public string? Locale { get; set; }
     public string? Category { get; set; }
+    public string? Search { get; set; }
+    public string? CurrencyCode { get; set; }
+    public string? RiskLevel { get; set; }
+    public bool? IsActive { get; set; }
     public string? SortBy { get; set; }
     public bool SortDesc { get; set; }
 
     public string CacheKey =>
-        $"CreditTypeList({PageRequest.PageIndex},{PageRequest.PageSize},{NormalizeLocale(Locale)},{NormalizeCategory(Category)},{SortBy},{SortDesc})";
+        $"CreditTypeList({PageRequest.PageIndex},{PageRequest.PageSize},{Normalize(Locale)},{Normalize(Category)},{Normalize(Search)},{Normalize(CurrencyCode)},{Normalize(RiskLevel)},{IsActive},{SortBy},{SortDesc})";
 
     public string? CacheGroupKey => CreditTypeCacheGroupKeys.Group;
     public TimeSpan? SlidingExpiration => null;
 
-    private static string NormalizeLocale(string? locale) =>
-        string.IsNullOrWhiteSpace(locale) ? "all" : locale.Trim().ToLowerInvariant();
-
-    private static string NormalizeCategory(string? category) =>
-        string.IsNullOrWhiteSpace(category) ? "all" : category.Trim().ToLowerInvariant();
+    private static string Normalize(string? value) =>
+        string.IsNullOrWhiteSpace(value) ? "all" : value.Trim().ToLowerInvariant();
 }
