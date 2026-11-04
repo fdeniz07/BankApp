@@ -3,7 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { createBranch, getBranches, updateBranch } from '../api/branchesApi'
 import { useAuth } from '../auth/AuthContext'
 import type { BranchListItem } from '../types/api'
+import { currencySymbol, formatMoney } from '../utils/formatMoney'
 import { mapApiError } from '../utils/mapApiError'
+
+const CURRENCIES = ['TRY', 'EUR', 'USD'] as const
 
 function parseOptionalAmount(raw: string): number | null {
   const trimmed = raw.trim()
@@ -13,7 +16,7 @@ function parseOptionalAmount(raw: string): number | null {
 }
 
 export function BranchesPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { isSuperAdmin } = useAuth()
   const [items, setItems] = useState<BranchListItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -25,9 +28,11 @@ export function BranchesPage() {
     city: '',
     isActive: true,
     maxApprovalAmount: '',
+    maxApprovalCurrencyCode: 'TRY' as (typeof CURRENCIES)[number],
   })
   const [editing, setEditing] = useState<BranchListItem | null>(null)
   const [editMaxApproval, setEditMaxApproval] = useState('')
+  const [editCurrency, setEditCurrency] = useState<(typeof CURRENCIES)[number]>('TRY')
 
   const load = useCallback(() => {
     if (!isSuperAdmin) return Promise.resolve()
@@ -56,14 +61,23 @@ export function BranchesPage() {
     setError(null)
     setSuccess(null)
     try {
+      const amount = parseOptionalAmount(form.maxApprovalAmount)
       await createBranch({
         code: form.code.trim(),
         name: form.name.trim(),
         city: form.city.trim() || null,
         isActive: form.isActive,
-        maxApprovalAmount: parseOptionalAmount(form.maxApprovalAmount),
+        maxApprovalAmount: amount,
+        maxApprovalCurrencyCode: amount != null ? form.maxApprovalCurrencyCode : null,
       })
-      setForm({ code: '', name: '', city: '', isActive: true, maxApprovalAmount: '' })
+      setForm({
+        code: '',
+        name: '',
+        city: '',
+        isActive: true,
+        maxApprovalAmount: '',
+        maxApprovalCurrencyCode: 'TRY',
+      })
       setSuccess(t('branches.createSuccess'))
       await load()
     } catch (err) {
@@ -77,16 +91,19 @@ export function BranchesPage() {
     setError(null)
     setSuccess(null)
     try {
+      const amount = parseOptionalAmount(editMaxApproval)
       await updateBranch({
         id: editing.id,
         code: editing.code.trim(),
         name: editing.name.trim(),
         city: editing.city?.trim() || null,
         isActive: editing.isActive,
-        maxApprovalAmount: parseOptionalAmount(editMaxApproval),
+        maxApprovalAmount: amount,
+        maxApprovalCurrencyCode: amount != null ? editCurrency : null,
       })
       setEditing(null)
       setEditMaxApproval('')
+      setEditCurrency('TRY')
       setSuccess(t('branches.updateSuccess'))
       await load()
     } catch (err) {
@@ -101,13 +118,17 @@ export function BranchesPage() {
         ? String(item.maxApprovalAmount)
         : '',
     )
+    const cc = (item.maxApprovalCurrencyCode || 'TRY').toUpperCase()
+    setEditCurrency(
+      (CURRENCIES as readonly string[]).includes(cc)
+        ? (cc as (typeof CURRENCIES)[number])
+        : 'TRY',
+    )
   }
 
-  function formatCap(value?: number | null) {
+  function formatCap(value?: number | null, currency?: string | null) {
     if (value == null || value <= 0) return t('branches.noCap')
-    return new Intl.NumberFormat(undefined, {
-      maximumFractionDigits: 2,
-    }).format(value)
+    return formatMoney(value, currency || 'TRY', i18n.language, 2)
   }
 
   return (
@@ -155,6 +176,25 @@ export function BranchesPage() {
             onChange={(e) => setForm((f) => ({ ...f, maxApprovalAmount: e.target.value }))}
             placeholder={t('branches.maxApprovalPlaceholder')}
           />
+        </label>
+        <label>
+          {t('branches.currency')}
+          <select
+            value={form.maxApprovalCurrencyCode}
+            onChange={(e) =>
+              setForm((f) => ({
+                ...f,
+                maxApprovalCurrencyCode: e.target.value as (typeof CURRENCIES)[number],
+              }))
+            }
+            disabled={!form.maxApprovalAmount.trim()}
+          >
+            {CURRENCIES.map((c) => (
+              <option key={c} value={c}>
+                {currencySymbol(c)} ({c})
+              </option>
+            ))}
+          </select>
         </label>
         <label className="checkbox-row">
           <input
@@ -206,6 +246,20 @@ export function BranchesPage() {
               placeholder={t('branches.maxApprovalPlaceholder')}
             />
           </label>
+          <label>
+            {t('branches.currency')}
+            <select
+              value={editCurrency}
+              onChange={(e) => setEditCurrency(e.target.value as (typeof CURRENCIES)[number])}
+              disabled={!editMaxApproval.trim()}
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c} value={c}>
+                  {currencySymbol(c)} ({c})
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="checkbox-row">
             <input
               type="checkbox"
@@ -224,6 +278,7 @@ export function BranchesPage() {
               onClick={() => {
                 setEditing(null)
                 setEditMaxApproval('')
+                setEditCurrency('TRY')
               }}
             >
               {t('common.cancel')}
@@ -252,7 +307,7 @@ export function BranchesPage() {
                 <td>{item.code}</td>
                 <td>{item.name}</td>
                 <td>{item.city || '—'}</td>
-                <td>{formatCap(item.maxApprovalAmount)}</td>
+                <td>{formatCap(item.maxApprovalAmount, item.maxApprovalCurrencyCode)}</td>
                 <td>{item.isActive ? t('branches.active') : t('branches.inactive')}</td>
                 <td>
                   <button type="button" className="btn ghost" onClick={() => startEdit(item)}>

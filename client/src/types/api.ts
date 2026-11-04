@@ -70,6 +70,9 @@ export interface IndividualCustomerListItem {
   nationalId: string
   isActive: boolean
   isDeleted: boolean
+  branchId?: string | null
+  branchCode?: string | null
+  branchName?: string | null
 }
 
 export interface IndividualCustomerDetail {
@@ -115,6 +118,9 @@ export interface CorporateCustomerListItem {
   authorizedPersonName: string
   isActive: boolean
   isDeleted: boolean
+  branchId?: string | null
+  branchCode?: string | null
+  branchName?: string | null
 }
 
 export interface CorporateCustomerDetail {
@@ -220,6 +226,19 @@ export interface CreditApplicationFacets {
   currencies: FacetBucket[]
   missingRequiredDocuments: { true: number; false: number }
   amountBuckets: AmountFacetBucket[]
+}
+
+export interface CustomerFacets {
+  source: 'Elasticsearch' | 'Sql' | string
+  branches: FacetBucket[]
+}
+
+export interface CreditTypeFacets {
+  source: 'Elasticsearch' | 'Sql' | string
+  locales: FacetBucket[]
+  categories: FacetBucket[]
+  currencies: FacetBucket[]
+  riskLevels: FacetBucket[]
 }
 
 export interface CreditApplicationDetail extends CreditApplicationListItem {
@@ -346,6 +365,7 @@ export interface BranchListItem {
   city?: string | null
   isActive: boolean
   maxApprovalAmount?: number | null
+  maxApprovalCurrencyCode?: string | null
 }
 
 export interface StaffUserListItem {
@@ -386,6 +406,7 @@ export interface CreateBranchRequest {
   city?: string | null
   isActive?: boolean
   maxApprovalAmount?: number | null
+  maxApprovalCurrencyCode?: string | null
 }
 
 export interface UpdateBranchRequest {
@@ -395,6 +416,7 @@ export interface UpdateBranchRequest {
   city?: string | null
   isActive: boolean
   maxApprovalAmount?: number | null
+  maxApprovalCurrencyCode?: string | null
 }
 
 export interface UpdateStaffUserRequest {

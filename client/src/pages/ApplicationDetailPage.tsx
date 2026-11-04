@@ -85,6 +85,9 @@ export function ApplicationDetailPage() {
   const [maxApprovalAmount, setMaxApprovalAmount] = useState<number | null>(null)
   const [positionMaxApprovalAmount, setPositionMaxApprovalAmount] = useState<number | null>(null)
   const [branchMaxApprovalAmount, setBranchMaxApprovalAmount] = useState<number | null>(null)
+  const [positionCurrencyCode, setPositionCurrencyCode] = useState('TRY')
+  const [branchCurrencyCode, setBranchCurrencyCode] = useState('TRY')
+  const [appliedCurrencyCode, setAppliedCurrencyCode] = useState('TRY')
   const [approvalAuthorityEnabled, setApprovalAuthorityEnabled] = useState(false)
 
   const uiLocale = (i18n.language || 'tr').slice(0, 2)
@@ -157,7 +160,8 @@ export function ApplicationDetailPage() {
       return
     }
     let cancelled = false
-    getCreditDocumentsConfig()
+    const appCurrency = item?.currencyCode || undefined
+    getCreditDocumentsConfig(appCurrency)
       .then((cfg) => {
         if (cancelled) return
         const mode = (cfg.approveGateMode || 'None') as ApproveGateMode
@@ -178,6 +182,15 @@ export function ApplicationDetailPage() {
             ? null
             : Number(cfg.branchMaxApprovalAmount),
         )
+        setPositionCurrencyCode(
+          cfg.positionCurrencyCode || cfg.authorityCurrencyCode || appCurrency || 'TRY',
+        )
+        setBranchCurrencyCode(
+          cfg.branchCurrencyCode || cfg.authorityCurrencyCode || appCurrency || 'TRY',
+        )
+        setAppliedCurrencyCode(
+          appCurrency || cfg.authorityCurrencyCode || 'TRY',
+        )
       })
       .catch(() => {
         if (!cancelled) {
@@ -191,7 +204,7 @@ export function ApplicationDetailPage() {
     return () => {
       cancelled = true
     }
-  }, [isStaff])
+  }, [isStaff, item?.currencyCode])
 
   useEffect(() => {
     const onRealtime = (event: Event) => {
@@ -942,7 +955,7 @@ export function ApplicationDetailPage() {
             {approvalAuthorityEnabled && maxApprovalAmount !== null && (
               <p className="muted">
                 {t('applications.authorityLimit', {
-                  amount: formatMoney(maxApprovalAmount, item.currencyCode, i18n.language),
+                  amount: formatMoney(maxApprovalAmount, appliedCurrencyCode, i18n.language),
                 })}
                 {(positionMaxApprovalAmount !== null || branchMaxApprovalAmount !== null) && (
                   <>
@@ -951,13 +964,21 @@ export function ApplicationDetailPage() {
                     {t('applications.authorityLimitBreakdown', {
                       position:
                         positionMaxApprovalAmount === null
-                          ? t('applications.authorityLimitUnlimited')
-                          : formatMoney(positionMaxApprovalAmount, item.currencyCode, i18n.language),
+                          ? t('applications.authorityLimitNAforCurrency')
+                          : formatMoney(
+                              positionMaxApprovalAmount,
+                              positionCurrencyCode,
+                              i18n.language,
+                            ),
                       branch:
                         branchMaxApprovalAmount === null
-                          ? t('applications.authorityLimitUnlimited')
-                          : formatMoney(branchMaxApprovalAmount, item.currencyCode, i18n.language),
-                      applied: formatMoney(maxApprovalAmount, item.currencyCode, i18n.language),
+                          ? t('applications.authorityLimitNAforCurrency')
+                          : formatMoney(
+                              branchMaxApprovalAmount,
+                              branchCurrencyCode,
+                              i18n.language,
+                            ),
+                      applied: formatMoney(maxApprovalAmount, appliedCurrencyCode, i18n.language),
                     })}
                     )
                   </>
