@@ -1055,6 +1055,48 @@ html[data-theme="dark"] .chip-btn.active {
   flex-basis: 100%;
 }
 
+.staff-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem 1.25rem;
+  align-items: end;
+  margin: 0.75rem 0 1rem;
+}
+
+.staff-search {
+  display: grid;
+  gap: 0.35rem;
+  min-width: min(280px, 100%);
+  font-size: 0.9rem;
+}
+
+.staff-search input {
+  min-width: 0;
+}
+
+.staff-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(20, 32, 51, 0.5);
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  overflow: auto;
+}
+
+.staff-modal-panel {
+  width: min(560px, 100%);
+  max-height: min(90vh, 900px);
+  overflow: auto;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+}
+
 .avatar-crop-overlay {
   position: fixed;
   inset: 0;

@@ -5,6 +5,7 @@ import { getBranches } from '../api/branchesApi'
 import { createStaffUser, getStaffUsers, updateStaffUser } from '../api/staffApi'
 import { resolveProfileImageUrl } from '../api/profileApi'
 import { useAuth } from '../auth/AuthContext'
+import { BranchFilter } from '../components/BranchFilter'
 import type {
   BranchListItem,
   Gender,
@@ -16,6 +17,7 @@ import type {
 import { mapApiError } from '../utils/mapApiError'
 
 type ActiveFilter = 'all' | 'active' | 'inactive'
+type ManagerFilter = 'all' | 'managers' | 'staff'
 
 const TITLES: PersonTitle[] = ['Dr', 'Prof']
 const GENDERS: Gender[] = ['Female', 'Male', 'PreferNotToSay']
@@ -75,9 +77,13 @@ function toEditForm(item: StaffUserListItem): EditForm {
 
 export function StaffPage() {
   const { t, i18n } = useTranslation()
-  const { isManager, user } = useAuth()
+  const { isManager, isSuperAdmin, user } = useAuth()
   const [pageIndex, setPageIndex] = useState(0)
   const [activeFilter, setActiveFilter] = useState<ActiveFilter>('all')
+  const [managerFilter, setManagerFilter] = useState<ManagerFilter>('all')
+  const [branchFilter, setBranchFilter] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [search, setSearch] = useState('')
   const [data, setData] = useState<GetListResponse<StaffUserListItem> | null>(null)
   const [loading, setLoading] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
@@ -93,13 +99,22 @@ export function StaffPage() {
     setLoading(true)
     const isActive =
       activeFilter === 'active' ? true : activeFilter === 'inactive' ? false : null
-    return getStaffUsers(pageIndex, 10, isActive)
+    const isManagerFlag =
+      managerFilter === 'managers' ? true : managerFilter === 'staff' ? false : null
+    return getStaffUsers({
+      pageIndex,
+      pageSize: 10,
+      isActive,
+      isManager: isManagerFlag,
+      branchId: branchFilter || null,
+      search: search || null,
+    })
       .then((res) => setData(res))
       .catch((err: unknown) => {
         toast.error(mapApiError(err, t))
       })
       .finally(() => setLoading(false))
-  }, [isManager, pageIndex, activeFilter, t])
+  }, [isManager, pageIndex, activeFilter, managerFilter, branchFilter, search, t])
 
   useEffect(() => {
     void loadList()
@@ -111,6 +126,27 @@ export function StaffPage() {
       .then(setBranches)
       .catch(() => setBranches([]))
   }, [isManager])
+
+  useEffect(() => {
+    if (!showCreate && !editing) return
+    function onKey(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        setShowCreate(false)
+        setEditing(null)
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showCreate, editing])
+
+  useEffect(() => {
+    const handle = window.setTimeout(() => setSearch(searchInput.trim()), 350)
+    return () => window.clearTimeout(handle)
+  }, [searchInput])
+
+  useEffect(() => {
+    setPageIndex(0)
+  }, [search, activeFilter, managerFilter, branchFilter])
 
   if (!isManager) {
     return (
@@ -128,7 +164,7 @@ export function StaffPage() {
       await createStaffUser({
         email: form.email.trim(),
         password: form.password,
-        isManager: form.isManager,
+        isManager: isSuperAdmin ? form.isManager : false,
         firstName: form.firstName.trim() || null,
         lastName: form.lastName.trim() || null,
         title: form.title || null,
@@ -246,25 +282,96 @@ export function StaffPage() {
     }
   }
 
+  function canEditTarget(item: StaffUserListItem) {
+    if (isSuperAdmin) return true
+    if (item.id === user?.userId) return true
+    return !item.isManager
+  }
+
+  function canToggleActive(item: StaffUserListItem) {
+    if (item.id === user?.userId) return false
+    if (isSuperAdmin) return true
+    return !item.isManager
+  }
+
+  function canToggleManager(item: StaffUserListItem) {
+    if (!isSuperAdmin) return false
+    return item.id !== user?.userId
+  }
+
   function displayName(item: StaffUserListItem) {
     const name = `${item.firstName || ''} ${item.lastName || ''}`.trim()
     return name || '—'
+  }
+
+  function openCreate() {
+    setEditing(null)
+    setShowCreate(true)
+  }
+
+  function openEdit(item: StaffUserListItem) {
+    setShowCreate(false)
+    setEditing(toEditForm(item))
   }
 
   return (
     <section>
       <div className="page-header-row">
         <h1>{t('staff.title')}</h1>
-        <button type="button" className="btn primary" onClick={() => setShowCreate((v) => !v)}>
-          {showCreate ? t('common.cancel') : t('staff.newStaff')}
+        <button type="button" className="btn primary" onClick={openCreate}>
+          {t('staff.newStaff')}
         </button>
       </div>
 
       <p className="muted">{t('staff.hint')}</p>
 
+      <div className="staff-filters">
+        <label className="staff-search">
+          {t('staff.search')}
+          <input
+            type="search"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder={t('staff.searchPlaceholder')}
+            autoComplete="off"
+          />
+        </label>
+        <BranchFilter
+          value={branchFilter}
+          onChange={(id) => setBranchFilter(id)}
+          allowAll
+        />
+        <div className="chip-row" role="tablist" aria-label={t('staff.managerFilter')}>
+          {([
+            ['all', 'filter_manager_all'],
+            ['managers', 'filter_managers'],
+            ['staff', 'filter_non_managers'],
+          ] as const).map(([key, labelKey]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              className={`chip-btn${managerFilter === key ? ' active' : ''}`}
+              onClick={() => setManagerFilter(key)}
+            >
+              {t(`staff.${labelKey}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {showCreate && (
-        <form className="panel form" onSubmit={onCreate}>
-          <h2>{t('staff.newStaff')}</h2>
+        <div
+          className="staff-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="staff-create-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !creating) setShowCreate(false)
+          }}
+        >
+          <form className="staff-modal-panel form" onSubmit={onCreate}>
+          <h2 id="staff-create-title">{t('staff.newStaff')}</h2>
           <label>
             {t('login.email')}
             <input
@@ -373,23 +480,45 @@ export function StaffPage() {
               ))}
             </select>
           </label>
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={form.isManager}
-              onChange={(e) => setForm((f) => ({ ...f, isManager: e.target.checked }))}
-            />
-            {t('staff.isManager')}
-          </label>
-          <button type="submit" className="btn success" disabled={creating}>
-            {creating ? t('common.loading') : t('staff.create')}
-          </button>
-        </form>
+          {isSuperAdmin && (
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={form.isManager}
+                onChange={(e) => setForm((f) => ({ ...f, isManager: e.target.checked }))}
+              />
+              {t('staff.isManager')}
+            </label>
+          )}
+          <div className="actions-cell">
+            <button type="submit" className="btn success" disabled={creating}>
+              {creating ? t('common.loading') : t('staff.create')}
+            </button>
+            <button
+              type="button"
+              className="btn ghost"
+              onClick={() => setShowCreate(false)}
+              disabled={creating}
+            >
+              {t('common.cancel')}
+            </button>
+          </div>
+          </form>
+        </div>
       )}
 
       {editing && (
-        <form className="panel form" onSubmit={onSaveEdit}>
-          <h2>{t('staff.editStaff')}</h2>
+        <div
+          className="staff-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="staff-edit-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !savingEdit) setEditing(null)
+          }}
+        >
+          <form className="staff-modal-panel form" onSubmit={onSaveEdit}>
+          <h2 id="staff-edit-title">{t('staff.editStaff')}</h2>
           <label>
             {t('login.email')}
             <input
@@ -503,8 +632,8 @@ export function StaffPage() {
               placeholder={t('profile.newPasswordHint')}
             />
           </label>
-          {editing.id !== user?.userId && (
-            <>
+          {editing.id !== user?.userId &&
+            (isSuperAdmin || !editing.isManager) && (
               <label className="checkbox-row">
                 <input
                   type="checkbox"
@@ -513,15 +642,16 @@ export function StaffPage() {
                 />
                 {t('staff.active')}
               </label>
-              <label className="checkbox-row">
-                <input
-                  type="checkbox"
-                  checked={editing.isManager}
-                  onChange={(e) => setEditing({ ...editing, isManager: e.target.checked })}
-                />
-                {t('staff.isManager')}
-              </label>
-            </>
+            )}
+          {isSuperAdmin && editing.id !== user?.userId && (
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={editing.isManager}
+                onChange={(e) => setEditing({ ...editing, isManager: e.target.checked })}
+              />
+              {t('staff.isManager')}
+            </label>
           )}
           <div className="actions-cell">
             <button type="submit" className="btn success" disabled={savingEdit}>
@@ -536,7 +666,8 @@ export function StaffPage() {
               {t('common.cancel')}
             </button>
           </div>
-        </form>
+          </form>
+        </div>
       )}
 
       <div className="chip-row" role="tablist" aria-label={t('staff.filter')}>
@@ -546,10 +677,7 @@ export function StaffPage() {
             type="button"
             role="tab"
             className={`chip-btn${activeFilter === f ? ' active' : ''}`}
-            onClick={() => {
-              setActiveFilter(f)
-              setPageIndex(0)
-            }}
+            onClick={() => setActiveFilter(f)}
           >
             {t(`staff.filter_${f}`)}
           </button>
@@ -634,34 +762,40 @@ export function StaffPage() {
                         })}
                       </td>
                       <td className="actions-cell">
-                        <button
-                          type="button"
-                          className="btn ghost"
-                          disabled={busy}
-                          onClick={() => setEditing(toEditForm(item))}
-                        >
-                          {t('common.edit')}
-                        </button>
-                        <button
-                          type="button"
-                          className={item.isActive ? 'btn reject' : 'btn success'}
-                          disabled={busy || isSelf}
-                          onClick={() => onToggleActive(item)}
-                        >
-                          {busy
-                            ? t('common.loading')
-                            : item.isActive
-                              ? t('staff.deactivate')
-                              : t('staff.activate')}
-                        </button>
-                        <button
-                          type="button"
-                          className="btn ghost"
-                          disabled={busy || isSelf}
-                          onClick={() => onToggleManager(item)}
-                        >
-                          {item.isManager ? t('staff.removeManager') : t('staff.makeManager')}
-                        </button>
+                        {canEditTarget(item) && (
+                          <button
+                            type="button"
+                            className="btn ghost"
+                            disabled={busy}
+                            onClick={() => openEdit(item)}
+                          >
+                            {t('common.edit')}
+                          </button>
+                        )}
+                        {canToggleActive(item) && (
+                          <button
+                            type="button"
+                            className={item.isActive ? 'btn reject' : 'btn success'}
+                            disabled={busy}
+                            onClick={() => onToggleActive(item)}
+                          >
+                            {busy
+                              ? t('common.loading')
+                              : item.isActive
+                                ? t('staff.deactivate')
+                                : t('staff.activate')}
+                          </button>
+                        )}
+                        {canToggleManager(item) && (
+                          <button
+                            type="button"
+                            className="btn ghost"
+                            disabled={busy}
+                            onClick={() => onToggleManager(item)}
+                          >
+                            {item.isManager ? t('staff.removeManager') : t('staff.makeManager')}
+                          </button>
+                        )}
                       </td>
                     </tr>
                   )

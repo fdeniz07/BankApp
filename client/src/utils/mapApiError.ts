@@ -25,6 +25,12 @@ const MESSAGE_KEYS: Record<string, string> = {
   'Cannot deactivate the last active bank manager.': 'errors.staffCannotDeactivateLastManager',
   'Cannot remove manager role from the last active bank manager.':
     'errors.staffCannotDemoteLastManager',
+  'Only SuperAdmin can update or deactivate other bank managers.':
+    'errors.staffCannotManageOtherManagers',
+  'Only SuperAdmin can assign or remove the bank manager role.':
+    'errors.staffOnlySuperAdminAssignManager',
+  'Only SuperAdmin can create staff accounts with the bank manager role.':
+    'errors.staffOnlySuperAdminCreateManager',
   'Email already exists.': 'errors.emailAlreadyExists',
   'Email must not contain Turkish characters': 'errors.emailTurkishChars',
   'Email address is not confirmed. Please check your inbox.': 'errors.emailNotConfirmed',
