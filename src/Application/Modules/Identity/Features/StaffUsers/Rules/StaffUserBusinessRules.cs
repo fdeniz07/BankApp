@@ -86,6 +86,55 @@ public class StaffUserBusinessRules : BaseBusinessRules
             uoc => uoc.UserId == userId && uoc.OperationClaimId == managerClaim.Id);
     }
 
+    public async Task<bool> UserHasElevatedStaffRoleAsync(Guid userId)
+    {
+        if (await UserHasManagerRoleAsync(userId))
+            return true;
+
+        Core.Security.Entities.OperationClaim? superAdminClaim = await _operationClaimRepository.GetAsync(
+            c => c.Name == GeneralOperationClaims.SuperAdmin);
+
+        if (superAdminClaim is null)
+            return false;
+
+        return await _userOperationClaimRepository.AnyAsync(
+            uoc => uoc.UserId == userId && uoc.OperationClaimId == superAdminClaim.Id);
+    }
+
+    /// <summary>
+    /// BankManager may mutate self (profile) or non-elevated staff; other managers require SuperAdmin.
+    /// </summary>
+    public async Task EnsureBankManagerMayMutateTargetAsync(
+        bool actorIsSuperAdmin,
+        bool isSelf,
+        Guid targetUserId)
+    {
+        if (actorIsSuperAdmin || isSelf)
+            return;
+
+        if (await UserHasElevatedStaffRoleAsync(targetUserId))
+            throw new BusinessException(StaffUserMessages.CannotManageOtherManagers);
+    }
+
+    public Task OnlySuperAdminMayAssignManagerRole(bool actorIsSuperAdmin, bool currentIsManager, bool nextIsManager)
+    {
+        if (currentIsManager == nextIsManager)
+            return Task.CompletedTask;
+
+        if (!actorIsSuperAdmin)
+            throw new BusinessException(StaffUserMessages.OnlySuperAdminMayAssignManager);
+
+        return Task.CompletedTask;
+    }
+
+    public Task OnlySuperAdminMayCreateManager(bool actorIsSuperAdmin, bool requestIsManager)
+    {
+        if (requestIsManager && !actorIsSuperAdmin)
+            throw new BusinessException(StaffUserMessages.OnlySuperAdminMayCreateManager);
+
+        return Task.CompletedTask;
+    }
+
     private async Task<int> CountActiveManagersAsync()
     {
         Core.Repositories.IPaginate<ApplicationUser> staffUsers = await _applicationUserRepository.GetListAsync(

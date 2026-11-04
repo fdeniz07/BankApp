@@ -9,6 +9,12 @@ public static class StaffUserMessages
     public const string CannotModifySelf = "You cannot deactivate your own staff account.";
     public const string CannotDeactivateLastManager = "Cannot deactivate the last active bank manager.";
     public const string CannotDemoteLastManager = "Cannot remove manager role from the last active bank manager.";
+    public const string CannotManageOtherManagers =
+        "Only SuperAdmin can update or deactivate other bank managers.";
+    public const string OnlySuperAdminMayAssignManager =
+        "Only SuperAdmin can assign or remove the bank manager role.";
+    public const string OnlySuperAdminMayCreateManager =
+        "Only SuperAdmin can create staff accounts with the bank manager role.";
     public const string BankStaffClaimMissing = "Operation claim 'BankStaff' is not seeded.";
     public const string BankManagerClaimMissing = "Operation claim 'BankManager' is not seeded.";
 }

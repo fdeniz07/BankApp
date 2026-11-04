@@ -17,6 +17,17 @@
 | SuperAdmin | Tümü + `?branchId=` | Tümü | Evet |
 | Customer | Kendi kaydı | Kendi kaydı | Yok |
 
+### Personel yönetimi (StaffUsers)
+
+| Aktör | Hedef | İzin |
+|-------|--------|------|
+| SuperAdmin | Herkes | Güncelle / aktif-pasif / yönetici rolü |
+| BankManager | Kendi hesabı | Profil alanları; **aktif-pasif ve IsManager değiştiremez** |
+| BankManager | Aynı şube, yönetici olmayan personel | Güncelle + aktif-pasif; **IsManager atayamaz** |
+| BankManager | Başka BankManager / SuperAdmin | **Yasak** |
+
+Create’te `IsManager=true` yalnızca SuperAdmin. UI: `StaffPage` aksiyonları + create checkbox aynı kurallara göre gizlenir.
+
 - `Customer.BranchId` / `CreditApplication.BranchId` (create’te müşteriden kopya).
 - JWT `branchId` claim; `IBranchAuthorizationService`.
 - Seed: NYC-01, CHI-01; `superadmin@bank.local`; pending başvurularda sahte evrak.
@@ -62,6 +73,7 @@ Lab şifresi (tüm demo hesaplar): `Demo123!` — Personel/Yönetici/Müşteri �
 - `ICurrentUserService.IsSuperAdmin` / `BranchId`
 - `JwtHelper.CreateToken(..., branchId)`
 - Branch CRUD: `CreateBranchRequest` / `UpdateBranchRequest`
+- Staff RBAC: `StaffUserBusinessRules.EnsureBankManagerMayMutateTargetAsync`, `OnlySuperAdminMayAssignManagerRole`, `OnlySuperAdminMayCreateManager`
 - Seed: `BranchSeed`, `CustomerBranchAssignmentSeed`, `ApplicationBranchAssignmentSeed`, `CreditApplicationDocumentSeed`
 
 ## Repoda nerede?
@@ -70,7 +82,8 @@ Lab şifresi (tüm demo hesaplar): `Demo123!` — Personel/Yönetici/Müşteri �
 - `src/WebApi/Services/CurrentUserService.cs`
 - `src/WebApi/Modules/Identity/Controllers/BranchesController.cs`
 - `src/Persistence/Seed/*Branch*`
-- `client/src/pages/BranchesPage.tsx`, `BranchFilter.tsx`
+- `client/src/pages/BranchesPage.tsx`, `BranchFilter.tsx`, `StaffPage.tsx`
+- `StaffUserBusinessRules` / Update+Create StaffUser handlers
 - Migration: `AddCustomerAndApplicationBranchId`
 
 ## Mini akış
@@ -78,12 +91,14 @@ Lab şifresi (tüm demo hesaplar): `Demo123!` — Personel/Yönetici/Müşteri �
 1. `staff.nyc@` login → JWT’de NYC branchId → yalnızca NYC başvuruları.
 2. `manager.nyc@` `?branchId=` ile CHI listesini okur → approve butonu UI’da gizli; API 403.
 3. `superadmin@` Şubeler sayfasından CHI-01 günceller; herhangi bir başvuruyu onaylar.
+4. `manager.nyc@` Personel’de aynı şube staff’ı pasif eder; başka manager satırında Düzenle/Pasif/Rol yok; “Yönetici” create checkbox görünmez. SuperAdmin her ikisini de yapar.
 
 ## Where useful
 
 - [ ] SuperAdmin login + `/branches` CRUD
 - [ ] Staff NYC / CHI izolasyonu
 - [ ] Manager cross-branch read-only
+- [ ] Manager başka manager’ı güncelleyemez / IsManager atayamaz; SuperAdmin atayabilir
 - [ ] Pending başvuruda demo PDF/JPEG görünür
 - [ ] Seq’te `AccessDenied` (yanlış şube yazma denemesi)
 
