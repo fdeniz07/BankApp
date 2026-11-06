@@ -34,3 +34,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-02 | `31`: Personel ES indeksi (`bankapp-staff`) + StaffPage şube/metin/rol filtre + düzenleme modal |
 | 2026-11-02 | `31`: Müşteri (`bankapp-customers`) + kredi türü (`bankapp-credit-types`) ES filtre/facet |
 | 2026-11-04 | `00` + history/roadmap (TR/EN/DE): ES indeksleri + DoA PB ile senkron |
+| 2026-11-06 | `33`: Keycloak lab Faz 1 — Compose (`:8180`) + `bankapp` realm import + token curl |

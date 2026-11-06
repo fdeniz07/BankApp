@@ -80,5 +80,5 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 - [ ] Kubernetes / ArgoCD Deployment
 - [ ] Raft-Vault / Secret-Rotation (Produktion; jenseits Compose-Dev-Mode — Learning 19)
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
-- [ ] Keycloak-Unterstützung
+- [ ] Keycloak-Unterstützung (Phase 1 Lab: Compose + Realm ✓; WebApi-JWT-Validierung später)
 - [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)

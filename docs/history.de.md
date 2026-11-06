@@ -65,3 +65,4 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Admin-Tailwind-Dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
 - [x] Filial-Obergrenze mit Währung (`MaxApprovalCurrencyCode` + `ApprovalAuthority:CurrencyCode`); nur bei gleicher Währung
 - [x] Manager-Personal-RBAC + StaffPage-Modal; ES-Indizes Personal/Kunden/Kreditarten (`bankapp-staff` / `customers` / `credit-types`)
+- [x] Keycloak-Lab Phase 1: Compose (`:8180`) + Realm `bankapp`; WebApi-Login weiter lokal JWT

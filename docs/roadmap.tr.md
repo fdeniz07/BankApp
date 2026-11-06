@@ -80,5 +80,5 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 - [ ] Kubernetes / ArgoCD dağıtımı
 - [ ] Raft Vault / secret rotasyonu (üretim; Compose dev-mode dışı — learning 19)
 - [ ] OAuth (sosyal medya ile kayıt / giriş)
-- [ ] Keycloak desteği
+- [ ] Keycloak desteği (Faz 1 lab: Compose + realm ✓; WebApi JWT doğrulama sonra)
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

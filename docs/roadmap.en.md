@@ -80,5 +80,5 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 - [ ] Kubernetes / ArgoCD deployment
 - [ ] Raft Vault / secret rotation (production; beyond Compose dev-mode — learning 19)
 - [ ] OAuth (social sign-up / login)
-- [ ] Keycloak support
+- [ ] Keycloak support (Phase 1 lab: Compose + realm ✓; WebApi JWT validation later)
 - [ ] Chatbot (customer / staff support assistant)

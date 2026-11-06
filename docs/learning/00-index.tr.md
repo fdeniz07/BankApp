@@ -63,6 +63,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Credit / Security | Onay evrak kapısı + DoA (şube/pozisyon PB etiketli) | [30](30-approve-gate-authority.tr.md) |
 | Search / Observability | ELK + başvuru/personel/müşteri/kredi türü arama + facets | [31](31-elk-elasticsearch.tr.md) |
 | UX / DevOps | Admin Tailwind dashboard + Vite chunk/gzip | [32](32-admin-tailwind-dashboard.tr.md) |
+| Security / Lab | Keycloak (Faz 1: Compose + realm; JWT geçişi sonra) | [33](33-keycloak-lab.tr.md) |
 
 Gereksinim (BRD/FRD): [docs/requirements/00-index.tr.md](../requirements/00-index.tr.md)
 
