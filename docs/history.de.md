@@ -66,3 +66,4 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Filial-Obergrenze mit Währung (`MaxApprovalCurrencyCode` + `ApprovalAuthority:CurrencyCode`); nur bei gleicher Währung
 - [x] Manager-Personal-RBAC + StaffPage-Modal; ES-Indizes Personal/Kunden/Kreditarten (`bankapp-staff` / `customers` / `credit-types`)
 - [x] Keycloak-Lab: Compose (`:8180`) + Realm; WebApi Dual-JWT + Claim-Enrich; UI-Login weiter lokal
+- [x] Vault JWT Dual-Key Lab-Rotation (`jwt_security_key_previous` + Script); Raft-HA später

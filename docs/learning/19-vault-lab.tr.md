@@ -99,41 +99,62 @@ docker compose --env-file .env up -d --force-recreate webapi
 
 **Dikkat / best practice:** Dev mode ≠ prod (Raft, policy, rotation). Root token’ı public issue’ya yapıştırma. SQL/Rabbit hâlâ Compose env — bilinçli sadeleştirme.
 
-## Secret rotasyonu ve Raft (bilinçli olarak sonra)
+## Secret rotasyonu (lab dual-key) ve Raft (hâlâ sonra)
 
-Bu lab **dev-mode** Vault kullanır: tek süreç, bellek/ephemeral, root token. Amaç JWT overlay’i görmek — HA production değil.
+Bu lab **dev-mode** Vault kullanır: tek süreç, ephemeral, root token. **JWT dual-key rotasyonu** eklendi; **Raft HA** yok.
 
-| Konu | Lab’de durum | Üretimde (sonraki dilim) |
-|------|--------------|---------------------------|
-| **Raft / HA** | Yok (dev server) | En az 3 node Raft, unseal, audit |
-| **Policy** | Root token her şeye yetkili | App role / policy: sadece `secret/data/bankapp` okuma |
-| **Secret rotasyonu** | Seed tekrar + WebApi recreate (manuel) | Lease/TTL, JWT key rotate → rolling restart; SQL/Rabbit ayrı |
-| **JWT key değiştirme (lab)** | UI veya `vault kv put` → `webapi` force-recreate | Key id / dual-key penceresi (kesinti az) |
+| Konu | Lab’de durum | Üretimde |
+|------|--------------|----------|
+| **JWT rotasyon** | `jwt_security_key` + `jwt_security_key_previous`; WebApi imza=current, doğrulama=ikisi | Key id, kısa dual-key penceresi, rolling restart |
+| **Raft / HA** | Yok | ≥3 node Raft, unseal, audit |
+| **Policy** | Root token | AppRole + dar policy |
 
-Lab’de “rotasyon” deneyi (en az yıkıcı → daha yıkıcı):
+### Dual-key rotate (önerilen lab)
 
 ```powershell
-# 1) Sadece KV değerini güncelle (UI veya CLI), sonra WebApi’yi yeniden başlat
-docker compose -f infra/docker-compose.yml --env-file infra/.env exec vault `
-  vault kv put secret/bankapp jwt_security_key="YENI_EN_AZ_64_BYTE_KEY_BURAYA________________________"
-docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate webapi
-# Seq/log: Vault overlay applied; eski JWT’ler geçersiz olabilir → yeniden login
+cd infra
 
-# 2) Vault recreate (dev secret’lar silinir) → seed → webapi
-# (-v volume silme: bu Compose’ta Vault genelde ephemeral; yine de dikkat)
-docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate vault
-docker compose -f infra/docker-compose.yml --env-file infra/.env up vault-seed
-docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate webapi
+# Aktif key → previous; yeni aktif key yaz (mssql/rabbit alanları korunur)
+docker compose --env-file .env exec `
+  -e VAULT_TOKEN=bankapp-vault-root-token `
+  vault /bin/sh /vault-rotate-jwt.sh
+
+# WebApi Vault overlay’i yeniden okusun (--no-deps: vault-seed yeniden yazmasın)
+docker compose --env-file .env up -d --force-recreate --no-deps webapi
 ```
 
-**Raft neden şimdi yok?** Compose’a 3 node + unseal + storage eklemek eğitim maliyetini şişirir; JWT overlay öğrenildikten sonra ayrı platform dilimi olarak anlamlı. Roadmap: *Raft Vault / secret rotasyonu (üretim)*.
+**Kontrol:** `vault kv get secret/bankapp` → `jwt_security_key` ve `jwt_security_key_previous`; log’da `SecurityKey + Previous`.  
+Eski (previous ile imzalı) access token hâlâ geçerli olmalı; yeni login current ile imzalanır.  
+`vault-seed` artık secret varsa üzerine yazmaz (rotasyonu korur); yine de recreate’de `--no-deps` kullanmak güvenli alışkanlıktır.
+
+İsteğe bağlı özel key:
+
+```powershell
+docker compose --env-file .env exec `
+  -e VAULT_TOKEN=bankapp-vault-root-token `
+  -e NEW_JWT_KEY="BankApp-Rotated-Jwt-Key-Replace-Me-With-At-Least-64-Characters-ABCDEF" `
+  vault /bin/sh /vault-rotate-jwt.sh
+```
+
+### Daha yıkıcı (eski yol)
+
+```powershell
+docker compose --env-file .env up -d --force-recreate vault
+docker compose --env-file .env up vault-seed
+docker compose --env-file .env up -d --force-recreate webapi
+```
+
+**Raft neden şimdi yok?** 3 node + unseal Compose maliyeti yüksek; dual-key öğrenildikten sonra ayrı platform dilimi.
 
 ## Sınıflar, metotlar, paketler
 
 | İsim | Rol |
 |------|-----|
 | `VaultOptions` | Enabled, Address, Token, MountPath, SecretPath |
-| `ApplyVaultSecretsAsync` | HTTP GET KV → `jwt_security_key` → config overlay |
+| `ApplyVaultSecretsAsync` | HTTP GET KV → `jwt_security_key` (+ optional previous) → config overlay |
+| `TokenOptions.SecurityKeyPrevious` | Dual-key validation window |
+| `TokenSigningKeyFactory` | İmza: current; doğrulama: current + previous |
+| `vault-rotate-jwt.sh` | KV rotate (previous ← current) |
 | `Program.cs` | DI’dan önce `await builder.Configuration.ApplyVaultSecretsAsync()` |
 
 Paket: ek Vault SDK yok — `HttpClient` + JSON.
@@ -147,9 +168,11 @@ src/WebApi/Program.cs
 src/WebApi/appsettings.json          # Vault:Enabled=false (local)
 infra/docker-compose.yml             # Vault__Enabled=true
 infra/scripts/vault-seed.sh
+infra/scripts/vault-rotate-jwt.sh
 infra/.env.example
 ```
 
 ## Mini akış
 
-vault-seed `jwt_security_key` yazar → WebApi start → GET `/v1/secret/data/bankapp` → SecurityKey overlay → JWT imza bu key ile.
+vault-seed `jwt_security_key` yazar → WebApi start → overlay → JWT imza current key ile.  
+Rotate script → previous + new current → WebApi recreate → eski token previous ile doğrulanır, yeni login current ile.

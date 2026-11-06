@@ -36,3 +36,5 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-04 | `00` + history/roadmap (TR/EN/DE): ES indeksleri + DoA PB ile senkron |
 | 2026-11-06 | `33`: Keycloak lab Faz 1 — Compose (`:8180`) + `bankapp` realm import + token curl |
 | 2026-11-06 | `33`: Keycloak Faz 2 — WebApi dual JwtBearer + claim enrich (`Keycloak:Enabled`) |
+| 2026-11-06 | `19`: JWT dual-key rotasyon (`jwt_security_key_previous` + `vault-rotate-jwt.sh`); Raft hâlâ sonra |
+| 2026-11-06 | `19`: `vault-seed` idempotent (rotate sonrası previous korunur); recreate `--no-deps` |

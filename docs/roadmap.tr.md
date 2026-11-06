@@ -78,7 +78,7 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 - [x] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
 - [x] Müşteri + kredi türü ES arama/filtre/facet (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD dağıtımı
-- [ ] Raft Vault / secret rotasyonu (üretim; Compose dev-mode dışı — learning 19)
+- [ ] Raft Vault HA (üretim; Compose 3-node — learning 19); JWT dual-key lab rotasyonu ✓
 - [ ] OAuth (sosyal medya ile kayıt / giriş)
 - [ ] Keycloak desteği (Compose + dual JWT ✓; login UI / OAuth sonra)
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

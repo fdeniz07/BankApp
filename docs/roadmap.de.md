@@ -78,7 +78,7 @@ Chronologische Phasen: [history.de.md](history.de.md). Architekturdiskussion: [a
 - [x] Admin-Welcome-Dashboard (Tailwind CSS + Bundle-Kompression / Performance)
 - [x] Kunden- + Kreditarten-ES Suche/Filter/Facetten (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD Deployment
-- [ ] Raft-Vault / Secret-Rotation (Produktion; jenseits Compose-Dev-Mode — Learning 19)
+- [ ] Raft-Vault HA (Produktion; Compose 3-Node — Learning 19); JWT Dual-Key Lab-Rotation ✓
 - [ ] OAuth (Registrierung / Login über soziale Netzwerke)
 - [ ] Keycloak-Unterstützung (Compose + Dual-JWT ✓; Login-UI / OAuth später)
 - [ ] Chatbot (Kunden- / Mitarbeiter-Support-Assistent)

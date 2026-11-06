@@ -78,7 +78,7 @@ For chronological phases, see [history.en.md](history.en.md). Architecture discu
 - [x] Admin welcome dashboard (Tailwind CSS + bundle compression / performance)
 - [x] Customer + credit-type ES search/filter/facets (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD deployment
-- [ ] Raft Vault / secret rotation (production; beyond Compose dev-mode — learning 19)
+- [ ] Raft Vault HA (production; Compose 3-node — learning 19); JWT dual-key lab rotation ✓
 - [ ] OAuth (social sign-up / login)
 - [ ] Keycloak support (Compose + dual JWT ✓; login UI / OAuth later)
 - [ ] Chatbot (customer / staff support assistant)
