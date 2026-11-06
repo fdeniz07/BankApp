@@ -12,7 +12,7 @@
 # WebApi overlays TokenOptions:SecurityKey from Vault when Vault__Enabled=true (Compose default).
 # Observability: Grafana http://localhost:3001 (default admin/admin) — Seq remains for .NET log UX
 # ELK lab: Elasticsearch (search + logs index) + Logstash (Serilog HTTP/TCP) + Kibana
-# Keycloak lab (Faz 1): http://localhost:8180 — realm `bankapp` import; WebApi login still local JWT
+# Keycloak lab: http://localhost:8180 — realm import; WebApi accepts Keycloak JWT when Keycloak__Enabled=true (local login remains)
 
 services:
   elasticsearch:
@@ -328,6 +328,11 @@ services:
       Elasticsearch__CreditTypesIndex: "bankapp-credit-types"
       Logstash__Enabled: "true"
       Logstash__HttpUrl: "http://logstash:8080"
+      Keycloak__Enabled: "true"
+      Keycloak__Authority: "http://keycloak:8080/realms/bankapp"
+      Keycloak__ValidIssuers__0: "http://localhost:8180/realms/bankapp"
+      Keycloak__ValidIssuers__1: "http://keycloak:8080/realms/bankapp"
+      Keycloak__RealmPathMarker: "/realms/bankapp"
     volumes:
       - profile-uploads:/app/wwwroot/uploads
       - credit-document-uploads:/app/App_Data/credit-documents
@@ -348,6 +353,8 @@ services:
         condition: service_healthy
       logstash:
         condition: service_started
+      keycloak:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8080/health || exit 1"]
       interval: 10s

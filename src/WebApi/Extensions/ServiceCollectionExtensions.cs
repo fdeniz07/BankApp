@@ -5,19 +5,15 @@ using Application.Services.Messaging;
 using Application.Services.ProfileImages;
 using Ardalis.SmartEnum.SystemTextJson;
 using Core.Caching;
-using Core.Security.Encryption;
-using Core.Security.JWT;
 using Domain.Enums;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.IdentityModel.Tokens;
+using WebApi.Authentication;
 using WebApi.Constants;
 using WebApi.Modules.Credit;
 using WebApi.Modules.Credit.Idempotency;
 using WebApi.Modules.Notification;
 using WebApi.Modules.Notification.Messaging;
-using WebApi.Modules.Notification.Realtime;
 using WebApi.Services;
 
 namespace WebApi.Extensions;
@@ -44,7 +40,7 @@ public static class ServiceCollectionExtensions
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<Gender, int>());
                 options.JsonSerializerOptions.Converters.Add(new SmartEnumNameConverter<StaffPosition, int>());
             });
-        services.AddJwtAuthentication(configuration);
+        services.AddBankAppJwtAuthentication(configuration);
         services.AddRedisCaching(configuration);
         services.AddBankAppOpenTelemetry(configuration);
         services.AddOpenApi();
@@ -76,50 +72,6 @@ public static class ServiceCollectionExtensions
             json.Options.Converters.Add(new SmartEnumNameConverter<StaffPosition, int>());
         });
 
-        return services;
-    }
-
-    private static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<TokenOptions>(configuration.GetSection("TokenOptions"));
-        TokenOptions tokenOptions = configuration.GetSection("TokenOptions").Get<TokenOptions>()
-            ?? throw new InvalidOperationException("TokenOptions configuration is missing.");
-
-        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                options.MapInboundClaims = false;
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = tokenOptions.Issuer,
-                    ValidAudience = tokenOptions.Audience,
-                    IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey),
-                    ClockSkew = TimeSpan.Zero,
-                    NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier,
-                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
-                };
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        string? accessToken = context.Request.Query["access_token"];
-                        PathString path = context.HttpContext.Request.Path;
-                        if (!string.IsNullOrEmpty(accessToken)
-                            && path.StartsWithSegments(CreditApplicationsHub.Path))
-                        {
-                            context.Token = accessToken;
-                        }
-
-                        return Task.CompletedTask;
-                    }
-                };
-            });
-
-        services.AddAuthorization();
         return services;
     }
 
