@@ -5,7 +5,7 @@
 BankApp is a **full-stack educational banking sample** for **individual and corporate credit applications**.  
 Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (Identity / Customers / Credit / Notification), Domain Events + Outbox, Idempotency-Key, Saga, SignalR.  
 Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n and live credit notifications (SignalR).  
-Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, WebApi, client).
+Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, Keycloak lab, ELK, WebApi, client).
 
 **Docs:** [Roadmap](docs/roadmap.en.md) · [Tech learning](docs/tech-learning.en.md) · [Learning library (TR)](docs/learning/00-index.tr.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
@@ -32,12 +32,16 @@ Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, We
 
 ## Demo logins
 
-| Role         | Email (locale variants)                                      | Password   |
-| ------------ | ------------------------------------------------------------ | ---------- |
-| Bank staff   | `staff.tr@` / `staff.de@` / `staff.en@bank.local` (+ legacy `staff@`, `.nyc`, `.chi`) | `Demo123!` |
-| Bank manager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` (+ legacy `manager@`, `.nyc`, `.chi`, `.ber`) | `Demo123!` |
-| SuperAdmin   | `superadmin@bank.local`                                      | `Demo123!` |
-| Customer     | `customer.tr@` / `customer.de@` / `customer.en@bank.local` (+ `customer@`) | `Demo123!` |
+Shared password: **`Demo123!`**. Roughly 1 manager + 3 staff per branch (top-up seed).
+
+| Role | Example email | Branch |
+| ---- | ------------- | ------ |
+| SuperAdmin | `superadmin@bank.local` | — |
+| Manager | `manager.ist@` / `manager.tr@` (ANK) / `manager.ber@` / `manager.nyc@` / `manager.chi@bank.local` | IST / ANK / BER / NYC / CHI |
+| Staff | `staff.tr@`, `staff.ank@`, `staff.de@`, `staff.nyc@`, `staff.chi@` (+ `.analyst` / `.rm` / `.ops` variants) | same |
+| Customer | `customer.tr@` / `customer.en@` / `customer.de@bank.local` (+ `customer@`) | by locale |
+
+Legacy aliases still work: `staff@`, `manager@`, `manager.en@`, `staff.en@`, …
 
 Roles: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (manager also has BankStaff; SuperAdmin can CRUD branches).
 
@@ -57,24 +61,27 @@ Roles: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (manager als
 - **SignalR** (`/hubs/credit-applications`; staff + customer groups; publish after Outbox consumer)
 - **Decision letter email / SMS (lab)** — after approve/reject, queues `decision-letter` + `decision-letter-sms` → Seq/log (no SMTP/SMS gateway)
 - **Rate limiting** — policies `auth` / `write` / `fixed` (429); health + SignalR exempt
-- **Vault lab** — JWT `SecurityKey` overlay from `secret/bankapp` (Compose); env fallback
-- **Branch model** (Branches; staff BranchId; approve/reject decision-branch snapshot)
-- Application **document upload** (lab: identity / income / other; PDF/JPEG/PNG ≤5 MB; App_Data; not required for approval yet)
-- Payment plan (amortization) with **pluggable export** (`payment-plan/export?format=pdf`; CSV/XLSX later) + print via PDF
-- Dashboard summary, staff user management, profile + avatar (≤ 2 MB)
-- Credit type create / update / delete / activate-deactivate (**BankManager**)
+- **Vault lab** — JWT `SecurityKey` (+ dual-key `SecurityKeyPrevious`) overlay from `secret/bankapp`; rotate script; env fallback
+- **Keycloak lab** — Compose realm; dual JwtBearer (BankApp + Keycloak) + claim enrich
+- **Branch model** + **DoA** (`Branch.MaxApprovalAmount` + currency; position × branch cap)
+- `ApproveGateMode` (None/Soft/Hard) + document soft/hard gate
+- Application **document upload** (lab: identity / income / other; PDF/JPEG/PNG ≤5 MB; App_Data)
+- **ELK lab** — ES live search/facets (applications, staff, customers, credit types); Seq remains for logs
+- Payment plan (amortization) + PDF export/print
+- Dashboard summary + **Admin Tailwind dashboard** (`/dashboard`)
+- Staff management, profile + avatar (≤ 2 MB); credit type CRUD (**BankManager**)
 - Serilog → Seq, Redis cache, FluentValidation, ProblemDetails
 - OpenTelemetry → collector → Tempo / Prometheus / Grafana
 
 ### Frontend (`client/`)
 
-- Login / register / email confirm, applications list & detail, customers, credit types, staff, profile
+- Login / register / email confirm, applications, customers, credit types, staff, branches, profile
 - Stats strip, FX ticker, accessibility panel (theme / font size / contrast)
 - Privacy / cookie banner; locale switcher TR / EN / DE
 - Idempotency-Key (UUID) on credit write requests
-- SignalR: application-status toast (success / error / warning by event) + list/detail refresh
-- Application detail: document upload / list / download (Pending)
-- Payment plan: collapsible installment table, **PDF download** and **print** (customer + staff)
+- SignalR: application-status toast + list/detail refresh; missing-doc badge
+- Application detail: document upload / list / download (Pending); ES filter/facets (manager)
+- Payment plan: collapsible installment table, **PDF download** and **print**
 - Staff decision forms: reloadable approve/reject message templates
 
 ### CI/CD
@@ -121,7 +128,7 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 
 ### Infrastructure & observability
 
-**Docker Compose** — Full lab stack (SQL, Redis, Seq, RabbitMQ, Vault, OTel, Prometheus, Grafana, WebApi, client).
+**Docker Compose** — Full lab stack (SQL, Redis, Seq, RabbitMQ, Vault, Keycloak, ELK, OTel, Prometheus, Grafana, WebApi, client).
 
 <img src="docs/assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker containers" width="720" />
 
@@ -145,7 +152,7 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 
 <img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ queues" width="720" />
 
-**Vault (lab)** — Dev-mode secrets seed (`secret/bankapp`); WebApi does not read Vault yet.
+**Vault (lab)** — Dev-mode KV `secret/bankapp`; WebApi startup overlay (JWT current + previous dual-key).
 
 <img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
 
@@ -163,12 +170,13 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 | Idempotency       | Header `Idempotency-Key` + Redis (credit write APIs, 24h)                         |
 | Saga              | `CreditApplicationProcessManager` + table `CreditApplicationSagas`                |
 | Realtime          | SignalR hub `/hubs/credit-applications` (JWT `access_token`)                      |
-| Secrets (lab)     | HashiCorp Vault **dev** (`secret/bankapp`; WebApi does not read Vault yet)        |
-| Auth              | JWT + role claims (Customer / BankStaff / BankManager)                            |
-| Client            | React, Vite, TypeScript, react-i18next, react-router, `@microsoft/signalr`        |
+| Secrets (lab)     | HashiCorp Vault **dev** (`secret/bankapp` overlay; dual-key JWT rotate)           |
+| Auth              | JWT + roles; Keycloak lab (dual JwtBearer)                                        |
+| Search (lab)      | Elasticsearch (applications / staff / customers / credit types) + Kibana          |
+| Client            | React, Vite, TypeScript, Tailwind (admin dashboard), react-i18next, SignalR       |
 | Docs (Dev)        | OpenAPI + Scalar (`/scalar/v1`)                                                   |
 | Test / CI         | xUnit (Application + WebApi.IntegrationTests), GitHub Actions                     |
-| Seed              | Bogus (+ fixed credit catalog)                                                    |
+| Seed              | Bogus — per-branch customer/staff/application top-up                              |
 | Infra             | Docker Compose (`infra/`) — healthchecked service chain                           |
 
 ---
@@ -326,7 +334,10 @@ Application **cancel** sets status to `Cancelled` via dedicated command (not sof
 | Prometheus                  | http://localhost:9090                     | No login (lab)                                               |
 | OTLP gRPC (collector)       | `localhost:4317`                          | App → collector (not a browser UI)                           |
 | RabbitMQ UI                 | http://localhost:15672                    | `guest` / `guest`                                            |
-| Vault UI (lab)              | http://localhost:8200                     | Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (default `bankapp-vault-root-token`); KV `secret/bankapp` |
+| Vault UI (lab)              | http://localhost:8200                     | Token = `VAULT_DEV_ROOT_TOKEN_ID` (default `bankapp-vault-root-token`); KV `secret/bankapp` |
+| Keycloak (lab)              | http://localhost:8180                     | Realm `bankapp`; admin console                               |
+| Elasticsearch               | http://localhost:9200                     | Lab search indexes                                           |
+| Kibana                      | http://localhost:5601                     | ELK UI                                                       |
 
 Most endpoints require JWT (`Authorization: Bearer …`) except login / public register / confirm-email.  
 Credit **writes** (`POST` create/approve/reject/cancel): required header **`Idempotency-Key`**.
@@ -339,14 +350,15 @@ Credit **writes** (`POST` create/approve/reject/cancel): required header **`Idem
 | **CreditSubTypes**                               | CRUD                                                                                                      |
 | **CreditApplications**                           | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
 | **Dashboard**                                    | `GET summary`                                                                                             |
-| **StaffUsers**                                   | List / create / update (manager)                                                                          |
+| **StaffUsers**                                   | List / create / update (manager); ES search                                                               |
+| **Branches**                                     | Branch CRUD (**SuperAdmin**); DoA cap + currency                                                          |
 | **Profile**                                      | Get mine; update staff profile; upload avatar                                                             |
 
 Interactive details: Scalar UI.
 
 ## Lab tools
 
-How to watch the stack (Scalar, Seq, Redis Insight, RabbitMQ UI, Grafana, Vault, SQL client, Docker) — setup, Compose DNS (`redis` vs `localhost`), cautions, and best practices → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (Turkish chapter; URLs match this README).
+How to watch the stack (Scalar, Seq, Redis Insight, RabbitMQ, Grafana, Vault, Keycloak, Kibana, SQL, Docker) — setup, Compose DNS, cautions, best practices → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (Turkish chapter; URLs match this README).
 
 Short debug chain: Scalar request → Redis Insight / RabbitMQ → Seq logs → (optional) Grafana traces.
 
@@ -371,14 +383,14 @@ Stored and serialized by **name** (e.g. `"Pending"`), not integer ordinals.
 
 Runs when configured (`Database__RunSeed`, typical in Docker / Development). Top-up strategy: fill up to targets if short.
 
-| Seed                 | Approx. target                    |
-| -------------------- | --------------------------------- |
-| Individual customers | 30 (10 × tr/en/de)                |
-| Corporate customers  | 30 (10 × tr/en/de)                |
-| Credit types         | 16 (locale catalogs TRY/USD/EUR)  |
-| Credit sub-types     | Per type (packaged amounts/terms) |
-| Credit applications  | 48                                |
-| Identity             | Demo staff / manager / customers  |
+| Seed                 | Approx. target                                      |
+| -------------------- | --------------------------------------------------- |
+| Branches             | 5 (IST / ANK / BER / NYC / CHI) + DoA cap/currency  |
+| Individual customers | 12 / branch (~60)                                   |
+| Corporate customers  | 8 / branch (~40)                                    |
+| Credit types / subs  | 16 types + packaged sub-types (TRY/USD/EUR)         |
+| Credit applications  | ~100 (mixed status; fake docs on Pending)           |
+| Identity             | ~1 manager + 3 staff / branch; SuperAdmin; customers |
 
 ---
 

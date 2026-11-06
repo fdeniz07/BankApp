@@ -5,7 +5,7 @@
 BankApp ist ein **full-stack Bildungsbeispiel** für **Privat- und Firmenkreditanträge**.  
 Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (Identity / Customers / Credit / Notification), Domain Events + Outbox, Idempotency-Key, Saga, SignalR.  
 Frontend: **React (Vite + TypeScript)** mit **TR / EN / DE**-i18n und Live-Kreditbenachrichtigungen (SignalR).  
-Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, Client).
+Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, Keycloak-Lab, ELK, WebApi, Client).
 
 **Dokumentation:** [Roadmap](docs/roadmap.de.md) · [Tech-Lernen](docs/tech-learning.de.md) · [Lernbibliothek (TR)](docs/learning/00-index.tr.md) · [Architekturnotizen](docs/architecture-notes.de.md) · [Verlauf](docs/history.de.md) · [Changelog](docs/changelog.de.md) · [Testnotizen](docs/test-notes.de.md) · [Infra](infra/README.md)
 
@@ -32,12 +32,16 @@ Lokal: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault-Lab, WebApi, 
 
 ## Demo-Logins
 
-| Rolle | E-Mail | Passwort |
-|-------|--------|----------|
-| Bankmitarbeiter | `staff.tr@` / `staff.de@` / `staff.en@bank.local` (+ Legacy `staff@`, `.nyc`, `.chi`) | `Demo123!` |
-| Bankmanager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` (+ Legacy `manager@`, `.nyc`, `.chi`, `.ber`) | `Demo123!` |
-| SuperAdmin | `superadmin@bank.local` | `Demo123!` |
-| Kunde | `customer.tr@` / `customer.de@` / `customer.en@bank.local` (+ `customer@`) | `Demo123!` |
+Gemeinsames Passwort: **`Demo123!`**. Pro Filiale ca. 1 Manager + 3 Mitarbeiter (Top-up-Seed).
+
+| Rolle | Beispiel-E-Mail | Filiale |
+|-------|-----------------|---------|
+| SuperAdmin | `superadmin@bank.local` | — |
+| Manager | `manager.ist@` / `manager.tr@` (ANK) / `manager.ber@` / `manager.nyc@` / `manager.chi@bank.local` | IST / ANK / BER / NYC / CHI |
+| Personal | `staff.tr@`, `staff.ank@`, `staff.de@`, `staff.nyc@`, `staff.chi@` (+ `.analyst` / `.rm` / `.ops`) | dieselbe |
+| Kunde | `customer.tr@` / `customer.en@` / `customer.de@bank.local` (+ `customer@`) | nach Locale |
+
+Legacy-Aliase bleiben gültig: `staff@`, `manager@`, `manager.en@`, `staff.en@`, …
 
 Rollen: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (Manager hat auch BankStaff; SuperAdmin: Filial-CRUD).
 
@@ -57,24 +61,27 @@ Rollen: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (Manager ha
 - **SignalR** (`/hubs/credit-applications`; Staff- + Kundengruppen; Publish nach Outbox-Consumer)
 - **Entscheidungsbrief E-Mail / SMS (Lab)** — nach Genehmigung/Ablehnung Queues `decision-letter` + `decision-letter-sms` → Seq/Log (kein SMTP/SMS-Gateway)
 - **Rate limiting** — Policies `auth` / `write` / `fixed` (429); Health + SignalR ausgenommen
-- **Vault-Lab** — JWT-`SecurityKey`-Overlay aus `secret/bankapp` (Compose); Env-Fallback
-- **Filialmodell** (Branches; Personal-BranchId; Genehmigung/Ablehnung Entscheidungsfiliale-Snapshot)
-- Antrags-**Dokumenten-Upload** (Lab: Ausweis / Einkommen / Sonstiges; PDF/JPEG/PNG ≤5 MB; App_Data; noch nicht Pflicht)
-- Zahlungsplan (Amortisation) mit **erweiterbarem Export** (`payment-plan/export?format=pdf`; später CSV/XLSX) und Druck
-- Dashboard-Summary, Personalverwaltung, Profil + Avatar (≤ 2 MB)
-- Kreditarten anlegen / ändern / löschen / aktiv-passiv (**BankManager**)
+- **Vault-Lab** — JWT-`SecurityKey` (+ Dual-Key `SecurityKeyPrevious`) Overlay aus `secret/bankapp`; Rotate-Script; Env-Fallback
+- **Keycloak-Lab** — Compose-Realm; Dual JwtBearer (BankApp + Keycloak) + Claim-Enrich
+- **Filialmodell** + **DoA** (`Branch.MaxApprovalAmount` + Währung; Position × Filialdeckel)
+- `ApproveGateMode` (None/Soft/Hard) + Soft/Hard-Dokumententor
+- Antrags-**Dokumenten-Upload** (Lab: Ausweis / Einkommen / Sonstiges; PDF/JPEG/PNG ≤5 MB; App_Data)
+- **ELK-Lab** — ES-Live-Suche/Facets (Anträge, Personal, Kunden, Kreditarten); Seq bleibt für Logs
+- Zahlungsplan (Amortisation) + PDF-Export/Druck
+- Dashboard-Summary + **Admin-Tailwind-Dashboard** (`/dashboard`)
+- Personalverwaltung, Profil + Avatar (≤ 2 MB); Kreditarten-CRUD (**BankManager**)
 - Serilog → Seq, Redis-Cache, FluentValidation, ProblemDetails
 - OpenTelemetry → Collector → Tempo / Prometheus / Grafana
 
 ### Frontend (`client/`)
 
-- Login / Registrierung / E-Mail-Bestätigung, Anträge, Kunden, Kreditarten, Personal, Profil
+- Login / Registrierung / E-Mail-Bestätigung, Anträge, Kunden, Kreditarten, Personal, Filialen, Profil
 - Statistikleiste, FX-Ticker, Barrierefreiheits-Panel (Thema / Schrift / Kontrast)
 - Datenschutz- / Cookie-Banner; Sprachumschalter TR / EN / DE
 - `Idempotency-Key` (UUID) bei Kredit-Schreibanfragen
-- SignalR: Antragsstatus-Toast (success / error / warning je Event) + Listen-/Detail-Refresh
-- Antragsdetail: Dokument hochladen / Liste / Download (Pending)
-- Zahlungsplan: einklappbare Ratenliste, **PDF-Download** und **Drucken** (Kunde + Personal)
+- SignalR: Antragsstatus-Toast + Listen-/Detail-Refresh; fehlende-Dokumente-Badge
+- Antragsdetail: Dokument hochladen / Liste / Download (Pending); ES-Filter/Facets (Manager)
+- Zahlungsplan: einklappbare Ratenliste, **PDF-Download** und **Drucken**
 - Entscheidungsformulare: neu ladbare Genehmigungs-/Ablehnungsvorlagen
 
 ### CI/CD
@@ -121,7 +128,7 @@ Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/
 
 ### Infrastruktur & Observability
 
-**Docker Compose** — Vollständiger Lab-Stack (SQL, Redis, Seq, RabbitMQ, Vault, OTel, Prometheus, Grafana, WebApi, Client).
+**Docker Compose** — Vollständiger Lab-Stack (SQL, Redis, Seq, RabbitMQ, Vault, Keycloak, ELK, OTel, Prometheus, Grafana, WebApi, Client).
 
 <img src="docs/assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker-Container" width="720" />
 
@@ -145,7 +152,7 @@ Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/
 
 <img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ-Queues" width="720" />
 
-**Vault (Lab)** — Dev-Mode Secrets-Seed (`secret/bankapp`); WebApi liest Vault noch nicht.
+**Vault (Lab)** — Dev-Mode KV `secret/bankapp`; WebApi-Startup-Overlay (JWT current + previous Dual-Key).
 
 <img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault Secrets" width="720" />
 
@@ -164,12 +171,13 @@ Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/
 | Idempotency | Header `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
 | Saga | `CreditApplicationProcessManager` + Tabelle `CreditApplicationSagas` |
 | Realtime | SignalR-Hub `/hubs/credit-applications` (JWT `access_token`) |
-| Secrets (Lab) | HashiCorp Vault **dev** (`secret/bankapp`; WebApi liest Vault noch nicht) |
-| Auth | JWT + Rollen-Claims (Customer / BankStaff / BankManager) |
-| Client | React, Vite, TypeScript, react-i18next, react-router, `@microsoft/signalr` |
+| Secrets (Lab) | HashiCorp Vault **dev** (`secret/bankapp`-Overlay; Dual-Key-JWT-Rotate) |
+| Auth | JWT + Rollen; Keycloak-Lab (Dual JwtBearer) |
+| Search (Lab) | Elasticsearch (Anträge / Personal / Kunden / Kreditarten) + Kibana |
+| Client | React, Vite, TypeScript, Tailwind (Admin-Dashboard), react-i18next, SignalR |
 | Docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
 | Test / CI | xUnit (Application + WebApi.IntegrationTests), GitHub Actions |
-| Seed | Bogus (+ fester Kreditkatalog) |
+| Seed | Bogus — Top-up pro Filiale (Kunden/Personal/Anträge) |
 | Infra | Docker Compose (`infra/`) — Healthcheck-Servicekette |
 
 ---
@@ -327,7 +335,10 @@ stateDiagram-v2
 | Prometheus | http://localhost:9090 | Kein Login (Lab) |
 | OTLP gRPC (Collector) | `localhost:4317` | App → Collector (keine Browser-UI) |
 | RabbitMQ UI | http://localhost:15672 | `guest` / `guest` |
-| Vault UI (Lab) | http://localhost:8200 | Methode **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (Default `bankapp-vault-root-token`); KV `secret/bankapp` |
+| Vault UI (Lab) | http://localhost:8200 | Token = `VAULT_DEV_ROOT_TOKEN_ID` (Default `bankapp-vault-root-token`); KV `secret/bankapp` |
+| Keycloak (Lab) | http://localhost:8180 | Realm `bankapp`; Admin-Console |
+| Elasticsearch | http://localhost:9200 | Lab-Suchindizes |
+| Kibana | http://localhost:5601 | ELK-UI |
 
 Die meisten Endpunkte brauchen JWT (außer Login / öffentliche Registrierung / E-Mail-Bestätigung).  
 Kredit-**Schreib**-APIs (`POST` create/approve/reject/cancel): Pflicht-Header **`Idempotency-Key`**.
@@ -340,14 +351,15 @@ Kredit-**Schreib**-APIs (`POST` create/approve/reject/cancel): Pflicht-Header **
 | **CreditSubTypes** | CRUD |
 | **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
 | **Dashboard** | `GET summary` |
-| **StaffUsers** | Liste / anlegen / ändern (Manager) |
+| **StaffUsers** | Liste / anlegen / ändern (Manager); ES-Suche |
+| **Branches** | Filial-CRUD (**SuperAdmin**); DoA-Deckel + Währung |
 | **Profile** | Eigenes Profil; Avatar |
 
 Details: Scalar-UI.
 
 ## Lab-Tools
 
-Stack beobachten (Scalar, Seq, Redis Insight, RabbitMQ-UI, Grafana, Vault, SQL-Client, Docker) — Setup, Compose-DNS (`redis` vs. `localhost`), Hinweise und Best Practices → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (TR-Kapitel; URLs wie in dieser README).
+Stack beobachten (Scalar, Seq, Redis Insight, RabbitMQ, Grafana, Vault, Keycloak, Kibana, SQL, Docker) — Setup, Compose-DNS, Hinweise → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (TR-Kapitel; URLs wie in dieser README).
 
 Kurze Debug-Kette: Scalar-Request → Redis Insight / RabbitMQ → Seq-Logs → (optional) Grafana-Traces.
 
@@ -374,12 +386,12 @@ Bei `Database__RunSeed` (typisch Docker / Development). Top-up bis Zielzahlen.
 
 | Seed | Ca. Ziel |
 |------|----------|
-| Privatkunden | 30 (10 × tr/en/de) |
-| Firmenkunden | 30 (10 × tr/en/de) |
-| Kreditarten | 16 (TRY/USD/EUR-Kataloge) |
-| Untertypen | Pakete je Typ |
-| Anträge | 48 |
-| Identity | Demo Staff / Manager / Kunden |
+| Filialen | 5 (IST / ANK / BER / NYC / CHI) + DoA-Deckel/Währung |
+| Privatkunden | 12 / Filiale (~60) |
+| Firmenkunden | 8 / Filiale (~40) |
+| Kreditarten / Untertypen | 16 Arten + Pakete (TRY/USD/EUR) |
+| Anträge | ~100 (gemischter Status; Fake-Docs bei Pending) |
+| Identity | ~1 Manager + 3 Staff / Filiale; SuperAdmin; Demo-Kunden |
 
 ---
 

@@ -5,7 +5,7 @@
 BankApp, **bireysel ve kurumsal kredi başvuruları** için eğitim amaçlı **full-stack** bir bankacılık örneğidir.  
 Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (Identity / Customers / Credit / Notification), Domain Events + Outbox, Idempotency-Key, Saga, SignalR.  
 Frontend: **React (Vite + TypeScript)**, **TR / EN / DE** i18n, anlık kredi bildirimleri (SignalR).  
-Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, WebApi, client).
+Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, Keycloak lab, ELK, WebApi, client).
 
 **Dokümanlar:** [Yol haritası](docs/roadmap.tr.md) · [Tech öğrenme](docs/tech-learning.tr.md) · [Öğrenme kitaplığı](docs/learning/00-index.tr.md) · [Mimari notlar](docs/architecture-notes.tr.md) · [Geçmiş](docs/history.tr.md) · [Changelog](docs/changelog.tr.md) · [Test notları](docs/test-notes.tr.md) · [Altyapı](infra/README.md)
 
@@ -32,12 +32,16 @@ Yerel yığın: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab,
 
 ## Demo girişler
 
-| Rol | E-posta | Şifre |
-|-----|---------|-------|
-| Banka personeli | `staff.tr@` / `staff.de@` / `staff.en@bank.local` (+ eski `staff@`, `.nyc`, `.chi`) | `Demo123!` |
-| Banka yöneticisi | `manager.tr@` / `manager.de@` / `manager.en@bank.local` (+ eski `manager@`, `.nyc`, `.chi`, `.ber`) | `Demo123!` |
-| SuperAdmin | `superadmin@bank.local` | `Demo123!` |
-| Müşteri | `customer.tr@` / `customer.de@` / `customer.en@bank.local` (+ `customer@`) | `Demo123!` |
+Ortak şifre: **`Demo123!`**. Her şubede ~1 manager + 3 personel (top-up seed).
+
+| Rol | Örnek e-posta | Şube |
+|-----|---------------|------|
+| SuperAdmin | `superadmin@bank.local` | — |
+| Yönetici | `manager.ist@` / `manager.tr@` (ANK) / `manager.ber@` / `manager.nyc@` / `manager.chi@bank.local` | IST / ANK / BER / NYC / CHI |
+| Personel | `staff.tr@`, `staff.ank@`, `staff.de@`, `staff.nyc@`, `staff.chi@` (+ `.analyst` / `.rm` / `.ops` varyantları) | aynı |
+| Müşteri | `customer.tr@` / `customer.en@` / `customer.de@bank.local` (+ `customer@`) | locale |
+
+Legacy alias’lar hâlâ geçerli: `staff@`, `manager@`, `manager.en@`, `staff.en@`, …
 
 Roller: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (yönetici aynı zamanda BankStaff; SuperAdmin şube CRUD).
 
@@ -57,24 +61,27 @@ Roller: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (yönetici 
 - **SignalR** (`/hubs/credit-applications`; staff + müşteri grupları; Outbox consumer sonrası yayın)
 - **Karar mektubu e-posta / SMS (lab)** — onay/red sonrası `decision-letter` + `decision-letter-sms` → Seq/log (SMTP/SMS gateway yok)
 - **Rate limiting** — `auth` / `write` / `fixed` politikaları (429); health + SignalR muaf
-- **Vault lab** — JWT `SecurityKey` `secret/bankapp` overlay (Compose); env fallback
-- **Şube modeli** (Branches; personel BranchId; onay/red karar şubesi snapshot)
-- Başvuru **evrak yükleme** (lab: kimlik / gelir / diğer; PDF/JPEG/PNG ≤5 MB; App_Data; onay için henüz zorunlu değil)
-- Ödeme planı (amortisman) + **genişletilebilir export** (`payment-plan/export?format=pdf`; ileride CSV/XLSX) ve yazdırma
-- Dashboard özeti, personel yönetimi, profil + avatar (≤ 2 MB)
-- Kredi tipi oluşturma / güncelleme / silme / aktif-pasif (**BankManager**)
+- **Vault lab** — JWT `SecurityKey` (+ dual-key `SecurityKeyPrevious`) overlay `secret/bankapp`; rotate script; env fallback
+- **Keycloak lab** — Compose realm; dual JwtBearer (BankApp + Keycloak) + claim enrich
+- **Şube modeli** + **DoA** (`Branch.MaxApprovalAmount` + PB; pozisyon × şube tavanı)
+- `ApproveGateMode` (None/Soft/Hard) + soft/hard evrak kapısı
+- Başvuru **evrak yükleme** (lab: kimlik / gelir / diğer; PDF/JPEG/PNG ≤5 MB; App_Data)
+- **ELK lab** — ES canlı arama/facet (başvuru, personel, müşteri, kredi türü); Seq log kalır
+- Ödeme planı (amortisman) + PDF export/yazdırma
+- Dashboard özeti + **Admin Tailwind dashboard** (`/dashboard`)
+- Personel yönetimi, profil + avatar (≤ 2 MB); kredi tipi CRUD (**BankManager**)
 - Serilog → Seq, Redis önbellek, FluentValidation, ProblemDetails
 - OpenTelemetry → collector → Tempo / Prometheus / Grafana
 
 ### Frontend (`client/`)
 
-- Giriş / kayıt / e-posta onay, başvurular, müşteriler, kredi türleri, personel, profil
+- Giriş / kayıt / e-posta onay, başvurular, müşteriler, kredi türleri, personel, şubeler, profil
 - İstatistik şeridi, döviz ticker, erişilebilirlik paneli (tema / yazı / kontrast)
 - Datenschutz / çerez bandı; dil seçici TR / EN / DE
 - Kredi yazma isteklerinde `Idempotency-Key` (UUID)
-- SignalR: başvuru durumu toast (olaya göre success / error / warning) + liste/detay yenileme
-- Başvuru detayı: evrak yükleme / liste / indirme (Pending)
-- Ödeme planı: açılır taksit listesi, **PDF indir** ve **yazdır** (müşteri + personel)
+- SignalR: başvuru durumu toast + liste/detay yenileme; evrak rozeti
+- Başvuru detayı: evrak yükleme / liste / indirme (Pending); ES filtre/facet (manager)
+- Ödeme planı: açılır taksit listesi, **PDF indir** ve **yazdır**
 - Personel karar formları: yenilenebilir onay/red mesaj şablonları
 
 ### CI/CD
@@ -121,7 +128,7 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 
 ### Altyapı ve gözlemlenebilirlik
 
-**Docker Compose** — Tam lab yığını (SQL, Redis, Seq, RabbitMQ, Vault, OTel, Prometheus, Grafana, WebApi, client).
+**Docker Compose** — Tam lab yığını (SQL, Redis, Seq, RabbitMQ, Vault, Keycloak, ELK, OTel, Prometheus, Grafana, WebApi, client).
 
 <img src="docs/assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker container’lar" width="720" />
 
@@ -145,7 +152,7 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 
 <img src="docs/assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ kuyrukları" width="720" />
 
-**Vault (lab)** — Dev-mode secrets seed (`secret/bankapp`); WebApi henüz Vault okumaz.
+**Vault (lab)** — Dev-mode KV `secret/bankapp`; WebApi startup overlay (JWT current + previous dual-key).
 
 <img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
 
@@ -164,12 +171,13 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 | Idempotency | Header `Idempotency-Key` + Redis (kredi yazma API’leri, 24 saat) |
 | Saga | `CreditApplicationProcessManager` + tablo `CreditApplicationSagas` |
 | Realtime | SignalR hub `/hubs/credit-applications` (JWT `access_token`) |
-| Secrets (lab) | HashiCorp Vault **dev** (`secret/bankapp`; WebApi henüz Vault okumaz) |
-| Auth | JWT + rol claim’leri (Customer / BankStaff / BankManager) |
-| Client | React, Vite, TypeScript, react-i18next, react-router, `@microsoft/signalr` |
+| Secrets (lab) | HashiCorp Vault **dev** (`secret/bankapp` overlay; dual-key JWT rotate) |
+| Auth | JWT + roller; Keycloak lab (dual JwtBearer) |
+| Search (lab) | Elasticsearch (başvuru / personel / müşteri / kredi türü) + Kibana |
+| Client | React, Vite, TypeScript, Tailwind (admin dashboard), react-i18next, SignalR |
 | Dokümantasyon (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
 | Test / CI | xUnit (Application + WebApi.IntegrationTests), GitHub Actions |
-| Seed | Bogus (+ sabit kredi kataloğu) |
+| Seed | Bogus — şube başına müşteri/personel/başvuru top-up |
 | Altyapı | Docker Compose (`infra/`) — healthcheck’li servis zinciri |
 
 ---
@@ -327,7 +335,10 @@ Başvuru **iptali** `Cancelled` durumuna özel komutla geçer (soft-delete deği
 | Prometheus | http://localhost:9090 | Giriş yok (lab) |
 | OTLP gRPC (collector) | `localhost:4317` | Uygulama → collector (tarayıcı UI değil) |
 | RabbitMQ UI | http://localhost:15672 | `guest` / `guest` |
-| Vault UI (lab) | http://localhost:8200 | Yöntem **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (varsayılan `bankapp-vault-root-token`); KV `secret/bankapp` |
+| Vault UI (lab) | http://localhost:8200 | Token = `VAULT_DEV_ROOT_TOKEN_ID` (varsayılan `bankapp-vault-root-token`); KV `secret/bankapp` |
+| Keycloak (lab) | http://localhost:8180 | Realm `bankapp`; admin console |
+| Elasticsearch | http://localhost:9200 | Lab arama indeksleri |
+| Kibana | http://localhost:5601 | ELK UI |
 
 Login / kamu kayıt / e-posta onay dışında çoğu endpoint JWT ister.  
 Kredi **yazma** (`POST` create/approve/reject/cancel): zorunlu header **`Idempotency-Key`**.
@@ -340,14 +351,15 @@ Kredi **yazma** (`POST` create/approve/reject/cancel): zorunlu header **`Idempot
 | **CreditSubTypes** | CRUD |
 | **CreditApplications** | `approve` / `reject` / **`cancel`** (+ Idempotency-Key); `payment-plan`; `payment-plan/export?format=pdf` |
 | **Dashboard** | `GET summary` |
-| **StaffUsers** | Liste / oluştur / güncelle (manager) |
+| **StaffUsers** | Liste / oluştur / güncelle (manager); ES arama |
+| **Branches** | Şube CRUD (**SuperAdmin**); DoA tavanı + PB |
 | **Profile** | Profilim; personel güncelleme; avatar |
 
 Detaylar: Scalar UI.
 
 ## Lab araçları
 
-Stack’i izlemek için (Scalar, Seq, Redis Insight, RabbitMQ UI, Grafana, Vault, SQL istemcisi, Docker): kurulum, Compose DNS (`redis` vs `localhost`), dikkat noktaları ve best practice → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)**.
+Stack’i izlemek için (Scalar, Seq, Redis Insight, RabbitMQ, Grafana, Vault, Keycloak, Kibana, SQL, Docker): kurulum, Compose DNS, dikkat / best practice → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)**.
 
 Kısa debug zinciri: Scalar istek → Redis Insight / RabbitMQ → Seq log → (gerekirse) Grafana trace.
 
@@ -374,12 +386,12 @@ Değerler **isim** olarak saklanır (`"Pending"`), int değil.
 
 | Seed | Yaklaşık hedef |
 |------|----------------|
-| Bireysel müşteri | 30 (10 × tr/en/de) |
-| Kurumsal müşteri | 30 (10 × tr/en/de) |
-| Kredi tipi | 16 (TRY/USD/EUR katalogları) |
-| Kredi alt tipi | Tip başına paketler |
-| Başvuru | 48 |
-| Identity | Demo staff / manager / customer |
+| Şubeler | 5 (IST / ANK / BER / NYC / CHI) + DoA tavanı/PB |
+| Bireysel müşteri | 12 / şube (~60) |
+| Kurumsal müşteri | 8 / şube (~40) |
+| Kredi tipi / alt tip | 16 tip + paket alt tipler (TRY/USD/EUR) |
+| Başvuru | ~100 (durum karışık; Pending’lere sahte evrak) |
+| Identity | Şube başına ~1 manager + 3 staff; SuperAdmin; demo müşteriler |
 
 ---
 
