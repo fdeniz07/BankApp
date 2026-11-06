@@ -27,10 +27,19 @@ SQL_PASSWORD="${MSSQL_SA_PASSWORD:-change-me-sql}"
 RMQ_PASSWORD="${RABBITMQ_PASSWORD:-guest}"
 
 # Dev server already mounts KV v2 at "secret/".
+# Idempotent: do not overwrite if secret already exists (preserves dual-key rotate).
+# jwt_security_key_previous omitted on first seed (dual-key window starts after rotate).
+if vault kv get secret/bankapp >/dev/null 2>&1; then
+  echo "secret/bankapp already present — skip seed (keeps jwt_security_key_previous if rotated)."
+  vault kv get secret/bankapp
+  exit 0
+fi
+
 vault kv put secret/bankapp \
   jwt_security_key="${JWT_KEY}" \
   mssql_sa_password="${SQL_PASSWORD}" \
   rabbitmq_password="${RMQ_PASSWORD}"
 
 echo "Seeded secret/bankapp (jwt_security_key, mssql_sa_password, rabbitmq_password)."
+echo "Rotate later: infra/scripts/vault-rotate-jwt.sh (sets jwt_security_key_previous)."
 vault kv get secret/bankapp
