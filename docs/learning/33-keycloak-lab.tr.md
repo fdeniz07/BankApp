@@ -1,4 +1,4 @@
-# 33 — Keycloak lab (Faz 1: Compose + realm)
+# 33 — Keycloak lab (Compose + dual JWT)
 
 [← Önceki](32-admin-tailwind-dashboard.tr.md) · [İçindekiler](00-index.tr.md)
 
@@ -10,52 +10,48 @@
 
 ## Bu projede ne işe yarar?
 
-Lab **Faz 1** (bu bölüm):
+**Faz 1 — Compose + realm**
 
-- Compose’ta Keycloak ayağa kalkar (`http://localhost:8180`)
-- `bankapp` realm import edilir (roller + demo kullanıcılar + `bankapp-api` client)
-- Token alınır; roller JWT’de `role` claim’i olarak gelir (Faz 2’de WebApi `RoleClaimType = "role"`)
+- Keycloak `http://localhost:8180`
+- Realm `bankapp` import (roller + demo user + `bankapp-api`)
+- Password grant ile token
 
-**Henüz yok (Faz 2+):** WebApi’nin Keycloak token’ını doğrulaması; React login’in Keycloak’a yönlenmesi. Bugün hâlâ `POST /api/Auth/login` + yerel JWT.
+**Faz 2 — WebApi dual JWT (lab)**
+
+- `Keycloak:Enabled=true` iken WebApi hem **yerel** `TokenOptions` JWT hem **Keycloak** access token kabul eder
+- Issuer’da `/realms/bankapp` → Keycloak scheme; aksi halde yerel imza
+- `role` → `ClaimTypes.Role`; email ile SQL’den `NameIdentifier` / `branchId` / `customerId` zenginleştirme
+- React hâlâ `POST /api/Auth/login` (yerel JWT)
+
+**Sonra:** OAuth / sosyal; login UI’nin Keycloak’a taşınması.
 
 ## Ne zaman eklendi?
 
-Roadmap “Keycloak desteği” — ilk lab iskeleti (Compose + realm), JWT geçişinden önce.
+Roadmap “Keycloak desteği” — Faz 1 Compose; ardından Faz 2 dual bearer.
 
 ## Temel kavramlar
 
 | Kavram | Anlam |
 |--------|--------|
-| Realm | Keycloak’ta izole kiracı (bizde `bankapp`) |
-| Client | Token isteyen uygulama (`bankapp-api`) |
-| Realm role | `Customer` / `BankStaff` / `BankManager` / `SuperAdmin` |
-| Direct access grant | Lab için password grant (kullanıcı/şifre → token) |
-| Protocol mapper | Rolü JWT claim’e yazar |
-| start-dev | Geliştirme modu (HTTPS zorunlu değil; production değil) |
+| Realm | İzole kiracı (`bankapp`) |
+| Client | `bankapp-api` (public + password grant) |
+| Authority / JWKS | WebApi imza anahtarını Keycloak’tan çeker |
+| Policy scheme | Token issuer’a göre hangi JwtBearer |
+| Claim enrich | Keycloak `sub` yerine BankApp user Id |
+| start-dev | Lab modu (prod değil) |
 
 ## Komutlar
 
 ### Keycloak’ı ayağa kaldır
-
-`infra` klasöründen (diğer stack ayaktaysa yalnız keycloak da yeter):
 
 ```powershell
 cd infra
 docker compose --env-file .env up -d keycloak
 ```
 
-**Ne yapar?** `bankapp-realm.json` import edilir; UI `:8180`’de dinler.  
-**Kontrol:** `docker compose ps keycloak` → healthy / running; tarayıcıda admin konsol.
+**Kontrol:** `docker compose ps keycloak` healthy; `http://localhost:8180` (admin/admin).
 
-### Admin konsol
-
-```text
-http://localhost:8180
-```
-
-Kullanıcı / şifre: `.env` → `KEYCLOAK_ADMIN_USER` / `KEYCLOAK_ADMIN_PASSWORD` (örnek: `admin` / `admin`). Realm seç: **bankapp**.
-
-### Password grant ile access token al
+### Password grant token
 
 ```powershell
 curl.exe -s -X POST "http://localhost:8180/realms/bankapp/protocol/openid-connect/token" `
@@ -66,13 +62,20 @@ curl.exe -s -X POST "http://localhost:8180/realms/bankapp/protocol/openid-connec
   -d "password=Demo123!"
 ```
 
-**Ne yapar?** Keycloak JWT döner (`access_token`).  
-**Kontrol:** JSON’da `access_token` var; [jwt.io](https://jwt.io) veya decode ile rol claim’inde `BankStaff` görünür.  
-**Önemli bayraklar:** `client_id=bankapp-api` (public + direct access); WebApi bu token’ı **henüz kabul etmez**.
+### Keycloak token ile korumalı API (Faz 2)
 
-### Realm’i yeniden import etmek
+WebApi Development veya Compose’ta `Keycloak__Enabled=true` olmalı.
 
-Import yalnızca **ilk** boş data ile güvenilir. Realm bozulduysa:
+```powershell
+# $TOKEN = access_token alanını yapıştır
+curl.exe -s "http://localhost:8080/api/Profile" `
+  -H "Authorization: Bearer $TOKEN"
+```
+
+**Kontrol:** 401 değil; profil / personel yanıtı (email seed ile eşleşiyorsa `branchId` dolu).  
+**Not:** Yerel login token’ı da aynı endpoint’te çalışmaya devam eder.
+
+### Realm yeniden import
 
 ```powershell
 docker compose --env-file .env stop keycloak
@@ -80,46 +83,44 @@ docker compose --env-file .env rm -f keycloak
 docker compose --env-file .env up -d keycloak
 ```
 
-(`start-dev` kalıcı volume kullanmıyoruz; container silinince realm yeniden import olur.)
-
 ## Sınıflar, metotlar, paketler
 
 | İsim | Rol |
 |------|-----|
-| `infra/keycloak/bankapp-realm.json` | Realm / client / roller / demo user |
-| Compose `keycloak` | `quay.io/keycloak/keycloak:26.0` + `--import-realm` |
-| Protocol mapper `bankapp-realm-roles` | Claim adı: `role` (noktalı URI Keycloak’ta iç içe JSON olur; lab’de kısa ad) |
-| Mevcut `JwtHelper` / `Auth/login` | Hâlâ yerel token (Faz 1 dışı) |
+| `KeycloakOptions` | Enabled, Authority, ValidIssuers |
+| `AddBankAppJwtAuthentication` | Local + Keycloak JwtBearer + `BankApp` policy scheme |
+| `KeycloakTokenEnricher` | `role` → Role + SQL enrich |
+| `infra/keycloak/bankapp-realm.json` | Realm import |
+| `JwtHelper` / Auth login | Yerel token üretimi (değişmedi) |
 
 ## Repoda nerede?
 
-- `infra/docker-compose.yml` — `keycloak` servisi
+- `infra/docker-compose.yml` — `keycloak` + WebApi `Keycloak__*`
 - `infra/keycloak/bankapp-realm.json`
-- `infra/.env.example` — `KEYCLOAK_*`
-- Bu bölüm: `docs/learning/33-keycloak-lab.tr.md`
+- `src/WebApi/Configuration/KeycloakOptions.cs`
+- `src/WebApi/Authentication/KeycloakAuthenticationExtensions.cs`
+- `src/WebApi/Authentication/KeycloakTokenEnricher.cs`
+- `src/WebApi/appsettings*.json`
 
 ## Mini akış
 
-1. `docker compose up -d keycloak`  
-2. Admin UI → realm `bankapp` → Users / Roles  
-3. curl password grant → `access_token`  
-4. Token’da BankApp rol claim’i  
-5. (Sonra) WebApi `Authority` / JWKS ile doğrulama — Faz 2  
+1. Keycloak up → realm import  
+2. Password grant → access_token  
+3. WebApi Bearer Keycloak token → scheme seçimi → JWKS doğrulama → enrich  
+4. MediatR RBAC `ClaimRoles()` BankStaff görür  
+5. Paralel: browser login → yerel JWT  
 
 ## Where useful
 
-- [ ] `http://localhost:8180` admin login çalışıyor  
-- [ ] Realm listesinde `bankapp` var  
-- [ ] `staff.tr@bank.local` / `Demo123!` ile token alınıyor  
-- [ ] Access token’da `role` dizisinde `BankStaff`  
+- [ ] Admin UI + realm `bankapp`  
+- [ ] Token’da `role` içinde `BankStaff`  
+- [ ] Keycloak token ile `/api/Profile` (veya staff list) 200  
+- [ ] Yerel `Auth/login` token’ı hâlâ çalışıyor  
+- [ ] Keycloak kapalıyken (`Enabled=false`) yalnız yerel JWT  
 
-- [ ] `manager.tr@bank.local` → `BankManager`  
-- [ ] WebApi `POST /api/Auth/login` hâlâ eski JWT üretiyor (bilinçli)
-
-### Felaket / kurtarma (az yıkıcı → çok)
+### Felaket / kurtarma
 
 1. `docker compose restart keycloak`  
-2. Container recreate (yukarıdaki rm + up) — realm yeniden import  
-3. Port çakışması: `.env` içinde `KEYCLOAK_PORT` değiştir (varsayılan 8180)
-
-Lab notu: Keycloak ilk açılış 30–90 sn sürebilir (`start_period`).
+2. Keycloak recreate (yeniden import)  
+3. WebApi log: JWKS / issuer uyumsuzluğu → `ValidIssuers` + `Authority` (Compose’ta `http://keycloak:8080/...`)  
+4. Port: `KEYCLOAK_PORT` (8180)

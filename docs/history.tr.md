@@ -73,4 +73,4 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
 - [x] Manager personel RBAC (başka manager’a dokunma yok; `IsManager` yalnız SuperAdmin) + StaffPage düzenleme modal
 - [x] Personel ES (`bankapp-staff`) + müşteri (`bankapp-customers`) + kredi türü (`bankapp-credit-types`) canlı arama/filtre/facet; SQL fallback
-- [x] Keycloak lab Faz 1: Compose (`:8180`) + `bankapp` realm import (roller/claim); WebApi login hâlâ yerel JWT
+- [x] Keycloak lab: Compose (`:8180`) + realm; WebApi dual JWT (`Keycloak:Enabled`) + claim enrich; UI login hâlâ yerel

@@ -65,4 +65,4 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
 - [x] Branch approval ceiling currency (`MaxApprovalCurrencyCode` + `ApprovalAuthority:CurrencyCode`); apply only when currencies match
 - [x] Manager staff RBAC + StaffPage edit modal; staff/customer/credit-type ES indexes (`bankapp-staff` / `customers` / `credit-types`)
-- [x] Keycloak lab Phase 1: Compose (`:8180`) + `bankapp` realm import; WebApi login still local JWT
+- [x] Keycloak lab: Compose (`:8180`) + realm; WebApi dual JWT + claim enrich; UI login still local
