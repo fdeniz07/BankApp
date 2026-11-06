@@ -5,22 +5,23 @@ namespace Persistence.Seed;
 
 public static class IndividualCustomerSeed
 {
-    public const int CountPerLocale = 10;
-    public static readonly string[] Locales = ["tr", "en", "de"];
-    public static int Count => CountPerLocale * Locales.Length;
+    /// <summary>Target active-ish fake individuals per branch (lab top-up).</summary>
+    public const int CountPerBranch = 12;
 
-    public static List<IndividualCustomer> GenerateForLocale(string locale, int count, int startSequence)
+    public static readonly string[] Locales = ["tr", "en", "de"];
+
+    public static List<IndividualCustomer> GenerateForLocale(string locale, int count, int startSequence, Guid? branchId = null)
     {
         if (count <= 0)
             return [];
 
         List<IndividualCustomer> items = [];
         for (int i = 0; i < count; i++)
-            items.Add(CreateOne(locale, startSequence + i));
+            items.Add(CreateOne(locale, startSequence + i, branchId));
         return items;
     }
 
-    private static IndividualCustomer CreateOne(string locale, int sequence)
+    private static IndividualCustomer CreateOne(string locale, int sequence, Guid? branchId)
     {
         Faker faker = new(locale);
         string firstName = faker.Name.FirstName();
@@ -40,6 +41,7 @@ public static class IndividualCustomerSeed
             },
             Address = faker.Address.FullAddress(),
             IsActive = faker.Random.Bool(0.9f),
+            BranchId = branchId,
             NationalId = (10000000000L + sequence).ToString(),
             DateOfBirth = DateOnly.FromDateTime(faker.Date.Past(40, DateTime.UtcNow.AddYears(-18))),
             Gender = faker.PickRandom("Male", "Female"),

@@ -6,7 +6,8 @@ namespace Persistence.Seed;
 
 public static class CreditApplicationSeed
 {
-    public const int Count = 48;
+    /// <summary>~20 applications × 5 branches (Pending/Approved/Rejected/Cancelled mix).</summary>
+    public const int Count = 100;
 
     private static readonly Dictionary<string, string[]> PurposesByLocale = new()
     {

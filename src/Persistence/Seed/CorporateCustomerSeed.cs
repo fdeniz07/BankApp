@@ -5,22 +5,23 @@ namespace Persistence.Seed;
 
 public static class CorporateCustomerSeed
 {
-    public const int CountPerLocale = 10;
-    public static readonly string[] Locales = ["tr", "en", "de"];
-    public static int Count => CountPerLocale * Locales.Length;
+    /// <summary>Target fake corporates per branch (lab top-up).</summary>
+    public const int CountPerBranch = 8;
 
-    public static List<CorporateCustomer> GenerateForLocale(string locale, int count, int startSequence)
+    public static readonly string[] Locales = ["tr", "en", "de"];
+
+    public static List<CorporateCustomer> GenerateForLocale(string locale, int count, int startSequence, Guid? branchId = null)
     {
         if (count <= 0)
             return [];
 
         List<CorporateCustomer> items = [];
         for (int i = 0; i < count; i++)
-            items.Add(CreateOne(locale, startSequence + i));
+            items.Add(CreateOne(locale, startSequence + i, branchId));
         return items;
     }
 
-    private static CorporateCustomer CreateOne(string locale, int sequence)
+    private static CorporateCustomer CreateOne(string locale, int sequence, Guid? branchId)
     {
         Faker faker = new(locale);
 
@@ -37,6 +38,7 @@ public static class CorporateCustomerSeed
             },
             Address = faker.Address.FullAddress(),
             IsActive = faker.Random.Bool(0.9f),
+            BranchId = branchId,
             TaxNumber = (2000000000L + sequence).ToString(),
             TaxOffice = locale switch
             {

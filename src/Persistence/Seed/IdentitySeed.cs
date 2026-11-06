@@ -16,20 +16,43 @@ public static class IdentitySeed
 
     private static readonly (string Email, string[] Roles, string? Locale, string? FirstName, string? LastName, StaffPosition? Position)[] DemoUsers =
     [
+        // --- IST-01 (tr) ---
+        ("manager.ist@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Ayşe", "Demir", StaffPosition.BranchManager),
         ("staff.tr@bank.local", [GeneralOperationClaims.BankStaff], null, "Emre", "Kaya", StaffPosition.BranchOfficer),
-        ("staff.en@bank.local", [GeneralOperationClaims.BankStaff], null, "Anna", "Miller", StaffPosition.RelationshipManager),
-        ("staff.de@bank.local", [GeneralOperationClaims.BankStaff], null, "Jonas", "Weber", StaffPosition.RiskOfficer),
         ("staff@bank.local", [GeneralOperationClaims.BankStaff], null, "Selin", "Yılmaz", StaffPosition.CreditAnalyst),
-        ("staff.nyc@bank.local", [GeneralOperationClaims.BankStaff], null, "Maya", "Chen", StaffPosition.CreditAnalyst),
-        ("staff.chi@bank.local", [GeneralOperationClaims.BankStaff], null, "Jordan", "Lee", StaffPosition.BranchOfficer),
+        ("staff.ist.rm@bank.local", [GeneralOperationClaims.BankStaff], null, "Burak", "Öztürk", StaffPosition.RelationshipManager),
+
+        // --- ANK-01 (tr) ---
         ("manager.tr@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Deniz", "Aydın", StaffPosition.BranchManager),
-        ("manager.en@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Alex", "Brooks", StaffPosition.BranchManager),
-        ("manager.de@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Lena", "Hoffmann", StaffPosition.BranchManager),
         ("manager@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Deniz", "Aydın", StaffPosition.BranchManager),
-        ("manager.nyc@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Alex", "Brooks", StaffPosition.BranchManager),
-        ("manager.chi@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Sam", "Patel", StaffPosition.BranchManager),
+        ("staff.ank@bank.local", [GeneralOperationClaims.BankStaff], null, "Mert", "Şahin", StaffPosition.BranchOfficer),
+        ("staff.ank.analyst@bank.local", [GeneralOperationClaims.BankStaff], null, "Elif", "Koç", StaffPosition.CreditAnalyst),
+        ("staff.ank.risk@bank.local", [GeneralOperationClaims.BankStaff], null, "Can", "Arslan", StaffPosition.RiskOfficer),
+
+        // --- BER-01 (de) ---
+        ("manager.de@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Lena", "Hoffmann", StaffPosition.BranchManager),
         ("manager.ber@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Lena", "Hoffmann", StaffPosition.BranchManager),
+        ("staff.de@bank.local", [GeneralOperationClaims.BankStaff], null, "Jonas", "Weber", StaffPosition.RiskOfficer),
+        ("staff.ber.officer@bank.local", [GeneralOperationClaims.BankStaff], null, "Greta", "Keller", StaffPosition.BranchOfficer),
+        ("staff.ber.rm@bank.local", [GeneralOperationClaims.BankStaff], null, "Felix", "Bauer", StaffPosition.RelationshipManager),
+
+        // --- NYC-01 (en) ---
+        ("manager.en@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Alex", "Brooks", StaffPosition.BranchManager),
+        ("manager.nyc@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Alex", "Brooks", StaffPosition.BranchManager),
+        ("staff.en@bank.local", [GeneralOperationClaims.BankStaff], null, "Anna", "Miller", StaffPosition.RelationshipManager),
+        ("staff.nyc@bank.local", [GeneralOperationClaims.BankStaff], null, "Maya", "Chen", StaffPosition.CreditAnalyst),
+        ("staff.nyc.ops@bank.local", [GeneralOperationClaims.BankStaff], null, "Chris", "Nguyen", StaffPosition.OperationsSpecialist),
+
+        // --- CHI-01 (en) ---
+        ("manager.chi@bank.local", [GeneralOperationClaims.BankStaff, GeneralOperationClaims.BankManager], null, "Sam", "Patel", StaffPosition.BranchManager),
+        ("staff.chi@bank.local", [GeneralOperationClaims.BankStaff], null, "Jordan", "Lee", StaffPosition.BranchOfficer),
+        ("staff.chi.analyst@bank.local", [GeneralOperationClaims.BankStaff], null, "Taylor", "Brooks", StaffPosition.CreditAnalyst),
+        ("staff.chi.rm@bank.local", [GeneralOperationClaims.BankStaff], null, "Riley", "Morgan", StaffPosition.RelationshipManager),
+
+        // --- Cross-branch / platform ---
         ("superadmin@bank.local", [GeneralOperationClaims.SuperAdmin, GeneralOperationClaims.BankStaff], null, "Root", "Admin", StaffPosition.BranchManager),
+
+        // --- Demo customers (linked to individual by locale) ---
         ("customer@bank.local", [GeneralOperationClaims.Customer], "tr", null, null, null),
         ("customer.tr@bank.local", [GeneralOperationClaims.Customer], "tr", null, null, null),
         ("customer.en@bank.local", [GeneralOperationClaims.Customer], "en", null, null, null),
@@ -38,19 +61,33 @@ public static class IdentitySeed
 
     private static readonly Dictionary<string, string> DemoStaffBranchCodes = new(StringComparer.OrdinalIgnoreCase)
     {
+        ["manager.ist@bank.local"] = "IST-01",
         ["staff.tr@bank.local"] = "IST-01",
         ["staff@bank.local"] = "IST-01",
-        ["staff.en@bank.local"] = "NYC-01",
-        ["staff.nyc@bank.local"] = "NYC-01",
-        ["staff.chi@bank.local"] = "CHI-01",
-        ["staff.de@bank.local"] = "BER-01",
+        ["staff.ist.rm@bank.local"] = "IST-01",
+
         ["manager.tr@bank.local"] = "ANK-01",
         ["manager@bank.local"] = "ANK-01",
+        ["staff.ank@bank.local"] = "ANK-01",
+        ["staff.ank.analyst@bank.local"] = "ANK-01",
+        ["staff.ank.risk@bank.local"] = "ANK-01",
+
+        ["manager.de@bank.local"] = "BER-01",
+        ["manager.ber@bank.local"] = "BER-01",
+        ["staff.de@bank.local"] = "BER-01",
+        ["staff.ber.officer@bank.local"] = "BER-01",
+        ["staff.ber.rm@bank.local"] = "BER-01",
+
         ["manager.en@bank.local"] = "NYC-01",
         ["manager.nyc@bank.local"] = "NYC-01",
+        ["staff.en@bank.local"] = "NYC-01",
+        ["staff.nyc@bank.local"] = "NYC-01",
+        ["staff.nyc.ops@bank.local"] = "NYC-01",
+
         ["manager.chi@bank.local"] = "CHI-01",
-        ["manager.de@bank.local"] = "BER-01",
-        ["manager.ber@bank.local"] = "BER-01"
+        ["staff.chi@bank.local"] = "CHI-01",
+        ["staff.chi.analyst@bank.local"] = "CHI-01",
+        ["staff.chi.rm@bank.local"] = "CHI-01"
     };
 
     public static async Task SeedAsync(BankingDbContext context)

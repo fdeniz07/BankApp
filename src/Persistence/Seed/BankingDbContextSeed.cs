@@ -1,3 +1,4 @@
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -33,25 +34,26 @@ public static class BankingDbContextSeed
 
     private static async Task SeedIndividualCustomersAsync(BankingDbContext context)
     {
+        List<Branch> branches = await context.Branches
+            .AsNoTracking()
+            .Where(b => !b.IsDeleted)
+            .ToListAsync();
+        if (branches.Count == 0)
+            return;
+
         List<IndividualCustomer> toAdd = [];
         int sequence = await context.IndividualCustomers.CountAsync();
 
-        foreach (string locale in IndividualCustomerSeed.Locales)
+        foreach (Branch branch in branches)
         {
-            int existingForLocale = await context.IndividualCustomers
-                .CountAsync(c => c.Email.Contains($"@individual.{locale}.local"));
-            if (locale == "tr" && existingForLocale == 0)
-            {
-                existingForLocale = await context.IndividualCustomers
-                    .CountAsync(c => !c.Email.Contains("@individual.en.local") && !c.Email.Contains("@individual.de.local"));
-                existingForLocale = Math.Min(existingForLocale, IndividualCustomerSeed.CountPerLocale);
-            }
-
-            int missing = IndividualCustomerSeed.CountPerLocale - existingForLocale;
+            string locale = BranchLocaleMap.ResolveLocale(branch.Code) ?? "tr";
+            int existing = await context.IndividualCustomers
+                .CountAsync(c => !c.IsDeleted && c.BranchId == branch.Id);
+            int missing = IndividualCustomerSeed.CountPerBranch - existing;
             if (missing <= 0)
                 continue;
 
-            toAdd.AddRange(IndividualCustomerSeed.GenerateForLocale(locale, missing, sequence));
+            toAdd.AddRange(IndividualCustomerSeed.GenerateForLocale(locale, missing, sequence, branch.Id));
             sequence += missing;
         }
 
@@ -64,25 +66,26 @@ public static class BankingDbContextSeed
 
     private static async Task SeedCorporateCustomersAsync(BankingDbContext context)
     {
+        List<Branch> branches = await context.Branches
+            .AsNoTracking()
+            .Where(b => !b.IsDeleted)
+            .ToListAsync();
+        if (branches.Count == 0)
+            return;
+
         List<CorporateCustomer> toAdd = [];
         int sequence = await context.CorporateCustomers.CountAsync();
 
-        foreach (string locale in CorporateCustomerSeed.Locales)
+        foreach (Branch branch in branches)
         {
-            int existingForLocale = await context.CorporateCustomers
-                .CountAsync(c => c.Email.Contains($"@corporate.{locale}.local"));
-            if (locale == "tr" && existingForLocale == 0)
-            {
-                existingForLocale = await context.CorporateCustomers
-                    .CountAsync(c => !c.Email.Contains("@corporate.en.local") && !c.Email.Contains("@corporate.de.local"));
-                existingForLocale = Math.Min(existingForLocale, CorporateCustomerSeed.CountPerLocale);
-            }
-
-            int missing = CorporateCustomerSeed.CountPerLocale - existingForLocale;
+            string locale = BranchLocaleMap.ResolveLocale(branch.Code) ?? "tr";
+            int existing = await context.CorporateCustomers
+                .CountAsync(c => !c.IsDeleted && c.BranchId == branch.Id);
+            int missing = CorporateCustomerSeed.CountPerBranch - existing;
             if (missing <= 0)
                 continue;
 
-            toAdd.AddRange(CorporateCustomerSeed.GenerateForLocale(locale, missing, sequence));
+            toAdd.AddRange(CorporateCustomerSeed.GenerateForLocale(locale, missing, sequence, branch.Id));
             sequence += missing;
         }
 

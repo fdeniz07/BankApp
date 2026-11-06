@@ -1,3 +1,4 @@
+using Domain.Constants;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Persistence.Contexts;
@@ -5,17 +6,11 @@ using Persistence.Contexts;
 namespace Persistence.Seed;
 
 /// <summary>
-/// Backfills Customer.BranchId from locale markers (and a few corporates) without wiping data.
+/// Backfills Customer.BranchId for rows still null (legacy locale-only seeds).
+/// New customers are created with BranchId in BankingDbContextSeed.
 /// </summary>
 public static class CustomerBranchAssignmentSeed
 {
-    private static readonly Dictionary<string, string> LocaleToBranchCode = new(StringComparer.OrdinalIgnoreCase)
-    {
-        ["tr"] = "IST-01",
-        ["en"] = "NYC-01",
-        ["de"] = "BER-01"
-    };
-
     public static async Task SeedAsync(BankingDbContext context)
     {
         Dictionary<string, Guid> branchIdByCode = await context.Branches
@@ -25,17 +20,17 @@ public static class CustomerBranchAssignmentSeed
         if (branchIdByCode.Count == 0)
             return;
 
+        bool changed = false;
+
         List<IndividualCustomer> individuals = await context.IndividualCustomers
             .Where(c => !c.IsDeleted && c.BranchId == null)
             .ToListAsync();
 
-        bool changed = false;
         foreach (IndividualCustomer customer in individuals)
         {
             string locale = ResolveLocaleFromEmail(customer.Email, "@individual.");
-            if (!LocaleToBranchCode.TryGetValue(locale, out string? code))
-                continue;
-            if (!branchIdByCode.TryGetValue(code, out Guid branchId))
+            string? code = BranchLocaleMap.ResolveBranchCodeForLocale(locale);
+            if (code is null || !branchIdByCode.TryGetValue(code, out Guid branchId))
                 continue;
 
             customer.BranchId = branchId;
@@ -47,20 +42,23 @@ public static class CustomerBranchAssignmentSeed
             .ToListAsync();
 
         int corporateIndex = 0;
-        string[] corporateBranchCodes = ["IST-01", "ANK-01", "BER-01", "NYC-01", "CHI-01"];
+        string[] allCodes = BranchSeed.DemoBranches.Select(b => b.Code).ToArray();
         foreach (CorporateCustomer customer in corporates)
         {
             string locale = ResolveLocaleFromEmail(customer.Email, "@corporate.");
-            string code = LocaleToBranchCode.TryGetValue(locale, out string? localeCode)
-                ? localeCode
-                : corporateBranchCodes[corporateIndex % corporateBranchCodes.Length];
+            string? code = BranchLocaleMap.ResolveBranchCodeForLocale(locale);
+
+            // Spread same-locale corporates across sibling branches (IST↔ANK, NYC↔CHI).
+            if (locale == "tr")
+                code = corporateIndex % 2 == 0 ? "IST-01" : "ANK-01";
+            else if (locale == "en")
+                code = corporateIndex % 2 == 0 ? "NYC-01" : "CHI-01";
+            else if (string.IsNullOrWhiteSpace(code))
+                code = allCodes[corporateIndex % allCodes.Length];
+
             corporateIndex++;
 
-            // Spread EN corporates across NYC + CHI
-            if (locale == "en" && corporateIndex % 2 == 0 && branchIdByCode.ContainsKey("CHI-01"))
-                code = "CHI-01";
-
-            if (!branchIdByCode.TryGetValue(code, out Guid branchId))
+            if (code is null || !branchIdByCode.TryGetValue(code, out Guid branchId))
                 continue;
 
             customer.BranchId = branchId;
@@ -73,7 +71,6 @@ public static class CustomerBranchAssignmentSeed
 
     private static string ResolveLocaleFromEmail(string email, string marker)
     {
-        // e.g. name@individual.en.local
         int at = email.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
         if (at < 0)
             return "tr";
