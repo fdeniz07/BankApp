@@ -69,6 +69,13 @@ public static class VaultConfigurationExtensions
                     overlay["TokenOptions:SecurityKey"] = jwtKey;
             }
 
+            if (data.TryGetProperty("jwt_security_key_previous", out JsonElement prevEl))
+            {
+                string? prevKey = prevEl.GetString();
+                if (!string.IsNullOrWhiteSpace(prevKey))
+                    overlay["TokenOptions:SecurityKeyPrevious"] = prevKey;
+            }
+
             if (overlay.Count == 0)
             {
                 Log.Warning("Vault secret/bankapp has no jwt_security_key; keeping existing TokenOptions.");
@@ -77,8 +84,9 @@ public static class VaultConfigurationExtensions
 
             configuration.AddInMemoryCollection(overlay!);
             Log.Information(
-                "Vault overlay applied from {Url} (TokenOptions:SecurityKey).",
-                url);
+                "Vault overlay applied from {Url} (TokenOptions:SecurityKey{Previous}).",
+                url,
+                overlay.ContainsKey("TokenOptions:SecurityKeyPrevious") ? " + Previous" : string.Empty);
         }
         catch (Exception ex)
         {

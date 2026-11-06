@@ -1,5 +1,4 @@
 using System.IdentityModel.Tokens.Jwt;
-using Core.Security.Encryption;
 using Core.Security.JWT;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -40,7 +39,7 @@ public static class KeycloakAuthenticationExtensions
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = tokenOptions.Issuer,
                 ValidAudience = tokenOptions.Audience,
-                IssuerSigningKey = SecurityKeyHelper.CreateSecurityKey(tokenOptions.SecurityKey),
+                IssuerSigningKeys = TokenSigningKeyFactory.CreateValidationKeys(tokenOptions).ToList(),
                 ClockSkew = TimeSpan.Zero,
                 NameClaimType = System.Security.Claims.ClaimTypes.NameIdentifier,
                 RoleClaimType = System.Security.Claims.ClaimTypes.Role

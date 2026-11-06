@@ -32,7 +32,7 @@ public class JwtHelper : ITokenHelper
             ? expirationMinutes.Value
             : _tokenOptions.AccessTokenExpiration;
         _accessTokenExpiration = DateTime.UtcNow.AddMinutes(minutes);
-        SecurityKey securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
+        SecurityKey securityKey = TokenSigningKeyFactory.CreateSigningKey(_tokenOptions);
         SigningCredentials signingCredentials = SigningCredentialsHelper.CreateSigningCredentials(securityKey);
         JwtSecurityToken jwt = CreateJwtSecurityToken(
             _tokenOptions,
