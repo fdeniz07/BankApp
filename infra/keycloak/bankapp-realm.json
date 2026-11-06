@@ -1,0 +1,126 @@
+{
+  "realm": "bankapp",
+  "enabled": true,
+  "displayName": "BankApp Lab",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "bruteForceProtected": false,
+  "roles": {
+    "realm": [
+      {
+        "name": "Customer",
+        "description": "BankApp customer role"
+      },
+      {
+        "name": "BankStaff",
+        "description": "BankApp bank staff role"
+      },
+      {
+        "name": "BankManager",
+        "description": "BankApp bank manager role"
+      },
+      {
+        "name": "SuperAdmin",
+        "description": "BankApp super admin role"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "bankapp-api",
+      "name": "BankApp API (lab password grant)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "serviceAccountsEnabled": false,
+      "fullScopeAllowed": true,
+      "redirectUris": [
+        "http://localhost:3000/*",
+        "http://localhost:8080/*"
+      ],
+      "webOrigins": [
+        "http://localhost:3000",
+        "http://localhost:8080"
+      ],
+      "attributes": {
+        "post.logout.redirect.uris": "http://localhost:3000/*"
+      },
+      "defaultClientScopes": [
+        "web-origins",
+        "acr",
+        "profile",
+        "roles",
+        "email"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ],
+      "protocolMappers": [
+        {
+          "name": "bankapp-realm-roles",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "multivalued": "true",
+            "claim.name": "role",
+            "jsonType.label": "String",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "staff.tr@bank.local",
+      "email": "staff.tr@bank.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Ayşe",
+      "lastName": "Yılmaz",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Demo123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "BankStaff",
+        "default-roles-bankapp"
+      ]
+    },
+    {
+      "username": "manager.tr@bank.local",
+      "email": "manager.tr@bank.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Mehmet",
+      "lastName": "Demir",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Demo123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "BankManager",
+        "default-roles-bankapp"
+      ]
+    }
+  ]
+}
