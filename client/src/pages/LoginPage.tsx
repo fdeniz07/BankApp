@@ -17,12 +17,16 @@ const DEMO_PASSWORD = 'Demo123!'
 const DEFAULT_EMAIL = 'staff.tr@bank.local'
 
 const DEMO_ACCOUNTS = [
-  { role: 'staff' as const, locale: 'TR', email: 'staff.tr@bank.local' },
-  { role: 'staff' as const, locale: 'DE', email: 'staff.de@bank.local' },
-  { role: 'staff' as const, locale: 'EN', email: 'staff.en@bank.local' },
-  { role: 'manager' as const, locale: 'TR', email: 'manager.tr@bank.local' },
-  { role: 'manager' as const, locale: 'DE', email: 'manager.de@bank.local' },
-  { role: 'manager' as const, locale: 'EN', email: 'manager.en@bank.local' },
+  { role: 'staff' as const, locale: 'IST', email: 'staff.tr@bank.local' },
+  { role: 'staff' as const, locale: 'ANK', email: 'staff.ank@bank.local' },
+  { role: 'staff' as const, locale: 'BER', email: 'staff.de@bank.local' },
+  { role: 'staff' as const, locale: 'NYC', email: 'staff.nyc@bank.local' },
+  { role: 'staff' as const, locale: 'CHI', email: 'staff.chi@bank.local' },
+  { role: 'manager' as const, locale: 'IST', email: 'manager.ist@bank.local' },
+  { role: 'manager' as const, locale: 'ANK', email: 'manager.tr@bank.local' },
+  { role: 'manager' as const, locale: 'BER', email: 'manager.ber@bank.local' },
+  { role: 'manager' as const, locale: 'NYC', email: 'manager.nyc@bank.local' },
+  { role: 'manager' as const, locale: 'CHI', email: 'manager.chi@bank.local' },
   { role: 'customer' as const, locale: 'TR', email: 'customer.tr@bank.local' },
   { role: 'customer' as const, locale: 'DE', email: 'customer.de@bank.local' },
   { role: 'customer' as const, locale: 'EN', email: 'customer.en@bank.local' },
@@ -30,7 +34,7 @@ const DEMO_ACCOUNTS = [
 
 export function LoginPage() {
   const { t } = useTranslation()
-  const { login, isAuthenticated, isManager } = useAuth()
+  const { login, loginWithKeycloak, keycloakEnabled, isAuthenticated, isManager } = useAuth()
   const navigate = useNavigate()
   const remembered = getRememberedEmail()
   const [email, setEmail] = useState(remembered || DEFAULT_EMAIL)
@@ -38,6 +42,7 @@ export function LoginPage() {
   const [rememberMe, setRememberMe] = useState(!!remembered)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [keycloakLoading, setKeycloakLoading] = useState(false)
 
   if (isAuthenticated) return <Navigate to={homePath(isManager)} replace />
 
@@ -107,10 +112,32 @@ export function LoginPage() {
             <span>{t('login.rememberMe')}</span>
           </label>
           {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn primary" disabled={loading}>
+          <button type="submit" className="btn primary" disabled={loading || keycloakLoading}>
             {loading ? t('common.loading') : t('login.submit')}
           </button>
         </form>
+        {keycloakEnabled && (
+          <div className="login-keycloak">
+            <p className="muted login-or">{t('login.or')}</p>
+            <button
+              type="button"
+              className="btn ghost login-keycloak-btn"
+              disabled={loading || keycloakLoading}
+              onClick={async () => {
+                setError(null)
+                setKeycloakLoading(true)
+                try {
+                  await loginWithKeycloak()
+                } catch {
+                  setError(t('login.keycloakError'))
+                  setKeycloakLoading(false)
+                }
+              }}
+            >
+              {keycloakLoading ? t('common.loading') : t('login.keycloak')}
+            </button>
+          </div>
+        )}
         <p className="muted register-footer">
           {t('login.noAccount')}{' '}
           <Link to="/register">{t('login.goRegister')}</Link>
@@ -143,6 +170,7 @@ export function LoginPage() {
           <p>{t('login.hintManager')}</p>
           <p>{t('login.hintCustomer')}</p>
           <p>{t('login.hintSuperAdmin')}</p>
+          {keycloakEnabled && <p>{t('login.hintKeycloak')}</p>}
         </div>
       </div>
     </div>

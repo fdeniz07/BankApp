@@ -11,6 +11,13 @@ import { login as loginApi, registerIndividual as registerIndividualApi } from '
 import { getMyProfile, resolveProfileImageUrl } from '../api/profileApi'
 import type { RegisterIndividualRequest, RegisteredIndividualResponse } from '../types/api'
 import {
+  beginKeycloakLogin,
+  completeKeycloakLogin as completeOidcCallback,
+  endKeycloakSessionIfNeeded,
+  isKeycloakConfigured,
+  markKeycloakSession,
+} from './keycloakOidc'
+import {
   clearSession,
   getAuthUser,
   hasRole,
@@ -34,7 +41,10 @@ interface AuthContextValue {
   isStaff: boolean
   isManager: boolean
   isSuperAdmin: boolean
+  keycloakEnabled: boolean
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>
+  loginWithKeycloak: () => Promise<void>
+  completeKeycloakLogin: () => Promise<void>
   registerIndividual: (body: RegisterIndividualRequest) => Promise<RegisteredIndividualResponse>
   logout: () => void
   updateProfileLocal: (patch: ProfilePatch) => void
@@ -102,9 +112,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [user?.userId])
 
   const login = useCallback(async (email: string, password: string, rememberMe = false) => {
+    markKeycloakSession(false)
     const response = await loginApi(email, password, rememberMe)
     applySession(response, rememberMe)
     setRememberedEmail(rememberMe ? email.trim() : null)
+    setUser(getAuthUser())
+  }, [])
+
+  const loginWithKeycloak = useCallback(async () => {
+    await beginKeycloakLogin()
+  }, [])
+
+  const completeKeycloakLogin = useCallback(async () => {
+    const session = await completeOidcCallback()
+    // Keycloak tokens live in sessionStorage-backed OIDC store; keep BankApp session non-persist.
+    applySession(
+      {
+        accessToken: { token: session.accessToken, expiration: session.expiration },
+      },
+      false,
+    )
     setUser(getAuthUser())
   }, [])
 
@@ -117,6 +144,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     clearSession()
     setUser(null)
+    void endKeycloakSessionIfNeeded()
   }, [])
 
   const updateProfileLocal = useCallback((patch: ProfilePatch) => {
@@ -151,12 +179,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isSuperAdmin,
       isManager: hasRole(user, 'BankManager') || isSuperAdmin,
       isSuperAdmin,
+      keycloakEnabled: isKeycloakConfigured(),
       login,
+      loginWithKeycloak,
+      completeKeycloakLogin,
       registerIndividual,
       logout,
       updateProfileLocal,
     }
-  }, [user, login, registerIndividual, logout, updateProfileLocal])
+  }, [
+    user,
+    login,
+    loginWithKeycloak,
+    completeKeycloakLogin,
+    registerIndividual,
+    logout,
+    updateProfileLocal,
+  ])
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

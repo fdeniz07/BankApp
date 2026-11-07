@@ -407,6 +407,21 @@ h2 {
   margin-top: 1rem;
 }
 
+.login-keycloak {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.login-or {
+  text-align: center;
+  margin: 0;
+}
+
+.login-keycloak-btn {
+  width: 100%;
+}
+
 .form label {
   display: grid;
   gap: 0.35rem;

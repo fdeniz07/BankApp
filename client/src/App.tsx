@@ -11,6 +11,7 @@ import { CreditTypesPage } from './pages/CreditTypesPage'
 import { CustomerDetailPage } from './pages/CustomerDetailPage'
 import { CustomersPage } from './pages/CustomersPage'
 import { ConfirmEmailPage } from './pages/ConfirmEmailPage'
+import { LoginCallbackPage } from './pages/LoginCallbackPage'
 import { LoginPage } from './pages/LoginPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { RegisterPage } from './pages/RegisterPage'
@@ -22,6 +23,7 @@ export default function App() {
     <>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/login/callback" element={<LoginCallbackPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/confirm-email" element={<ConfirmEmailPage />} />
         <Route element={<ProtectedRoute />}>

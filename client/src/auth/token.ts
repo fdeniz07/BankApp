@@ -135,7 +135,10 @@ export function getAuthUser(): AuthUser | null {
     claimValues(payload, NAME_CLAIM_ALT)[0] ||
     claimValues(payload, 'sub')[0] ||
     ''
-  const roles = claimValues(payload, ROLE_CLAIM)
+  // Local BankApp JWT uses ClaimTypes.Role URI; Keycloak realm mapper emits `role`.
+  const roles = [
+    ...new Set([...claimValues(payload, ROLE_CLAIM), ...claimValues(payload, 'role')]),
+  ]
   const customerId = claimValues(payload, CUSTOMER_CLAIM)[0]
   const branchId = claimValues(payload, BRANCH_CLAIM)[0]
   const displayName = claimValues(payload, DISPLAY_NAME_CLAIM)[0]
