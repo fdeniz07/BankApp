@@ -393,6 +393,8 @@ Bei `Database__RunSeed` (typisch Docker / Development). Top-up bis Zielzahlen.
 | Anträge | ~100 (gemischter Status; Fake-Docs bei Pending) |
 | Identity | ~1 Manager + 3 Staff / Filiale; SuperAdmin; Demo-Kunden |
 
+**Hinweis:** Seed legt nur `BranchSeed.DemoBranches` an. Manuell erzeugte Filialen (z. B. `DOR-01`) können Kunden-Top-up erhalten, aber kein Staff-Mapping. Orphans über SuperAdmin → Filialen entfernen/deaktivieren.
+
 ---
 
 ## Schnellstart

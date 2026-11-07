@@ -65,5 +65,8 @@ Diskussionsnotizen: [architecture-notes.de.md](architecture-notes.de.md)
 - [x] Admin-Tailwind-Dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
 - [x] Filial-Obergrenze mit Währung (`MaxApprovalCurrencyCode` + `ApprovalAuthority:CurrencyCode`); nur bei gleicher Währung
 - [x] Manager-Personal-RBAC + StaffPage-Modal; ES-Indizes Personal/Kunden/Kreditarten (`bankapp-staff` / `customers` / `credit-types`)
-- [x] Keycloak-Lab: Compose (`:8180`) + Realm; WebApi Dual-JWT + Claim-Enrich; UI-Login weiter lokal
-- [x] Vault JWT Dual-Key Lab-Rotation (`jwt_security_key_previous` + Script); Raft-HA später
+- [x] Keycloak-Lab: Compose (`:8180`) + Realm; WebApi Dual-JWT + Claim-Enrich
+- [x] Keycloak-SPA-Login (PKCE, `oidc-client-ts`, `/login/callback`); lokaler Login bleibt
+- [x] Keycloak Social-IdP Lab-Skript (Google/GitHub; ohne Secrets aus)
+- [x] Vault JWT Dual-Key Lab-Rotation (`jwt_security_key_previous` + Script)
+- [x] Vault Raft-HA Lab-Overlay (`docker-compose.vault-raft.yml` + Init-Skript; Ports 8210+)

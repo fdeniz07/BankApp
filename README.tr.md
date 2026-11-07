@@ -393,6 +393,8 @@ Değerler **isim** olarak saklanır (`"Pending"`), int değil.
 | Başvuru | ~100 (durum karışık; Pending’lere sahte evrak) |
 | Identity | Şube başına ~1 manager + 3 staff; SuperAdmin; demo müşteriler |
 
+**Not:** Seed yalnızca `BranchSeed.DemoBranches` kodlarını oluşturur. Lab’de elle eklenen şubeler (ör. `DOR-01`) top-up’ta müşteri alabilir; personel map’i yoktur. Orphan şubeyi SuperAdmin → Şubeler UI ile silin veya pasifleştirin.
+
 ---
 
 ## Kurulum

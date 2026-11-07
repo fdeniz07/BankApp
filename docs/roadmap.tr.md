@@ -78,7 +78,7 @@ Kronolojik faz özeti için: [history.tr.md](history.tr.md). Mimari tartışma: 
 - [x] Admin karşılama dashboard (Tailwind CSS + paket sıkıştırma / performans)
 - [x] Müşteri + kredi türü ES arama/filtre/facet (`bankapp-customers`, `bankapp-credit-types`)
 - [ ] Kubernetes / ArgoCD dağıtımı
-- [ ] Raft Vault HA (üretim; Compose 3-node — learning 19); JWT dual-key lab rotasyonu ✓
-- [ ] OAuth (sosyal medya ile kayıt / giriş)
-- [ ] Keycloak desteği (Compose + dual JWT ✓; login UI / OAuth sonra)
+- [x] Raft Vault HA lab (Compose overlay `docker-compose.vault-raft.yml`; günlük vault -dev kalır); JWT dual-key ✓
+- [x] OAuth (Keycloak Identity Brokering: Google/GitHub lab script; secret yoksa kapalı)
+- [x] Keycloak desteği (Compose + dual JWT + SPA PKCE + sosyal IdP script)
 - [ ] Sohbet robotu (müşteri / personel destek asistanı)

@@ -99,14 +99,14 @@ docker compose --env-file .env up -d --force-recreate webapi
 
 **Dikkat / best practice:** Dev mode ≠ prod (Raft, policy, rotation). Root token’ı public issue’ya yapıştırma. SQL/Rabbit hâlâ Compose env — bilinçli sadeleştirme.
 
-## Secret rotasyonu (lab dual-key) ve Raft (hâlâ sonra)
+## Secret rotasyonu (lab dual-key) ve Raft HA (opsiyonel Compose)
 
-Bu lab **dev-mode** Vault kullanır: tek süreç, ephemeral, root token. **JWT dual-key rotasyonu** eklendi; **Raft HA** yok.
+Günlük BankApp yığını **dev-mode** Vault kullanır (`:8200`). **JWT dual-key** bu stack’te. **Raft HA** ayrı dosya: `docker-compose.vault-raft.yml` (port **8210/8211/8212** — çakışma yok).
 
 | Konu | Lab’de durum | Üretimde |
 |------|--------------|----------|
 | **JWT rotasyon** | `jwt_security_key` + `jwt_security_key_previous`; WebApi imza=current, doğrulama=ikisi | Key id, kısa dual-key penceresi, rolling restart |
-| **Raft / HA** | Yok | ≥3 node Raft, unseal, audit |
+| **Raft / HA** | Opsiyonel 3-node Compose overlay | ≥3 node Raft, unseal, audit, TLS |
 | **Policy** | Root token | AppRole + dar policy |
 
 ### Dual-key rotate (önerilen lab)
@@ -144,7 +144,34 @@ docker compose --env-file .env up vault-seed
 docker compose --env-file .env up -d --force-recreate webapi
 ```
 
-**Raft neden şimdi yok?** 3 node + unseal Compose maliyeti yüksek; dual-key öğrenildikten sonra ayrı platform dilimi.
+### Raft HA lab (opsiyonel — günlük stack’i bozmaz)
+
+```powershell
+cd infra
+
+# 3 node (UI: http://localhost:8210 )
+docker compose -f docker-compose.vault-raft.yml up -d
+
+# Leader init + unseal (root token / unseal çıktıda)
+docker compose -f docker-compose.vault-raft.yml exec vault-raft-1 /bin/sh /vault-raft-init.sh
+```
+
+Peer join (node 2 / 3 — önce leader unseal edilmiş olmalı):
+
+```powershell
+docker compose -f docker-compose.vault-raft.yml exec vault-raft-2 `
+  vault operator raft join http://vault-raft-1:8200
+docker compose -f docker-compose.vault-raft.yml exec vault-raft-2 `
+  vault operator unseal <UNSEAL>
+# aynı vault-raft-3 için
+docker compose -f docker-compose.vault-raft.yml exec -e VAULT_TOKEN=<ROOT> vault-raft-1 `
+  vault operator raft list-peers
+```
+
+**Kontrol:** `list-peers` 3 satır (leader + 2 follower); UI Token ile `:8210`.  
+**Not:** Varsayılan WebApi hâlâ `vault:8200` (dev). Raft’ı BankApp’e bağlamak ayrı deney (env `Vault__Address=http://host.docker.internal:8210`) — günlük lab için gerekli değil.  
+**Lab notu:** Raft data `/tmp/vault-raft-data` (container ephemeral — recreate = yeniden init). Prod’da kalıcı volume + TLS kullan.  
+**Yıkıcı:** `docker compose -f docker-compose.vault-raft.yml down` (tmp data kaybolur).
 
 ## Sınıflar, metotlar, paketler
 
@@ -155,6 +182,7 @@ docker compose --env-file .env up -d --force-recreate webapi
 | `TokenOptions.SecurityKeyPrevious` | Dual-key validation window |
 | `TokenSigningKeyFactory` | İmza: current; doğrulama: current + previous |
 | `vault-rotate-jwt.sh` | KV rotate (previous ← current) |
+| `vault-raft-init.sh` | Raft leader init/unseal (opsiyonel HA) |
 | `Program.cs` | DI’dan önce `await builder.Configuration.ApplyVaultSecretsAsync()` |
 
 Paket: ek Vault SDK yok — `HttpClient` + JSON.
@@ -166,9 +194,12 @@ src/WebApi/Configuration/VaultOptions.cs
 src/WebApi/Configuration/VaultConfigurationExtensions.cs
 src/WebApi/Program.cs
 src/WebApi/appsettings.json          # Vault:Enabled=false (local)
-infra/docker-compose.yml             # Vault__Enabled=true
+infra/docker-compose.yml             # Vault__Enabled=true (dev)
+infra/docker-compose.vault-raft.yml  # opsiyonel 3-node Raft
+infra/vault-raft/config-node*.hcl
 infra/scripts/vault-seed.sh
 infra/scripts/vault-rotate-jwt.sh
+infra/scripts/vault-raft-init.sh
 infra/.env.example
 ```
 

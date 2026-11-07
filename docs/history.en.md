@@ -65,5 +65,8 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] Admin Tailwind dashboard (`/dashboard`) + Vite manualChunks + nginx gzip_static
 - [x] Branch approval ceiling currency (`MaxApprovalCurrencyCode` + `ApprovalAuthority:CurrencyCode`); apply only when currencies match
 - [x] Manager staff RBAC + StaffPage edit modal; staff/customer/credit-type ES indexes (`bankapp-staff` / `customers` / `credit-types`)
-- [x] Keycloak lab: Compose (`:8180`) + realm; WebApi dual JWT + claim enrich; UI login still local
-- [x] Vault JWT dual-key lab rotation (`jwt_security_key_previous` + rotate script); Raft HA later
+- [x] Keycloak lab: Compose (`:8180`) + realm; WebApi dual JWT + claim enrich
+- [x] Keycloak SPA login (PKCE, `oidc-client-ts`, `/login/callback`); local login remains
+- [x] Keycloak social IdP lab script (Google/GitHub; off without secrets)
+- [x] Vault JWT dual-key lab rotation (`jwt_security_key_previous` + rotate script)
+- [x] Vault Raft HA lab overlay (`docker-compose.vault-raft.yml` + init script; ports 8210+)

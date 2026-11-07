@@ -392,6 +392,8 @@ Runs when configured (`Database__RunSeed`, typical in Docker / Development). Top
 | Credit applications  | ~100 (mixed status; fake docs on Pending)           |
 | Identity             | ~1 manager + 3 staff / branch; SuperAdmin; customers |
 
+**Note:** Seed creates only `BranchSeed.DemoBranches`. Manually added branches (e.g. `DOR-01`) may receive customer top-up but no staff map. Remove or deactivate orphans via SuperAdmin → Branches UI.
+
 ---
 
 ## Getting started

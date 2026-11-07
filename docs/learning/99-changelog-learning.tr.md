@@ -39,3 +39,6 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-06 | `19`: JWT dual-key rotasyon (`jwt_security_key_previous` + `vault-rotate-jwt.sh`); Raft hâlâ sonra |
 | 2026-11-06 | `19`: `vault-seed` idempotent (rotate sonrası previous korunur); recreate `--no-deps` |
 | 2026-11-06 | Seed: şube başına bireysel/kurumsal/personel/başvuru top-up; README TR/EN/DE senkron |
+| 2026-11-07 | `33`: SPA Keycloak PKCE login (`oidc-client-ts`, `/login/callback`) |
+| 2026-11-07 | `33`: Google/GitHub Identity Brokering lab notları |
+| 2026-11-07 | `19`: Vault Raft HA Compose lab (3-node) |
