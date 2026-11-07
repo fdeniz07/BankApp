@@ -32,7 +32,7 @@
   "clients": [
     {
       "clientId": "bankapp-api",
-      "name": "BankApp API (lab password grant)",
+      "name": "BankApp SPA + API (lab PKCE / password grant)",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
@@ -43,6 +43,7 @@
       "fullScopeAllowed": true,
       "redirectUris": [
         "http://localhost:3000/*",
+        "http://localhost:3000/login/callback",
         "http://localhost:8080/*"
       ],
       "webOrigins": [
@@ -50,6 +51,7 @@
         "http://localhost:8080"
       ],
       "attributes": {
+        "pkce.code.challenge.method": "S256",
         "post.logout.redirect.uris": "http://localhost:3000/*"
       },
       "defaultClientScopes": [
@@ -119,6 +121,45 @@
       ],
       "realmRoles": [
         "BankManager",
+        "default-roles-bankapp"
+      ]
+    },
+    {
+      "username": "customer.tr@bank.local",
+      "email": "customer.tr@bank.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Demo",
+      "lastName": "Customer",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Demo123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "Customer",
+        "default-roles-bankapp"
+      ]
+    },
+    {
+      "username": "superadmin@bank.local",
+      "email": "superadmin@bank.local",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Root",
+      "lastName": "Admin",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Demo123!",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "SuperAdmin",
+        "BankStaff",
         "default-roles-bankapp"
       ]
     }
