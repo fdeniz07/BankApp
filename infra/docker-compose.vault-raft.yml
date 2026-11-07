@@ -1,0 +1,66 @@
+# Optional Raft HA lab — does NOT replace default vault -dev.
+# Ports 8210/8211/8212 avoid clash with bankapp-vault :8200.
+#
+#   cd infra
+#   docker compose -f docker-compose.vault-raft.yml up -d
+#   docker compose -f docker-compose.vault-raft.yml exec vault-raft-1 /bin/sh /vault-raft-init.sh
+#
+# Default BankApp stack keeps using vault -dev + vault-seed. Point WebApi at Raft only for experiments.
+
+services:
+  vault-raft-1:
+    image: hashicorp/vault:1.17
+    container_name: bankapp-vault-raft-1
+    # Bypass image entrypoint user switch; lab-only root for raft volume writes
+    user: "0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["mkdir -p /tmp/vault-raft-data && exec vault server -config=/vault/config/config.hcl"]
+    ports:
+      - "${VAULT_RAFT_PORT1:-8210}:8200"
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    volumes:
+      - ./vault-raft/config-node1.hcl:/vault/config/config.hcl:ro
+      - ./scripts/vault-raft-init.sh:/vault-raft-init.sh:ro
+    cap_add:
+      - IPC_LOCK
+    # status exit 2 = uninitialized/sealed but process is up
+    healthcheck:
+      test: ["CMD-SHELL", "vault status -address=http://127.0.0.1:8200 >/dev/null 2>&1; exit 0"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+    restart: unless-stopped
+
+  vault-raft-2:
+    image: hashicorp/vault:1.17
+    container_name: bankapp-vault-raft-2
+    user: "0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["mkdir -p /tmp/vault-raft-data && exec vault server -config=/vault/config/config.hcl"]
+    ports:
+      - "${VAULT_RAFT_PORT2:-8211}:8200"
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    volumes:
+      - ./vault-raft/config-node2.hcl:/vault/config/config.hcl:ro
+    cap_add:
+      - IPC_LOCK
+    restart: unless-stopped
+
+  vault-raft-3:
+    image: hashicorp/vault:1.17
+    container_name: bankapp-vault-raft-3
+    user: "0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["mkdir -p /tmp/vault-raft-data && exec vault server -config=/vault/config/config.hcl"]
+    ports:
+      - "${VAULT_RAFT_PORT3:-8212}:8200"
+    environment:
+      VAULT_ADDR: "http://127.0.0.1:8200"
+    volumes:
+      - ./vault-raft/config-node3.hcl:/vault/config/config.hcl:ro
+    cap_add:
+      - IPC_LOCK
+    restart: unless-stopped
