@@ -62,7 +62,7 @@ Rollen: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (Manager ha
 - **Entscheidungsbrief E-Mail / SMS (Lab)** — nach Genehmigung/Ablehnung Queues `decision-letter` + `decision-letter-sms` → Seq/Log (kein SMTP/SMS-Gateway)
 - **Rate limiting** — Policies `auth` / `write` / `fixed` (429); Health + SignalR ausgenommen
 - **Vault-Lab** — JWT-`SecurityKey` (+ Dual-Key `SecurityKeyPrevious`) Overlay aus `secret/bankapp`; Rotate-Script; Env-Fallback
-- **Keycloak-Lab** — Compose-Realm; Dual JwtBearer (BankApp + Keycloak) + Claim-Enrich
+- **Keycloak-Lab** — Compose-Realm; Dual JwtBearer + Claim-Enrich; SPA-**PKCE** („Mit Keycloak anmelden“); Google/GitHub-IdP-Skript (ohne Secrets aus)
 - **Filialmodell** + **DoA** (`Branch.MaxApprovalAmount` + Währung; Position × Filialdeckel)
 - `ApproveGateMode` (None/Soft/Hard) + Soft/Hard-Dokumententor
 - Antrags-**Dokumenten-Upload** (Lab: Ausweis / Einkommen / Sonstiges; PDF/JPEG/PNG ≤5 MB; App_Data)
@@ -171,8 +171,8 @@ Rollen-Galerien: [Kunde](docs/screenshots/customer.en.md) · [Mitarbeiter](docs/
 | Idempotency | Header `Idempotency-Key` + Redis (Kredit-Schreib-APIs, 24h) |
 | Saga | `CreditApplicationProcessManager` + Tabelle `CreditApplicationSagas` |
 | Realtime | SignalR-Hub `/hubs/credit-applications` (JWT `access_token`) |
-| Secrets (Lab) | HashiCorp Vault **dev** (`secret/bankapp`-Overlay; Dual-Key-JWT-Rotate) |
-| Auth | JWT + Rollen; Keycloak-Lab (Dual JwtBearer) |
+| Secrets (Lab) | HashiCorp Vault **dev** (Overlay + Dual-Key-Rotate); optionales Raft-Overlay `:8210+` |
+| Auth | JWT + Rollen; Keycloak-Lab (Dual JwtBearer + SPA-PKCE) |
 | Search (Lab) | Elasticsearch (Anträge / Personal / Kunden / Kreditarten) + Kibana |
 | Client | React, Vite, TypeScript, Tailwind (Admin-Dashboard), react-i18next, SignalR |
 | Docs (Dev) | OpenAPI + Scalar (`/scalar/v1`) |
@@ -336,7 +336,8 @@ stateDiagram-v2
 | OTLP gRPC (Collector) | `localhost:4317` | App → Collector (keine Browser-UI) |
 | RabbitMQ UI | http://localhost:15672 | `guest` / `guest` |
 | Vault UI (Lab) | http://localhost:8200 | Token = `VAULT_DEV_ROOT_TOKEN_ID` (Default `bankapp-vault-root-token`); KV `secret/bankapp` |
-| Keycloak (Lab) | http://localhost:8180 | Realm `bankapp`; Admin-Console |
+| Keycloak (Lab) | http://localhost:8180 | Realm `bankapp`; SPA-PKCE-Login; Admin-Console |
+| Vault Raft (optional) | http://localhost:8210 | `docker-compose.vault-raft.yml`; tägliches Vault bleibt `:8200` |
 | Elasticsearch | http://localhost:9200 | Lab-Suchindizes |
 | Kibana | http://localhost:5601 | ELK-UI |
 

@@ -122,7 +122,7 @@ Input rules before handlers; DTO mapping in feature `Profiles`; named enums inst
 
 ### JWT + RBAC
 
-Roles: Customer, BankStaff, BankManager. Keycloak/OIDC later (roadmap).
+Roles: Customer, BankStaff, BankManager, SuperAdmin. Keycloak lab: dual JWT + SPA PKCE ([33](learning/33-keycloak-lab.tr.md)).
 
 ### Serilog → Seq + ProblemDetails
 
@@ -138,7 +138,7 @@ Structured logs for local investigation; consistent API errors for the client.
 | **RabbitMQ** | `email-confirmation`, `domain-events`, `decision-letter` (lab decision email → Seq) |
 | **SignalR** | Hub `/hubs/credit-applications` after Outbox consume |
 | **OpenTelemetry** | OTLP traces + metrics → collector → Tempo / Prometheus / Grafana `:3001` |
-| **Vault (lab)** | Dev mode + `secret/bankapp` seed (WebApi not wired yet) |
+| **Vault (lab)** | Dev mode + JWT overlay (dual-key rotate); optional Raft overlay ([19](learning/19-vault-lab.tr.md)) |
 | **Docker Compose** | Full local stack with healthchecks — `infra/docker-compose.yml` |
 
 **Client hook:** `client/src/realtime/useCreditApplicationRealtime.ts`  
@@ -189,4 +189,4 @@ One flow shows CQRS, domain events, outbox, saga, idempotency, and SignalR toget
 
 ## 8) Later (roadmap)
 
-Keycloak, Elasticsearch, K8s/ArgoCD, chatbot — see [architecture-notes.en.md](architecture-notes.en.md) and [roadmap.en.md](roadmap.en.md). OTel is already in the stack; walk it in Grafana, then apply the same what/why/example template to the next layer.
+K8s/ArgoCD, chatbot — see [architecture-notes.en.md](architecture-notes.en.md) and [roadmap.en.md](roadmap.en.md). Keycloak, ELK, and Vault overlay are in the lab (learning 31/33/19). OTel is already in the stack; walk it in Grafana, then apply the same what/why/example template to the next layer.

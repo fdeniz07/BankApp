@@ -49,7 +49,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | 6 | SignalR | [16](16-signalr.tr.md) |
 | 6 | Modular Monolith | [17](17-modular-monolith.tr.md) |
 | 6 | OpenTelemetry / Grafana / Prometheus | [18](18-otel-observability.tr.md) |
-| Lab | HashiCorp Vault (+ WebApi JWT overlay) | [19](19-vault-lab.tr.md) |
+| Lab | HashiCorp Vault (+ JWT overlay, dual-key, opsiyonel Raft) | [19](19-vault-lab.tr.md) |
 | UX | QuestPDF / ödeme planı export | [20](20-pdf-export.tr.md) |
 | DevOps | GitHub Actions CI | [21](21-ci-github-actions.tr.md) |
 | Notification | Karar mektubu e-posta (lab) | [22](22-decision-letter-email.tr.md) |
@@ -63,7 +63,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Credit / Security | Onay evrak kapısı + DoA (şube/pozisyon PB etiketli) | [30](30-approve-gate-authority.tr.md) |
 | Search / Observability | ELK + başvuru/personel/müşteri/kredi türü arama + facets | [31](31-elk-elasticsearch.tr.md) |
 | UX / DevOps | Admin Tailwind dashboard + Vite chunk/gzip | [32](32-admin-tailwind-dashboard.tr.md) |
-| Security / Lab | Keycloak (Compose + dual JWT; login UI sonra) | [33](33-keycloak-lab.tr.md) |
+| Security / Lab | Keycloak (Compose + dual JWT + SPA PKCE + sosyal IdP) | [33](33-keycloak-lab.tr.md) |
 
 Gereksinim (BRD/FRD): [docs/requirements/00-index.tr.md](../requirements/00-index.tr.md)
 

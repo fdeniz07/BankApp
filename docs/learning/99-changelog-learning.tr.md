@@ -42,3 +42,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-07 | `33`: SPA Keycloak PKCE login (`oidc-client-ts`, `/login/callback`) |
 | 2026-11-07 | `33`: Google/GitHub Identity Brokering lab notları |
 | 2026-11-07 | `19`: Vault Raft HA Compose lab (3-node) |
+| 2026-11-07 | README / tech-learning / `00-index` / infra README: Keycloak SPA + Vault/Raft senkron |

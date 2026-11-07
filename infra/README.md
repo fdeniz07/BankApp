@@ -15,11 +15,13 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 
 Lab tooling guide (setup / cautions / best practices): [docs/learning/24-lab-tools.tr.md](../docs/learning/24-lab-tools.tr.md).
 | RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation + domain-events queues; volume `bankapp-rabbitmq-data`; **healthcheck** |
-| Vault | http://localhost:8200 | **dev mode** lab; root token from `.env`; `vault-seed` writes `secret/bankapp` |
+| Vault | http://localhost:8200 | **dev mode** lab; root token from `.env`; `vault-seed` writes `secret/bankapp`; WebApi JWT overlay |
+| Vault Raft (optional) | http://localhost:8210 (+8211/8212) | `docker-compose.vault-raft.yml` — see learning 19; daily stack keeps `:8200` |
+| Keycloak | http://localhost:8180 | Realm `bankapp` import; SPA PKCE + dual JWT on WebApi |
 | SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data`; **healthcheck** |
 | WebApi | http://localhost:8080 | `/health` liveness; waits for SQL/Redis/Seq/RabbitMQ **healthy**; OTLP → collector |
 | Scalar (Dev) | http://localhost:8080/scalar/v1 | — |
-| Client (React) | http://localhost:3000 | nginx static build; waits for WebApi **healthy**; own **healthcheck** |
+| Client (React) | http://localhost:3000 | nginx static build; Keycloak PKCE button when `VITE_KEYCLOAK_*` set |
 | OTel Collector | host `:4317` / `:4318` | receives OTLP from WebApi |
 | Tempo | (internal + Grafana) | distributed traces |
 | Prometheus | http://localhost:9090 | scrapes collector `:8889` |
@@ -29,10 +31,11 @@ Lab tooling guide (setup / cautions / best practices): [docs/learning/24-lab-too
 
 | Role | Email | Password |
 |------|-------|----------|
-| Staff | `staff.tr@` / `staff.de@` / `staff.en@bank.local` | `Demo123!` |
-| Manager | `manager.tr@` / `manager.de@` / `manager.en@bank.local` | `Demo123!` |
+| Staff | `staff.tr@` / `staff.ank@` / `staff.de@` / `staff.nyc@` / `staff.chi@bank.local` | `Demo123!` |
+| Manager | `manager.ist@` / `manager.tr@` / `manager.ber@` / `manager.nyc@` / `manager.chi@bank.local` | `Demo123!` |
 | Customer | `customer.tr@` / `customer.de@` / `customer.en@bank.local` | `Demo123!` |
 | SuperAdmin | `superadmin@bank.local` | `Demo123!` |
+| Keycloak (same password) | `staff.tr@` / `manager.tr@` / `customer.tr@` / `superadmin@bank.local` | `Demo123!` |
 
 ## Prerequisites
 
@@ -185,7 +188,9 @@ Local `dotnet run` keeps OTel **off** by default (`appsettings`); point `OpenTel
 
 ## Roadmap
 
-- GitHub Actions / ArgoCD / K8s
-- WebApi JWT overlay from Vault (`Vault__Enabled`, path `secret/bankapp` → `jwt_security_key`) — **done in lab**
-- File/raft Vault (non-dev) and more secret keys (SQL/RabbitMQ) for production-like labs
-- Keycloak / OIDC, Elasticsearch (see docs roadmap)
+- GitHub Actions / ArgoCD / K8s; chatbot (see docs roadmap)
+- WebApi JWT overlay + dual-key rotate — **done** (`Vault__Enabled`, `secret/bankapp`)
+- Optional Raft HA lab — **done** (`docker-compose.vault-raft.yml`; still TLS/AppRole for prod)
+- Keycloak dual JWT + SPA PKCE + social IdP script — **done**
+- Elasticsearch live search — **done** (learning 31)
+- More secret keys in Vault (SQL/RabbitMQ) for production-like labs — later

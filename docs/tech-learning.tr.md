@@ -132,7 +132,7 @@ Kredi durumu / kategori gibi değerler **isim** ile API’de; int magic number y
 
 ### JWT + RBAC
 
-Roller: Customer, BankStaff, BankManager. Claim’lerle endpoint yetkisi. İleride Keycloak/OIDC (roadmap).
+Roller: Customer, BankStaff, BankManager, SuperAdmin. Claim’lerle endpoint yetkisi. Keycloak lab: dual JWT + SPA PKCE ([33](learning/33-keycloak-lab.tr.md)).
 
 **Öğrenim ipucu:** Önce “kim ne yapabilir?” matrisini çiz, sonra attribute/policy ekle.
 
@@ -184,7 +184,7 @@ Seq: yapısal log (+ TraceId/SpanId)
 
 ### HashiCorp Vault (lab)
 
-Compose **dev** mode + `secret/bankapp` seed. WebApi henüz Vault’tan okumaz — amaç secret yönetimini tanımak.
+Compose **dev** mode + `secret/bankapp` seed. WebApi startup’ta JWT key overlay (dual-key rotate). Opsiyonel Raft overlay: [19](learning/19-vault-lab.tr.md).
 
 ### Docker Compose
 
@@ -260,4 +260,4 @@ Compose URL’leri yetmezse: kurulum, Compose DNS, dikkat ve best practice için
 
 ## 9) İleride (roadmap)
 
-Keycloak, Elasticsearch, K8s/ArgoCD, chatbot — [architecture-notes.tr.md](architecture-notes.tr.md) ve [roadmap.tr.md](roadmap.tr.md). OTel yığında; Grafana’da dolaş, sonra bir sonraki katmana aynı “neden / örnek” şablonunu uygula.
+K8s/ArgoCD, chatbot — [architecture-notes.tr.md](architecture-notes.tr.md) ve [roadmap.tr.md](roadmap.tr.md). Keycloak, ELK, Vault overlay lab’de mevcut (learning 31/33/19). OTel yığında; Grafana’da dolaş, sonra bir sonraki katmana aynı “neden / örnek” şablonunu uygula.

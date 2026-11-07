@@ -62,7 +62,7 @@ Roles: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (manager als
 - **Decision letter email / SMS (lab)** — after approve/reject, queues `decision-letter` + `decision-letter-sms` → Seq/log (no SMTP/SMS gateway)
 - **Rate limiting** — policies `auth` / `write` / `fixed` (429); health + SignalR exempt
 - **Vault lab** — JWT `SecurityKey` (+ dual-key `SecurityKeyPrevious`) overlay from `secret/bankapp`; rotate script; env fallback
-- **Keycloak lab** — Compose realm; dual JwtBearer (BankApp + Keycloak) + claim enrich
+- **Keycloak lab** — Compose realm; dual JwtBearer + claim enrich; SPA **PKCE** (“Sign in with Keycloak”); Google/GitHub IdP script (off without secrets)
 - **Branch model** + **DoA** (`Branch.MaxApprovalAmount` + currency; position × branch cap)
 - `ApproveGateMode` (None/Soft/Hard) + document soft/hard gate
 - Application **document upload** (lab: identity / income / other; PDF/JPEG/PNG ≤5 MB; App_Data)
@@ -170,8 +170,8 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 | Idempotency       | Header `Idempotency-Key` + Redis (credit write APIs, 24h)                         |
 | Saga              | `CreditApplicationProcessManager` + table `CreditApplicationSagas`                |
 | Realtime          | SignalR hub `/hubs/credit-applications` (JWT `access_token`)                      |
-| Secrets (lab)     | HashiCorp Vault **dev** (`secret/bankapp` overlay; dual-key JWT rotate)           |
-| Auth              | JWT + roles; Keycloak lab (dual JwtBearer)                                        |
+| Secrets (lab)     | HashiCorp Vault **dev** (overlay + dual-key rotate); optional Raft overlay `:8210+` |
+| Auth              | JWT + roles; Keycloak lab (dual JwtBearer + SPA PKCE)                             |
 | Search (lab)      | Elasticsearch (applications / staff / customers / credit types) + Kibana          |
 | Client            | React, Vite, TypeScript, Tailwind (admin dashboard), react-i18next, SignalR       |
 | Docs (Dev)        | OpenAPI + Scalar (`/scalar/v1`)                                                   |
@@ -335,7 +335,8 @@ Application **cancel** sets status to `Cancelled` via dedicated command (not sof
 | OTLP gRPC (collector)       | `localhost:4317`                          | App → collector (not a browser UI)                           |
 | RabbitMQ UI                 | http://localhost:15672                    | `guest` / `guest`                                            |
 | Vault UI (lab)              | http://localhost:8200                     | Token = `VAULT_DEV_ROOT_TOKEN_ID` (default `bankapp-vault-root-token`); KV `secret/bankapp` |
-| Keycloak (lab)              | http://localhost:8180                     | Realm `bankapp`; admin console                               |
+| Keycloak (lab)              | http://localhost:8180                     | Realm `bankapp`; SPA PKCE login; admin console               |
+| Vault Raft (optional)       | http://localhost:8210                     | `docker-compose.vault-raft.yml`; daily vault stays on `:8200` |
 | Elasticsearch               | http://localhost:9200                     | Lab search indexes                                           |
 | Kibana                      | http://localhost:5601                     | ELK UI                                                       |
 
