@@ -7,6 +7,8 @@
 **Unit test**: Exercises a small unit (handler, rule) in isolation; dependencies are **mocked**.  
 **Integration test**: Boots the real WebApi pipeline (`WebApplicationFactory`) and exercises it over HTTP.
 
+**Analogy:** A unit test tightens one **screw**; an integration test watches the **car** complete a lap on the assembly line.
+
 ```mermaid
 flowchart TD
   CI[dotnet test / Actions] --> U[Application.UnitTests]
@@ -34,6 +36,19 @@ Unit: **Phase 3**. Integration skeleton → flows: **Phase 5**.
 | **FluentAssertions** | Readable asserts: `Should().Be(...)` |
 | **WebApplicationFactory** | In-process test host |
 | **AAA** | Arrange / Act / Assert |
+
+```mermaid
+sequenceDiagram
+  participant Dev as dotnet test
+  participant U as UnitTests
+  participant I as IntegrationTests
+  participant CI as GitHub Actions
+  Dev->>U: Handler with Moq
+  U-->>Dev: Pass
+  Dev->>I: WebApplicationFactory
+  I-->>Dev: HTTP Pass
+  CI->>Dev: slnx test
+```
 
 ## Commands
 
@@ -81,3 +96,23 @@ tests/WebApi.IntegrationTests/Infrastructure/CustomWebApplicationFactory.cs
 ## Mini flow
 
 `dotnet restore` → `dotnet build` → unit tests → integration tests → (parallel) client `npm` build.
+
+## Beginner lab
+
+1. `dotnet test tests/Application.UnitTests` — quick green suite.
+2. Single test: `--filter "FullyQualifiedName~ApproveCreditApplication"`.
+3. Read `CustomWebApplicationFactory.cs` — how is the host built?
+4. Run integration project with Release (same as CI).
+5. Break an assert on purpose → read red output → fix.
+
+## Common mistakes
+
+- Expecting real SQL while the factory uses InMemory → read the factory docs.  
+- Skipping `Verify` on mocks → tests pass without checking side effects.  
+- Only happy paths — add 403/400 scenarios too.  
+
+## Where it helps
+
+- [ ] Local `dotnet test BankApp.slnx` is green  
+- [ ] CI workflow uses the same command  
+- [ ] You can add a unit test for a new handler  

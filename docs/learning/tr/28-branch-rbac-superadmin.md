@@ -8,13 +8,15 @@
 
 **Şube kapsamlı yetkilendirme**: Personel yalnızca kendi şubesinin müşteri/başvurusunu görür ve değiştirir; yönetici diğer şubeleri **okuyabilir** ama yazamaz; **SuperAdmin** her şubede tam yetki + şube CRUD yapar.
 
+**Benzetme:** Mağaza zinciri: çalışan yalnız kendi şubesinin kasasını açar; bölge müdürü diğer şubeleri **camdan** görür ama kasa açamaz; genel müdür (SuperAdmin) her kasada işlem yapar.
+
 ```mermaid
 flowchart TB
-  JWT[JWT branchId claim] --> SVC[IBranchAuthorizationService]
-  SVC --> ST[BankStaff: kendi şube]
-  SVC --> MG[BankManager: oku tümü / yaz kendi]
-  SVC --> SA[SuperAdmin: CRUD + bypass]
-  ST --> API[Cross-şube yazma → 403]
+  JWT["JWT branchId claim"] --> SVC["IBranchAuthorizationService"]
+  SVC --> ST["BankStaff: kendi sube"]
+  SVC --> MG["BankManager: oku tumu, yaz kendi"]
+  SVC --> SA["SuperAdmin: CRUD ve bypass"]
+  ST --> API["Cross-sube yazma 403"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -53,6 +55,17 @@ Roadmap şube RBAC dilimi (2026-10-29 / 10-30).
 | **List filter** | Staff zorunlu kendi şube; Manager default kendi; SuperAdmin null = tümü |
 | **SuperAdmin bypass** | `AuthorizationBehavior` tüm `ISecuredRequest` rollerini geçer |
 | **AccessDenied audit** | Şube-cross red Seq’e yazılır |
+
+```mermaid
+sequenceDiagram
+  participant M as Manager NYC
+  participant API as CreditApplications
+  participant R as BranchAuthorization
+  M->>API: approve CHI basvuru
+  API->>R: modify izni
+  R-->>API: red
+  API-->>M: 403 AccessDenied
+```
 
 ## Komutlar
 
@@ -101,6 +114,21 @@ Lab şifresi (tüm demo hesaplar): `Demo123!` — Personel/Yönetici/Müşteri �
 2. `manager.nyc@` `?branchId=` ile CHI listesini okur → approve butonu UI’da gizli; API 403.
 3. `superadmin@` Şubeler sayfasından CHI-01 günceller; herhangi bir başvuruyu onaylar.
 4. `manager.nyc@` Personel’de aynı şube staff’ı pasif eder; başka manager satırında Düzenle/Pasif/Rol yok; “Yönetici” create checkbox görünmez. SuperAdmin her ikisini de yapar.
+
+## Yeni başlayan lab
+
+1. `staff.nyc@` login → başvuru listesinde yalnız NYC.
+2. `manager.nyc@` → şube filtresi ile CHI oku; approve butonu yok veya API 403.
+3. `superadmin@` → `/branches` yeni kod dene veya güncelle.
+4. Seq’te kasıtlı cross-şube approve → `AccessDenied`.
+
+## Sık yapılan hatalar
+
+- JWT’de **branchId** yok sanmak — staff seed ve login sonrası claim dolu olmalı.
+- Manager’ın **tüm şubede yazabildiğini** düşünmek — yalnız okuma geniş.
+- **IsManager** atamayı manager ile denemek — yalnız SuperAdmin.
+- Mermaid oklarında `→` karakteri — düz metin veya tırnak kullan.
+- Liste filtresi `?branchId=` — SuperAdmin için null = tümü.
 
 ## Nerede işe yarar?
 

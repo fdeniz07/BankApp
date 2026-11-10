@@ -7,6 +7,8 @@
 **Redis**: Sehr schneller In-Memory-Key-Value-Store.  
 In BankApp zwei Hauptaufgaben: **Cache** (Listen) und Speicher für **Idempotency-Key**.
 
+**Vergleich:** Redis ist das **Notizbuch** für schnelle Listen; Idempotency der Stempel „Beleg schon verbucht“.
+
 ```mermaid
 flowchart LR
   API[WebApi] --> R[Redis]
@@ -34,6 +36,22 @@ Cache: **Faz 2–3**. Idempotency: **Faz 6**. Redis Insight UI: Lab (Compose).
 | **Cache stampede** | Plötzliche DB-Last, wenn Cache leer ist (bewusst sein) |
 | **Idempotency** | Gleiche Anfrage zweimal → gleicher Effekt / Replay |
 | **Redis Insight** | Offizielle Web-UI; Redis selbst hat keine eingebaute Oberfläche |
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant API as WebApi
+  participant R as Redis
+  C->>API: POST + Idempotency-Key
+  API->>R: Key vorhanden?
+  alt Erste Anfrage
+    API->>API: Verarbeiten
+    API->>R: Antwort mit TTL
+  else Wiederholung
+    R-->>API: Gespeicherte Antwort
+    API-->>C: Replay
+  end
+```
 
 ## Befehle
 
@@ -78,3 +96,23 @@ tests/.../IdempotencyKeyTests.cs
 Erster POST + Key → Verarbeitung, Antwort nach Redis.  
 Gleicher Key + gleicher Body → gespeicherte Antwort (kein zweites Outbox).  
 Gleicher Key + anderer Body → **409 Conflict**.
+
+## Einstiegs-Lab
+
+1. `docker compose up -d redis redis-insight` in `infra`.
+2. Insight: Host **`redis`**, Port **6379**.
+3. Kredittyp-Liste in UI → Keys in Redis prüfen.
+4. Zwei POSTs mit gleichem `Idempotency-Key`.
+5. `redis-cli PING` → `PONG`.
+
+## Häufige Fehler
+
+- Insight-Host `localhost` statt `redis`.  
+- Idempotency-Key bei jedem Retry ändern.  
+- Schreiben ohne Cache-Invalidierung (`ICacheRemoverRequest`).  
+
+## Wo hilft es?
+
+- [ ] `PING` → PONG  
+- [ ] Insight verbunden  
+- [ ] Doppel-POST verarbeitet nicht zweimal  

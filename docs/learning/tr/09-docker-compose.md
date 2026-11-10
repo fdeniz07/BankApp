@@ -7,6 +7,8 @@
 **Docker**: Uygulamayı container’da paketler.  
 **Compose**: Birden fazla container’ı (SQL, Redis, Seq, API, client, …) tek YAML ile ayağa kaldırır.
 
+**Benzetme:** Compose bir **orkestra şefi** — tek YAML dosyası hangi müzisyenin (container) ne zaman sahneye çıkacağını söyler.
+
 ```mermaid
 flowchart TB
   CLIENT["client\n(nginx :3000)"]
@@ -40,6 +42,21 @@ Yerel “lab prod” yığını: DB + cache + log + kuyruk + Vault + OTel + WebA
 | **Healthcheck** | Servis hazır mı? |
 | **depends_on** | Başlama sırası (health ile güçlendirilir) |
 | **.env** | Compose değişkenleri (secret’ları commit etme) |
+
+```mermaid
+sequenceDiagram
+  participant You as Sen
+  participant DC as docker compose
+  participant SQL as sqlserver
+  participant API as webapi
+  participant CL as client
+  You->>DC: up -d --build
+  DC->>SQL: start + health
+  SQL-->>DC: healthy
+  DC->>API: migrate seed
+  DC->>CL: nginx SPA
+  CL-->>You: localhost 3000
+```
 
 ## Komutlar
 
@@ -169,3 +186,25 @@ infra/README.md
 ## Mini akış
 
 `compose up` → SQL healthy → WebApi migrate/seed → client nginx → tarayıcıda login.
+
+Ekran örneği: [`Containers on Docker.png`](../../assets/screenshots/en/Containers%20on%20Docker.png)
+
+## Yeni başlayan lab
+
+1. `infra` → `copy .env.example .env` (yoksa).
+2. `docker compose --env-file .env up -d --build` — ilk sefer uzun sürebilir.
+3. `compose ps` → sql, redis, webapi **healthy**.
+4. `http://localhost:8080/health` ve `http://localhost:3000` aç.
+5. `compose logs --tail=50 webapi` → seed satırlarını gör.
+
+## Sık yapılan hatalar
+
+- `.env` olmadan port/şifre varsayımları → kopyala ve düzenle.  
+- Health beklemeden API’ye abanıp “connection refused” → `ps` ile healthy bekle.  
+- `down -v` ile SQL’i de silmek istemeden panik yapmak → önce sadece `down` dene.  
+
+## Nerede işe yarar?
+
+- [ ] Full stack tek komutla ayakta  
+- [ ] Health checklist yeşil  
+- [ ] Loglardan migrate/seed doğrulandı  

@@ -9,12 +9,14 @@ Related: [06 JWT](06-jwt-rbac.md) · [24 Lab tools](24-lab-tools.md) · [09 Comp
 **Vault**: Secret storage. In the BankApp lab, Compose runs **dev-mode** Vault plus `vault-seed` → KV path `secret/bankapp`.  
 On WebApi startup, optionally reads the **JWT signing key** from Vault and overlays `TokenOptions:SecurityKey`.
 
+**Analogy:** Vault is the **safe room**; overlay is swapping the desk copy with the key from the safe; `.env` fallback is the drawer spare (lab only).
+
 ```mermaid
 flowchart LR
-  SEED[vault-seed] -->|KV write| VAULT[(Vault dev :8200)]
-  VAULT -->|GET secret/bankapp| API[WebApi startup]
-  API -->|AddInMemoryCollection| JWT[TokenOptions SecurityKey overlay]
-  JWT --> SIGN[JWT sign / validate]
+  V["Vault KV secret bankapp"] -->|"jwt_security_key"| W["WebApi startup"]
+  W -->|"overlay"| C["TokenOptions SecurityKey"]
+  C --> JWT["JWT sign validate"]
+  ENV["env fallback"] -.->|"Vault down"| C
 ```
 
 ## Role in BankApp
@@ -36,6 +38,20 @@ Compose lab earlier; **WebApi JWT overlay** in the security slice.
 | **Overlay** | Overwrite config via `AddInMemoryCollection` |
 | **Dev mode** | Not production; no unseal/raft; ephemeral data |
 | **Root token** | Full access in the lab — anti-pattern in prod |
+
+```mermaid
+sequenceDiagram
+  participant Seed as vault-seed
+  participant V as Vault
+  participant API as WebApi
+  participant User as User login
+  Seed->>V: write jwt_security_key
+  API->>V: KV GET at startup
+  V-->>API: current and optional previous
+  API->>API: AddInMemoryCollection overlay
+  User->>API: request access token
+  API->>User: JWT signed with current key
+```
 
 ## Commands
 
@@ -216,6 +232,25 @@ infra/.env.example
 vault-seed writes `jwt_security_key` → WebApi starts → overlay → JWT signed with current key.  
 Rotate script → previous + new current → WebApi recreate → old token validates with previous, new login with current.
 
+## Beginner lab
+
+1. `docker compose up -d vault` then `docker compose up vault-seed` — UI :8200 with token.
+2. `vault kv get secret/bankapp` — see `jwt_security_key` (do not share).
+3. Start WebApi — log `Vault overlay applied`.
+4. Login — valid JWT.
+5. Run rotate script, recreate WebApi — test old and new tokens.
+
+## Common mistakes
+
+- Mixing dev Vault with prod Raft  
+- Overwriting rotate with careless `vault-seed`  
+- JWT key under 64 bytes  
+- Root token in screenshots  
+
 ## Where it helps
 
-Use the **What to verify** and **Disaster / recovery (lab)** tables under [Commands](#commands) when Vault UI is empty, JWT signing fails, or after `force-recreate vault`.
+- [ ] Vault healthy + seed path populated  
+- [ ] WebApi overlay or fallback log  
+- [ ] Login JWT valid  
+- [ ] Dual-key after rotate tested  
+- [ ] Commands tables when UI empty or JWT fails

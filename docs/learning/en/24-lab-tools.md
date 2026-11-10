@@ -10,6 +10,8 @@ Related: [07 Seq](07-serilog-seq.md) · [08 Redis](08-redis.md) · [09 Compose](
 
 Doc style: above/beside frequent commands — **what it does**, **what to check next**, and when possible **disaster / recovery** (e.g. [09 Compose](09-docker-compose.md)).
 
+**Analogy:** Like a hospital ward — the patient (WebApi) is in bed; monitors (Grafana), charts (Seq), pharmacy inventory (Redis Insight), and courier queue (RabbitMQ) each answer a different diagnostic question.
+
 ```mermaid
 flowchart TB
   subgraph observe [Lab surfaces]
@@ -61,6 +63,21 @@ Services arrived across Phases 2–6; **Redis Insight** and this combined “lab
 | **Host port** | `localhost:PORT` in the browser (Compose `ports:`) |
 | **Lab credential** | Training passwords — **not for production**; rotate / Vault / secret manager required |
 | **Liveness vs data UI** | `/health` = “alive?”; Insight/Grafana = “what’s inside?” |
+
+```mermaid
+sequenceDiagram
+  participant U as You
+  participant S as Scalar
+  participant API as WebApi
+  participant Q as Seq
+  participant R as Redis Insight
+  U->>S: login plus GET CreditTypes
+  S->>API: Bearer JWT
+  API-->>S: 200 JSON
+  U->>R: BankApp keys present
+  U->>Q: filter by TraceId
+  Q-->>U: request log line
+```
 
 ---
 
@@ -317,3 +334,38 @@ docs/learning/en/08-redis.md  # Insight connection note
 5. (Optional) Grafana HTTP duration / trace.
 
 Repeat with approve + `Idempotency-Key` → Redis idempotency record + RabbitMQ `decision-letter` / domain event queue.
+
+## Beginner lab
+
+1. `cd infra` → `docker compose --env-file .env up -d --build` → check `ps` healthy.
+2. Scalar login → `GET /api/CreditTypes` → 200.
+3. Redis Insight connect `redis://redis:6379` → see `BankApp:` keys.
+4. Seq: last 5 minutes Errors → empty or known lab warnings.
+5. (Optional) Grafana Explore → Tempo service `bankapp-webapi`.
+
+## Common mistakes
+
+- Insight **`localhost:6379`** — wrong inside the container; use host **`redis`**.
+- Header key **`Auth`** — must be **`Authorization: Bearer …`**.
+- Looking for Grafana on **3000** — client is 3000; Grafana lab is **3001**.
+- `down -v` as quick fix — wipes Seq/Redis data; mind SQL volumes ([09](09-docker-compose.md)).
+- Unquoted `:` in Mermaid node labels — wrap labels in quotes.
+
+## Where it helps
+
+### Health checklist
+
+| Check | How | Good sign |
+|---------|-------|-------------|
+| Stack | `docker compose ps` | webapi, redis, rabbitmq healthy |
+| Scalar | Login + protected GET | 200 / 403 by role |
+| Insight | `redis://redis:6379` | Connected |
+| RabbitMQ | Queue consumers | ≥ 1 |
+
+### Disaster / recovery (lab)
+
+| Situation | Path |
+|-------|-----|
+| UI 404 / refused | `ps` + `.env` ports |
+| Empty Seq | webapi logs; sink URL |
+| No traces | OTel on + send requests |

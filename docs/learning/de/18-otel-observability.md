@@ -7,24 +7,17 @@
 **OpenTelemetry (OTel)**: Standard zum Sammeln von **Traces / Metriken / (Log-Brücken)** aus der App.  
 **Prometheus**: Metrics scrape und Speicher.  
 **Grafana**: Dashboard-UI. Im Lab **Tempo** als Trace-Backend.  
-**Seq** bleibt für Logs (eigenes Kapitel).
+**Seq** bleibt für Logs (Kapitel 07).
+
+**Analogie:** OTel = **Überwachungskamera**; Grafana = **Leitstand** für Traces und Metriken.
 
 ```mermaid
 flowchart LR
-  http[HTTP Request]
-  webapi[bankapp-webapi]
-  otlp[OTLP Exporter]
-  collector[otel-collector]
-  tempo[Tempo]
-  prom[Prometheus]
-  grafana[Grafana :3001]
-  http --> webapi
-  webapi --> otlp
-  otlp --> collector
-  collector --> tempo
-  collector --> prom
-  tempo --> grafana
-  prom --> grafana
+  API["WebApi OTLP"] --> COL["otel-collector"]
+  COL --> PROM["Prometheus"]
+  COL --> TEMPO["Tempo"]
+  PROM --> GRAF["Grafana Port 3001"]
+  TEMPO --> GRAF
 ```
 
 ## Rolle in BankApp
@@ -43,6 +36,18 @@ WebApi sendet per OTLP an den Collector → Prometheus / Tempo → Grafana unter
 | **Metric** | Counter / Histogram (z. B. HTTP-Dauer) |
 | **OTLP** | OTel-Export-Protokoll |
 | **Collector** | Vermittler (empfängt, verteilt) |
+| **service.name** | Filter `bankapp-webapi` in Tempo |
+
+```mermaid
+sequenceDiagram
+  participant Browser as Client
+  participant API as WebApi
+  participant COL as collector
+  participant TEMPO as Tempo
+  Browser->>API: HTTP Request
+  API->>COL: OTLP Span
+  COL->>TEMPO: Trace speichern
+```
 
 ## Befehle
 
@@ -91,3 +96,19 @@ docs/assets/screenshots/en/Metrics on Grafana.png
 ## Mini-Ablauf
 
 HTTP-Request → AspNetCore-Instrumentation-Span → OTLP Collector → Tempo/Prometheus → Grafiken in Grafana.
+
+## Einsteiger-Lab
+
+Stack starten → echte API-Calls (nicht nur health) → Grafana Dashboard BankApp HTTP → Tempo Explore → TraceId in Seq vergleichen.
+
+## Häufige Fehler
+
+- Kein Traffic vor Grafana  
+- Nur health endpoint  
+- Collector down ignorieren  
+
+## Wo hilft es?
+
+- [ ] Prometheus ready  
+- [ ] Tempo Spans für webapi  
+- [ ] Grafana Dashboards laden

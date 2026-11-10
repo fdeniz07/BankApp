@@ -10,12 +10,14 @@ Sayfa üzerinde açılan bir **erişilebilirlik asistanı**: tema, yazı boyutu,
 
 Kod **ticari bir widget değil**; klasörü kopyalayıp başka SPA’ya taşıyabileceğin **lab kiti**.
 
+**Benzetme:** Gözlük dükkânındaki deneme aynası — renk filtresi, büyük yazı, kontrast; seçimler cebine not edilir (`localStorage`), dükkanı terk edip gelince aynı ayarlar geri gelir.
+
 ```mermaid
 flowchart LR
-  FAB[FAB panel] --> CTRL[createA11yController]
-  CTRL --> DOM[data-* + CSS]
-  CTRL --> LS[localStorage tercihler]
-  I18N[i18n etiketler] --> FAB
+  FAB["FAB panel"] --> CTRL["createA11yController"]
+  CTRL --> DOM["data attrs ve CSS"]
+  CTRL --> LS["localStorage tercihler"]
+  I18N["i18n etiketler"] --> FAB
 ```
 
 ## Bu projede ne işe yarar?
@@ -38,6 +40,20 @@ UX lab — Keycloak SPA’dan sonra; eski basit toolbar’ın taşınabilir kite
 | **data-\*** | CSS’in dinlediği HTML öznitelikleri |
 | **TTS** | Tarayıcı `speechSynthesis` (lab; ekran okuyucu yerine geçmez) |
 | **Portable kit** | `core.ts` framework’süz; React sadece UI kabuğu |
+
+```mermaid
+sequenceDiagram
+  participant U as Kullanici
+  participant P as Panel
+  participant C as Controller
+  participant H as html root
+  U->>P: Yuksek kontrast
+  P->>C: setPrefs
+  C->>H: data-contrast high
+  C->>C: localStorage yaz
+  U->>U: sayfa yenile
+  C->>H: boot apply prefs
+```
 
 ## Komutlar
 
@@ -105,3 +121,19 @@ Kullanıcı FAB’a basar → panel açılır (`panelOpen`) → “Yüksek kontr
 1. Panelden **Sıfırla**
 2. DevTools → Local Storage → `bankapp-theme` / `bankapp-a11y-*` anahtarlarını sil → yenile
 3. Asistan gizlendiyse FAB hâlâ görünür; tıklayınca tekrar açılır
+
+## Yeni başlayan lab
+
+1. `cd client` → `npm run dev` → sağ-alt FAB.
+2. Tema koyu + font A+ → sayfayı yenile → tercihler kalır.
+3. Mavi filtre aç → butonlara tıklanabildiğini doğrula (overlay `pointer-events: none`).
+4. TTS başlat/durdur (destekleyen tarayıcı).
+5. Panelden Sıfırla → varsayılan tema.
+
+## Sık yapılan hatalar
+
+- TTS’i **ekran okuyucu** sanmak — lab demo; NVDA/JAWS yerine geçmez.
+- Taşırken **`BANKAPP_A11Y_KEYS`** ile yeni projede legacy anahtar karışıklığı — `DEFAULT_A11Y_KEYS`.
+- Host CSS’te `--font-scale` yok → yazı boyutu görünmez değişir.
+- `data-*` eksik → kontrast CSS tetiklenmez; `applyA11yPrefs` boot’ta çağrılmalı.
+- Mermaid’de `data-* + CSS` — `+` diyagramı kırar; tırnaklı düz metin kullan.

@@ -2,23 +2,25 @@
 
 [← Previous](14-outbox-events.md) · [Contents](00-index.md) · [Next →](16-signalr.md)
 
+Related: [14 Outbox](14-outbox-events.md) · [16 SignalR](16-signalr.md)
+
 ## What is this?
 
-**Saga / Process Manager**: State machine for a long-running process.  
-Tracks steps that do not finish in one transaction (created → decision → onboarding stub).
+**Saga / Process Manager**: A **state machine** for long-running processes. Steps that do not fit one transaction (created → decision → onboarding stub) are tracked; each domain event answers “which step are we on?”.
+
+**Analogy:** Passport processing — form received, review done, card printed; each stage gets a stamp. In BankApp stamps live in `CreditApplicationSagas`.
 
 ```mermaid
-flowchart LR
-  E1[Created event] --> S1[Saga: Created]
-  S1 --> E2[Approved / Rejected event]
-  E2 --> S2[Decision state]
-  S2 --> O[Onboarding stub]
-  O --> Done[Completed]
+stateDiagram-v2
+  [*] --> Submitted: Created
+  Submitted --> Decided: Approved or Rejected
+  Decided --> Onboarding: stub step
+  Onboarding --> [*]: Completed
 ```
 
 ## Role in BankApp
 
-`CreditApplicationSagas` table + `CreditApplicationProcessManager`: orchestrates the credit application lifecycle (including teaching stubs).
+`CreditApplicationSagas` + `CreditApplicationProcessManager`: credit application lifecycle orchestration (including education stubs). Outbox consumer invokes the process manager on relevant events.
 
 ## When added?
 
@@ -29,25 +31,48 @@ flowchart LR
 | Concept | Meaning |
 |--------|--------|
 | **Orchestration** | Central manager drives steps |
-| **State** | Current step of the process |
-| **Compensation** | (Advanced) rollback; here stub-focused |
-| **Idempotent handler** | Same event twice does not break state |
+| **State** | Current step (`Submitted`, `Decided`, …) |
+| **Compensation** | (Advanced) rollback; lab focuses on stubs |
+| **Idempotent handler** | Same event twice does not corrupt state |
+| **Correlation** | Saga row tied to `CreditApplicationId` |
+
+```mermaid
+flowchart TB
+  EV["Domain event"] --> CON["DomainEventsConsumer"]
+  CON --> PM["CreditApplicationProcessManager"]
+  PM --> DB["CreditApplicationSagas"]
+  PM --> STUB["Onboarding stub log"]
+  DB --> TEST["Unit test happy path"]
+```
 
 ## Commands
 
-No CLI; verify with unit tests:
+No CLI; verify with tests:
 
 ```powershell
-dotnet test --filter "FullyQualifiedName~Saga"
+dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --filter "FullyQualifiedName~Saga"
+```
+
+```powershell
+dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj --filter "FullyQualifiedName~Credit"
+```
+
+Lab SQL:
+
+```sql
+SELECT TOP 10 CreditApplicationId, State, UpdatedOnUtc
+FROM CreditApplicationSagas
+ORDER BY UpdatedOnUtc DESC;
 ```
 
 ## Classes, methods, packages
 
 | Name | Role |
 |------|-----|
-| `CreditApplicationProcessManager` | State transitions from events |
+| `CreditApplicationProcessManager` | State transitions per event |
 | `CreditApplicationSaga` entity | Persisted process state |
-| Called from consumer | After outbox event |
+| Consumer invocation | After outbox event |
+| Unit tests | Happy path + idempotency |
 
 ## Where in the repo?
 
@@ -59,4 +84,26 @@ tests/Application.UnitTests/…Saga…
 
 ## Mini flow
 
-Created event → saga “Created” → Approved event → decision state → onboarding stub → Completed (happy path fixed by tests).
+Created → `Submitted` → Approved → `Decided` → onboarding stub → `Completed`. Reject also reaches `Decided` (not approved).
+
+## Beginner lab
+
+1. Create application → SQL saga row `Submitted`.
+2. Staff approves → state moves to `Decided` or next stub.
+3. Read unit test that simulates duplicate approve — state must not double-advance.
+4. Run `dotnet test --filter Saga` — all green.
+5. Search Seq for onboarding stub log if present.
+
+## Common mistakes
+
+- State transitions in HTTP handler skipping outbox consumer  
+- Counters without idempotency on duplicate events  
+- Manually editing saga table and confusing tests  
+- Same final state name for approve and reject  
+
+## Where it helps
+
+- [ ] Saga row on new application  
+- [ ] State updates on approve/reject  
+- [ ] Saga unit tests green  
+- [ ] Duplicate event scenario safe

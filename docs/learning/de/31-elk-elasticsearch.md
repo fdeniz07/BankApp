@@ -72,6 +72,17 @@ Faz 6 — nach Soft/Hard-Tor + DoA (Roadmap: Personal-GET-Suche).
 
 **Fazit:** Seq **nicht** durch ES ersetzen; Log-Suche mit Kibana **erweitern**. In Produktion nutzen manche Teams nur ELK — im Lab sind beide lehrreich.
 
+```mermaid
+sequenceDiagram
+  participant API as WebApi
+  participant ES as Elasticsearch
+  participant SQL as SQL
+  API->>ES: multi_match
+  alt ES down
+    API->>SQL: Contains
+  end
+```
+
 ## Befehle
 
 ### Stack starten
@@ -201,3 +212,16 @@ Verifikation: JSON mit `statuses`, `branches`, `currencies`, `missingRequiredDoc
 3. Volume löschen (**Daten weg**): `docker compose down`, dann `docker volume rm bankapp-elasticsearch-data` — `-v` betrifft alle Named Volumes; SQL-External-Volume beachten
 
 Lab: ES startet unter Docker Desktop manchmal langsam (`start_period` 60s+).
+
+## Einstiegs-Lab
+
+1. `docker compose up -d elasticsearch kibana` → `curl localhost:9200`.
+2. WebApi neu starten → Index `bankapp-credit-applications`.
+3. Antragsliste Suche → Ergebnisfilter.
+4. ES stoppen → SQL-Fallback funktioniert.
+
+## Häufige Fehler
+
+- Seq durch ELK **ersetzen** — im Lab beides parallel.
+- ES OOM — `ELASTIC_JAVA_OPTS` senken.
+- Facet-Panel als Staff — nur Manager/SuperAdmin.

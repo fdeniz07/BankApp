@@ -6,15 +6,17 @@ Related: [14 Outbox](14-outbox-events.md) · [22 Decision letter](../tr/22-decis
 
 ## What is this?
 
-**RabbitMQ**: Message broker. A producer drops a message on a queue; a consumer processes it when ready.  
-Separates slow work (email simulation, event publishing) from the HTTP request path.
+**RabbitMQ**: Message broker (AMQP). A producer drops a message on a queue; a consumer processes it when ready.  
+Separates slow work from the HTTP path — the API can return 200 while the queue finishes in the background.
+
+**Analogy:** Supermarket **ticket dispenser** — checkout (API) prints the slip; the kitchen (consumer) prepares in order. The customer does not wait at the till.
 
 ```mermaid
 flowchart LR
-  PUB[Publisher] --> Q[Queue]
-  Q --> CON[Consumer HostedService]
-  CON --> SAGA[Saga / SignalR]
-  CON --> SEQ[Seq lab log]
+  PUB["Publisher"] --> Q["Queue"]
+  Q --> CON["Consumer HostedService"]
+  CON --> SAGA["Saga and SignalR"]
+  CON --> SEQ["Seq lab log"]
 ```
 
 ## Role in BankApp
@@ -41,6 +43,21 @@ Email queue: **Phase 5**. Domain-events: **Phase 6** (Outbox). Decision-letter: 
 | **Unacked** | With consumer, not yet acked |
 | **Ack / Nack** | Success / failure marker |
 | **At-least-once** | Delivered at least once — consumer should be idempotent |
+
+```mermaid
+flowchart TB
+  subgraph lab["BankApp lab queues"]
+    EC["email-confirmation"]
+    DE["domain-events"]
+    DL["decision-letter"]
+    SMS["decision-letter-sms"]
+  end
+  API["WebApi publishers"] --> EC
+  API --> DE
+  API --> DL
+  API --> SMS
+  HS["HostedService consumers"] --> lab
+```
 
 ## Commands
 
@@ -125,3 +142,26 @@ docs/learning/tr/22-decision-letter-email.md
 
 Register → generate token → `email-confirmation` → consumer log/Seq → user confirms via link → login.  
 Approve/reject → Outbox → `domain-events` (+ `decision-letter`) → SignalR / Seq.
+
+## Beginner lab
+
+1. `cd infra` → `docker compose --env-file .env up -d rabbitmq webapi`.
+2. http://localhost:15672 → `guest` / `guest` → **Queues**.
+3. Register a user → watch `email-confirmation` Ready drop.
+4. Approve/reject → `domain-events` and `decision-letter` move.
+5. Seq → search consumed / decision letter lines.
+
+## Common mistakes
+
+- Blaming the broker when WebApi is down (Consumers = 0)  
+- **Get messages** from Management UI and confusing ack/requeue  
+- Renaming queues in code but keeping old volume definitions  
+- Using `guest` outside the lab  
+
+## Where it helps
+
+- [ ] `compose ps` → rabbitmq healthy  
+- [ ] Management UI lists four lab queues  
+- [ ] Consumers ≥ 1 per queue when WebApi is up  
+- [ ] Ready spikes then drops after register/approve  
+- [ ] Seq shows consumer logs

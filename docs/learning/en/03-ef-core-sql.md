@@ -7,6 +7,8 @@
 **Entity Framework Core (EF Core)** is an ORM that maps C# objects to SQL tables.  
 **SQL Server** is a relational database. In BankApp, main persistence lives here.
 
+**Analogy:** EF Core is a **translator**; C# entities speak, SQL tables listen. Migrations are “dictionary updates” when the schema changes.
+
 ```mermaid
 flowchart LR
   E[C# Entity] --> EF[EF Core DbContext]
@@ -35,6 +37,15 @@ flowchart LR
 | **Include** | Eager load of related data |
 | **Soft delete** | Mark rows with `DeletedDate` etc. instead of deleting |
 | **TPT** | Separate tables for inheritance |
+
+```mermaid
+stateDiagram-v2
+  [*] --> ModelChange
+  ModelChange --> AddMigration: dotnet ef migrations add
+  AddMigration --> UpdateDb: dotnet ef database update
+  UpdateDb --> WorkingDb: Schema in sync
+  WorkingDb --> ModelChange: New entity field
+```
 
 ## Commands
 
@@ -79,3 +90,23 @@ infra/docker-compose.yml   # sqlserver service
 ## Mini flow
 
 Handler calls `ICreditApplicationRepository.GetAsync(...)` → EF generates SQL → row loads into memory → `Approve(...)` → `UpdateAsync` → `SaveChangesAsync` commits the transaction.
+
+## Beginner lab
+
+1. Ensure SQL is healthy in Compose (`infra`, `compose ps`).
+2. Run `dotnet ef database update --project src/Persistence --startup-project src/WebApi`.
+3. Connect with SSMS / Azure Data Studio to `localhost,11433` → inspect `CreditApplications`.
+4. List an application in the UI → matches a DB row?
+5. Find a `DbSet` in `BankingDbContext.cs` → read the entity under `Domain/Entities`.
+
+## Common mistakes
+
+- Omitting `--startup-project` → connection/DI not found.  
+- Assuming port `1433` on the host → lab often uses `11433`.  
+- Adding migrations but skipping `database update` → runtime “invalid column”.  
+
+## Where it helps
+
+- [ ] `database update` succeeds  
+- [ ] Demo data after seed  
+- [ ] Handlers use EF-generated SQL, not mandatory raw SQL  

@@ -9,9 +9,11 @@ Related: [03 EF Core](03-ef-core-sql.md) · [06 JWT / RBAC](06-jwt-rbac.md) · p
 Attach **identity / income / other** files to an application.  
 Files live on disk (`App_Data`, not wwwroot); metadata in SQL. Download via **JWT-protected API** — not public StaticFiles.
 
+**Analogy:** Card index in SQL, original in a locked cabinet (volume); copy only with ID (JWT download).
+
 ```mermaid
 flowchart LR
-  UP[multipart upload] --> API[POST .../documents]
+  UP["multipart upload"] --> API["POST documents"]
   API --> META[SQL metadata]
   API --> DISK[App_Data / credit-documents]
   LIST[GET list] --> META
@@ -38,6 +40,19 @@ Roadmap “document upload” slice (2026-10-28); pattern derived from avatar up
 | **App_Data** | Outside wwwroot; no static serve |
 | **Magic bytes** | Content-Type matches real content |
 | **Path traversal protection** | Storage path cannot escape root |
+
+```mermaid
+sequenceDiagram
+  participant U as Browser
+  participant API as WebApi
+  participant DB as SQL
+  participant V as Volume
+  U->>API: multipart POST
+  API->>V: write file
+  API->>DB: metadata
+  U->>API: GET download Bearer
+  API->>V: stream
+```
 
 ## Commands
 
@@ -106,6 +121,22 @@ client/src/pages/ApplicationDetailPage.tsx
 
 1. Customer picks optional files on **new application** → save → `POST` create → then `POST …/documents` → redirect to detail.  
 2. Or on existing **Pending** detail: Documents panel → upload / list / download.
+
+## Beginner lab
+
+1. Customer token → Pending application.
+2. Upload small PDF on detail → appears in list.
+3. Download → file opens.
+4. Download without token → 401.
+5. `docker volume ls` → `bankapp-credit-document-uploads`.
+
+## Common mistakes
+
+- Looking under **wwwroot** — files are in `App_Data`.
+- Upload on **Approved** — UI hidden; business rules apply.
+- Trusting spoofed `Content-Type` — server checks magic bytes.
+- SQL only after volume wipe — blob is on disk.
+- `POST .../documents` with ellipsis in Mermaid — use quoted labels.
 
 ## Where it helps
 

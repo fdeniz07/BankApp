@@ -9,12 +9,14 @@
 Başvuruya **kimlik / gelir belgesi / diğer** dosya eklemek.  
 Dosya diskte (`App_Data`, wwwroot değil); metadata SQL’de. İndirme **JWT’li API** ile — StaticFiles ile herkese açık değil.
 
+**Benzetme:** Banka kasasındaki evrak: kartotekte indeks (SQL), asıl dosya kapalı rafta (volume); fotokopi yalnızca kimlik gösteren müşteri/personel alır (JWT download).
+
 ```mermaid
 flowchart LR
-  UI[FormData upload] --> API[Documents API]
-  API --> SQL[(SQL metadata)]
-  API --> DISK[App_Data volume]
-  DL[JWT download] --> API
+  UI["FormData upload"] --> API["Documents API"]
+  API --> SQL[("SQL metadata")]
+  API --> DISK["App_Data volume"]
+  DL["JWT download"] --> API
   API --> DISK
 ```
 
@@ -38,6 +40,22 @@ Roadmap “evrak yükleme” dilimi (2026-10-28); avatar upload deseninden türe
 | **App_Data** | wwwroot dışı; static serve yok |
 | **Magic bytes** | Content-Type’ın gerçek içeriğe uyumu |
 | **Path traversal koruması** | Storage path kök dışına çıkamaz |
+
+```mermaid
+sequenceDiagram
+  participant U as Tarayici
+  participant API as WebApi
+  participant DB as SQL
+  participant V as Volume
+  U->>API: multipart POST documents
+  API->>API: magic bytes boyut
+  API->>V: dosya yaz
+  API->>DB: metadata insert
+  API-->>U: 200 id
+  U->>API: GET download Bearer
+  API->>V: stream
+  API-->>U: application/pdf
+```
 
 ## Komutlar
 
@@ -106,6 +124,22 @@ client/src/pages/ApplicationDetailPage.tsx
 
 1. Müşteri **yeni başvuru** formunda (isteğe bağlı) dosya seçer → kayıt → `POST` create → ardından `POST …/documents` → detay sayfasına yönlenir.  
 2. Veya mevcut **Pending** başvuru detayında Evraklar paneli → yükle / liste / indir.
+
+## Yeni başlayan lab
+
+1. Müşteri token ile Pending başvuru aç veya oluştur.
+2. Detayda küçük bir PDF yükle → listede görünür.
+3. İndir → dosya açılır.
+4. Token’sız download URL dene → 401.
+5. `docker volume ls` → `bankapp-credit-document-uploads` var.
+
+## Sık yapılan hatalar
+
+- Dosyayı **wwwroot** altında aramak — yol `App_Data`, static serve yok.
+- **Approved** başvuruya upload — UI gizli; API iş kuralı.
+- `Content-Type` spoof — sunucu magic bytes kontrol eder.
+- Volume silmeden “dosya nerede” diye SQL’e bakmak — blob diskte.
+- Mermaid’de `[(SQL)]` yerine tırnaklı düğüm kullanmak daha güvenli.
 
 ## Nerede işe yarar?
 

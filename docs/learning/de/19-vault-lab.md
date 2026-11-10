@@ -9,17 +9,14 @@ Verwandt: [06 JWT](06-jwt-rbac.md) · [24 Lab-Tools](24-lab-tools.md) · [09 Com
 **Vault**: Speicher für Secrets. Im BankApp-Lab: Compose **Dev-Mode** Vault + `vault-seed` → KV-Pfad `secret/bankapp`.  
 Beim WebApi-Start optional **JWT-SecurityKey** aus Vault lesen und `TokenOptions:SecurityKey` überschreiben.
 
+**Analogie:** Vault = **Tresor**; Overlay = Schlüssel vom Tresor auf den Schreibtisch legen; `.env` = Lab-Reserve.
+
 ```mermaid
 flowchart LR
-  seed[vault-seed]
-  vault[Vault KV secret/bankapp]
-  webapi[bankapp-webapi]
-  jwt[JWT sign / validate]
-  env[.env fallback]
-  seed --> vault
-  vault -->|overlay| webapi
-  env -.->|Vault down| webapi
-  webapi --> jwt
+  V["Vault KV secret bankapp"] -->|"jwt_security_key"| W["WebApi Start"]
+  W -->|"Overlay"| C["TokenOptions SecurityKey"]
+  C --> JWT["JWT Signatur"]
+  ENV["env Fallback"] -.->|"Vault down"| C
 ```
 
 ## Rolle in BankApp
@@ -41,6 +38,20 @@ Compose-Lab früher; **WebApi JWT-Overlay** im Security-Slice.
 | **Overlay** | Config-Überschreibung via `AddInMemoryCollection` |
 | **Dev mode** | Kein Prod; kein Unseal/Raft; Daten ephemeral |
 | **Root token** | Im Lab alles erlaubt — Prod-Antipattern |
+
+```mermaid
+sequenceDiagram
+  participant Seed as vault-seed
+  participant V as Vault
+  participant API as WebApi
+  participant User as Login
+  Seed->>V: jwt_security_key schreiben
+  API->>V: KV GET beim Start
+  V-->>API: current und optional previous
+  API->>API: Overlay anwenden
+  User->>API: Token anfordern
+  API->>User: JWT mit current Key
+```
 
 ## Befehle
 
@@ -184,6 +195,17 @@ infra/.env.example
 
 vault-seed schreibt `jwt_security_key` → WebApi-Start → Overlay → JWT-Signatur mit current key.  
 Rotate-Script → previous + neuer current → WebApi recreate → alte Tokens über previous, neue Logins über current.
+
+## Einsteiger-Lab
+
+Vault + seed → `kv get` → WebApi-Log Overlay → Login → optional JWT-Rotate testen.
+
+## Häufige Fehler
+
+- Dev-Mode mit Raft verwechseln  
+- Seed nach Rotate ohne Vorsicht  
+- JWT-Key zu kurz  
+- Root-Token teilen  
 
 ## Wo hilft es?
 

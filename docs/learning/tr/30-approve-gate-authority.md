@@ -1,5 +1,7 @@
 ﻿# 30 — Onay evrak kapısı + yetki tavanı (DoA)
 
+[← Önceki](29-decision-letter-templates.md) · [İçindekiler](00-index.md) · [Sonraki →](31-elk-elasticsearch.md)
+
 ## Bu nedir?
 
 İki bağımsız config:
@@ -8,13 +10,15 @@
 2. **ApprovalAuthority** — personel pozisyonuna göre max onay tutarı
 3. **Branch.MaxApprovalAmount + MaxApprovalCurrencyCode** — isteğe bağlı şube tavanı (PB etiketli); efektif = `min(pozisyon, şube)` yalnız **aynı para biriminde**
 
+**Benzetme:** İki kapı: evrak kapısı (kimlik fotokopisi yok mu?); tutar kapısı (müdürün imza limiti). Soft = uyarı ile içeri alırsın; Hard = turnike kilitli.
+
 ```mermaid
 flowchart TD
-  CFG[appsettings] --> GATE[ApproveGateMode]
-  CFG --> DOA[ApprovalAuthority]
-  GATE -->|Soft/Hard| UI[ApplicationDetail]
-  DOA --> LIM[min pozisyon, şube]
-  LIM --> APR[Approve handler]
+  CFG["appsettings"] --> GATE["ApproveGateMode"]
+  CFG --> DOA["ApprovalAuthority"]
+  GATE --> UI["ApplicationDetail"]
+  DOA --> LIM["min pozisyon ve sube"]
+  LIM --> APR["Approve handler"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -35,6 +39,23 @@ Soft boolean kapıdan hemen sonra (Faz 6 UX / güvenlik).
 | AppliedMax | `min(PositionMax, BranchMax)` (set + PB eşleşenler); eşleşme yoksa `0` |
 | CurrencyCode | `ApprovalAuthority:CurrencyCode` (pozisyon); şube kendi `MaxApprovalCurrencyCode` |
 | UnlimitedRoles | BankManager / SuperAdmin — pozisyon ve şube tavanını bypass |
+
+```mermaid
+sequenceDiagram
+  participant P as Personel
+  participant UI as Detay
+  participant C as GET config
+  participant H as Approve handler
+  P->>UI: Onayla tikla
+  UI->>C: approveGateMode maxAmount
+  alt Hard ve evrak eksik
+    UI-->>P: buton kilitli
+  else Soft
+    UI->>P: confirm
+    P->>H: Approve
+    H->>H: DoA min tavan
+  end
+```
 
 ## Komutlar
 
@@ -86,3 +107,19 @@ Personel detayı açar → `GET config` → Soft ise eksik evrakta confirm; Hard
 - [ ] Manager rolü: `maxApprovalAmount` null (şube tavanı bypass)
 
 Lab: FX yok; PB etiketli tek-PB limitler.
+
+## Yeni başlayan lab
+
+1. `GET /api/CreditDocuments/config` ile token — `approveGateMode`, `maxApprovalAmount` oku.
+2. Development’ta evraksız Pending → Soft ise confirm ile onayla.
+3. `appsettings.Development.json` içinde `Hard` yap → webapi recreate → buton kilitli.
+4. DoA açıkken düşük limitli analist ile yüksek tutarlı başvuru → red.
+5. SuperAdmin şube formunda tavan değiştir → config kırılımı UI’da güncellenir.
+
+## Sık yapılan hatalar
+
+- **ApproveGateMode** ile **ApprovalAuthority**’yi tek ayar sanmak — ayrı config anahtarları.
+- Farklı PB’de `min(pozisyon, şube)` beklemek — lab’de PB eşleşmezse AppliedMax 0.
+- UI’da confirm geçip API’nin reddetmesini “bug” saymak — handler aynı kuralları uygular.
+- `SoftApproveGateEnabled` eski flag adını aramak — güncel: `ApproveGateMode`.
+- Mermaid’de `Soft/Hard` slash — virgül veya ayrı düğüm.

@@ -7,6 +7,8 @@
 **Entity Framework Core (EF Core)** ist ein ORM, das C#-Objekte SQL-Tabellen zuordnet.  
 **SQL Server** ist eine relationale Datenbank. In BankApp liegt die Hauptpersistenz hier.
 
+**Vergleich:** EF Core ist ein **Übersetzer**; C#-Entities sprechen, SQL-Tabellen hören. Migrationen sind „Wörterbuch-Updates“ bei Schemaänderungen.
+
 ```mermaid
 flowchart LR
   E[C# Entity] --> EF[EF Core DbContext]
@@ -35,6 +37,15 @@ flowchart LR
 | **Include** | Verknüpfte Daten eager laden |
 | **Soft delete** | Statt Löschen z. B. `DeletedDate` setzen |
 | **TPT** | Getrennte Tabellen für Vererbung |
+
+```mermaid
+stateDiagram-v2
+  [*] --> ModellAenderung
+  ModellAenderung --> MigrationAdd: dotnet ef migrations add
+  MigrationAdd --> DbUpdate: dotnet ef database update
+  DbUpdate --> LaufendeDB: Schema passt
+  LaufendeDB --> ModellAenderung: Neues Feld
+```
 
 ## Befehle
 
@@ -79,3 +90,23 @@ infra/docker-compose.yml   # sqlserver-Dienst
 ## Mini-Ablauf
 
 Handler ruft `ICreditApplicationRepository.GetAsync(...)` auf → EF erzeugt SQL → Zeile wird geladen → `Approve(...)` → `UpdateAsync` → `SaveChangesAsync` committet die Transaktion.
+
+## Einstiegs-Lab
+
+1. SQL in Compose healthy (`infra`, `compose ps`).
+2. `dotnet ef database update --project src/Persistence --startup-project src/WebApi`.
+3. SSMS / Azure Data Studio: `localhost,11433` → Tabelle `CreditApplications`.
+4. Antrag in der UI listen → passt zur DB-Zeile?
+5. `DbSet` in `BankingDbContext.cs` → Entity in `Domain/Entities`.
+
+## Häufige Fehler
+
+- Kein `--startup-project` — Connection/DI fehlt.  
+- Host-Port `1433` statt `11433` im Lab.  
+- Migration ohne `database update` — Laufzeitfehler „invalid column“.  
+
+## Wo hilft es?
+
+- [ ] `database update` ohne Fehler  
+- [ ] Demo-Daten nach Seed  
+- [ ] Handler nutzt EF-SQL, kein Pflicht-Raw-SQL  

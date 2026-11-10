@@ -9,6 +9,8 @@
 **Serilog**: Yapılandırılmış (.structured) log kütüphanesi.  
 **Seq**: Bu logları toplayıp UI’da aramanı sağlayan sunucu (lab’de Docker).
 
+**Benzetme:** Serilog mutfaktaki **aşçı defteri**; Seq ise defterleri indeksleyen **arama motoru** — “dün kim login oldu?” sorusu saniyede yanıtlanır.
+
 ```mermaid
 flowchart LR
   APP[WebApi / hosted] --> SER[Serilog]
@@ -35,6 +37,18 @@ flowchart LR
 | **Structured log** | `"{UserId} login"` gibi property’li mesaj |
 | **Audit** | “Kim ne yaptı?” iş olayı |
 | **Signal** | Seq’te kayıtlı arama / uyarı (lab’de isteğe bağlı) |
+
+```mermaid
+sequenceDiagram
+  participant W as WebApi
+  participant S as Serilog
+  participant Q as Seq
+  participant You as Geliştirici
+  W->>S: Log.Information
+  S->>Q: Sink gönder
+  You->>Q: Filtre @Level Error
+  Q-->>You: Event listesi
+```
 
 ## Komutlar
 
@@ -117,3 +131,25 @@ infra/README.md
 
 Exception → LoggingBehavior / middleware → Serilog → Seq UI’da event listesi.  
 OTel açıksa aynı isteğin TraceId’si Grafana + Seq’te eşleşir.
+
+Ekran örneği: [`Logs on Seq.png`](../../assets/screenshots/en/Logs%20on%20Seq.png)
+
+## Yeni başlayan lab
+
+1. `cd infra` → `docker compose --env-file .env up -d seq webapi`.
+2. Tarayıcı `http://localhost:5341` → Events boş değil mi kontrol et.
+3. Uygulamada login yap → Seq’te yeni satır.
+4. Filtre: `@Level = 'Error'` → kasıtlı hata üretmeden önce boş olabilir.
+5. `docker compose logs --tail=30 webapi` → Seq sink hatası var mı?
+
+## Sık yapılan hatalar
+
+- Seq ayaktayken WebApi host’tan çalıştırıp yanlış Seq URL → container içi `http://seq`.  
+- Düz string birleştirerek loglamak → structured property kullan.  
+- JWT/şifreyi Information seviyesinde yazmak → maskele veya audit kategorisi.  
+
+## Nerede işe yarar?
+
+- [ ] Login sonrası Seq’te event  
+- [ ] Error filtre çalışıyor  
+- [ ] `compose ps seq` healthy  

@@ -8,12 +8,14 @@ Related: [19 — Vault lab](19-vault-lab.md)
 
 **Rate limiting**: Caps how many requests a client / IP can send in a time window. Over the limit → HTTP **429 Too Many Requests**.
 
+**Analogy:** Like a bank turnstile: at most N card taps per minute; extra attempts are refused (429). Login (`auth`), credit writes (`write`), and everything else (`fixed`) each have their own counter.
+
 ```mermaid
 flowchart TD
-  REQ[HTTP request] --> MW[RateLimiter middleware]
-  MW --> POL{Policy auth / write / fixed}
-  POL -->|under limit| OK[Controller action]
-  POL -->|over limit| R429[429 Too Many Requests]
+  REQ["HTTP request"] --> MW["RateLimiter middleware"]
+  MW --> POL["Policy: auth, write, fixed"]
+  POL -->|under limit| OK["Controller action"]
+  POL -->|over limit| R429["429 Too Many Requests"]
 ```
 
 ## Role in BankApp
@@ -43,6 +45,21 @@ Basic `fixed` existed earlier; **auth / write** policies added in the security s
 | **QueueLimit** | Queue when limited (0 = immediate 429) |
 | **EnableRateLimiting** | Controller/action attribute |
 | **Environment layering** | `appsettings.json` + `appsettings.{Environment}.json` merge |
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant MW as RateLimiter
+  participant API as Controller
+  C->>MW: POST Auth login
+  MW->>MW: increment auth counter
+  alt under limit
+    MW->>API: forward request
+    API-->>C: 401 or 200
+  else over limit
+    MW-->>C: 429 Too Many Requests
+  end
+```
 
 ## Commands
 
@@ -116,6 +133,20 @@ src/WebApi/appsettings.Development.json    # relaxed lab overlay
 ## Mini flow
 
 Request → RateLimiter middleware → policy (auth/write/fixed) counter (from environment config) → permit → action; else 429.
+
+## Beginner lab
+
+1. Stack up under `infra`; confirm `printenv ASPNETCORE_ENVIRONMENT` → `Development`.
+2. Run the 30× login loop; expect 401/400 first, then **429**.
+3. Wait 60s; single login again → counter window reset.
+4. Call `/health` five times → always **200** (exempt).
+
+## Common mistakes
+
+- Running lab scripts under **Production** → 429 too early; demo UI locks up.
+- Treating **429** as CORS or **401** → read status and body.
+- Expecting different counters per browser tab on the same machine — partition is usually **client IP**.
+- Unquoted `auth / write` in Mermaid node labels → broken diagram; use quotes or commas.
 
 ## Where it helps
 

@@ -2,88 +2,74 @@
 
 [← Zurück](21-ci-github-actions.md) · [Inhalt](00-index.md) · [Weiter →](25-decision-letter-sms.md)
 
-Verwandt: [25 SMS-Lab](25-decision-letter-sms.md)
-
 ## Was ist das?
 
-Nach **Genehmigung oder Ablehnung** einer Kreditanfrage durch Mitarbeitende: „Entscheidungsbrief“ an den Kunden.  
-Im Lab kein echtes SMTP: Nachricht in **RabbitMQ**, Consumer schreibt nach **Seq/Serilog** (gleiches Schulungsmodell wie E-Mail-Verifikation).
+Nach **Approve/Reject** soll der Kunde einen Entscheidungsbrief bekommen. Im Lab **kein SMTP** — Queue `decision-letter`, Consumer loggt in **Seq**.
+
+**Analogie:** **Fax-Simulation** — Inhalt echt, Zustellung = Logzeile.
 
 ```mermaid
 flowchart LR
-  staff[Staff approve/reject]
-  outbox[Outbox]
-  dom[domain-events]
-  pub[DecisionLetterPublisher]
-  q[decision-letter queue]
-  cons[Consumer]
-  seq[Seq log]
-  staff --> outbox --> dom --> pub --> q --> cons --> seq
+  ST["Staff Entscheidung"] --> OB["Outbox"]
+  OB --> DE["domain-events"]
+  DE --> PUB["Publisher"]
+  PUB --> Q["decision-letter"]
+  Q --> CON["Consumer"]
+  CON --> SEQ["Seq"]
 ```
 
 ## Rolle in BankApp
 
-- UI-Notes aus Genehmigung/Ablehnung werden als Body mitgesendet.
-- An Outbox → `domain-events` gekoppelt; nach SignalR-Toast.
-- Queue-Name: `decision-letter`.
+Notizen aus UI werden `Body`; Outbox-Kette; Queue `decision-letter`.
 
 ## Wann hinzugefügt?
 
-Roadmap „Später“ — E-Mail-Lab-Slice; SMS in [25](25-decision-letter-sms.md).
+E-Mail-Lab-Slice; SMS in Kapitel 25.
 
-## Grundbegriffe
-
-| Begriff | Bedeutung |
-|--------|--------|
-| **Decision letter** | Kundentext nach Entscheidung |
-| **Publisher** | Schreibt in die Queue |
-| **Consumer** | Hosted Service simuliert Versand |
-| **Lab delivery** | Log ersetzt echte E-Mail |
+```mermaid
+sequenceDiagram
+  participant Staff as Personal
+  participant API as WebApi
+  participant Q as Queue
+  participant Seq as Seq
+  Staff->>API: Approve mit Notiz
+  API->>Q: DecisionLetterRequested
+  Q->>Seq: To Subject Body
+```
 
 ## Befehle
 
 ```powershell
 cd infra
-docker compose up -d rabbitmq webapi
-# RabbitMQ UI → Queues → decision-letter
-# Seq → "Decision letter consumed"
+docker compose --env-file .env up -d rabbitmq webapi seq
 ```
 
-Broker aus: Publisher warnt, Body wird trotzdem geloggt — Genehmigungsflow bricht nicht.
-
-## Klassen, Methoden, Pakete
-
-| Name | Rolle |
-|------|-----|
-| `DecisionLetterRequested` | ToEmail, Subject, Body, Decision, … |
-| `IDecisionLetterPublisher` | Abstraktion |
-| `RabbitMqDecisionLetterPublisher` | Publish / Fallback-Log |
-| `DecisionLetterConsumerHostedService` | Consume + Seq |
-| `DomainEventsConsumerHostedService.TryPublishDecisionLetterAsync` | Nach Approve/Reject |
-| `RabbitMqOptions.DecisionLetterQueue` | Default `decision-letter` |
-
-Paket: `RabbitMQ.Client` (Notification-Host).
+```powershell
+dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --filter "DecisionLetter"
+```
 
 ## Wo im Repo?
 
-```
-src/Application/Services/Messaging/DecisionLetterRequested.cs
-src/Application/Services/Messaging/IDecisionLetterPublisher.cs
-src/WebApi/Modules/Notification/Messaging/RabbitMqDecisionLetterPublisher.cs
-src/WebApi/Modules/Notification/Messaging/DecisionLetterConsumerHostedService.cs
-src/WebApi/Modules/Notification/Messaging/DomainEventsConsumerHostedService.cs
-src/WebApi/Modules/Notification/NotificationHostModule.cs
-tests/Application.UnitTests/Services/Messaging/DecisionLetterRequestedTests.cs
-```
+`src/WebApi/Modules/Notification/Messaging/`, `DecisionLetterRequested.cs`
 
 ## Mini-Ablauf
 
-Mitarbeiter genehmigt → Outbox → `domain-events` → Saga + SignalR → Kunden-E-Mail → `DecisionLetterRequested` → Queue → Consumer loggt `To` / `Subject` / `Body` in Seq.
+Approve → Outbox → Queue → Seq mit To/Subject/Body.
+
+## Einsteiger-Lab
+
+Approve mit markantem Satz → Rabbit Ready → Seq Body prüfen → Rabbit stoppen → Fallback-Log.
+
+## Häufige Fehler
+
+- Seq nicht prüfen  
+- Consumer vergessen  
+- Leere `ToEmail`  
+- Messages in UI löschen  
 
 ## Wo hilft es?
 
-| Check | Gut |
-|-------|-----|
-| Queue `decision-letter` | Consumers ≥ 1 |
-| Approve im UI | Seq: consumed + Felder |
-| Rabbit down | Warn-Log, kein 500 auf Approve |
+- [ ] Queue verarbeitet  
+- [ ] Seq vollständig  
+- [ ] Unit-Tests grün  
+- [ ] Approve ohne Broker bricht HTTP nicht

@@ -7,16 +7,17 @@
 **OpenTelemetry (OTel)**: Standard for collecting **traces / metrics / (log bridges)** from the app.  
 **Prometheus**: Metric scrape and storage.  
 **Grafana**: Dashboard UI. In the lab **Tempo** is the trace backend.  
-**Seq** remains for logs (separate chapter).
+**Seq** remains for logs (separate chapter — chapter 07).
+
+**Analogy:** OTel is security **camera footage**; a span is time at each door; Prometheus is the counter panel; Grafana is the **control room** on one screen.
 
 ```mermaid
 flowchart LR
-  API[bankapp-webapi] -->|OTLP gRPC :4317| COL[otel-collector]
-  COL --> PROM[Prometheus]
-  COL --> TEMPO[Tempo]
-  PROM --> GRAF[Grafana :3001]
+  API["WebApi OTLP"] --> COL["otel-collector"]
+  COL --> PROM["Prometheus"]
+  COL --> TEMPO["Tempo"]
+  PROM --> GRAF["Grafana port 3001"]
   TEMPO --> GRAF
-  API --> SEQ[Seq logs TraceId]
 ```
 
 ## Role in BankApp
@@ -35,6 +36,21 @@ WebApi sends OTLP to the collector → Prometheus / Tempo → inspect in Grafana
 | **Metric** | Counter / histogram (HTTP duration, etc.) |
 | **OTLP** | OTel export protocol |
 | **Collector** | Middle tier (receive, process, fan-out) |
+| **service.name** | Filter in Grafana/Tempo: `bankapp-webapi` |
+
+```mermaid
+sequenceDiagram
+  participant Browser as Client
+  participant API as WebApi
+  participant COL as collector
+  participant TEMPO as Tempo
+  participant GRAF as Grafana
+  Browser->>API: GET api call
+  API->>COL: OTLP span
+  COL->>TEMPO: trace record
+  Note over GRAF: Explore Tempo service bankapp-webapi
+  GRAF->>TEMPO: trace query
+```
 
 ## Commands
 
@@ -83,3 +99,25 @@ docs/assets/screenshots/en/Metrics on Grafana.png
 ## Mini flow
 
 HTTP request → AspNetCore instrumentation span → OTLP collector → Tempo/Prometheus → charts in Grafana.
+
+## Beginner lab
+
+1. `docker compose --env-file .env up -d otel-collector prometheus grafana tempo webapi`.
+2. Send real API traffic (not only `/health`).
+3. Grafana → **Dashboards → BankApp → BankApp HTTP (OTel)**.
+4. **Explore → Tempo** → service `bankapp-webapi`.
+5. Match `TraceId` in Seq for the same request.
+
+## Common mistakes
+
+- Opening Grafana before generating traffic  
+- Calling only `/health` and expecting rich traces  
+- Ignoring OTLP errors when collector is down  
+- Skipping Prometheus `up` before reading dashboards  
+
+## Where it helps
+
+- [ ] `curl http://localhost:9090/-/ready` → 200  
+- [ ] Grafana health 200  
+- [ ] Tempo shows `bankapp-webapi` spans  
+- [ ] Seq TraceId correlates with traces (lab)

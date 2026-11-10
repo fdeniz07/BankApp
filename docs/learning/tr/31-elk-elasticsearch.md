@@ -1,5 +1,7 @@
 ﻿# 31 — ELK (Elasticsearch + Logstash + Kibana)
 
+[← Önceki](30-approve-gate-authority.md) · [İçindekiler](00-index.md) · [Sonraki →](32-admin-tailwind-dashboard.md)
+
 ## Bu nedir?
 
 **ELK**, üç parçalı bir gözlem / arama yığınıdır:
@@ -20,13 +22,15 @@ BankApp lab’de ELK **beş iş** için kullanılır:
 
 **Seq silinmedi.** Seq .NET yapısal log için hızlı lab UX’tir; ELK ise arama motoru + Kibana’dır. İkisi yan yana çalışır.
 
+**Benzetme:** Seq = günlük defter (hızlı bak); Elasticsearch = kütüphane kataloğu (milyon kayıtta arama); Kibana = katalog odası ekranı.
+
 ```mermaid
 flowchart LR
-  API[WebApi read-model] --> ES[Elasticsearch]
-  LOG[Serilog] --> LS[Logstash]
+  API["WebApi read-model"] --> ES["Elasticsearch"]
+  LOG["Serilog"] --> LS["Logstash"]
   LS --> ES
-  ES --> KB[Kibana Discover]
-  SEQ[Seq] -.->|paralel log UX| LOG
+  ES --> KB["Kibana Discover"]
+  SEQ["Seq"] -.->|"paralel log UX"| LOG
 ```
 
 ## Bu projede ne işe yarar?
@@ -66,6 +70,23 @@ Faz 6 — Soft/Hard kapı + DoA sonrasında (roadmap: personel GET araması).
 | BankApp lab | **Birincil log UX** | Kibana’da log **da** aranabilir (opsiyonel derinlik) |
 
 **Sonuç:** Seq’i ES ile **değiştirme**; log aramasını Kibana ile **genişlet**. Üretimde bazı ekipler yalnızca ELK tutar — lab’de ikisini bilmek daha öğretici.
+
+```mermaid
+sequenceDiagram
+  participant U as Personel UI
+  participant API as WebApi
+  participant ES as Elasticsearch
+  participant SQL as SQL fallback
+  U->>API: searchText debounce
+  alt ES ayakta
+    API->>ES: multi_match
+    ES-->>API: hits
+  else ES kapali
+    API->>SQL: Contains
+    SQL-->>API: satirlar
+  end
+  API-->>U: liste JSON
+```
 
 ## Komutlar
 
@@ -199,3 +220,20 @@ Listeyi daraltmak: aynı parametreleri `GET /api/CreditApplications?amountMin=0&
    `docker compose down` sonra `docker volume rm bankapp-elasticsearch-data` — `-v` tüm named volume’ları da etkiler; SQL external volume’a dikkat  
 
 Lab notu: Docker Desktop’ta ES bazen yavaş ayağa kalkar (`start_period` 60s+).
+
+## Yeni başlayan lab
+
+1. `docker compose up -d elasticsearch kibana` → `curl localhost:9200`.
+2. WebApi restart → `_cat/indices` içinde `bankapp-credit-applications`.
+3. Başvuru listesinde arama kutusuna APP numarası yaz → sonuç daralır.
+4. ES konteynerini durdur → liste hâlâ çalışır (SQL fallback).
+5. Kibana’da `bankapp-logs-*` data view + Discover.
+
+## Sık yapılan hatalar
+
+- ES’yi **Seq yerine** kurmak zorunda sanmak — ikisi paralel.
+- RAM yetmez → ES OOM; `ELASTIC_JAVA_OPTS` düşür.
+- Staff kullanıcıyla **facet** paneli aramak — facet manager/SuperAdmin.
+- Index yokken API 500 — healthy ES + reindex bekle.
+- Logstash TCP testinde Windows telnet — WebApi log + Kibana yeterli.
+- Mermaid kenar etiketinde `|paralel|` içinde özel karakter — tırnak kullan.

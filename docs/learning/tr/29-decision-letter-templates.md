@@ -1,15 +1,19 @@
 ﻿# 29 — Karar mektubu şablonları (kullanıcı CRUD)
 
+[← Önceki](28-branch-rbac-superadmin.md) · [İçindekiler](00-index.md) · [Sonraki →](30-approve-gate-authority.md)
+
 ## Bu nedir?
 
 Onay / red sonrası müşteriye giden mektubun **kişisel şablonları**. Sistem varsayılanları istemci i18n’de kalır; personel kendi metinlerini kaydedip seçebilir.
 
+**Benzetme:** Word’de “kurumsal şablon” + “benim kaydettiğim paragraf” — sistem metni bankanın standart mektubu; kullanıcı şablonu senin favori cümlen.
+
 ```mermaid
 flowchart LR
-  UI[ApplicationDetail] --> SYS[i18n sistem şablonu]
-  UI --> USR[DB kullanıcı şablonu]
-  USR --> API[DecisionLetterTemplates CRUD]
-  SYS --> MKT[Onay/Red mektubu]
+  UI["ApplicationDetail"] --> SYS["i18n sistem sablonu"]
+  UI --> USR["DB kullanici sablonu"]
+  USR --> API["DecisionLetterTemplates CRUD"]
+  SYS --> MKT["Onay veya Red mektubu"]
   USR --> MKT
 ```
 
@@ -35,6 +39,19 @@ Başvuru detayında personel:
 | System template | `client` i18n (`applications.templates.*`) |
 | User template | DB tablosu `DecisionLetterTemplates`, kullanıcıya özel |
 | Placeholders | `customerName`, `applicationNumber`, `amount`, `term`, `rate`, `reason` |
+
+```mermaid
+sequenceDiagram
+  participant P as Personel
+  participant UI as Detay sayfasi
+  participant API as Templates API
+  participant DB as SQL
+  P->>UI: metni duzenle kaydet
+  UI->>API: POST template
+  API->>DB: insert kullaniciya ozel
+  P->>UI: sonraki basvuru sec
+  UI->>UI: placeholder doldur
+```
 
 ## Komutlar
 
@@ -92,3 +109,19 @@ Lab: migration yoksa API 500 verebilir — `AddDecisionLetterTemplates` / `AddDe
 - Liste preset (personel): “Bekleyen + eksik evrak” → `Pending` + `missingRequiredDocumentsOnly`
 - Karar audit: `DecisionBy` · `DecisionBranch*` · `DecisionTemplateName`
 - Evrak yükleme → `CreditApplicationDocumentUploaded` SignalR toast + liste/detay kırmızı rozet
+
+## Yeni başlayan lab
+
+1. `staff.tr@bank.local` / `Demo123!` login.
+2. Pending başvuru detay → mektup kutusu UI dilinde dolu.
+3. Metni değiştir → “şablon olarak kaydet” → select’te görünür.
+4. `GET /api/DecisionLetterTemplates` → kendi kayıtların.
+5. Onayla → Seq’te e-posta body şablonla uyumlu ([22](22-decision-letter-email.md)).
+
+## Sık yapılan hatalar
+
+- Şablon **locale** ile UI dilini karıştırmak — şablon dili ayrı seçilebilir.
+- Başka personelin şablonunu API’den beklemek — liste kullanıcıya özel.
+- Placeholder elle yazarken `{customerName}` formatını bozmak.
+- Migration eksik → 500; `docker compose up -d --build webapi`.
+- Mermaid’de `Onay/Red` slash — tırnaklı düğüm.

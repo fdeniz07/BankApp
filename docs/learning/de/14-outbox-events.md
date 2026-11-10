@@ -4,29 +4,23 @@
 
 ## Was ist das?
 
-**Domain Event**: Im Aggregate passiert etwas Wichtiges (`CreditApplicationApproved`).  
-**Transactional Outbox**: Event in **derselben DB-Transaktion** in `OutboxMessages` schreiben; danach ein Worker nach RabbitMQ publishen. So sinkt das Risiko „DB ja / Queue nein“.
+**Domain Event**: Wichtiges Ereignis im Aggregate. **Transactional Outbox**: Event in **derselben SQL-Transaktion** in `OutboxMessages`; Worker publiziert später nach RabbitMQ — weniger **Dual-Write**-Risiko.
+
+**Analogie:** Kassentransaktion und Brief im **selben Umschlag**; Kurier (Dispatcher) bringt ihn zur Post (RabbitMQ).
 
 ```mermaid
 flowchart LR
-  handler[Handler SaveChanges]
-  outbox[(OutboxMessages)]
-  dispatcher[OutboxDispatcherHostedService]
-  rmq[RabbitMQ domain-events]
-  consumer[DomainEventsConsumerHostedService]
-  saga[Saga ProcessManager]
-  signalr[SignalR Hub]
-  handler --> outbox
-  dispatcher --> outbox
-  dispatcher --> rmq
-  rmq --> consumer
-  consumer --> saga
-  consumer --> signalr
+  H["Handler SaveChanges"] --> DB["SQL aggregate + Outbox"]
+  D["OutboxDispatcher"] --> DB
+  D --> RMQ["RabbitMQ domain-events"]
+  C["DomainEventsConsumer"] --> RMQ
+  C --> PM["Saga"]
+  C --> SR["SignalR"]
 ```
 
 ## Rolle in BankApp
 
-Nach Kredit Create / Approve / Reject / Cancel zuverlässige Veröffentlichung → Saga-Update + SignalR-Toast.
+Zuverlässige Events nach Create/Approve/Reject → Saga + SignalR + Decision-Letter.
 
 ## Wann hinzugefügt?
 
@@ -34,43 +28,55 @@ Nach Kredit Create / Approve / Reject / Cancel zuverlässige Veröffentlichung �
 
 ## Grundbegriffe
 
-| Begriff | Bedeutung |
-|--------|--------|
-| **IDomainEvent** | Event-Vertrag |
-| **Outbox row** | Noch nicht publiziertes Event |
-| **Dispatcher** | Periodisch lesen und in Queue senden (Hosted Service) |
-| **Dual-write problem** | Zwei Speicher inkonsistent |
+Outbox-Zeile, Dispatcher, `ProcessedOnUtc`, idempotenter Consumer, At-least-once.
+
+```mermaid
+sequenceDiagram
+  participant API as WebApi
+  participant SQL as SQL
+  participant DISP as Dispatcher
+  participant RMQ as RabbitMQ
+  API->>SQL: aggregate + outbox commit
+  DISP->>RMQ: publish
+```
 
 ## Befehle
 
-Kein spezielles CLI. Beobachten:
-
 ```powershell
-# Outbox in SQL (Lab-Verbindung)
-# SELECT TOP 20 * FROM OutboxMessages ORDER BY OccurredOnUtc DESC
-
-docker compose logs -f webapi
+cd infra
+docker compose --env-file .env logs -f webapi
 ```
 
-## Klassen, Methoden, Pakete
+```sql
+SELECT TOP 20 Id, Type, ProcessedOnUtc FROM OutboxMessages ORDER BY OccurredOnUtc DESC;
+```
 
-| Name | Rolle |
-|------|-----|
-| `CreditApplicationApproved` usw. | Domain-Event-Typen |
-| `OutboxMessage` entity | Tabellenzeile |
-| `OutboxDispatcherHostedService` | Publish |
-| `DomainEventsConsumerHostedService` | Consume |
-| Aggregate `Approve(...)` | Erzeugt Event |
+```powershell
+dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --filter "Outbox"
+```
 
 ## Wo im Repo?
 
-```
-src/Domain/Events/
-src/Persistence/…Outbox…
-src/WebApi/…/Outbox…
-src/WebApi/Modules/Notification/Messaging/DomainEventsConsumerHostedService.cs
-```
+`src/Domain/Events/`, Persistence Outbox, `DomainEventsConsumerHostedService.cs`
 
 ## Mini-Ablauf
 
-Handler SaveChanges (Aggregate + Outbox) → Dispatcher publish → RabbitMQ → Consumer → ProcessManager + SignalR `NotifyAsync`.
+SaveChanges → Dispatcher → RabbitMQ → Consumer → Saga + SignalR.
+
+## Einsteiger-Lab
+
+Approve im UI → Rabbit `domain-events` Ready sinkt → SQL `ProcessedOnUtc` gesetzt → Toast sichtbar.
+
+## Häufige Fehler
+
+- Publish ohne Outbox nach Commit  
+- Outbox nicht als verarbeitet markieren  
+- Event-Typ umbenennen ohne Consumer  
+- Nur SignalR debuggen, Dispatcher vergessen  
+
+## Wo hilft es?
+
+- [ ] Outbox nach Approve verarbeitet  
+- [ ] Queue läuft frei  
+- [ ] Saga aktualisiert  
+- [ ] SignalR am Ende der Kette

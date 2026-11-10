@@ -42,6 +42,16 @@ Roadmap „Dokument-Upload“ (2026-10-28); vom Avatar-Muster abgeleitet.
 | **Magic bytes** | Inhalt vs Content-Type |
 | **Path traversal** | Pfad bleibt unter Storage-Root |
 
+```mermaid
+sequenceDiagram
+  participant U as Browser
+  participant API as WebApi
+  U->>API: multipart POST
+  API-->>U: 200
+  U->>API: GET download Bearer
+  API-->>U: PDF stream
+```
+
 ## Befehle
 
 Migration (im Repo; neue Umgebung: WebApi `MigrateAsync`):
@@ -107,6 +117,17 @@ client/src/pages/ApplicationDetailPage.tsx
 
 1. Neuer Antrag optional mit Datei → create → `POST …/documents` → Detailseite.  
 2. Oder Pending-Detail: Panel „Dokumente“ → hochladen / liste / download.
+
+## Einstiegs-Lab
+
+1. Pending-Antrag → kleines PDF hochladen.
+2. Download mit Bearer → Datei ok; ohne Token → 401.
+3. Volume `bankapp-credit-document-uploads` prüfen.
+
+## Häufige Fehler
+
+- Dateien unter **wwwroot** suchen — Pfad ist `App_Data`.
+- Upload auf **Approved** — UI verborgen.
 
 ## Wo hilft es?
 

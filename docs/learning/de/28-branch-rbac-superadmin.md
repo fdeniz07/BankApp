@@ -58,6 +58,14 @@ Roadmap-Slice Filial-RBAC (2026-10-29 / 10-30).
 | **SuperAdmin bypass** | `AuthorizationBehavior` durchlässt alle `ISecuredRequest`-Rollen |
 | **AccessDenied audit** | Filial-übergreifende Ablehnung wird nach Seq geschrieben |
 
+```mermaid
+sequenceDiagram
+  participant M as Manager
+  participant API as API
+  M->>API: fremde Filiale approve
+  API-->>M: 403
+```
+
 ## Befehle
 
 Rebuild + Migrate + Seed (kein Wipe nötig; BranchId-Backfill kommt per Seed):
@@ -105,6 +113,17 @@ Lab-Passwort (alle Demo-Konten): `Demo123!` — Personal/Manager/Kunde × `tr` /
 2. `manager.nyc@` liest CHI-Liste mit `?branchId=` → Approve-Button in UI ausgeblendet; API 403.
 3. `superadmin@` aktualisiert CHI-01 auf der Filialseite; genehmigt beliebigen Antrag.
 4. `manager.nyc@` setzt Staff derselben Filiale inaktiv; bei anderem Manager keine Zeilen Bearbeiten/Inaktiv/Rolle; Create-Checkbox „Manager“ unsichtbar. SuperAdmin kann beides.
+
+## Einstiegs-Lab
+
+1. `staff.nyc@` — nur NYC-Anträge.
+2. `manager.nyc@` — CHI lesen, Approve 403.
+3. `superadmin@` — `/branches` CRUD.
+
+## Häufige Fehler
+
+- Manager darf **nicht** fremde Filiale schreiben — nur lesen.
+- **IsManager** nur durch SuperAdmin.
 
 ## Wo hilft es?
 

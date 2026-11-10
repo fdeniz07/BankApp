@@ -7,6 +7,8 @@
 **Redis**: Bellekte çalışan çok hızlı key-value store.  
 BankApp’te iki ana iş: **cache** (liste) ve **Idempotency-Key** saklama.
 
+**Benzetme:** Redis bankanın **hızlı not defteri** — sık okunan liste sayfaları deftere yazılır; idempotency ise “bu fiş numarası zaten işlendi” damgasıdır.
+
 ```mermaid
 flowchart LR
   API[WebApi] --> R[Redis]
@@ -34,6 +36,22 @@ Cache: **Faz 2–3**. Idempotency: **Faz 6**. Redis Insight UI: lab (Compose).
 | **Cache stampede** | Cache boşalınca ani DB yükü (bilinçli olmak için) |
 | **Idempotency** | Aynı isteği iki kez göndersen aynı etki / replay |
 | **Redis Insight** | Resmi web UI; Redis’in kendisinde yerleşik arayüz yoktur |
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant API as WebApi
+  participant R as Redis
+  C->>API: POST + Idempotency-Key
+  API->>R: Key var mı?
+  alt İlk istek
+    API->>API: İşlem yap
+    API->>R: Cevabı TTL ile yaz
+  else Tekrar
+    R-->>API: Kayıtlı cevap
+    API-->>C: Replay
+  end
+```
 
 ## Komutlar
 
@@ -78,3 +96,23 @@ tests/.../IdempotencyKeyTests.cs
 İlk POST + Key → işlem yapılır, cevap Redis’e yazılır.  
 Aynı Key + aynı body → kayıtlı cevap replay (ikinci outbox yok).  
 Aynı Key + farklı body → **409 Conflict**.
+
+## Yeni başlayan lab
+
+1. `docker compose up -d redis redis-insight` (`infra`).
+2. Insight’ta host **`redis`**, port **6379** ile bağlan.
+3. Kredi türü listesini UI’da aç → sonra Redis’te cache key’lerine bak.
+4. Aynı `Idempotency-Key` ile iki POST (integration test veya Postman).
+5. `redis-cli PING` → `PONG`.
+
+## Sık yapılan hatalar
+
+- Insight’ta host olarak `localhost` kullanmak → Compose servis adı `redis`.  
+- Idempotency key’i her istekte değiştirmek → tekrar koruması kalkar.  
+- Cache invalidate etmeyen yazma → eski liste görünür (`ICacheRemoverRequest`).  
+
+## Nerede işe yarar?
+
+- [ ] `PING` PONG  
+- [ ] Insight bağlantısı yeşil  
+- [ ] Tekrarlayan POST çift işlem üretmiyor  

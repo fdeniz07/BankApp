@@ -7,6 +7,8 @@
 **Docker**: Verpackt die Anwendung in einen Container.  
 **Compose**: Startet mehrere Container (SQL, Redis, Seq, API, Client, …) aus einer YAML-Datei.
 
+**Vergleich:** Compose ist der **Dirigent** — eine YAML-Partitur sagt jedem Musiker (Container), wann er spielt.
+
 ```mermaid
 flowchart TB
   client[client]
@@ -40,6 +42,21 @@ Lokaler „Lab-Prod“-Stack: DB + Cache + Log + Queue + Vault + OTel + WebApi +
 | **Healthcheck** | Ist der Dienst bereit? |
 | **depends_on** | Startreihenfolge (mit health verstärkt) |
 | **.env** | Compose-Variablen (Secrets nicht committen) |
+
+```mermaid
+sequenceDiagram
+  participant You as Du
+  participant DC as docker compose
+  participant SQL as sqlserver
+  participant API as webapi
+  participant CL as client
+  You->>DC: up -d --build
+  DC->>SQL: start + health
+  SQL-->>DC: healthy
+  DC->>API: migrate seed
+  DC->>CL: nginx SPA
+  CL-->>You: localhost 3000
+```
 
 ## Befehle
 
@@ -169,3 +186,25 @@ infra/README.md
 ## Mini-Ablauf
 
 `compose up` → SQL healthy → WebApi migrate/seed → Client nginx → Login im Browser.
+
+Screenshot: [`Containers on Docker.png`](../../assets/screenshots/en/Containers%20on%20Docker.png)
+
+## Einstiegs-Lab
+
+1. In `infra`: `copy .env.example .env` falls fehlend.
+2. `docker compose --env-file .env up -d --build`.
+3. `compose ps` → sql, redis, webapi **healthy**.
+4. `http://localhost:8080/health` und `:3000` öffnen.
+5. `compose logs --tail=50 webapi` — Seed-Zeilen.
+
+## Häufige Fehler
+
+- Ohne `.env` starten — Ports/Passwörter falsch.  
+- Vor `healthy` API testen — `connection refused`.  
+- `down -v` ohne Absicht — zuerst `down` probieren.  
+
+## Wo hilft es?
+
+- [ ] Gesamter Stack mit einem Befehl  
+- [ ] Health-Checkliste grün  
+- [ ] Migrate/Seed in Logs bestätigt  

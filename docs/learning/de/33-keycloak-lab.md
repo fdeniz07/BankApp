@@ -60,6 +60,16 @@ Roadmap „Keycloak-Unterstützung“ — Faz 1 Compose; danach Faz 2 Dual-Beare
 | PKCE | SPA Code Flow; `code_challenge` S256 |
 | start-dev | Lab-Modus (nicht Produktion) |
 
+```mermaid
+sequenceDiagram
+  participant SPA as React
+  participant KC as Keycloak
+  participant API as WebApi
+  SPA->>KC: PKCE
+  KC-->>SPA: access_token
+  SPA->>API: Bearer JWT
+```
+
 ## Befehle
 
 ### Keycloak starten
@@ -180,3 +190,17 @@ docker compose --env-file .env exec `
 2. Keycloak recreate (Re-Import)
 3. WebApi-Log JWKS/Issuer → `ValidIssuers` + `Authority` (Compose: `http://keycloak:8080/...`)
 4. Port: `KEYCLOAK_PORT` (8180)
+
+## Einstiegs-Lab
+
+1. `docker compose up -d keycloak` → `:8180` admin/admin.
+2. Password-Grant-curl (`staff.tr@bank.local` / `Demo123!`).
+3. `Keycloak__Enabled=true` → `GET /api/Profile` mit Bearer 200.
+4. SPA PKCE-Login → `/login/callback`.
+5. Lokales Formular-Login parallel nutzbar.
+
+## Häufige Fehler
+
+- Issuer intern (`keycloak:8080`) vs Browser-URL — `ValidIssuers` prüfen.
+- Keycloak-Token bei `Enabled=false` — nur lokales JWT.
+- Social Login ohne SQL-E-Mail-Match — Enrich fehlt.

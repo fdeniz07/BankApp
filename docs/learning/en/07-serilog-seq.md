@@ -9,6 +9,8 @@ Related lab summary: [24 — Lab tools](24-lab-tools.md) · Compose recovery: [0
 **Serilog**: Structured logging library.  
 **Seq**: Server that collects those logs and lets you search them in a UI (Docker in the lab).
 
+**Analogy:** Serilog is the kitchen **logbook**; Seq is the **search engine** over those books — “who logged in yesterday?” answers in seconds.
+
 ```mermaid
 flowchart LR
   APP[WebApi / hosted] --> SER[Serilog]
@@ -35,6 +37,18 @@ flowchart LR
 | **Structured log** | Message with properties like `"{UserId} login"` |
 | **Audit** | Business event: “Who did what?” |
 | **Signal** | Saved search / alert in Seq (optional in the lab) |
+
+```mermaid
+sequenceDiagram
+  participant W as WebApi
+  participant S as Serilog
+  participant Q as Seq
+  participant You as Developer
+  W->>S: Log.Information
+  S->>Q: Sink send
+  You->>Q: Filter @Level Error
+  Q-->>You: Event list
+```
 
 ## Commands
 
@@ -117,3 +131,25 @@ infra/README.md
 
 Exception → LoggingBehavior / middleware → Serilog → event list in Seq UI.  
 With OTel on, the same request’s TraceId matches in Grafana + Seq.
+
+Screenshot: [`Logs on Seq.png`](../../assets/screenshots/en/Logs%20on%20Seq.png)
+
+## Beginner lab
+
+1. `cd infra` → `docker compose --env-file .env up -d seq webapi`.
+2. Open `http://localhost:5341` → Events should not stay empty after traffic.
+3. Log in via the app → new row in Seq.
+4. Filter: `@Level = 'Error'` — may be empty until you trigger an error.
+5. `docker compose logs --tail=30 webapi` → any Seq sink errors?
+
+## Common mistakes
+
+- Running WebApi on the host with wrong Seq URL → in Compose use `http://seq`.  
+- Plain string concatenation logging → use structured properties.  
+- Logging JWT/passwords at Information → mask or use audit categories.  
+
+## Where it helps
+
+- [ ] Event after login in Seq  
+- [ ] Error filter works  
+- [ ] `compose ps seq` healthy  

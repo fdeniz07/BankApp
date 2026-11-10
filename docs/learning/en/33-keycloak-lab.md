@@ -8,6 +8,8 @@ Related: [06 JWT / RBAC](06-jwt-rbac.md) · [19 Vault](19-vault-lab.md) · [09 D
 
 **Keycloak** is an open-source **identity and access management** (IAM) server: it defines users / roles / clients, and issues **JWT access tokens** via OpenID Connect.
 
+**Analogy:** One ID desk (Keycloak) issuing cards; the door guard (WebApi) accepts both Keycloak cards and legacy BankApp cards when dual mode is on.
+
 ```mermaid
 flowchart TB
   KC[Keycloak realm bankapp]
@@ -58,6 +60,18 @@ Roadmap “Keycloak support” — Phase 1 Compose; then Phase 2 dual bearer.
 | Claim enrich | Keycloak `sub` replaced with BankApp user Id |
 | PKCE | SPA code flow; `code_challenge` S256 |
 | start-dev | Lab mode (not production) |
+
+```mermaid
+sequenceDiagram
+  participant SPA as React
+  participant KC as Keycloak
+  participant API as WebApi
+  SPA->>KC: Authorization Code PKCE
+  KC-->>SPA: access_token
+  SPA->>API: Bearer Keycloak JWT
+  API->>API: JWKS issuer enrich
+  API-->>SPA: 200 Profile
+```
 
 ## Commands
 
@@ -178,3 +192,18 @@ docker compose --env-file .env exec `
 2. Keycloak recreate (re-import)
 3. WebApi log: JWKS / issuer mismatch → `ValidIssuers` + `Authority` (Compose: `http://keycloak:8080/...`)
 4. Port: `KEYCLOAK_PORT` (8180)
+
+## Beginner lab
+
+1. `docker compose up -d keycloak` → `http://localhost:8180` admin/admin.
+2. Password grant curl (`staff.tr@bank.local` / `Demo123!`).
+3. With `Keycloak__Enabled=true`, `GET /api/Profile` with Bearer → 200.
+4. SPA `VITE_KEYCLOAK_URL` → Sign in with Keycloak → `/login/callback`.
+5. Local form login still works (dual path).
+
+## Common mistakes
+
+- Internal issuer (`http://keycloak:8080/...`) vs browser URL — check `ValidIssuers` + `Authority`.
+- Keycloak token when `Enabled=false` — local JWT only.
+- Social login without SQL email match — enrich needs seed user.
+- JWKS errors — webapi logs + keycloak healthy.

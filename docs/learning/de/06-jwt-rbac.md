@@ -7,6 +7,8 @@
 **JWT** (JSON Web Token): Signiertes Identitätsticket, das der Client nach dem Login bei jeder Anfrage mitschickt.  
 **RBAC** (Role-Based Access Control): Rechte nach **Rolle** (`Customer`, `BankStaff`, `BankManager`).
 
+**Vergleich:** JWT ist das **Festival-Armband**; der Türsteher (API) liest die Rolle und lässt zur Bühne (Endpoint) oder nicht.
+
 ```mermaid
 flowchart LR
   LOGIN[POST /Auth/login] --> JWT[JWT-Token]
@@ -34,6 +36,19 @@ flowchart LR
 | **Access token** | API-Zugangsticket (kann kurzlebig sein) |
 | **Password hash** | Passwort wird nicht als Klartext gespeichert |
 | **ICurrentUserService** | Benutzerkontext aus dem Token |
+
+```mermaid
+sequenceDiagram
+  participant U as Nutzer
+  participant API as Auth API
+  participant C as Client
+  participant P as Geschützter Endpoint
+  U->>API: E-Mail + Passwort
+  API-->>U: JWT Access Token
+  U->>C: Token speichern
+  C->>P: Authorization Bearer
+  P-->>C: 200 oder 403
+```
 
 ## Befehle
 
@@ -72,3 +87,25 @@ src/Core/Application/Pipelines/Authorization/
 ## Mini-Ablauf
 
 Login → Hash-Vergleich → Rollen in JWT-Claims → Client setzt Header → bei jedem MediatR-Command Rollenprüfung.
+
+Screenshot (Login): [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
+
+## Einstiegs-Lab
+
+1. Demo-Konto aus README → `POST /api/Auth/login`.
+2. Token auf jwt.io dekodieren — `role`-Claims (nicht committen).
+3. Genehmigung mit Staff-Token → 200.
+4. Gleicher Call mit Customer → 403.
+5. Client-Login → Network: `Bearer` bei Folgerequests.
+
+## Häufige Fehler
+
+- Token in Query/Logs — nur Header.  
+- Abgelaufenes Token — erneut einloggen.  
+- Tippfehler bei Rollennamen — `GeneralOperationClaims`.  
+
+## Wo hilft es?
+
+- [ ] Login liefert Token  
+- [ ] Falsche Rolle → 403  
+- [ ] `ICurrentUserService` korrekt  

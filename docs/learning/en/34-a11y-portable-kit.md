@@ -10,12 +10,14 @@ An on-page **accessibility assistant**: theme, font size, contrast, blue filter,
 
 The code is **not** a commercial widget; it is a **lab kit** you can copy into another SPA.
 
+**Analogy:** Optician trial mirror — filters and font size; choices saved in your pocket (`localStorage`) and restored on return.
+
 ```mermaid
 flowchart LR
-  FAB[AccessibilityAssistant FAB] --> CTRL[createA11yController]
-  CTRL --> LS[localStorage]
-  CTRL --> DOM[html data-* + --font-scale]
-  BOOT[main.tsx boot] --> CTRL
+  FAB["AccessibilityAssistant FAB"] --> CTRL["createA11yController"]
+  CTRL --> LS["localStorage"]
+  CTRL --> DOM["html data attrs and font scale"]
+  BOOT["main.tsx boot"] --> CTRL
 ```
 
 ## Role in BankApp
@@ -38,6 +40,20 @@ UX lab — after Keycloak SPA; portable kit expanded from older simple toolbar.
 | **data-\*** | HTML attributes CSS listens to |
 | **TTS** | Browser `speechSynthesis` (lab; not a screen reader replacement) |
 | **Portable kit** | `core.ts` framework-free; React is UI shell only |
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant P as Panel
+  participant C as Controller
+  participant H as html root
+  U->>P: High contrast
+  P->>C: setPrefs
+  C->>H: data-contrast high
+  C->>C: write localStorage
+  U->>U: refresh
+  C->>H: boot apply prefs
+```
 
 ## Commands
 
@@ -105,3 +121,19 @@ User taps FAB → panel opens (`panelOpen`) → “High contrast” → `control
 1. **Reset** from panel
 2. DevTools → Local Storage → delete `bankapp-theme` / `bankapp-a11y-*` → refresh
 3. If assistant was hidden, FAB still shows; click to reopen
+
+## Beginner lab
+
+1. `cd client` → `npm run dev` → bottom-right FAB.
+2. Dark theme + font A+ → refresh → prefs persist.
+3. Blue filter on → buttons still clickable (`pointer-events: none` on overlay).
+4. TTS start/stop (supported browser).
+5. Panel Reset → default theme.
+
+## Common mistakes
+
+- Treating TTS as a **screen reader** — lab demo only.
+- Porting with **`BANKAPP_A11Y_KEYS`** in a new app — use `DEFAULT_A11Y_KEYS`.
+- Missing `--font-scale` in host CSS.
+- Skipping `applyA11yPrefs` on boot.
+- `data-* +` in Mermaid nodes — breaks diagram; use quoted plain text.

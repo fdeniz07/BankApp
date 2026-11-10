@@ -1,61 +1,63 @@
-# 17 — Modular Monolith
+# 17 — Modularer Monolith
 
 [← Zurück](16-signalr.md) · [Inhalt](00-index.md) · [Weiter →](18-otel-observability.md)
 
 ## Was ist das?
 
-**Modular Monolith**: Ein Deploy, meist eine DB; Code in **Modulgrenzen** getrennt. Bounded-Context-Disziplin ohne Mikroservice-Komplexität.
+**Modularer Monolith**: Ein Deploy, meist eine DB; Code in **Modulen** (Identity, Credit, …).
+
+**Analogie:** Ein Gebäude, **Etagen** pro Modul — gemeinsame Treppe (Domain), keine Tür direkt in fremde Wohnung.
 
 ```mermaid
 flowchart TB
-  WA[WebApi ein Deploy] --> ID[Identity]
-  WA --> CU[Customers]
-  WA --> CR[Credit]
-  WA --> NT[Notification]
+  WA["WebApi"] --> ID["Identity"]
+  WA --> CU["Customers"]
+  WA --> CR["Credit"]
+  WA --> NT["Notification"]
 ```
 
 ## Rolle in BankApp
 
-Module: **Identity**, **Customers**, **Credit**, **Notification** — jeweils in `Application/Modules` und `WebApi/Modules`.
+`Application/Modules` + `WebApi/Modules` für Identity, Customers, Credit, Notification.
 
 ## Wann hinzugefügt?
 
 **Faz 6**.
 
-## Grundbegriffe
-
-| Begriff | Bedeutung |
-|--------|--------|
-| **Bounded context** | Grenze einer Fachsprache |
-| **Module** | Ordner + Registration + Controller-Gruppe |
-| **Shared kernel** | Dünner Kern, den Module teilen (Domain/Core) |
+```mermaid
+flowchart LR
+  REQ["HTTP"] --> CTL["Controller"]
+  CTL --> MED["MediatR"]
+  MED --> FH["Handler"]
+  FH --> DB["Persistence"]
+```
 
 ## Befehle
-
-Strukturelles Pattern; CLI:
 
 ```powershell
 dotnet build BankApp.slnx
 ```
 
-Neues Feature in den richtigen Modulordner legen (`Credit` oder `Identity`?).
-
-## Klassen, Methoden, Pakete
-
-| Name | Rolle |
-|------|-----|
-| `AddApplicationModules()` | Modul-DI-Registrierungen |
-| `WebApi/Modules/*/Controllers` | HTTP-Endpunkte |
-| Notification hosted services | Messaging / Realtime |
-
 ## Wo im Repo?
 
-```
-src/Application/Modules/
-src/WebApi/Modules/
-docs/architecture-notes.de.md
-```
+`src/Application/Modules/`, `src/WebApi/Modules/`, `docs/architecture-notes.tr.md`
 
 ## Mini-Ablauf
 
-Neues „Filial“-Feature → welcher Context? (Customers vs Credit) → CQRS unter `Features` des Moduls → WebApi-Controller im selben Modul.
+Feature → richtiges Modul → CQRS unter `Features` → Controller im selben Modul.
+
+## Einsteiger-Lab
+
+Vier Modulordner ansehen → Credit-Controller → `NotificationHostModule` → `dotnet build`.
+
+## Häufige Fehler
+
+- Alles in WebApi  
+- Direkte Modul-zu-Modul-Kopplung  
+- Regeln im Controller statt Handler  
+
+## Wo hilft es?
+
+- [ ] Feature im richtigen Modul  
+- [ ] Build ohne Fehler  
+- [ ] Dünne Controller

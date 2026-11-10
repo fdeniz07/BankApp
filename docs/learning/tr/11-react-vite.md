@@ -8,6 +8,8 @@
 **Vite**: Hızlı geliştirme sunucusu + production bundler.  
 **TypeScript**: Tipli JavaScript — hataları derlemede yakalar.
 
+**Benzetme:** React **Lego** kutusu (bileşenler); Vite hızlı **montaj masası**; TypeScript eksik parçayı daha kutuyu açmadan uyarır.
+
 ```mermaid
 flowchart LR
   V[Vite dev/build] --> R[React SPA client/]
@@ -32,6 +34,17 @@ flowchart LR
 | **SPA** | Tek sayfa; client-side routing |
 | **react-router** | URL → sayfa |
 | **Fetch / api module** | HTTP istemci katmanı |
+
+```mermaid
+sequenceDiagram
+  participant UI as React sayfa
+  participant API as client src api
+  participant BE as WebApi
+  UI->>API: getList
+  API->>BE: JWT ile GET
+  BE-->>API: JSON
+  API-->>UI: State güncelle
+```
 
 ## Komutlar
 
@@ -74,3 +87,25 @@ client/Dockerfile
 ## Mini akış
 
 `npm run dev` → Login → token localStorage/context → ApplicationsPage list çeker → SignalR toast.
+
+Ekran örneği (personel dashboard): [`Bank Employee Page - Dashboard.png`](../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png)
+
+## Yeni başlayan lab
+
+1. `cd client` → `npm install` → `npm run dev`.
+2. `.env` / `VITE_API_BASE_URL` API adresini gösteriyor mu kontrol et.
+3. Login → DevTools Application → token/context.
+4. `src/pages` altında Applications sayfasını bul → hangi `api/` modülü çağrılıyor?
+5. `npm run build` → `dist/` oluşumu (Docker ile aynı).
+
+## Sık yapılan hatalar
+
+- API kapalıyken CORS sanmak → önce `8080/health`.  
+- `any` ile TypeScript’i devre dışı bırakmak → `client/src/api` tiplerini kullan.  
+- Production’da yanlış `VITE_*` build-arg → Compose `.env` ile yeniden build.  
+
+## Nerede işe yarar?
+
+- [ ] `npm run dev` açılıyor  
+- [ ] Login sonrası korumalı sayfalar yükleniyor  
+- [ ] `npm run build` CI ile uyumlu  

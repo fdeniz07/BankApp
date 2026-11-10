@@ -4,18 +4,20 @@
 
 ## What is this?
 
-**CI** (Continuous Integration): Automatic build + test on every push/PR.  
-**GitHub Actions**: YAML workflows in the repo run on hosted runners.
+**CI** (Continuous Integration): Automatic build + test on every push or PR.  
+**GitHub Actions** runs YAML workflows on GitHub-hosted runners — no green check, no confidence in `main`.
+
+**Analogy:** A **factory quality belt** on every commit — code rides the belt; failures drop into the red bin; you do not rely on remembering `dotnet test` manually.
 
 ```mermaid
-flowchart LR
-  PUSH[git push / PR] --> GA[GitHub Actions]
-  GA --> BE[Backend job]
-  GA --> FE[Client job]
-  BE --> T[dotnet test]
-  FE --> NPM[npm ci + build]
-  T --> OK[Green check]
-  NPM --> OK
+flowchart TD
+  P["git push or PR"] --> GH["GitHub Actions"]
+  GH --> BE["Backend: restore build test"]
+  GH --> CL["Client: npm ci build"]
+  BE --> OK{"Green CI?"}
+  CL --> OK
+  OK -->|yes| MERGE["Safe merge"]
+  OK -->|no| FIX["Read logs fix"]
 ```
 
 ## Role in BankApp
@@ -25,26 +27,40 @@ flowchart LR
 1. Backend: restore → build → unit → integration  
 2. Client: Node setup → `npm ci` / build  
 
-Green CI = confidence for `main`.
+Green CI = safe merge. NuGet and npm caches shorten runner time.
 
 ## When added?
 
-Around **Phase 5**; extended later.
+Around **Phase 5**; later expanded (ubuntu pin, cache v5, nullable cleanup).
 
 ## Core concepts
 
 | Concept | Meaning |
 |--------|--------|
-| **Workflow** | YAML file |
+| **Workflow** | YAML file (triggers + jobs) |
 | **Job** | Parallel work unit (backend / client) |
 | **Step** | Step inside a job |
 | **Runner** | `ubuntu-24.04` VM |
 | **Badge / check** | Pass/fail on the PR |
-| **Cache** | Client: `setup-node` `cache: npm`; Backend: `actions/cache` → `~/.nuget/packages` |
+| **Cache** | npm via `setup-node`; NuGet via `actions/cache` |
+
+```mermaid
+flowchart LR
+  subgraph backend["Job backend"]
+    R["restore"] --> B["build Release"]
+    B --> U["unit tests"]
+    U --> I["integration tests"]
+  end
+  subgraph client["Job client"]
+    N["npm ci"] --> NB["npm run build"]
+  end
+  backend --> GATE["required check"]
+  client --> GATE
+```
 
 ## Commands
 
-Mimic CI locally:
+Local CI mimic:
 
 ```powershell
 dotnet restore BankApp.slnx
@@ -64,14 +80,21 @@ gh run list --limit 5
 gh run view <id> --log-failed
 ```
 
-## Classes, methods, packages
+### Disaster / recovery (developer)
 
-Actions (Node 24 runtime — clears v4 Node 20 deprecation warning):
+| Situation | Path |
+|-----------|------|
+| Client only red | local `npm ci` + `npm run build` |
+| NU1605 | fix csproj / package versions |
+| Integration fail | run integration project alone |
+| Suspect cache | verify local Release chain matches CI |
+
+## Classes, methods, packages
 
 - `actions/checkout@v5`
 - `actions/setup-dotnet@v5`
 - `actions/setup-node@v5` (`cache: npm`)
-- `actions/cache@v5` (NuGet `~/.nuget/packages`, key = csproj/slnx hash; Node 24)
+- `actions/cache@v5`
 - Runner: `ubuntu-24.04`
 
 ## Where in the repo?
@@ -82,4 +105,26 @@ Actions (Node 24 runtime — clears v4 Node 20 deprecation warning):
 
 ## Mini flow
 
-`git push` → Actions runs → NU1605 / test fail → red → fix → green again.
+`git push` → Actions runs → fail → `gh run view --log-failed` → fix → green.
+
+## Beginner lab
+
+1. Branch → tiny change → push → open Actions tab.
+2. Note duration and two jobs.
+3. Introduce temporary client syntax error → push → client job red.
+4. Revert → green.
+5. Run local `dotnet test` + `npm ci` once — match CI.
+
+## Common mistakes
+
+- Only `npm run dev`, never `npm run build`  
+- `package.json` changed without `package-lock.json` → `npm ci` fails  
+- Skipping integration tests locally before PR  
+- Downgrading Actions and bringing back Node 20 warnings  
+
+## Where it helps
+
+- [ ] CI runs on push/PR  
+- [ ] Backend + client jobs green  
+- [ ] Local Release build matches CI  
+- [ ] `gh run view --log-failed` shows actionable errors

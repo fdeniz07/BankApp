@@ -4,23 +4,27 @@
 
 ## Bu nedir?
 
-**QuestPDF**: C# ile PDF oluşturma kütüphanesi.  
-BankApp’te amortisman **ödeme planını** PDF indir / yazdır.
+**QuestPDF**, C# koduyla PDF üreten bir kütüphanedir (HTML’e bağımlı olmadan sayfa düzeni kurarsın).  
+BankApp’te kredi **amortisman / ödeme planını** PDF indirmek ve yazdırmak için kullanılır.
+
+**Benzetme:** Excel’de tabloyu “PDF olarak kaydet” demek gibi — ama düzen ve etiketler sunucuda, locale’e göre üretilir.
 
 ```mermaid
 flowchart LR
-  UI[React PDF] --> API[GET export?format=pdf]
-  API --> H[Amortisman handler]
-  H --> Q[QuestPDF]
-  Q --> B[PDF byte[]]
-  B --> DL[İndir / yazdır]
+  UI["React: PDF / Yazdır"] --> API["GET payment-plan/export"]
+  API --> H["Amortisman handler"]
+  H --> Q["QuestPDF"]
+  Q --> B["PDF bytes"]
+  B --> DL["İndir veya yazdır"]
 ```
 
 ## Bu projede ne işe yarar?
 
 - API: `payment-plan/export?format=pdf&locale=…`
-- Pluggable exporter (`IPaymentPlanDocumentExporter`) — ileride CSV/XLSX.
-- Locale’e göre etiket + para sembolleri (₺ $ €).
+- Pluggable exporter (`IPaymentPlanDocumentExporter`) — ileride CSV/XLSX eklenebilir
+- Locale’e göre etiket + para sembolleri (₺ $ €)
+
+Ekran: [Bank Manager — Print & PDF](../../screenshots/bank-manager.en.md)
 
 ## Ne zaman eklendi?
 
@@ -30,9 +34,24 @@ PDF/print UX: Faz 6 sonrası özellik dilimi (README Features + screenshots).
 
 | Kavram | Anlamı |
 |--------|--------|
-| **Exporter** | Document → byte[] / dosya |
-| **Locale** | PDF yazı dili |
-| **Amortization** | Taksit / faiz / kalan anapara tablosu |
+| **Exporter** | Belge → `byte[]` / dosya |
+| **Locale** | PDF yazı dili (`tr` / `en` / `de`) |
+| **Amortization** | Taksit, faiz, kalan anapara tablosu |
+
+```mermaid
+sequenceDiagram
+  participant U as Kullanıcı
+  participant C as React
+  participant A as WebApi
+  participant Q as QuestPDF
+  U->>C: PDF indir
+  C->>A: GET export format=pdf locale=tr
+  A->>A: Plan hesapla
+  A->>Q: Document oluştur
+  Q-->>A: PDF bytes
+  A-->>C: application/pdf
+  C-->>U: Blob indir / print
+```
 
 ## Komutlar
 
@@ -40,11 +59,13 @@ PDF/print UX: Faz 6 sonrası özellik dilimi (README Features + screenshots).
 dotnet add src/Application package QuestPDF
 ```
 
-HTTP (token ile):
+HTTP (Bearer token ile):
 
 ```http
-GET /api/CreditApplications/payment-plan/export?format=pdf&amount=50000&termMonths=24&locale=tr
+GET /api/CreditApplications/{id}/payment-plan/export?format=pdf&locale=tr
 ```
+
+(Gerçek route’u repodaki `applicationsApi` / controller ile doğrula; query’de `locale` ve gerekirse plan parametreleri vardır.)
 
 ## Sınıflar, metotlar, paketler
 
@@ -62,9 +83,28 @@ GET /api/CreditApplications/payment-plan/export?format=pdf&amount=50000&termMont
 src/Application/Services/Amortization/Export/
 client/src/api/applicationsApi.ts
 client/src/pages/ApplicationDetailPage.tsx
-docs/screenshots/bank-manager.en.md  # Print&Pdf
+docs/screenshots/bank-manager.en.md
 ```
 
 ## Mini akış
 
-UI “PDF” → `locale` + plan parametreleri → handler plan hesaplar → QuestPDF document → dosya indir / print dialog.
+UI “PDF” → `locale` + plan → handler hesaplar → QuestPDF document → dosya indir / print dialog.
+
+## Yeni başlayan lab
+
+1. Onaylı bir başvurunun detayına gir (ödeme planı görünen).
+2. PDF indir — dosyanın açıldığını kontrol et.
+3. Dil EN/DE yapıp tekrar indir — başlık dilinin değiştiğini gör.
+4. Yazdır’ı dene (tarayıcı print dialog).
+
+## Sık yapılan hatalar
+
+- Locale göndermemek → varsayılan dil / yanlış etiket  
+- PDF’i JSON sanıp `response.json()` çağırmak → bozulur; blob kullanılmalı  
+- Mermaid/dokümanda `byte[]` gibi iç içe köşeli parantez yazmak diyagramı kırar  
+
+## Nerede işe yarar?
+
+- [ ] PDF indiriliyor ve açılıyor  
+- [ ] TR/EN/DE etiketler locale ile uyumlu  
+- [ ] Print yolu çalışıyor  

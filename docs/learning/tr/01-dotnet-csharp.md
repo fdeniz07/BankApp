@@ -7,6 +7,8 @@
 **.NET**, Microsoft’un uygulama çalıştırma platformudur (runtime + kütüphaneler + SDK).  
 **C#**, bu platformda yazdığımız dil. BankApp backend’i **.NET 10** / **C#** ile yazılmıştır.
 
+**Benzetme:** `BankApp.slnx` bir **dosya dolabı**; her `.csproj` çekmcedir. `dotnet build` tüm çekmeceleri kontrol edip derlenmiş çıktıyı üretir; `dotnet run` ise WebApi çekmecesini “açar” ve API’yi dinler.
+
 “SDK” = bilgisayarında `dotnet` komutunu çalıştırmanı sağlayan araç seti.
 
 ```mermaid
@@ -43,6 +45,20 @@ flowchart LR
 | **async / await** | I/O beklerken thread’i bloke etmeden bekleme |
 | **NuGet** | .NET paket yöneticisi (`PackageReference`) |
 | **TargetFramework** | Örn. `net10.0` — hangi .NET sürümüne derleneceği |
+
+```mermaid
+sequenceDiagram
+  participant Dev as Geliştirici
+  participant SDK as dotnet CLI
+  participant Build as Derleme
+  participant Host as Kestrel
+  Dev->>SDK: dotnet build BankApp.slnx
+  SDK->>Build: Tüm csproj derle
+  Build-->>Dev: Başarı / hata
+  Dev->>SDK: dotnet run --project WebApi
+  SDK->>Host: API başlat
+  Host-->>Dev: Dinleme URL si
+```
 
 ## Komutlar
 
@@ -98,3 +114,25 @@ src/Core/Core.csproj
 1. `dotnet build` → C# kaynakları IL’e derlenir.  
 2. `dotnet run --project src/WebApi` → Kestrel web sunucusu ayağa kalkar.  
 3. Tarayıcı / React istemci `http://localhost:…` üzerinden API’ye HTTP isteği atar.
+
+Ekran örneği (API dokümantasyonu): [`Api Documents with Scalar.png`](../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png)
+
+## Yeni başlayan lab
+
+1. `dotnet --version` → SDK’nın yüklü olduğunu doğrula (proje `net10.0` hedefler).
+2. Repo kökünde `dotnet restore BankApp.slnx` → NuGet paketleri insin.
+3. `dotnet build BankApp.slnx` → hata olmadan “Build succeeded”.
+4. `dotnet run --project src/WebApi/WebApi.csproj` → konsolda dinleme adresi görünür.
+5. Tarayıcıda `/health` veya Scalar/OpenAPI sayfasına git → 200 / doküman açılır.
+
+## Sık yapılan hatalar
+
+- Eski SDK ile derlemek → `global.json` veya SDK güncelle.  
+- `dotnet run`’ı `src/WebApi` dışında yanlış klasörden çalıştırmak → `--project` ile tam yolu ver.  
+- Restore atlayıp build’de “package not found” görmek → önce `dotnet restore`.  
+
+## Nerede işe yarar?
+
+- [ ] `dotnet build` tüm solution’da yeşil  
+- [ ] WebApi lokal çalışıyor ve health yanıt veriyor  
+- [ ] CI’daki `dotnet test` ile aynı SDK sürümünü kullanıyorsun  

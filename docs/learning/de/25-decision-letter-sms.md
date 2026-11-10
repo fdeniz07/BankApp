@@ -9,14 +9,25 @@ Verwandt: [22 E-Mail-Lab](22-decision-letter-email.md) · [13 RabbitMQ](13-rabbi
 **SMS-Benachrichtigung** nach Genehmigung/Ablehnung.  
 Kein Twilio o. Ä.: **RabbitMQ** → Consumer → **Seq**-Log (wie E-Mail-Lab).
 
+**Analogie:** Wie E-Mail-Lab — Kurier ist RabbitMQ, Seq ist die kurze SMS-Zeile im Heft.
+
 ```mermaid
 flowchart LR
-  evt[Approve/Reject event]
+  evt["Approve oder Reject event"]
   pub[SmsPublisher]
   q[decision-letter-sms]
   cons[SmsConsumer]
   seq[Seq]
   evt --> pub --> q --> cons --> seq
+```
+
+```mermaid
+sequenceDiagram
+  participant C as Consumer
+  participant Q as RabbitMQ
+  participant S as Seq
+  Q->>C: SMS message
+  C->>S: log To Body
 ```
 
 ## Rolle in BankApp
@@ -86,6 +97,17 @@ tests/.../DecisionSmsRequestedTests.cs
 ## Mini-Ablauf
 
 Mitarbeiter genehmigt → Outbox → `domain-events` → SignalR + E-Mail + **decision-letter-sms** → Consumer loggt `To` / `Body`.
+
+## Einstiegs-Lab
+
+1. RabbitMQ UI: Queue `decision-letter-sms`.
+2. Pending mit Telefon genehmigen → Seq SMS-Zeile.
+3. Ohne Telefon → Warning-Skip.
+
+## Häufige Fehler
+
+- Nur E-Mail-Queue prüfen — SMS ist separate Queue.
+- Genehmigung für gescheitert halten wenn Broker down — nur Warning.
 
 ## Wo hilft es?
 

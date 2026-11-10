@@ -10,10 +10,12 @@ Three related config areas:
 2. **ApprovalAuthority** — max approve amount by staff position
 3. **Branch.MaxApprovalAmount + MaxApprovalCurrencyCode** — optional branch ceiling (currency-labelled); effective = `min(position, branch)` only when **same currency**
 
+**Analogy:** Two doors: document gate (ID copy missing?) and amount gate (signature limit). Soft = warning then enter; Hard = locked turnstile.
+
 ```mermaid
 flowchart TB
-  CFG[GET /api/CreditDocuments/config]
-  GATE[ApproveGateMode None / Soft / Hard]
+  CFG["GET CreditDocuments config"]
+  GATE["ApproveGateMode"]
   DOA[ApprovalAuthority + Branch max]
   CFG --> GATE
   CFG --> DOA
@@ -39,6 +41,16 @@ Right after the soft boolean gate (Phase 6 UX / security).
 | AppliedMax | `min(PositionMax, BranchMax)` (when set + currency matches); no match → `0` |
 | CurrencyCode | `ApprovalAuthority:CurrencyCode` (position); branch has its own `MaxApprovalCurrencyCode` |
 | UnlimitedRoles | BankManager / SuperAdmin — bypass position and branch ceilings |
+
+```mermaid
+sequenceDiagram
+  participant U as UI
+  participant C as Config
+  participant H as Approve
+  U->>C: GET config
+  U->>H: Approve
+  H->>H: gate and DoA rules
+```
 
 ## Commands
 
@@ -90,3 +102,18 @@ Staff opens detail → `GET config` → Soft: confirm when docs missing; Hard: b
 - [ ] Manager role: `maxApprovalAmount` null (branch ceiling bypass)
 
 Lab: no FX; single-currency labelled limits.
+
+## Beginner lab
+
+1. `GET /api/CreditDocuments/config` — read `approveGateMode`, limits.
+2. Development: approve Pending without docs — Soft → confirm works.
+3. Set `Hard` in `appsettings.Development.json` → recreate webapi → button locked.
+4. DoA on + low analyst limit + high amount → reject.
+5. SuperAdmin changes branch ceiling → UI breakdown updates.
+
+## Common mistakes
+
+- One knob for **ApproveGateMode** and **ApprovalAuthority** — separate keys.
+- `min(position, branch)` across **different currencies** — lab uses matching PB or AppliedMax 0.
+- UI confirm passes but API rejects — handler enforces same rules.
+- Old flag name `SoftApproveGateEnabled` — use `ApproveGateMode`.

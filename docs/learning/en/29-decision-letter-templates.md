@@ -6,6 +6,8 @@
 
 **Personal templates** for the letter sent to the customer after approve/reject. System defaults stay in client i18n; staff can save their own text and pick it again.
 
+**Analogy:** Corporate Word template plus your saved favourite paragraph.
+
 ```mermaid
 flowchart LR
   i18n[System templates — client i18n] --> UI[Application detail]
@@ -37,6 +39,16 @@ Right after the branch RBAC / SuperAdmin slice (Phase 6 UX).
 | System template | `client` i18n (`applications.templates.*`) |
 | User template | DB table `DecisionLetterTemplates`, per user |
 | Placeholders | `customerName`, `applicationNumber`, `amount`, `term`, `rate`, `reason` |
+
+```mermaid
+sequenceDiagram
+  participant S as Staff
+  participant UI as Detail
+  participant API as Templates API
+  S->>UI: save as template
+  UI->>API: POST
+  API-->>UI: created
+```
 
 ## Commands
 
@@ -77,6 +89,21 @@ Expected: JSON array (may be empty on first use).
 ## Mini flow
 
 Staff opens Pending application → system template fills in UI language → edits text → “Save as template” → on next application picks own template from select → Approve/Reject.
+
+## Beginner lab
+
+1. `staff.tr@bank.local` / `Demo123!` login.
+2. Pending detail — letter prefilled in UI language.
+3. Edit → save as template → appears in select.
+4. `GET /api/DecisionLetterTemplates` — own rows only.
+5. Approve → Seq body matches template ([22](22-decision-letter-email.md)).
+
+## Common mistakes
+
+- Template **locale** vs UI language — template language is separate.
+- Expecting another user’s templates in the list.
+- Breaking `{customerName}` placeholders.
+- Missing migration → 500; rebuild webapi.
 
 ## Where it helps
 

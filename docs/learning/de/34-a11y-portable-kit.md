@@ -42,6 +42,15 @@ UX-Lab — nach Keycloak-SPA; Erweiterung der alten einfachen Toolbar zum portab
 | **TTS** | Browser `speechSynthesis` (Lab; ersetzt keinen Screenreader) |
 | **Portable kit** | `core.ts` frameworkfrei; React nur UI-Hülle |
 
+```mermaid
+sequenceDiagram
+  participant U as Nutzer
+  participant C as Controller
+  participant H as html
+  U->>C: setPrefs
+  C->>H: data-contrast
+```
+
 ## Befehle
 
 Kein eigenes CLI. Panel in der Entwicklung:
@@ -107,3 +116,16 @@ Nutzer tippt FAB → Panel öffnet (`panelOpen`) → „Hoher Kontrast“ → `c
 1. **Zurücksetzen** im Panel
 2. DevTools → Local Storage → `bankapp-theme` / `bankapp-a11y-*` löschen → Reload
 3. Assistent ausgeblendet: FAB bleibt; Klick öffnet Panel wieder
+
+## Einstiegs-Lab
+
+1. `cd client` → `npm run dev` → FAB unten rechts.
+2. Dunkles Theme + Schrift A+ → Reload → Einstellungen bleiben.
+3. Blaufilter — Klicks durch Overlay (`pointer-events: none`).
+4. TTS start/stop; Panel Zurücksetzen.
+
+## Häufige Fehler
+
+- TTS als **Screenreader** missverstehen — nur Lab-Demo.
+- Portieren ohne `DEFAULT_A11Y_KEYS`.
+- `--font-scale` in Host-CSS vergessen.

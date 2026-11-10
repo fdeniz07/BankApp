@@ -9,12 +9,14 @@
 **Vault**: Secret saklama. BankApp lab’inde Compose **dev-mode** Vault + `vault-seed` → KV path `secret/bankapp`.  
 WebApi startup’ta opsiyonel olarak **JWT güvenlik anahtarını** Vault’tan okuyup `TokenOptions:SecurityKey` üzerine yazar.
 
+**Benzetme:** Vault = **kasa dairesi**; overlay = kasadan çıkan anahtarın çalışma masasındaki kopyayla değiştirilmesi; `.env` fallback = kasa kapalıyken çekmecedeki yedek anahtar (sadece lab).
+
 ```mermaid
 flowchart LR
-  V[Vault KV\nsecret/bankapp] -->|jwt_security_key| W[WebApi startup]
-  W -->|overlay| C[TokenOptions\nSecurityKey]
-  C --> JWT[JWT imzalama]
-  ENV[.env fallback] -.->|Vault down| C
+  V["Vault KV secret bankapp"] -->|"jwt_security_key"| W["WebApi startup"]
+  W -->|"overlay"| C["TokenOptions SecurityKey"]
+  C --> JWT["JWT imzalama"]
+  ENV["env fallback"] -.->|"Vault down"| C
 ```
 
 ## Bu projede ne işe yarar?
@@ -36,6 +38,20 @@ Compose lab daha önce; **WebApi JWT overlay** güvenlik diliminde.
 | **Overlay** | `AddInMemoryCollection` ile config üstüne yazma |
 | **Dev mode** | Üretim değil; unseal/raft yok; veri ephemeral |
 | **Root token** | Lab’de her şeye yetkili — prod anti-pattern |
+
+```mermaid
+sequenceDiagram
+  participant Seed as vault-seed
+  participant V as Vault
+  participant API as WebApi
+  participant User as Kullanıcı login
+  Seed->>V: jwt_security_key yaz
+  API->>V: KV GET startup
+  V-->>API: current ve optional previous
+  API->>API: AddInMemoryCollection overlay
+  User->>API: access token iste
+  API->>User: JWT current key ile
+```
 
 ## Komutlar
 
@@ -215,3 +231,25 @@ infra/.env.example
 
 vault-seed `jwt_security_key` yazar → WebApi start → overlay → JWT imza current key ile.  
 Rotate script → previous + new current → WebApi recreate → eski token previous ile doğrulanır, yeni login current ile.
+
+## Yeni başlayan lab
+
+1. `docker compose up -d vault` → `docker compose up vault-seed` → UI :8200 token ile giriş.
+2. `vault kv get secret/bankapp` → `jwt_security_key` satırını gör (değeri paylaşma).
+3. WebApi’yi başlat → logda `Vault overlay applied` ara.
+4. Login ol → geçerli JWT al.
+5. `vault-rotate-jwt.sh` çalıştır → WebApi recreate → **eski** token hâlâ çalışıyor mu, **yeni** login farklı key ile mi test et.
+
+## Sık yapılan hatalar
+
+- Dev Vault’u prod Raft ile karıştırmak — günlük stack `:8200` dev mode  
+- Rotate sonrası `vault-seed` ile secret’ı ezmek — `--no-deps webapi` ve seed idempotency  
+- `TOKEN_SECURITY_KEY` 64 byte altı → JWT handler hata  
+- Root token’ı issue/screenshot’a yapıştırmak  
+
+## Nerede işe yarar?
+
+- [ ] Vault healthy + seed path dolu  
+- [ ] WebApi overlay veya bilinçli fallback logu  
+- [ ] Login JWT geçerli  
+- [ ] Rotate sonrası dual-key penceresi (previous + current) test edildi

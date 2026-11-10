@@ -4,19 +4,25 @@
 
 ## What is this?
 
-**Modular Monolith**: Single deploy / usually single DB; code split by **module boundaries**. Bounded-context discipline without microservice overhead.
+**Modular Monolith**: Single deploy / usually one database; code split by **module boundaries** (Identity, Credit, …). No microservice mesh or distributed transactions; you keep bounded-context discipline.
+
+**Analogy:** One building, different **floor plans** — each floor (module) has its own rules, a shared stairwell (Domain/Core), but you do not punch a door straight into the neighbor’s apartment; you use the corridor (Application interfaces).
 
 ```mermaid
 flowchart TB
-  WA[WebApi single deploy] --> ID[Identity]
-  WA --> CU[Customers]
-  WA --> CR[Credit]
-  WA --> NT[Notification]
+  WA["WebApi single deploy"] --> ID["Identity"]
+  WA --> CU["Customers"]
+  WA --> CR["Credit"]
+  WA --> NT["Notification"]
+  ID --> APP["Application Modules"]
+  CU --> APP
+  CR --> APP
+  NT --> APP
 ```
 
 ## Role in BankApp
 
-Modules: **Identity**, **Customers**, **Credit**, **Notification** — in both `Application/Modules` and `WebApi/Modules`.
+Modules: **Identity**, **Customers**, **Credit**, **Notification** — under both `Application/Modules` and `WebApi/Modules`. New features start with “which business language?” to pick a folder.
 
 ## When added?
 
@@ -26,19 +32,35 @@ Modules: **Identity**, **Customers**, **Credit**, **Notification** — in both `
 
 | Concept | Meaning |
 |--------|--------|
-| **Bounded context** | Boundary of one business language |
-| **Module** | Folder + registration + controller group |
-| **Shared kernel** | Thin core shared by modules (Domain/Core) |
+| **Bounded context** | Boundary of a business language |
+| **Module** | Folder + DI registration + controller group |
+| **Shared kernel** | Thin core shared by modules (`Domain`, cross-cutting `Application`) |
+| **Feature slice** | CQRS handler + validator + controller together |
+| **Host module** | WebApi registration for module hosted services |
+
+```mermaid
+flowchart LR
+  REQ["HTTP request"] --> CTL["Module Controller"]
+  CTL --> MED["MediatR"]
+  MED --> FH["Feature Handler"]
+  FH --> DOM["Domain aggregate"]
+  FH --> DB["Persistence"]
+  NT["Notification module"] -.->|"event or message"| FH
+```
 
 ## Commands
 
-Structural pattern; CLI:
+Structural pattern; verify:
 
 ```powershell
 dotnet build BankApp.slnx
 ```
 
-When adding a feature, put it in the right module folder (`Credit` vs `Identity`?).
+Architecture notes: `docs/architecture-notes.tr.md` (design decisions).
+
+```powershell
+dotnet build BankApp.slnx --warnaserror
+```
 
 ## Classes, methods, packages
 
@@ -46,6 +68,7 @@ When adding a feature, put it in the right module folder (`Credit` vs `Identity`
 |------|-----|
 | `AddApplicationModules()` | Module DI registration |
 | `WebApi/Modules/*/Controllers` | HTTP endpoints |
+| `Application/Modules/*/Features` | CQRS use cases |
 | Notification hosted services | Messaging / realtime |
 
 ## Where in the repo?
@@ -53,9 +76,31 @@ When adding a feature, put it in the right module folder (`Credit` vs `Identity`
 ```
 src/Application/Modules/
 src/WebApi/Modules/
-docs/architecture-notes.en.md
+docs/architecture-notes.tr.md
 ```
 
 ## Mini flow
 
-New “branch” feature → which context? (Customers vs Credit) → CQRS files under that module’s Features → WebApi controller in the same module.
+New branch feature → which context? → CQRS under that module’s `Features` → controller in same module → tests beside the module.
+
+## Beginner lab
+
+1. Browse four folders under `src/Application/Modules/`.
+2. Open a controller under `src/WebApi/Modules/Credit/` — which MediatR commands it sends.
+3. Find `NotificationHostModule` hosted service registrations.
+4. Search for direct cross-module `DbSet` misuse in handlers.
+5. `dotnet build` — solution compiles across module references.
+
+## Common mistakes
+
+- Dumping logic in `WebApi` only — empty Application layer  
+- Direct concrete calls across modules — prefer interfaces/events  
+- Business rules in controllers — move to MediatR handlers  
+- “One DB” = “one table everywhere” — respect aggregates  
+
+## Where it helps
+
+- [ ] New feature under `Modules/{Name}/Features`  
+- [ ] `dotnet build BankApp.slnx` clean  
+- [ ] Thin controllers, thick handlers  
+- [ ] Notification messaging decoupled from Credit

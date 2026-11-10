@@ -51,3 +51,7 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-10 | Requirements dil klasörleri (tr/en/de) + EN/DE çeviri; learning EN/DE 10–18 |
 | 2026-11-10 | TR `28`–`34`: **Bu nedir?** sonrası kompakt Mermaid (5–8 düğüm) |
 | 2026-11-10 | EN/DE `03`–`13`, `16`, `17`: giriş bölümü sonrası Mermaid backfill (dil etiketli) |
+| 2026-11-10 | Bölümler `01`–`11` (TR/EN/DE): 2+ Mermaid, benzetme, Yeni başlayan lab, Sık yapılan hatalar, Nerede işe yarar? |
+| 2026-11-10 | TR/EN/DE `12`–`15`, `17`–`19`, `21`–`22`: Benzetme, Yeni başlayan lab, Sık hatalar; ≥2 Mermaid (güvenli sözdizimi); `16`/`20` hariç |
+| 2026-11-10 | TR/EN/DE `23`–`31`, `33`–`34` (32 hariç): ≥2 Mermaid, Benzetme/Analogie, Yeni başlayan lab, Sık hatalar; Keycloak/a11y lab notları korundu |
+| 2026-11-10 | `16`/`20`/`32` bozuk Mermaid düzeltildi + beginner zenginleştirme; `tech-learning-library` kuralı: ≥2 görsel, lab, hatalar, Mermaid safety |

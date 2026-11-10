@@ -8,6 +8,8 @@ Related: [06 JWT / RBAC](06-jwt-rbac.md) · staff management
 
 **Branch**: A physical / organizational unit of the bank. Staff belong to a branch; on approve/reject, branch info is **snapshotted** onto the application (if staff move later, the decision record stays correct).
 
+**Analogy:** A photo at decision time — staff transfer later does not change the stored branch name on the application.
+
 ```mermaid
 erDiagram
   Branch ||--o{ ApplicationUser : BranchId
@@ -42,6 +44,17 @@ Roadmap “branch model” lab slice (2026-10-29).
 | **Snapshot** | Copy of code/name at decision time (not a live FK) |
 | **BranchId** | Staff’s current branch FK |
 | **Seed sync** | Fill demo branches + staff BranchId without wipe |
+
+```mermaid
+sequenceDiagram
+  participant S as Staff
+  participant API as Approve API
+  participant B as Branch
+  participant A as Application
+  S->>API: approve with branchId
+  API->>B: read staff branch
+  API->>A: write DecisionBranch fields
+```
 
 ## Commands
 
@@ -81,6 +94,19 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini flow
 
 Seed branches → staff `BranchId` → staff approves → application gets `DecisionBranch*` → detail UI shows “Decision branch”.
+
+## Beginner lab
+
+1. Login as `staff.tr@bank.local` — branch on profile.
+2. `GET /api/Branches` — three demo branches.
+3. Approve Pending → detail shows decision branch.
+4. SQL: `DecisionBranchCode` stays if staff `BranchId` changes later.
+
+## Common mistakes
+
+- Mixing **BranchId** (live FK) with **DecisionBranch*** (snapshot).
+- Empty decision branch — re-run seed / `EnsureDemoStaffBranches`.
+- `GET /api/Branches` without JWT → 401.
 
 ## Where it helps
 

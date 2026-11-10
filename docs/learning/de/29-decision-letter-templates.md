@@ -39,6 +39,14 @@ Direkt nach Filial-RBAC / SuperAdmin (Faz 6 UX).
 | User template | DB-Tabelle `DecisionLetterTemplates`, benutzerspezifisch |
 | Placeholders | `customerName`, `applicationNumber`, `amount`, `term`, `rate`, `reason` |
 
+```mermaid
+sequenceDiagram
+  participant P as Personal
+  participant API as Templates API
+  P->>API: POST Vorlage
+  API-->>P: 200
+```
+
 ## Befehle
 
 Nach Migration, API läuft — Vorlagenliste (JWT erforderlich):
@@ -78,6 +86,17 @@ Erwartet: JSON-Array (erste Nutzung kann leer sein).
 ## Mini-Ablauf
 
 Personal öffnet Pending-Antrag → Systemvorlage in UI-Sprache → Text bearbeiten → „Als Vorlage speichern“ → beim nächsten Antrag eigene Vorlage im Select → Genehmigen/Ablehnen.
+
+## Einstiegs-Lab
+
+1. `staff.tr@bank.local` / `Demo123!` — Brief vorausgefüllt.
+2. Als Vorlage speichern → im Select sichtbar.
+3. `GET /api/DecisionLetterTemplates` — nur eigene Einträge.
+
+## Häufige Fehler
+
+- Vorlagen-**Locale** und UI-Sprache verwechseln.
+- Fehlende Migration → API 500; WebApi neu bauen.
 
 ## Wo hilft es?
 

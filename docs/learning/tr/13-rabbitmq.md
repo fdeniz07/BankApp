@@ -6,15 +6,17 @@
 
 ## Bu nedir?
 
-**RabbitMQ**: Mesaj kuyruğu. Üretici mesajı kuyruğa bırakır; tüketici (consumer) zamanı gelince işler.  
-HTTP isteğini yavaş işlerden (e-posta simülasyonu, event yayını) ayırır.
+**RabbitMQ**: Mesaj kuyruğu (AMQP broker). Üretici mesajı kuyruğa bırakır; tüketici (consumer) zamanı gelince işler.  
+HTTP isteğini yavaş işlerden (e-posta simülasyonu, event yayını) ayırır — kullanıcı “Gönder”e basınca API hemen 200 döner, arka planda kuyruk işi biter.
+
+**Benzetme:** Süpermarket **numaratör** — kasiyer (API) fişi keser, mutfak (consumer) sırayla hazırlar. Müşteri kasada beklemez.
 
 ```mermaid
 flowchart LR
-  PUB[Publisher] --> Q[Kuyruk]
-  Q --> CON[Consumer HostedService]
-  CON --> SAGA[Saga / SignalR]
-  CON --> SEQ[Seq lab log]
+  PUB["Publisher"] --> Q["Kuyruk"]
+  Q --> CON["Consumer HostedService"]
+  CON --> SAGA["Saga ve SignalR"]
+  CON --> SEQ["Seq lab log"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -41,6 +43,21 @@ E-posta kuyruğu: **Faz 5**. Domain-events: **Faz 6** (Outbox). Decision-letter:
 | **Unacked** | Consumer’da işlenen, henüz ack edilmemiş |
 | **Ack / Nack** | Başarı / başarısız işaretleme |
 | **At-least-once** | En az bir kez teslim — consumer idempotent olmalı |
+
+```mermaid
+flowchart TB
+  subgraph lab["BankApp lab kuyrukları"]
+    EC["email-confirmation"]
+    DE["domain-events"]
+    DL["decision-letter"]
+    SMS["decision-letter-sms"]
+  end
+  API["WebApi publishers"] --> EC
+  API --> DE
+  API --> DL
+  API --> SMS
+  HS["HostedService consumers"] --> lab
+```
 
 ## Komutlar
 
@@ -125,3 +142,26 @@ docs/learning/tr/22-decision-letter-email.md
 
 Kayıt → token üret → `email-confirmation` → consumer log/Seq → kullanıcı link ile confirm → login.  
 Onay/red → Outbox → `domain-events` (+ `decision-letter`) → SignalR / Seq.
+
+## Yeni başlayan lab
+
+1. `cd infra` → `docker compose --env-file .env up -d rabbitmq webapi`.
+2. http://localhost:15672 → `guest` / `guest` → **Queues** sekmesi.
+3. Yeni kullanıcı kaydı yap → `email-confirmation` Ready artıp azalsın.
+4. Personel onay/red → `domain-events` ve `decision-letter` hareket etsin.
+5. Seq http://localhost:5341 → “consumed” / decision letter log satırlarını ara.
+
+## Sık yapılan hatalar
+
+- WebApi çalışmıyorken Ready sürekli artıyor — Consumers = 0 sanıp broker’ı suçlamak  
+- Management UI’dan mesaj **Get** ile çekip ack/requeue karmaşası (önce metrik oku)  
+- Kuyruk adını kodda değiştirip Compose’ta eski volume tanımını unutmak  
+- Guest ile production karıştırmak — lab dışında `guest` kullanılmaz  
+
+## Nerede işe yarar?
+
+- [ ] `compose ps` → rabbitmq healthy  
+- [ ] Management UI dört lab kuyruğunu listeliyor  
+- [ ] WebApi ayaktayken her kuyrukta Consumers ≥ 1  
+- [ ] Kayıt/onay sonrası Ready spike → düşüyor  
+- [ ] Seq’te ilgili consumer log’ları görünüyor

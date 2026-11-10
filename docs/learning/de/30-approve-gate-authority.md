@@ -42,6 +42,14 @@ Direkt nach dem Soft-Boolean-Tor (Faz 6 UX / Sicherheit).
 | CurrencyCode | `ApprovalAuthority:CurrencyCode` (Position); Filiale eigene `MaxApprovalCurrencyCode` |
 | UnlimitedRoles | BankManager / SuperAdmin — Position- und Filial-Limit bypass |
 
+```mermaid
+sequenceDiagram
+  participant U as UI
+  participant H as Approve Handler
+  U->>H: Approve
+  H->>H: Gate und DoA
+```
+
 ## Befehle
 
 Config anzeigen (JWT Personal):
@@ -80,6 +88,17 @@ Soft in Development auf Hard: in `appsettings.Development.json` `ApproveGateMode
 ## Mini-Ablauf
 
 Personal öffnet Detail → `GET config` → bei Soft Confirm bei fehlenden Dokumenten; bei Hard gesperrter Button → bei DoA an: Betrag gegen `min(Position, Filiale)` (UI zeigt Aufschlüsselung) → Approve-Handler wendet dieselben Regeln serverseitig an.
+
+## Einstiegs-Lab
+
+1. `GET /api/CreditDocuments/config` — `approveGateMode`, Limits lesen.
+2. Development Soft: genehmigen ohne Dokumente mit Confirm.
+3. `Hard` in `appsettings.Development.json` → WebApi recreate.
+
+## Häufige Fehler
+
+- **ApproveGateMode** und **ApprovalAuthority** sind getrennte Configs.
+- `min(Position, Filiale)` bei **unterschiedlicher Währung** — Lab: AppliedMax 0.
 
 ## Wo hilft es?
 

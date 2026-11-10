@@ -7,6 +7,8 @@
 **FluentValidation**: Fluent rules for request objects (`RuleFor…`).  
 **Ardalis SmartEnum**: Named, type-safe enum-like classes instead of magic strings/ints (`Pending`, `Approved`…).
 
+**Analogy:** FluentValidation is **security at the door**; SmartEnum is the official **status label** on the card (cannot typo the value).
+
 ```mermaid
 flowchart LR
   REQ[Request] --> M[MediatR pipeline]
@@ -34,6 +36,16 @@ flowchart LR
 | **When** | Conditional rule |
 | **SmartEnum** | Class carrying `Name` + `Value` |
 | **TryFromName** | Parse string → SmartEnum |
+
+```mermaid
+stateDiagram-v2
+  [*] --> RequestArrives
+  RequestArrives --> Validating: Pipeline
+  Validating --> Rejected: Rule fail
+  Validating --> Handler: Valid
+  Rejected --> [*]: HTTP 400
+  Handler --> [*]: Done
+```
 
 ## Commands
 
@@ -64,3 +76,23 @@ src/WebApi  # SmartEnum JSON converter registration
 
 Request arrives → `RequestValidationBehavior` finds validator → rule fails → `ValidationException` → ProblemDetails 400.  
 On success, flow continues to the handler; status is compared with `CreditApplicationStatus.Pending`.
+
+## Beginner lab
+
+1. Open `CreateCreditApplicationRequestValidator` → read `RuleFor` examples.
+2. POST invalid body (e.g. `monthlyIncome: 0`) → 400 ProblemDetails.
+3. Compare JSON status with `CreditApplicationStatus.Pending.Name`.
+4. Test `TryFromName` with unknown string → false / error path.
+5. Valid request → handler runs, status stays Pending.
+
+## Common mistakes
+
+- Mixing C# `enum` with SmartEnum → different JSON serialization.  
+- Validators not inheriting `AbstractValidator` → pipeline cannot find them.  
+- Magic string `"Pending"` → use `CreditApplicationStatus.Pending`.  
+
+## Where it helps
+
+- [ ] Bad input stopped before the handler  
+- [ ] Status values live in one place (`Domain/Enums`)  
+- [ ] Field-level error messages are readable  

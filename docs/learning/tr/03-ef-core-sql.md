@@ -7,6 +7,8 @@
 **Entity Framework Core (EF Core)**, C# nesnelerini SQL tablolarına map’leyen ORM’dir.  
 **SQL Server**, ilişkisel veritabanıdır. BankApp’te ana kalıcılık buradadır.
 
+**Benzetme:** EF Core bir **tercüman**; C# entity konuşur, SQL tablosu dinler. Migration’lar da “sözlük güncellemesi” — şema değişince yeni sürüm kaydı oluşur.
+
 ```mermaid
 flowchart LR
   E[C# Entity] --> EF[EF Core DbContext]
@@ -35,6 +37,15 @@ flowchart LR
 | **Include** | İlişkili veriyi eager load |
 | **Soft delete** | Satırı silmek yerine `DeletedDate` vb. işaretlemek |
 | **TPT** | Kalıtım için ayrı tablolar |
+
+```mermaid
+stateDiagram-v2
+  [*] --> ModelDegisikligi
+  ModelDegisikligi --> MigrationEkle: dotnet ef migrations add
+  MigrationEkle --> DbGuncelle: dotnet ef database update
+  DbGuncelle --> CalisirDB: Şema uyumlu
+  CalisirDB --> ModelDegisikligi: Yeni entity alanı
+```
 
 ## Komutlar
 
@@ -79,3 +90,23 @@ infra/docker-compose.yml   # sqlserver servisi
 ## Mini akış
 
 Handler `ICreditApplicationRepository.GetAsync(...)` çağırır → EF SQL üretir → satır belleğe gelir → `Approve(...)` → `UpdateAsync` → `SaveChangesAsync` transaction commit.
+
+## Yeni başlayan lab
+
+1. Compose’ta SQL healthy (`infra`, `compose ps`).
+2. `dotnet ef database update --project src/Persistence --startup-project src/WebApi` (connection string host’tan veya lab’den).
+3. SSMS / Azure Data Studio ile `localhost,11433` → `CreditApplications` tablosuna bak.
+4. Uygulamada bir başvuru listele → satır DB ile eşleşiyor mu?
+5. `BankingDbContext.cs` içinde bir `DbSet` bul → karşılık gelen entity’yi `Domain/Entities`’te oku.
+
+## Sık yapılan hatalar
+
+- `--startup-project` vermemek → connection/DI bulunamaz.  
+- Lab portunu `1433` sanmak → host’ta genelde `11433`.  
+- Migration oluşturup `update` etmemek → “column invalid” çalışma zamanı hatası.  
+
+## Nerede işe yarar?
+
+- [ ] `database update` hatasız  
+- [ ] Seed sonrası tablolarda demo veri var  
+- [ ] Handler değişikliği SQL’i EF üzerinden üretiyor (ham SQL zorunlu değil)  

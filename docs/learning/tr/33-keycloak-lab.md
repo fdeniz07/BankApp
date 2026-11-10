@@ -8,13 +8,15 @@
 
 **Keycloak**, açık kaynaklı bir **kimlik ve erişim yönetimi** (IAM) sunucusudur: kullanıcı / rol / istemci (client) tanımlar, OpenID Connect ile **JWT access token** üretir.
 
+**Benzetme:** Bankanın tek gişe kimlik masası (Keycloak): hem kart (PKCE SPA) hem şube içi kart (yerel JWT) kabul eden güvenlik — kapıdaki görevli (WebApi) kartın hangi baskıdan olduğuna bakar.
+
 ```mermaid
 flowchart LR
-  KC[Keycloak realm] --> JWT[Access token]
-  JWT --> DUAL[WebApi dual JWT]
-  DUAL --> API[Korumalı endpoints]
-  SPA[React PKCE] --> KC
-  LOC[Yerel login] --> JWT2[TokenOptions JWT]
+  KC["Keycloak realm"] --> JWT["Access token"]
+  JWT --> DUAL["WebApi dual JWT"]
+  DUAL --> API["Korumali endpoints"]
+  SPA["React PKCE"] --> KC
+  LOC["Yerel login"] --> JWT2["TokenOptions JWT"]
   JWT2 --> DUAL
 ```
 
@@ -58,6 +60,18 @@ Roadmap “Keycloak desteği” — Faz 1 Compose; ardından Faz 2 dual bearer.
 | Claim enrich | Keycloak `sub` yerine BankApp user Id |
 | PKCE | SPA code flow; `code_challenge` S256 |
 | start-dev | Lab modu (prod değil) |
+
+```mermaid
+sequenceDiagram
+  participant SPA as React
+  participant KC as Keycloak
+  participant API as WebApi
+  SPA->>KC: Authorization Code PKCE
+  KC-->>SPA: access_token
+  SPA->>API: Bearer Keycloak JWT
+  API->>API: JWKS issuer enrich
+  API-->>SPA: 200 Profile
+```
 
 ## Komutlar
 
@@ -178,3 +192,19 @@ docker compose --env-file .env exec `
 2. Keycloak recreate (yeniden import)  
 3. WebApi log: JWKS / issuer uyumsuzluğu → `ValidIssuers` + `Authority` (Compose’ta `http://keycloak:8080/...`)  
 4. Port: `KEYCLOAK_PORT` (8180)
+
+## Yeni başlayan lab
+
+1. `docker compose up -d keycloak` → `http://localhost:8180` admin/admin.
+2. Password grant curl ile token al (`staff.tr@bank.local` / `Demo123!`).
+3. `Keycloak__Enabled=true` iken `GET /api/Profile` Bearer ile 200.
+4. SPA `VITE_KEYCLOAK_URL` → “Keycloak ile giriş” → `/login/callback`.
+5. Yerel form login hâlâ çalışır (dual path).
+
+## Sık yapılan hatalar
+
+- Compose **iç** issuer (`http://keycloak:8080/...`) ile tarayıcı **dış** URL karışması — `ValidIssuers` + Authority kontrol.
+- `Keycloak:Enabled=false` iken Keycloak token beklentisi → yalnız yerel JWT.
+- Sosyal login sonrası enrich yok — email SQL `Users` ile eşleşmeli (lab seed).
+- Realm import için volume silmeden `stop/rm/up` — mevcut lab notlarına uy.
+- JWKS hatası — webapi log + keycloak healthy.

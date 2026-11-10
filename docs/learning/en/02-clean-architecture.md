@@ -7,6 +7,8 @@
 **Clean Architecture** splits code into layers: **business rules** stay near the center, **UI / DB / framework** stay on the outside.  
 Dependency arrows point **inward**: outer layers know inner ones; inner layers do not know outer ones.
 
+**Analogy:** The company **core** (Domain) is inside; the counter (WebApi) and archive (Persistence) are outside. The core does not know the counter’s brand; the counter follows the core’s rules.
+
 ```mermaid
 flowchart TB
   subgraph outer["Outer (framework / I/O)"]
@@ -50,6 +52,19 @@ BankApp layers:
 | **Business rule** | Domain/application rule such as “Only Pending can be approved” |
 | **Repository** | Interface that abstracts data access |
 
+```mermaid
+sequenceDiagram
+  participant UI as WebApi
+  participant App as Application
+  participant Dom as Domain
+  participant Per as Persistence
+  UI->>App: Mediator.Send command
+  App->>Dom: Business rule
+  App->>Per: Repository
+  Per-->>App: Entity
+  App-->>UI: DTO response
+```
+
 ## Commands
 
 Clean Architecture is not a CLI tool; layers are wired with project references:
@@ -80,3 +95,23 @@ src/Core/
 ## Mini flow
 
 **Approve button** → `WebApi` controller → `Application` handler → `Domain` aggregate method → `Persistence` `SaveChanges` → (later) Outbox / SignalR.
+
+## Beginner lab
+
+1. Open `src/Domain/Domain.csproj` — it must **not** reference `WebApi`.
+2. Check `src/Application/Application.csproj` — references should point at `Domain` (and `Core` if needed).
+3. Find a command handler under `Features/.../Commands/` — no raw SQL/HTTP, only repository interfaces.
+4. Trace `AddApplication` + `AddPersistence` in `src/WebApi/Program.cs`.
+5. Try adding a forbidden reference (Domain→WebApi) — the compiler should block it.
+
+## Common mistakes
+
+- Putting EF or HTTP inside `Domain` → layer violation.  
+- Using `DbContext` directly in controllers → move logic to handlers.  
+- Confusing DTOs with domain entities → keep API DTOs separate.  
+
+## Where it helps
+
+- [ ] Dependency graph always points inward  
+- [ ] New features start in Application/Domain  
+- [ ] Persistence changes barely touch WebApi  

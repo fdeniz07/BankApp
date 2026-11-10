@@ -7,6 +7,8 @@
 **Docker**: Packages an app in a container.  
 **Compose**: Brings up multiple containers (SQL, Redis, Seq, API, client, …) from a single YAML file.
 
+**Analogy:** Compose is the **conductor** — one YAML score tells each musician (container) when to play.
+
 ```mermaid
 flowchart TB
   CLIENT["client\n(nginx :3000)"]
@@ -40,6 +42,21 @@ Local “lab prod” stack: DB + cache + logs + queue + Vault + OTel + WebApi + 
 | **Healthcheck** | Is the service ready? |
 | **depends_on** | Startup order (strengthened with health) |
 | **.env** | Compose variables (do not commit secrets) |
+
+```mermaid
+sequenceDiagram
+  participant You as You
+  participant DC as docker compose
+  participant SQL as sqlserver
+  participant API as webapi
+  participant CL as client
+  You->>DC: up -d --build
+  DC->>SQL: start + health
+  SQL-->>DC: healthy
+  DC->>API: migrate seed
+  DC->>CL: nginx SPA
+  CL-->>You: localhost 3000
+```
 
 ## Commands
 
@@ -169,3 +186,25 @@ infra/README.md
 ## Mini flow
 
 `compose up` → SQL healthy → WebApi migrate/seed → client nginx → login in the browser.
+
+Screenshot: [`Containers on Docker.png`](../../assets/screenshots/en/Containers%20on%20Docker.png)
+
+## Beginner lab
+
+1. In `infra`, `copy .env.example .env` if missing.
+2. `docker compose --env-file .env up -d --build` — first run can take a while.
+3. `compose ps` → sql, redis, webapi **healthy**.
+4. Open `http://localhost:8080/health` and `http://localhost:3000`.
+5. `compose logs --tail=50 webapi` → see seed lines.
+
+## Common mistakes
+
+- Running without `.env` → wrong ports/passwords.  
+- Hitting the API before health is ready → connection refused; wait for `healthy`.  
+- Panic `down -v` when you only meant to stop containers → try `down` first.  
+
+## Where it helps
+
+- [ ] Full stack up with one command  
+- [ ] Health checklist green  
+- [ ] Migrate/seed verified in logs  

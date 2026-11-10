@@ -7,6 +7,8 @@
 **CQRS** (Command Query Responsibility Segregation): **yazma** (Command) ile **okuma** (Query) isteklerini ayırma fikri.  
 **MediatR**: Controller’ın handler’ı doğrudan new’lemesi yerine “şu request’i işle” diye aracıya vermesi.
 
+**Benzetme:** MediatR banka **danışma masasıdır**; müşteri (controller) “onay isteği” der, masa doğru memura (handler) yönlendirir, önce güvenlik ve kontrol (pipeline) çalışır.
+
 ```mermaid
 flowchart LR
   C[Controller] --> M[MediatR]
@@ -34,6 +36,19 @@ flowchart LR
 | **IPipelineBehavior** | Handler’dan önce/sonra çalışan middleware |
 | **Command** | Durumu değiştiren istek |
 | **Query** | Durumu değiştirmeyen okuma |
+
+```mermaid
+sequenceDiagram
+  participant C as Controller
+  participant M as MediatR
+  participant P as Pipeline
+  participant H as Handler
+  C->>M: Send request
+  M->>P: Authorization
+  P->>P: Validation
+  P->>H: Handle
+  H-->>C: Response
+```
 
 ## Komutlar
 
@@ -79,3 +94,23 @@ src/WebApi/Modules/**/Controllers/
 → Controller `mediator.Send(new Approve…Request { … })`  
 → Authorization → Validation → Logging → Handler  
 → Response DTO.
+
+## Yeni başlayan lab
+
+1. `src/WebApi/Modules` altında bir controller aç → `IMediator` enjekte edildiğini gör.
+2. Aynı feature’ın `Application/.../Commands` handler’ını bul.
+3. Breakpoint veya log ile `Send` → pipeline sırasını izle.
+4. Scalar’da bir POST dene → handler’a düşen request body’yi karşılaştır.
+5. Query handler (`Queries/`) ile command handler farkını not et (yan etki yok).
+
+## Sık yapılan hatalar
+
+- Controller’da iş kuralı yazmak → handler’a taşı.  
+- Query içinde `SaveChanges` çağırmak → command sorumluluğu.  
+- Pipeline davranışı ekleyip DI’da kaydetmemek → hiç çalışmaz.  
+
+## Nerede işe yarar?
+
+- [ ] Yeni endpoint = yeni Request + Handler çifti  
+- [ ] Validation/rol tek yerde (pipeline)  
+- [ ] Controller ince kalıyor  

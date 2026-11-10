@@ -7,6 +7,8 @@
 **.NET** is Microsoft’s application platform (runtime + libraries + SDK).  
 **C#** is the language we write on that platform. The BankApp backend is built with **.NET 10** / **C#**.
 
+**Analogy:** `BankApp.slnx` is a **filing cabinet**; each `.csproj` is a drawer. `dotnet build` checks every drawer and produces binaries; `dotnet run` opens the WebApi drawer and starts listening.
+
 “SDK” = the toolset on your machine that lets you run the `dotnet` command.
 
 ```mermaid
@@ -43,6 +45,20 @@ flowchart LR
 | **async / await** | Waiting without blocking the thread during I/O |
 | **NuGet** | .NET package manager (`PackageReference`) |
 | **TargetFramework** | e.g. `net10.0` — which .NET version to compile for |
+
+```mermaid
+sequenceDiagram
+  participant Dev as Developer
+  participant SDK as dotnet CLI
+  participant Build as Build
+  participant Host as Kestrel
+  Dev->>SDK: dotnet build BankApp.slnx
+  SDK->>Build: Compile all csproj
+  Build-->>Dev: Success or errors
+  Dev->>SDK: dotnet run --project WebApi
+  SDK->>Host: Start API
+  Host-->>Dev: Listening URL
+```
 
 ## Commands
 
@@ -98,3 +114,25 @@ src/Core/Core.csproj
 1. `dotnet build` → C# source is compiled to IL.  
 2. `dotnet run --project src/WebApi` → Kestrel web server starts.  
 3. Browser / React client sends HTTP requests to the API at `http://localhost:…`.
+
+Screenshot (API docs): [`Api Documents with Scalar.png`](../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png)
+
+## Beginner lab
+
+1. Run `dotnet --version` — confirm the SDK is installed (project targets `net10.0`).
+2. At repo root: `dotnet restore BankApp.slnx`.
+3. `dotnet build BankApp.slnx` — expect “Build succeeded”.
+4. `dotnet run --project src/WebApi/WebApi.csproj` — note the listening URL.
+5. Open `/health` or Scalar/OpenAPI in the browser — 200 / docs load.
+
+## Common mistakes
+
+- Building with an outdated SDK → update SDK or check `global.json`.  
+- Running `dotnet run` from the wrong folder → pass `--project` with the full path.  
+- Skipping restore → “package not found” on build.  
+
+## Where it helps
+
+- [ ] `dotnet build` succeeds for the whole solution  
+- [ ] WebApi runs locally and health responds  
+- [ ] You use the same SDK version CI expects for `dotnet test`  

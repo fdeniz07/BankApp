@@ -7,6 +7,8 @@
 **CQRS** (Command Query Responsibility Segregation): the idea of separating **writes** (Command) from **reads** (Query).  
 **MediatR**: Instead of the controller `new`-ing a handler directly, it hands the request to a mediator (“process this request”).
 
+**Analogy:** MediatR is the bank **reception desk**; the customer (controller) asks for “approval”, the desk routes to the right clerk (handler) after security checks (pipeline).
+
 ```mermaid
 flowchart LR
   C[Controller] --> M[MediatR]
@@ -34,6 +36,19 @@ flowchart LR
 | **IPipelineBehavior** | Middleware that runs before/after the handler |
 | **Command** | Request that changes state |
 | **Query** | Read that does not change state |
+
+```mermaid
+sequenceDiagram
+  participant C as Controller
+  participant M as MediatR
+  participant P as Pipeline
+  participant H as Handler
+  C->>M: Send request
+  M->>P: Authorization
+  P->>P: Validation
+  P->>H: Handle
+  H-->>C: Response
+```
 
 ## Commands
 
@@ -79,3 +94,23 @@ src/WebApi/Modules/**/Controllers/
 → Controller `mediator.Send(new Approve…Request { … })`  
 → Authorization → Validation → Logging → Handler  
 → Response DTO.
+
+## Beginner lab
+
+1. Open a controller under `src/WebApi/Modules` → confirm `IMediator` injection.
+2. Find the matching handler under `Application/.../Commands`.
+3. Trace `Send` → pipeline order (log or breakpoint).
+4. Try a POST in Scalar → compare body with the handler.
+5. Contrast a query handler (`Queries/`) with a command (no side effects).
+
+## Common mistakes
+
+- Business rules in controllers → move to handlers.  
+- Calling `SaveChanges` in a query → command responsibility.  
+- Adding a pipeline behavior without DI registration → it never runs.  
+
+## Where it helps
+
+- [ ] New endpoint = new Request + Handler pair  
+- [ ] Validation/roles in one place (pipeline)  
+- [ ] Controllers stay thin  

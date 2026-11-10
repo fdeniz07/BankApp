@@ -8,6 +8,8 @@ Related: [06 JWT / RBAC](06-jwt-rbac.md) · [27 Branch model](27-branch-model.md
 
 **Branch-scoped authorization**: Staff only see and change customers/applications in their own branch; managers can **read** other branches but not write; **SuperAdmin** has full access in every branch plus branch CRUD.
 
+**Analogy:** Store chain — staff open only their till; regional manager looks through the window at other stores but cannot open their till; SuperAdmin opens every till.
+
 ```mermaid
 flowchart TB
   subgraph view_modify
@@ -57,6 +59,17 @@ Roadmap branch RBAC slice (2026-10-29 / 10-30).
 | **SuperAdmin bypass** | `AuthorizationBehavior` passes all `ISecuredRequest` roles |
 | **AccessDenied audit** | Cross-branch denial written to Seq |
 
+```mermaid
+sequenceDiagram
+  participant M as Manager
+  participant API as API
+  participant R as BranchAuth
+  M->>API: approve other branch
+  API->>R: modify check
+  R-->>API: deny
+  API-->>M: 403
+```
+
 ## Commands
 
 Rebuild + migrate + seed (no wipe needed; BranchId backfill comes from seed):
@@ -104,6 +117,20 @@ Lab password (all demo accounts): `Demo123!` — Staff/Manager/Customer × `tr` 
 2. `manager.nyc@` reads CHI list with `?branchId=` → approve hidden in UI; API 403.
 3. `superadmin@` updates CHI-01 on Branches page; approves any application.
 4. `manager.nyc@` deactivates same-branch staff on Staff page; no Edit/Inactive/Role on another manager row; “Manager” create checkbox hidden. SuperAdmin can do both.
+
+## Beginner lab
+
+1. `staff.nyc@` — NYC applications only.
+2. `manager.nyc@` — read CHI; approve 403 or hidden.
+3. `superadmin@` — `/branches` CRUD.
+4. Seq `AccessDenied` on intentional cross-branch approve.
+
+## Common mistakes
+
+- Missing **branchId** claim after login — check seed.
+- Manager **write** on other branches — read-only cross-branch.
+- **IsManager** assign as manager — SuperAdmin only.
+- `?branchId=` on list — SuperAdmin null = all branches.
 
 ## Where it helps
 

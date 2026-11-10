@@ -11,6 +11,10 @@ New / updated chapters are listed chronologically. Source of truth for dates is 
 | 2026-11-10 | EN mirror chapters `28`–`34` (branch RBAC → a11y kit); Mermaid after *What is this?* in each; `en/00-index` local links; `27` next → `28` |
 | 2026-11-10 | Chapters `28`–`34` DE mirrors still pending |
 | 2026-11-10 | Reorganized into `docs/learning/{tr,en,de}/` language folders |
+| 2026-11-10 | Beginner enrichment pass (2+ Mermaid, lab, pitfalls); fixed broken Mermaid in 16/20/32; stricter learning-library rule |
 | 2026-11-10 | Mermaid backfill: chapters `03`–`08`, `10`–`13`, `16`, `17` after **What is this?** |
+| 2026-11-10 | Chapters `01`–`11` (TR/EN/DE): 2+ Mermaid, analogy, Beginner lab, Common mistakes, Where it helps |
+| 2026-11-10 | TR/EN/DE enrich `12`–`15`, `17`–`19`, `21`–`22`: analogy, beginner lab, common mistakes; ≥2 Mermaid (safe syntax); skip `16`/`20` |
+| 2026-11-10 | TR/EN/DE enrich `23`–`31`, `33`–`34` (skip `32`): 2+ Mermaid, analogy, Beginner lab, Common mistakes; Keycloak/a11y lab accuracy preserved |
 
 Full TR history: [99-changelog-learning.md](../tr/99-changelog-learning.md)

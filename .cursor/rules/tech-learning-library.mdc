@@ -20,23 +20,43 @@ After **every explicitly approved** feature or infra change that introduces or m
 2. Update `docs/learning/tr/00-index.md` (table of contents + Faz order); sync `en/` / `de/` indexes when mirroring.
 3. Append a short line to `docs/learning/tr/99-changelog-learning.md` (and EN/DE changelogs if present).
 4. Keep chronology aligned with [docs/history.tr.md](docs/history.tr.md) / roadmap.
+5. New tech chapters **must** ship TR + EN + DE together (or propose EN/DE in the same approval slice).
 
 Do **not** skip the library update for “small” tech changes (new NuGet package, new Compose service, new CI step, new client lib).
 
 ## Chapter template (required sections)
 
-Each chapter must stay beginner-friendly and include:
+Each chapter must stay **beginner-friendly** (someone who has never seen the tech) and include:
 
-1. **Bu nedir?** / EN **What is this?** / DE **Was ist das?** — plain-language definition  
+1. **Bu nedir?** / EN **What is this?** / DE **Was ist das?** — plain-language definition + everyday analogy  
 2. **Bu projede ne işe yarar?** / **Role in BankApp** / **Rolle in BankApp**  
 3. **Ne zaman eklendi?** / **When added?** / **Wann hinzugefügt?** — Faz / approximate order  
-4. **Temel kavramlar** / **Core concepts** / **Grundbegriffe**  
+4. **Temel kavramlar** / **Core concepts** / **Grundbegriffe** — vocabulary a junior needs  
 5. **Komutlar** / **Commands** / **Befehle** — real CLI examples; **above/beside each block** explain what it does, what to verify afterward, and important flags  
 6. **Sınıflar, metotlar, paketler** / **Classes, methods, packages** / **Klassen, Methoden, Pakete**  
 7. **Repoda nerede?** / **Where in the repo?** / **Wo im Repo?**  
 8. **Mini akış** / **Mini flow** / **Mini-Ablauf** — short end-to-end story  
-9. **Nerede işe yarar?** / **Where it helps** / **Wo hilft es?** — health checklist + lab disaster / recovery paths (least destructive first; mark `-v` / volume deletes clearly)
-10. **Görseller** — at least one Mermaid diagram and/or existing screenshot link per chapter when it clarifies architecture or flow (prefer Mermaid over heavy binary assets)
+9. **Yeni başlayan lab** / **Beginner lab** / **Einstiegs-Lab** — 3–7 concrete click/CLI steps the reader can do locally  
+10. **Sık yapılan hatalar** / **Common mistakes** / **Häufige Fehler** — at least 2–3 pitfalls  
+11. **Nerede işe yarar?** / **Where it helps** / **Wo hilft es?** — health checklist + lab disaster / recovery (least destructive first; mark `-v` / volume deletes clearly)
+
+## Visuals (required for every chapter)
+
+- **Minimum 2 visuals** per chapter, for example:
+  - architecture / data-flow Mermaid
+  - sequence or state Mermaid
+  - and/or a real screenshot link under `docs/screenshots/` / `docs/assets/screenshots/`
+- Prefer Mermaid over heavy new binary assets; reuse existing screenshots when they exist.
+- Place the first diagram right after the definition section; place the second near Mini flow or Beginner lab.
+
+### Mermaid safety (broken diagrams are not acceptable)
+
+- Prefer `flowchart` / `sequenceDiagram` / `stateDiagram-v2`.
+- **Quote** node labels that contain `/`, `?`, `#`, `[]`, `()`, or spaces: `N["/hubs/credit-applications"]`.
+- Never nest brackets: bad `B[PDF byte[]]` → good `B["PDF bytes"]`.
+- Do **not** use stadium shape `/label/` for URL paths (GitHub Mermaid misreads `/hubs/...`).
+- Keep diagrams compact (about 5–10 nodes); split into two diagrams instead of one crowded graph.
+- After editing, mentally parse special characters; if unsure, use quoted labels only.
 
 ## Scope rules
 

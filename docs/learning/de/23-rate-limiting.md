@@ -8,16 +8,14 @@ Verwandt: [19 — Vault lab](19-vault-lab.md)
 
 **Rate limiting**: Begrenzt, wie viele Requests ein Client/IP im Zeitfenster senden darf. Überschreitung → HTTP **429 Too Many Requests**.
 
+**Analogie:** Wie ein Bankdrehkreuz: höchstens N Kartentaps pro Minute; weitere Versuche stoppt das System (429). Login (`auth`), Schreib-Endpoints (`write`) und Rest (`fixed`) haben getrennte Zähler.
+
 ```mermaid
 flowchart TD
-  req[HTTP Request]
-  mw[RateLimiter middleware]
-  pol{Policy auth/write/fixed}
-  ok[Controller action]
-  deny[429 Too Many Requests]
-  req --> mw --> pol
-  pol -->|Permit| ok
-  pol -->|limit| deny
+  REQ["HTTP Request"] --> MW["RateLimiter middleware"]
+  MW --> POL["Policy: auth, write, fixed"]
+  POL -->|unter Limit| OK["Controller action"]
+  POL -->|Limit| DENY["429 Too Many Requests"]
 ```
 
 ## Rolle in BankApp
@@ -46,6 +44,21 @@ Compose-Default `ASPNETCORE_ENVIRONMENT=Development` → lockere Lab-Limits.
 | **QueueLimit** | Warteschlange bei Limit (0 = sofort 429) |
 | **EnableRateLimiting** | Attribute an Controller/Action |
 | **Umgebungs-Layer** | `appsettings.json` + `appsettings.{Environment}.json` |
+
+```mermaid
+sequenceDiagram
+  participant C as Client
+  participant MW as RateLimiter
+  participant API as Controller
+  C->>MW: POST Auth login
+  MW->>MW: auth-Zaehler erhoehen
+  alt unter Limit
+    MW->>API: Request weiter
+    API-->>C: 401 oder 200
+  else ueber Limit
+    MW-->>C: 429 Too Many Requests
+  end
+```
 
 ## Befehle
 
@@ -118,6 +131,20 @@ src/WebApi/appsettings.Development.json
 ## Mini-Ablauf
 
 Request → RateLimiter → Policy-Zähler (aus Config) → erlaubt → Action; sonst 429.
+
+## Einstiegs-Lab
+
+1. Stack unter `infra` starten; `printenv ASPNETCORE_ENVIRONMENT` → `Development`.
+2. 30×-Login-Schleife ausführen; zuerst 401/400, dann **429**.
+3. 60s warten; ein Login erneut → Fenster zurückgesetzt.
+4. `/health` fünfmal aufrufen → immer **200** (ausgenommen).
+
+## Häufige Fehler
+
+- Lab-Skripte unter **Production** → frühes 429; Demo-UI blockiert.
+- **429** als CORS oder **401** deuten → Statuscode lesen.
+- Andere Zähler pro Browser-Tab erwarten — Partition meist **Client-IP**.
+- Mermaid-Knoten mit `auth / write` ohne Anführungszeichen → Diagramm defekt.
 
 ## Wo hilft es?
 

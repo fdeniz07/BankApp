@@ -7,6 +7,8 @@
 **JWT** (JSON Web Token): Girişten sonra istemcinin her istekte gönderdiği imzalı kimlik bileti.  
 **RBAC** (Role-Based Access Control): Yetkiyi **role** göre verme (`Customer`, `BankStaff`, `BankManager`).
 
+**Benzetme:** JWT konser **bilek bandı**; kapıdaki görevli (API) bandındaki role bakarak sahneye (endpoint) alır veya almaz.
+
 ```mermaid
 flowchart LR
   LOGIN[POST /Auth/login] --> JWT[JWT token]
@@ -34,6 +36,19 @@ flowchart LR
 | **Access token** | API erişim bileti (kısa ömürlü olabilir) |
 | **Password hash** | Şifrenin düz metin saklanmaması |
 | **ICurrentUserService** | Token’dan okunan kullanıcı bağlamı |
+
+```mermaid
+sequenceDiagram
+  participant U as Kullanıcı
+  participant API as Auth API
+  participant C as Client
+  participant P as Korumalı endpoint
+  U->>API: email + şifre
+  API-->>U: JWT access token
+  U->>C: Token sakla
+  C->>P: Authorization Bearer
+  P-->>C: 200 veya 403
+```
 
 ## Komutlar
 
@@ -72,3 +87,25 @@ src/Core/Application/Pipelines/Authorization/
 ## Mini akış
 
 Login → hash karşılaştır → JWT claim’lere roller yaz → client header’a koy → her MediatR command’de rol kontrolü.
+
+Ekran örneği (giriş): [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
+
+## Yeni başlayan lab
+
+1. README’deki demo hesapla `POST /api/Auth/login` (curl veya Scalar).
+2. Dönen token’ı jwt.io’da aç → `role` claim’lerini oku (commit etme).
+3. Staff token ile onay endpoint’ini dene → 200.
+4. Customer token ile aynı endpoint → 403 bekle.
+5. Client’ta login → Network’te sonraki isteklerde `Bearer` header’ını doğrula.
+
+## Sık yapılan hatalar
+
+- Token’ı query string’de loglamak / paylaşmak → sadece header.  
+- Süresi dolmuş token ile denemek → yeniden login.  
+- Rol adını kodda typo ile yazmak → `GeneralOperationClaims` sabitlerini kullan.  
+
+## Nerede işe yarar?
+
+- [ ] Login token üretiyor  
+- [ ] Yanlış rol 403  
+- [ ] `ICurrentUserService` doğru kullanıcıyı görüyor  

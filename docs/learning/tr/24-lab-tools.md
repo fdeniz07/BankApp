@@ -10,14 +10,16 @@
 
 Dokümantasyon stili: sık kullanılan komutların **üstünde/yanında ne yaptığı**, **sonra ne kontrol edileceği** ve mümkünse **felaket / kurtarma** adımları yazılır (ör. [09 Compose](09-docker-compose.md)).
 
+**Benzetme:** Hastane lab’i gibi — hasta (WebApi) yatakta; etrafında monitör (Grafana), röntgen arşivi (Seq), ecza deposu sayımı (Redis Insight), kurye kuyruğu (RabbitMQ). Her cihaz farklı soruya cevap verir; hepsini bir arada bilmek teşhisi hızlandırır.
+
 ```mermaid
 flowchart TB
-  WA[WebApi] --> SCALAR[Scalar :8080]
-  WA --> SEQ[Seq :5341]
-  WA --> INS[Redis Insight :5540]
-  WA --> RMQ[RabbitMQ :15672]
-  WA --> GRAF[Grafana :3001]
-  WA --> VAULT[Vault :8200]
+  WA["WebApi"] --> SCALAR["Scalar :8080"]
+  WA --> SEQ["Seq :5341"]
+  WA --> INS["Redis Insight :5540"]
+  WA --> RMQ["RabbitMQ :15672"]
+  WA --> GRAF["Grafana :3001"]
+  WA --> VAULT["Vault :8200"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -49,6 +51,21 @@ Servisler Faz 2–6 boyunca geldi; **Redis Insight** ve bu birleşik “lab tool
 | **Host port** | Tarayıcının gördüğü `localhost:PORT` (Compose `ports:`) |
 | **Lab credential** | Eğitim şifresi; **üretimde kullanma**, rotasyon / Vault / secret manager şart |
 | **Liveness vs data UI** | `/health` “yaşıyor mu?”; Insight/Grafana “içeride ne var?” |
+
+```mermaid
+sequenceDiagram
+  participant U as Sen
+  participant S as Scalar
+  participant API as WebApi
+  participant Q as Seq
+  participant R as Redis Insight
+  U->>S: login plus GET CreditTypes
+  S->>API: Bearer JWT
+  API-->>S: 200 JSON
+  U->>R: BankApp key var mi
+  U->>Q: TraceId filtre
+  Q-->>U: request log satiri
+```
 
 ---
 
@@ -305,3 +322,38 @@ docs/learning/tr/08-redis.md  # Insight bağlantı notu
 5. (İsteğe bağlı) Grafana’da HTTP süresi / trace.
 
 Aynı zinciri approve + `Idempotency-Key` ile tekrarla → Redis’te idempotency kaydı + RabbitMQ’da decision-letter / domain event kuyruğu.
+
+## Yeni başlayan lab
+
+1. `cd infra` → `docker compose --env-file .env up -d --build` → `ps` ile healthy kontrol.
+2. Scalar’da login → `GET /api/CreditTypes` → 200.
+3. Redis Insight’ta `redis://redis:6379` ile bağlan → `BankApp:` prefix’li key gör.
+4. Seq’te son 5 dakika Errors → boş veya bilinen lab uyarıları.
+5. (İsteğe bağlı) Grafana Explore → Tempo’da `bankapp-webapi` trace.
+
+## Sık yapılan hatalar
+
+- Insight’ta **`localhost:6379`** — konteyner içinde yanlış; host adı **`redis`** olmalı.
+- JWT header’da **`Auth`** yazmak — doğrusu **`Authorization: Bearer …`**.
+- Grafana’yı **3000** portunda aramak — client 3000, Grafana lab’de **3001**.
+- `down -v` ile “hızlı fix” — Seq/Redis verisi gider; SQL volume’a dikkat ([09](09-docker-compose.md)).
+- Mermaid düğümünde `:` ve boşluk — etiketleri tırnak içine al.
+
+## Nerede işe yarar?
+
+### Sağlık checklist
+
+| Kontrol | Nasıl | İyi görünüm |
+|---------|-------|-------------|
+| Stack | `docker compose ps` | webapi, redis, rabbitmq healthy |
+| Scalar | Login + korumalı GET | 200, 403 role’e göre |
+| Insight | `redis://redis:6379` | Connected |
+| RabbitMQ | Queues consumers | ≥ 1 consumer |
+
+### Felaket / kurtarma (lab)
+
+| Durum | Yol |
+|-------|-----|
+| UI 404 / connection refused | `ps` + port `.env` |
+| Seq boş | webapi logs; sink URL |
+| Trace yok | OTel enabled + istek at |

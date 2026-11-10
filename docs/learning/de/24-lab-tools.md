@@ -10,6 +10,8 @@ Verwandt: [07 Seq](07-serilog-seq.md) · [08 Redis](08-redis.md) · [09 Compose]
 
 Stil: Über/neben Befehlen steht, **was sie tun**, **was danach zu prüfen ist**, und wo sinnvoll **Recovery** (siehe [09 Compose](09-docker-compose.md)).
 
+**Analogie:** Wie eine Krankenstation — WebApi ist der Patient; Seq, Grafana, Redis Insight und RabbitMQ sind unterschiedliche Monitore.
+
 ```mermaid
 flowchart TB
   subgraph observe [Lab-Observability]
@@ -60,6 +62,18 @@ Services Faz 2–6; **Redis Insight** und dieser Sammel-Leitfaden im Schulungs-S
 | **Host port** | `localhost:PORT` im Browser |
 | **Lab credential** | Nur Schulung — in Prod rotieren / Vault |
 | **Liveness vs data UI** | `/health` = lebt; Insight/Grafana = Inhalt |
+
+```mermaid
+sequenceDiagram
+  participant U as Du
+  participant S as Scalar
+  participant API as WebApi
+  participant Q as Seq
+  U->>S: Login und GET CreditTypes
+  S->>API: Bearer JWT
+  API-->>S: 200 JSON
+  U->>Q: TraceId Filter
+```
 
 ---
 
@@ -244,6 +258,19 @@ docs/learning/de/08-redis.md
 4. CreditType-Update → Cache-Gruppe invalidiert?  
 5. Optional Grafana HTTP-Dauer / Trace.  
 Dasselbe mit Approve + Idempotency-Key → Redis + Rabbit `decision-letter`.
+
+## Einstiegs-Lab
+
+1. `docker compose up -d --build` → `ps` healthy.
+2. Scalar Login → `GET /api/CreditTypes`.
+3. Redis Insight: `redis://redis:6379`.
+4. Seq Errors der letzten Minuten prüfen.
+
+## Häufige Fehler
+
+- Insight mit `localhost:6379` statt Host **`redis`**.
+- Header `Auth` statt **`Authorization: Bearer`**.
+- Grafana auf Port **3001**, nicht 3000.
 
 ## Wo hilft es?
 

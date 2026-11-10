@@ -8,12 +8,14 @@
 
 **Şube (Branch)**: Bankanın fiziksel / organizasyonel birimi. Personel bir şubeye bağlanır; onay/red anında şube bilgisi başvuruya **snapshot** olarak yazılır (sonradan personelin şubesi değişse bile karar kaydı bozulmaz).
 
+**Benzetme:** Fotoğraf makinesi: karar anında şubenin adını başvuruya “çekilmiş foto” gibi yapıştırırsın; personel sonra başka şubeye transfer olsa fotoğraf değişmez.
+
 ```mermaid
 flowchart LR
-  BR[Branches] --> ST[Staff BranchId]
-  ST --> APR[Onay/red]
-  APR --> SNAP[DecisionBranch snapshot]
-  SNAP --> APP[CreditApplication]
+  BR["Branches"] --> ST["Staff BranchId"]
+  ST --> APR["Onay veya red"]
+  APR --> SNAP["DecisionBranch snapshot"]
+  SNAP --> APP["CreditApplication"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -35,6 +37,18 @@ Roadmap “şube modeli” lab dilimi (2026-10-29).
 | **Snapshot** | Karar anındaki kod/ad kopyası (canlı FK değil) |
 | **BranchId** | Personelin güncel şube FK’si |
 | **Seed sync** | Wipe olmadan demo şube + staff BranchId doldurma |
+
+```mermaid
+sequenceDiagram
+  participant S as Staff
+  participant API as Approve API
+  participant B as Branch tablosu
+  participant A as Basvuru
+  S->>API: onayla JWT branchId ile
+  API->>B: staff sube oku
+  API->>A: DecisionBranchCode Name yaz
+  API-->>S: 200 snapshot dolu
+```
 
 ## Komutlar
 
@@ -74,6 +88,20 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini akış
 
 Seed şube → staff BranchId → personel onaylar → başvuruda DecisionBranch* dolar → detay UI’da “Karar şubesi”.
+
+## Yeni başlayan lab
+
+1. `staff.tr@bank.local` ile login → profil veya personel listesinde şube kodu (ör. IST-01).
+2. `GET /api/Branches` → üç demo şube.
+3. Pending başvuruyu onayla → detayda **Karar şubesi** dolu.
+4. SQL’de `DecisionBranchCode` — personel `BranchId` değişince eski onaylı kayıt aynı kalmalı.
+
+## Sık yapılan hatalar
+
+- **BranchId** ile **DecisionBranch*** alanlarını karıştırmak — biri canlı FK, diğeri snapshot.
+- Staff şubesiz seed → onayda boş karar şubesi; `EnsureDemoStaffBranches`.
+- Şube listesini token’sız çağırmak → 401.
+- Mermaid’de `Onay/red` slash — tırnaklı etiket.
 
 ## Nerede işe yarar?
 

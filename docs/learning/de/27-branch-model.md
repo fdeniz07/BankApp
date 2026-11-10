@@ -38,6 +38,13 @@ Roadmap „Filialmodell“ (2026-10-29).
 | **BranchId** | Aktuelle Filiale des Users (FK) |
 | **Seed sync** | Demo-Filialen + Staff ohne DB-Wipe |
 
+```mermaid
+sequenceDiagram
+  participant S as Staff
+  participant API as Approve
+  API->>API: DecisionBranch Snapshot
+```
+
 ## Befehle
 
 ```powershell
@@ -74,6 +81,17 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini-Ablauf
 
 Seed-Filiale → Staff `BranchId` → Mitarbeiter genehmigt → `DecisionBranch*` am Antrag → UI „Entscheidungsfiliale“.
+
+## Einstiegs-Lab
+
+1. `staff.tr@bank.local` — Filiale im Profil.
+2. `GET /api/Branches` — drei Demo-Filialen.
+3. Pending genehmigen — Entscheidungsfiliale in der Detailansicht.
+
+## Häufige Fehler
+
+- **BranchId** (live) und **DecisionBranch*** (Snapshot) verwechseln.
+- `GET /api/Branches` ohne JWT → 401.
 
 ## Wo hilft es?
 

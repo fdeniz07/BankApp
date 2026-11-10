@@ -22,9 +22,11 @@ In the BankApp lab, ELK serves **five jobs**:
 
 **Seq was not removed.** Seq is fast lab UX for .NET structured logs; ELK is the search engine + Kibana. Both run side by side.
 
+**Analogy:** Seq = quick diary; Elasticsearch = library catalogue; Kibana = catalogue terminal.
+
 ```mermaid
 flowchart LR
-  API[WebApi read models] --> ES[(Elasticsearch)]
+  API["WebApi read models"] --> ES["Elasticsearch"]
   LOG[Serilog] --> LS[Logstash] --> ES
   ES --> KIB[Kibana Discover]
   UI[React search + facets] --> API
@@ -67,6 +69,23 @@ Phase 6 — after Soft/Hard gate + DoA (roadmap: staff GET search).
 | BankApp lab | **Primary log UX** | Logs **also** searchable in Kibana (optional depth) |
 
 **Takeaway:** Do **not** replace Seq with ES; **extend** log search with Kibana. Some prod teams keep ELK only — in lab, knowing both is more educational.
+
+```mermaid
+sequenceDiagram
+  participant U as Staff UI
+  participant API as WebApi
+  participant ES as Elasticsearch
+  participant SQL as SQL fallback
+  U->>API: searchText debounce
+  alt ES up
+    API->>ES: multi_match
+    ES-->>API: hits
+  else ES down
+    API->>SQL: Contains
+    SQL-->>API: rows
+  end
+  API-->>U: list JSON
+```
 
 ## Commands
 
@@ -199,3 +218,18 @@ To narrow list: same params on `GET /api/CreditApplications?amountMin=0&amountMa
    `docker compose down` then `docker volume rm bankapp-elasticsearch-data` — `-v` also affects all named volumes; watch SQL external volume
 
 Lab note: on Docker Desktop ES sometimes starts slowly (`start_period` 60s+).
+
+## Beginner lab
+
+1. `docker compose up -d elasticsearch kibana` → `curl localhost:9200`.
+2. WebApi restart → indices include `bankapp-credit-applications`.
+3. Application list search box → results narrow.
+4. Stop ES container → list still works (SQL fallback).
+5. Kibana data view `bankapp-logs-*` + Discover.
+
+## Common mistakes
+
+- Replacing **Seq** with ELK — run both in lab.
+- ES OOM — lower `ELASTIC_JAVA_OPTS`.
+- Staff user expecting **facet** panel — manager/SuperAdmin.
+- API 500 with no index — wait for healthy ES + reindex.

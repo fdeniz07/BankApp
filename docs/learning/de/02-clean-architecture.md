@@ -7,6 +7,8 @@
 **Clean Architecture** teilt Code in Schichten: **Geschäftsregeln** liegen innen, **UI / DB / Framework** außen.  
 Abhängigkeitspfeile zeigen **nach innen**: Äußere Schichten kennen innere; Innere kennen äußere nicht.
 
+**Vergleich:** Der **Kern** (Domain) sitzt innen; Schalter (WebApi) und Archiv (Persistence) außen. Der Kern kennt die Marke am Schalter nicht; der Schalter folgt den Kernregeln.
+
 ```mermaid
 flowchart TB
   subgraph aussen [Äußere Schichten]
@@ -47,6 +49,19 @@ BankApp-Schichten:
 | **Business rule** | Domänen-/Anwendungsregel wie „Nur Pending darf genehmigt werden“ |
 | **Repository** | Schnittstelle, die Datenzugriff abstrahiert |
 
+```mermaid
+sequenceDiagram
+  participant UI as WebApi
+  participant App as Application
+  participant Dom as Domain
+  participant Per as Persistence
+  UI->>App: Mediator.Send command
+  App->>Dom: Geschäftsregel
+  App->>Per: Repository
+  Per-->>App: Entity
+  App-->>UI: DTO Antwort
+```
+
 ## Befehle
 
 Clean Architecture selbst ist kein CLI; Schichten werden über Projekt-Referenzen verbunden:
@@ -77,3 +92,23 @@ src/Core/
 ## Mini-Ablauf
 
 **Genehmigen-Button** → `WebApi` Controller → `Application` Handler → `Domain` Aggregate-Methode → `Persistence` `SaveChanges` → (später) Outbox / SignalR.
+
+## Einstiegs-Lab
+
+1. `src/Domain/Domain.csproj` — **keine** Referenz auf `WebApi`.
+2. `src/Application/Application.csproj` — Referenzen nur nach `Domain`/`Core`.
+3. Command-Handler unter `Features/.../Commands/` finden — nur Repository-Schnittstellen.
+4. `Program.cs`: `AddApplication` + `AddPersistence` nachvollziehen.
+5. Verbotene Referenz Domain→WebApi — Compiler blockiert.
+
+## Häufige Fehler
+
+- EF oder HTTP in `Domain` — Schichtverletzung.  
+- `DbContext` im Controller — Logik in Handler.  
+- DTOs mit Domain-Entities verwechseln.  
+
+## Wo hilft es?
+
+- [ ] Abhängigkeiten zeigen nach innen  
+- [ ] Neue Features starten in Application/Domain  
+- [ ] Persistence-Änderungen berühren WebApi wenig  

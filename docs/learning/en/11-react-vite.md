@@ -8,6 +8,8 @@
 **Vite**: Fast dev server + production bundler.  
 **TypeScript**: Typed JavaScript — catches mistakes at compile time.
 
+**Analogy:** React is a **Lego** kit (components); Vite is the fast **workbench**; TypeScript warns about missing pieces before you open the box.
+
 ```mermaid
 flowchart LR
   V[Vite dev/build] --> R[React SPA client/]
@@ -32,6 +34,17 @@ flowchart LR
 | **SPA** | Single page; client-side routing |
 | **react-router** | URL → page |
 | **Fetch / api module** | HTTP client layer |
+
+```mermaid
+sequenceDiagram
+  participant UI as React page
+  participant API as client src api
+  participant BE as WebApi
+  UI->>API: getList
+  API->>BE: GET with JWT
+  BE-->>API: JSON
+  API-->>UI: Update state
+```
 
 ## Commands
 
@@ -74,3 +87,25 @@ client/Dockerfile
 ## Mini flow
 
 `npm run dev` → Login → token in localStorage/context → ApplicationsPage loads list → SignalR toast.
+
+Screenshot (staff dashboard): [`Bank Employee Page - Dashboard.png`](../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png)
+
+## Beginner lab
+
+1. `cd client` → `npm install` → `npm run dev`.
+2. Check `.env` / `VITE_API_BASE_URL` points at the API.
+3. Login → DevTools Application → token/context.
+4. Under `src/pages`, find Applications → which `api/` module is called?
+5. `npm run build` → `dist/` output (same as Docker).
+
+## Common mistakes
+
+- Blaming CORS when the API is down → check `8080/health` first.  
+- Disabling TypeScript with `any` → use types in `client/src/api`.  
+- Wrong `VITE_*` at production build → rebuild client with Compose `.env`.  
+
+## Where it helps
+
+- [ ] `npm run dev` starts  
+- [ ] Protected pages load after login  
+- [ ] `npm run build` matches CI  

@@ -8,12 +8,14 @@
 
 **Rate limiting**: Aynı istemcinin / IP’nin belirli sürede kaç istek atabileceğini sınırlamak. Aşılınca HTTP **429 Too Many Requests**.
 
+**Benzetme:** Banka girişinde güvenlik, aynı kişinin 60 saniyede en fazla N kez kart okutmasına izin verir; fazlası turniketten geçemez (429). Giriş kapısı (`auth`), kasa işlemleri (`write`) ve genel koridor (`fixed`) ayrı sayaçlarla izlenir.
+
 ```mermaid
 flowchart TD
-  REQ[HTTP istek] --> RL[Rate limiter]
-  RL --> POL[auth / write / fixed]
-  POL -->|limit OK| API[Controller]
-  POL -->|aşım| R429[429 Too Many Requests]
+  REQ["HTTP istek"] --> RL["Rate limiter"]
+  RL --> POL["Policy: auth, write, fixed"]
+  POL -->|limit OK| API["Controller"]
+  POL -->|asim| R429["429 Too Many Requests"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -43,6 +45,21 @@ Temel `fixed` daha önce vardı; **auth / write** politikaları güvenlik dilimi
 | **QueueLimit** | Limit dolunca kuyruk (0 = hemen 429) |
 | **EnableRateLimiting** | Controller/action attribute |
 | **Ortam katmanı** | `appsettings.json` + `appsettings.{Environment}.json` birleşimi |
+
+```mermaid
+sequenceDiagram
+  participant C as Istemci
+  participant MW as RateLimiter
+  participant API as Controller
+  C->>MW: POST Auth login
+  MW->>MW: auth sayaci artar
+  alt limit altinda
+    MW->>API: istek iletilir
+    API-->>C: 401 veya 200
+  else limit asildi
+    MW-->>C: 429 Too Many Requests
+  end
+```
 
 ## Komutlar
 
@@ -117,6 +134,20 @@ src/WebApi/appsettings.Development.json    # lab gevşek overlay
 ## Mini akış
 
 İstek → RateLimiter middleware → policy (auth/write/fixed) sayacı (ortam config’inden) → izin varsa action; yoksa 429.
+
+## Yeni başlayan lab
+
+1. `infra` altında stack ayakta olsun; `printenv ASPNETCORE_ENVIRONMENT` → `Development` doğrula.
+2. Yukarıdaki 30× login döngüsünü çalıştır; konsolda önce 401/400, sonra **429** gör.
+3. 60 saniye bekle; tekrar tek login at → sayaç sıfırlanmış gibi yanıt alırsın.
+4. `curl` ile `/health`’i 5 kez çağır → hep **200** (muafiyet).
+
+## Sık yapılan hatalar
+
+- **Production** ortamında lab scriptleri çalıştırmak → çok erken 429; demo UI kilitlenir.
+- Rate limit’i **CORS** veya **401** sanmak → 429’un `Retry-After` veya mesajına bak.
+- Aynı makineden farklı IP beklemek — sayaç genelde **partition key** (IP veya client) ile tutulur.
+- Mermaid’de `auth / write` gibi düğüm metnini tırnaksız yazmak → diyagram kırılır; tırnak veya virgül kullan.
 
 ## Nerede işe yarar?
 

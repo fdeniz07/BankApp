@@ -9,13 +9,15 @@
 Onay/red sonrası müşteriye giden **SMS** bildirimi.  
 Gerçek SMS gateway (Twilio vb.) yok: mesaj **RabbitMQ** → consumer **Seq**’e loglar (e-posta lab ile aynı eğitim modeli).
 
+**Benzetme:** Gerçek kurye yerine “SMS’i deftere yaz” — e-posta lab’inde mektup kuryesi yerine Seq’e yazılıyordu; SMS de aynı deftere kısa satır olarak düşer.
+
 ```mermaid
 flowchart LR
-  EV[Onay/red event] --> PUB[SMS Publisher]
-  PHN[Customer.Phone] --> PUB
-  PUB --> Q[decision-letter-sms]
-  Q --> CON[SMS Consumer]
-  CON --> SEQ[Seq log]
+  EV["Onay veya red event"] --> PUB["SMS Publisher"]
+  PHN["Customer.Phone"] --> PUB
+  PUB --> Q["decision-letter-sms"]
+  Q --> CON["SMS Consumer"]
+  CON --> SEQ["Seq log"]
 ```
 
 ## Bu projede ne işe yarar?
@@ -36,6 +38,20 @@ Roadmap “Karar mektubunu SMS ile gönderme” — e-posta lab’inden sonra ko
 | **Decision SMS** | Onay/red kısa metin (telefon) |
 | **Lab delivery** | Seq log = SMS yerine geçer |
 | **Skip** | Telefon yoksa yayınlama |
+
+```mermaid
+sequenceDiagram
+  participant H as Approve handler
+  participant OB as Outbox
+  participant C as DomainEvents consumer
+  participant Q as RabbitMQ
+  participant S as SMS consumer
+  H->>OB: domain event
+  OB->>C: deliver
+  C->>Q: decision-letter-sms
+  Q->>S: mesaj
+  S-->>S: Seq log To Body
+```
 
 ## Komutlar
 
@@ -86,3 +102,35 @@ tests/.../DecisionSmsRequestedTests.cs
 ## Mini akış
 
 Staff onaylar → Outbox → `domain-events` → SignalR + decision-letter e-posta + **decision-letter-sms** → consumer Seq’e `To` / `Body` yazar.
+
+## Yeni başlayan lab
+
+1. RabbitMQ UI açık; `decision-letter-sms` kuyruğu listede.
+2. Telefonu dolu müşteri ile Pending başvuruyu staff olarak **onayla**.
+3. Seq’te `Decision SMS` veya benzeri satır — `To=` telefon, `Body=` kısa metin.
+4. Aynı akışta e-posta kuyruğu logunu da gör ([22](22-decision-letter-email.md)).
+5. Telefonu boş müşteri ile red et → warning skip; kuyruk şişmez.
+
+## Sık yapılan hatalar
+
+- Sadece **e-posta** kuyruğuna bakmak — SMS ayrı kuyruk `decision-letter-sms`.
+- Seq’te arama yaparken **e-posta subject** aramak — SMS body kısa, farklı log mesajı.
+- RabbitMQ kapalı sanıp onayın kırıldığını düşünmek — publish uyarısı; karar DB’de kalır.
+- Mermaid’de `Onay/red` slash — tırnaklı etiket kullan.
+
+## Nerede işe yarar?
+
+### Sağlık checklist
+
+| Kontrol | İyi görünüm |
+|---------|-------------|
+| Consumers ≥ 1 | SMS consumer ayakta |
+| Approve + telefon | Seq SMS satırı |
+| Skip | Warning, akış 200 |
+
+### Felaket / kurtarma (lab)
+
+| Durum | Yol |
+|-------|-----|
+| Kuyruk birikiyor | `logs webapi`; consumer restart |
+| Hiç mesaj yok | Domain event mi; telefon skip mi |

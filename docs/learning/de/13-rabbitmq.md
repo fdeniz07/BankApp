@@ -6,15 +6,16 @@ Verwandt: [14 Outbox](14-outbox-events.md) · [22 Decision letter](../tr/22-deci
 
 ## Was ist das?
 
-**RabbitMQ**: Message Queue. Der Producer legt Nachrichten in eine Queue; der Consumer arbeitet sie später ab.  
-Trennt den HTTP-Request von langsamen Arbeiten (E-Mail-Simulation, Event-Veröffentlichung).
+**RabbitMQ**: Message Queue (AMQP). Producer → Queue → Consumer; HTTP antwortet schnell, Arbeit läuft im Hintergrund.
+
+**Analogie:** **Nummernzettel** — Kasse gibt Bon, Küche arbeitet die Schlange ab.
 
 ```mermaid
 flowchart LR
-  PUB[Publisher] --> Q[Warteschlange]
-  Q --> CON[Consumer HostedService]
-  CON --> SAGA[Saga / SignalR]
-  CON --> SEQ[Seq Lab-Log]
+  PUB["Publisher"] --> Q["Warteschlange"]
+  Q --> CON["Consumer HostedService"]
+  CON --> SAGA["Saga und SignalR"]
+  CON --> SEQ["Seq Lab-Log"]
 ```
 
 ## Rolle in BankApp
@@ -41,6 +42,18 @@ E-Mail-Queue: **Faz 5**. Domain-Events: **Faz 6** (Outbox). Decision-letter: Lab
 | **Unacked** | Vom Consumer bearbeitet, noch nicht ack |
 | **Ack / Nack** | Erfolg / Fehler markieren |
 | **At-least-once** | Mindestens einmal zugestellt — Consumer muss idempotent sein |
+
+```mermaid
+flowchart TB
+  subgraph lab["BankApp Lab Queues"]
+    EC["email-confirmation"]
+    DE["domain-events"]
+    DL["decision-letter"]
+    SMS["decision-letter-sms"]
+  end
+  API["WebApi Publisher"] --> lab
+  HS["HostedService Consumer"] --> lab
+```
 
 ## Befehle
 
@@ -125,3 +138,25 @@ docs/learning/tr/22-decision-letter-email.md
 
 Registrierung → Token → `email-confirmation` → Consumer log/Seq → Nutzer bestätigt per Link → Login.  
 Approve/Reject → Outbox → `domain-events` (+ `decision-letter`) → SignalR / Seq.
+
+## Einsteiger-Lab
+
+1. `docker compose up -d rabbitmq webapi`  
+2. UI :15672 → vier Queues  
+3. Registrierung → `email-confirmation`  
+4. Approve → `domain-events`  
+5. Seq prüfen  
+
+## Häufige Fehler
+
+- WebApi down, Consumers = 0  
+- Get messages in UI ohne Metriken  
+- `guest` in Prod  
+- Queue-Namen out of sync  
+
+## Wo hilft es?
+
+- [ ] rabbitmq healthy  
+- [ ] Consumers ≥ 1  
+- [ ] Ready sinkt nach Aktion  
+- [ ] Seq-Logs sichtbar
