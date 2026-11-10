@@ -100,13 +100,29 @@ Roles: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (manager als
 ## Screenshots (EN)
 
 UI captures under [`docs/assets/screenshots/en/`](docs/assets/screenshots/en/) (English locale for now).  
-Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](docs/screenshots/bank-employee.en.md) · [Bank manager](docs/screenshots/bank-manager.en.md)
+Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](docs/screenshots/bank-employee.en.md) · [Bank manager](docs/screenshots/bank-manager.en.md) · [SuperAdmin](docs/screenshots/super-admin.en.md)
 
 ### Auth, privacy & accessibility
 
 **Login & privacy banner** — Sign-in with TR/EN/DE switcher, remember-me, demo credentials on the card, and cookie/privacy consent before using the SPA.
 
 <img src="docs/assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login page and privacy banner" width="720" />
+
+**Dark theme login** — Same login card with accessibility dark theme.
+
+<img src="docs/assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png" alt="Login dark theme" width="720" />
+
+**Register** — Individual customer self-registration form.
+
+<img src="docs/assets/screenshots/en/Register%20Page.png" alt="Register page" width="720" />
+
+**Keycloak login** — SPA “Sign in with Keycloak” / IdP hosted login.
+
+<img src="docs/assets/screenshots/en/Login%20with%20Keycloak.png" alt="Login with Keycloak" width="720" />
+
+**403 Permission denied** — Cross-role / cross-branch denial surface.
+
+<img src="docs/assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 permission denied" width="720" />
 
 **Accessibility panel** — Floating controls for light/dark theme, font scale, and high contrast (persisted in the browser).
 
@@ -116,7 +132,7 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 
 **Customer** — Welcome by display name; own application counters. More: [customer gallery](docs/screenshots/customer.en.md).
 
-<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard-1.png" alt="Customer dashboard" width="720" />
+<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard.png" alt="Customer dashboard" width="720" />
 
 **Bank staff** — Global stats, FX ticker, SignalR lifecycle toasts. More: [staff gallery](docs/screenshots/bank-employee.en.md).
 
@@ -125,6 +141,10 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 **Bank manager** — Same overview with staff + credit-type admin. More: [manager gallery](docs/screenshots/bank-manager.en.md).
 
 <img src="docs/assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Bank manager dashboard" width="720" />
+
+**SuperAdmin** — Cross-branch admin + Branches CRUD. More: [SuperAdmin gallery](docs/screenshots/super-admin.en.md).
+
+<img src="docs/assets/screenshots/en/Admin/Super%20Admin%20-%20Dashboard.png" alt="SuperAdmin dashboard" width="720" />
 
 ### Infrastructure & observability
 
@@ -140,11 +160,17 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 
 <img src="docs/assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq logs" width="720" />
 
+**Redis Insight** — Cache browser for the Compose Redis instance (`:5540`).
+
+<img src="docs/assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight cache" width="720" />
+
 **Prometheus & Grafana** — Metrics scrape + dashboards/traces UI (`:9090` / `:3001`).
 
 <img src="docs/assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus" width="720" />
 
 <img src="docs/assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana metrics" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png" alt="Grafana metrics panel 2" width="720" />
 
 <img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana additional metrics" width="720" />
 
@@ -155,6 +181,14 @@ Role walkthroughs: [Customer](docs/screenshots/customer.en.md) · [Bank staff](d
 **Vault (lab)** — Dev-mode KV `secret/bankapp`; WebApi startup overlay (JWT current + previous dual-key).
 
 <img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
+
+**Keycloak admin** — Realm / users console (`:8180`).
+
+<img src="docs/assets/screenshots/en/Keycloak%20Management.png" alt="Keycloak management" width="720" />
+
+**Kibana** — Elasticsearch Discover / Lens over `bankapp-credit-applications` and `bankapp-logs-*`.
+
+<img src="docs/assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png" alt="Kibana Elasticsearch results" width="720" />
 
 ---
 

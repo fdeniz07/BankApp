@@ -13,6 +13,18 @@ Operational overview with manager privileges (staff + credit-type admin).
 
 ---
 
+## Credits — facets & branch filter
+
+Pending list; facet panel; filter by other branch (read-only write scope stays own branch).
+
+<img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credits%20(Pending).png" alt="Credits pending" width="720" />
+
+<img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credits%20facet%20filtered%20.png" alt="Credits facet filtered" width="720" />
+
+<img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credits%20filtered%20by%20Branch%20.png" alt="Credits filtered by branch" width="720" />
+
+---
+
 ## Credit detail & payment schedule
 
 Collapsible installment table; **PDF** and **print** of the amortized plan (locale-aware currency symbols).
@@ -27,21 +39,23 @@ Collapsible installment table; **PDF** and **print** of the amortized plan (loca
 
 ## Credit type catalog
 
-Filter by locale/category; create/update/activate types and packages.
+Filter by locale/category; create/update types in a modal.
 
 <img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Types%20(filtered%20EN).png" alt="Credit types filtered EN" width="720" />
 
 <img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Types%20Management.png" alt="Credit types management" width="720" />
 
-<img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Defining%20a%20new%20type%20of%20credit.png" alt="Define new credit type" width="720" />
+<img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Types%20adding.png" alt="Add credit type modal" width="720" />
 
 ---
 
 ## Customers & staff
 
-Individual customers list; staff user management (create/update).
+Individual customers (incl. other-branch filter); staff management (edit/deactivate own branch only).
 
 <img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Invidual%20Customers.png" alt="Manager individual customers" width="720" />
+
+<img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Invidual%20Customers%20-%20filter%20by%20other%20branch.png" alt="Individual customers other branch filter" width="720" />
 
 <img src="../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Staff%20Management.png" alt="Staff management" width="720" />
 

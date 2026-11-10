@@ -100,13 +100,29 @@ Roller: **Customer**, **BankStaff**, **BankManager**, **SuperAdmin** (yönetici 
 ## Ekran görüntüleri (EN)
 
 Yakalar [`docs/assets/screenshots/en/`](docs/assets/screenshots/en/) altında (şimdilik yalnızca İngilizce UI).  
-Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/screenshots/bank-employee.en.md) · [Yönetici](docs/screenshots/bank-manager.en.md)
+Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/screenshots/bank-employee.en.md) · [Yönetici](docs/screenshots/bank-manager.en.md) · [SuperAdmin](docs/screenshots/super-admin.en.md)
 
 ### Auth, gizlilik ve erişilebilirlik
 
 **Giriş ve gizlilik bandı** — TR/EN/DE dil seçici, beni hatırla, kart üzerinde demo kimlik bilgileri; SPA kullanımından önce çerez/gizlilik onayı.
 
 <img src="docs/assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Giriş sayfası ve gizlilik bandı" width="720" />
+
+**Koyu tema giriş** — Erişilebilirlik koyu teması ile aynı kart.
+
+<img src="docs/assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png" alt="Koyu tema giriş" width="720" />
+
+**Kayıt** — Bireysel müşteri self-register formu.
+
+<img src="docs/assets/screenshots/en/Register%20Page.png" alt="Kayıt sayfası" width="720" />
+
+**Keycloak girişi** — SPA “Keycloak ile giriş” / IdP ekranı.
+
+<img src="docs/assets/screenshots/en/Login%20with%20Keycloak.png" alt="Keycloak ile giriş" width="720" />
+
+**403 Yetki yok** — Rol / şube dışı erişim reddi.
+
+<img src="docs/assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 yetki reddi" width="720" />
 
 **Erişilebilirlik paneli** — Açık/koyu tema, yazı boyutu ve yüksek kontrast (tarayıcıda saklanır).
 
@@ -116,7 +132,7 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 
 **Müşteri** — Görünen adla karşılama; kendi başvuru sayaçları. Devamı: [müşteri galerisi](docs/screenshots/customer.en.md).
 
-<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard-1.png" alt="Müşteri dashboard" width="720" />
+<img src="docs/assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard.png" alt="Müşteri dashboard" width="720" />
 
 **Banka personeli** — Genel istatistikler, döviz ticker, SignalR yaşam döngüsü toast’ları. Devamı: [personel galerisi](docs/screenshots/bank-employee.en.md).
 
@@ -125,6 +141,10 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 **Banka yöneticisi** — Personel + kredi tipi yönetimiyle aynı özet. Devamı: [yönetici galerisi](docs/screenshots/bank-manager.en.md).
 
 <img src="docs/assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Yönetici dashboard" width="720" />
+
+**SuperAdmin** — Tüm şubeler + Şubeler CRUD. Devamı: [SuperAdmin galerisi](docs/screenshots/super-admin.en.md).
+
+<img src="docs/assets/screenshots/en/Admin/Super%20Admin%20-%20Dashboard.png" alt="SuperAdmin dashboard" width="720" />
 
 ### Altyapı ve gözlemlenebilirlik
 
@@ -140,11 +160,17 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 
 <img src="docs/assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq logları" width="720" />
 
+**Redis Insight** — Compose Redis önbellek tarayıcısı (`:5540`).
+
+<img src="docs/assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight önbellek" width="720" />
+
 **Prometheus ve Grafana** — Metrik scrape + dashboard/trace UI (`:9090` / `:3001`).
 
 <img src="docs/assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus" width="720" />
 
 <img src="docs/assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana metrikleri" width="720" />
+
+<img src="docs/assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png" alt="Grafana metrik paneli 2" width="720" />
 
 <img src="docs/assets/screenshots/en/Metrics%20are%20also%20tracked%20on%20Grafana.png" alt="Grafana ek metrikler" width="720" />
 
@@ -155,6 +181,14 @@ Rol galerileri: [Müşteri](docs/screenshots/customer.en.md) · [Personel](docs/
 **Vault (lab)** — Dev-mode KV `secret/bankapp`; WebApi startup overlay (JWT current + previous dual-key).
 
 <img src="docs/assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
+
+**Keycloak admin** — Realm / kullanıcı konsolu (`:8180`).
+
+<img src="docs/assets/screenshots/en/Keycloak%20Management.png" alt="Keycloak yönetimi" width="720" />
+
+**Kibana** — `bankapp-credit-applications` ve `bankapp-logs-*` üzerinde Discover / Lens.
+
+<img src="docs/assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png" alt="Kibana Elasticsearch sonuçları" width="720" />
 
 
 ---
