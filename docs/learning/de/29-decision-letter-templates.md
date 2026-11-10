@@ -87,6 +87,10 @@ Erwartet: JSON-Array (erste Nutzung kann leer sein).
 
 Personal öffnet Pending-Antrag → Systemvorlage in UI-Sprache → Text bearbeiten → „Als Vorlage speichern“ → beim nächsten Antrag eigene Vorlage im Select → Genehmigen/Ablehnen.
 
+Bildschirm (Genehmigungs-/Ablehnungsbrief-Vorlagen — vorausgefüllt):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-Custom%20Approving-Rejecting%20Templates.png" alt="Entscheidungsbrief-Vorlagenpanel" width="720" />
+
 ## Einstiegs-Lab
 
 1. `staff.tr@bank.local` / `Demo123!` — Brief vorausgefüllt.

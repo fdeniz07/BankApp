@@ -56,6 +56,14 @@ dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --filter "D
 
 Approve → Outbox → Queue → Seq mit To/Subject/Body.
 
+UI-Briefvorlage (Genehmigen/Ablehnen-Notiz — Body für die Queue):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-Custom%20Approving-Rejecting%20Templates.png" alt="Entscheidungsbrief-Vorlage" width="720" />
+
+Im Lab erscheint die „gesendete E-Mail“ in Seq:
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Entscheidungsbrief in Seq-Logs" width="720" />
+
 ## Einsteiger-Lab
 
 Approve mit markantem Satz → Rabbit Ready → Seq Body prüfen → Rabbit stoppen → Fallback-Log.

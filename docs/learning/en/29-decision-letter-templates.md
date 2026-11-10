@@ -90,6 +90,10 @@ Expected: JSON array (may be empty on first use).
 
 Staff opens Pending application → system template fills in UI language → edits text → “Save as template” → on next application picks own template from select → Approve/Reject.
 
+Screen (approve/reject letter templates — auto-filled copy):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-Custom%20Approving-Rejecting%20Templates.png" alt="Decision letter template panel" width="720" />
+
 ## Beginner lab
 
 1. `staff.tr@bank.local` / `Demo123!` login.

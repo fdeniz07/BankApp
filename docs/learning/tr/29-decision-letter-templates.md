@@ -93,6 +93,10 @@ Beklenen: JSON dizi (ilk kullanımda boş olabilir).
 
 Personel Pending başvuruyu açar → sistem şablonu UI dilinde dolar → metni düzenler → “Şablon olarak kaydet” → sonraki başvuruda select’ten kendi şablonunu seçer → Onayla/Reddet.
 
+Ekran (onay/red mektubu şablonları — otomatik doldurulmuş kalıp):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-Custom%20Approving-Rejecting%20Templates.png" alt="Karar mektubu şablon paneli" width="720" />
+
 ## Nerede işe yarar?
 
 - [ ] Detayda dil değiştirince (metin kirli değilse) mektup yenilenir

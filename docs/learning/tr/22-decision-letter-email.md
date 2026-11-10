@@ -113,6 +113,14 @@ tests/Application.UnitTests/Services/Messaging/DecisionLetterRequestedTests.cs
 
 Staff onaylar → Outbox → `domain-events` → Saga + SignalR → müşteri e-postası bulunur → `DecisionLetterRequested` → `decision-letter` kuyruğu → consumer Seq’e `To` / `Subject` / `Body` yazar.
 
+UI’da mektup kalıbı (onay/red notu — kuyruğa gidecek body):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-Custom%20Approving-Rejecting%20Templates.png" alt="Karar mektubu şablonu" width="720" />
+
+Lab’de “gönderilen e-posta” Seq’te görünür:
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq’te karar mektubu logu" width="720" />
+
 ## Yeni başlayan lab
 
 1. İki servis ayakta: rabbitmq, webapi, seq.

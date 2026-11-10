@@ -98,6 +98,14 @@ tests/Application.UnitTests/Services/Messaging/DecisionLetterRequestedTests.cs
 
 Staff approves → Outbox → `domain-events` → saga + SignalR → customer email resolved → `DecisionLetterRequested` → queue → Seq logs `To` / `Subject` / `Body`.
 
+UI letter template (approve/reject notes — body that goes to the queue):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-Custom%20Approving-Rejecting%20Templates.png" alt="Decision letter template" width="720" />
+
+In the lab, the “sent email” appears in Seq:
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Decision letter in Seq logs" width="720" />
+
 ## Beginner lab
 
 1. Stack: rabbitmq, webapi, seq.

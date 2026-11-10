@@ -107,6 +107,10 @@ client/src/locales/*/common.json  # a11y.*
 
 Kullanıcı FAB’a basar → panel açılır (`panelOpen`) → “Yüksek kontrast” → `controller.setPrefs` → `localStorage` + `data-contrast=high` → CSS token’ları değişir → yenilemede `main.tsx` boot aynı tercihi uygular.
 
+Ekran (FAB + panel — tema / font / kontrast):
+
+<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Erişilebilirlik asistanı paneli" width="720" />
+
 ## Nerede işe yarar?
 
 **Sağlık**

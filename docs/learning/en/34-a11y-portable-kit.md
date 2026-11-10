@@ -107,6 +107,10 @@ client/src/locales/*/common.json  # a11y.*
 
 User taps FAB → panel opens (`panelOpen`) → “High contrast” → `controller.setPrefs` → `localStorage` + `data-contrast=high` → CSS tokens change → on refresh `main.tsx` boot applies same prefs.
 
+Screen (FAB + panel — theme / font / contrast):
+
+<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Accessibility assistant panel" width="720" />
+
 ## Where it helps
 
 ### Health

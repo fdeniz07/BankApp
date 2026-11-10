@@ -102,6 +102,10 @@ client/src/locales/*/common.json  # a11y.*
 
 Nutzer tippt FAB → Panel öffnet (`panelOpen`) → „Hoher Kontrast“ → `controller.setPrefs` → `localStorage` + `data-contrast=high` → CSS-Tokens ändern → nach Reload wendet `main.tsx` dieselben Prefs an.
 
+Bildschirm (FAB + Panel — Theme / Schrift / Kontrast):
+
+<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Barrierefreiheits-Assistentenpanel" width="720" />
+
 ## Wo hilft es?
 
 ### Gesundheit
