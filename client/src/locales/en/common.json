@@ -316,7 +316,7 @@
     "applications": "Applications",
     "total": "Total",
     "emptyTitle": "You have no credit applications yet.",
-    "emptyHint": "You can create a new application using the form below."
+    "emptyHint": "Use the «New credit application» button to create one."
   },
   "locale": {
     "tr": "Turkish",

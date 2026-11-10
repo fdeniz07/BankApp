@@ -316,7 +316,7 @@
     "applications": "Başvuru",
     "total": "Toplam",
     "emptyTitle": "Henüz kredi başvurunuz yok.",
-    "emptyHint": "Aşağıdaki formdan yeni başvuru oluşturabilirsiniz."
+    "emptyHint": "Yeni başvuru için «Yeni kredi başvurusu» butonunu kullanın."
   },
   "locale": {
     "tr": "Türkçe",

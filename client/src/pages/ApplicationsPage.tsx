@@ -84,6 +84,12 @@ export function ApplicationsPage() {
   const [createDocumentType, setCreateDocumentType] =
     useState<CreditDocumentType>('IdentityDocument')
   const [createDocumentFiles, setCreateDocumentFiles] = useState<File[]>([])
+  const [showCreateModal, setShowCreateModal] = useState(false)
+
+  function closeCreateModal() {
+    if (creating) return
+    setShowCreateModal(false)
+  }
 
   const loadDashboard = useCallback(() => {
     return getDashboardSummary()
@@ -395,6 +401,7 @@ export function ApplicationsPage() {
       }))
       setCreateDocumentFiles([])
       setCreateDocumentType('IdentityDocument')
+      setShowCreateModal(false)
       setPageIndex(0)
       await loadList()
       await loadDashboard()
@@ -496,251 +503,300 @@ export function ApplicationsPage() {
         </div>
       )}
 
-      {!isStaff && (
-        <div className="panel create-panel">
-          <h2>{t('applications.newTitle')}</h2>
-          <p className="muted">{t('applications.newHint')}</p>
-          <form className="form" onSubmit={onCreate}>
-            <label>
-              {t('applications.creditType')}
-              <select
-                value={form.creditSubTypeId}
-                onChange={(e) => onSubTypeChange(e.target.value)}
-                required
+      {!isStaff && showCreateModal && (
+        <div
+          className="staff-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="create-application-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeCreateModal()
+          }}
+        >
+          <div className="staff-modal-panel create-application-modal create-panel">
+            <div className="staff-modal-header">
+              <div>
+                <h2 id="create-application-title">{t('applications.newTitle')}</h2>
+                <p className="muted">{t('applications.newHint')}</p>
+              </div>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={closeCreateModal}
+                disabled={creating}
               >
-                {subTypes.length === 0 && (
-                  <option value="">{t('common.empty')}</option>
-                )}
-                {subTypes.map((s) => (
-                  <option key={s.id} value={s.id}>
-                    {s.name} · {formatMoney(s.minAmount, s.currencyCode, i18n.language)} –{' '}
-                    {formatMoney(s.maxAmount, s.currencyCode, i18n.language)} · {s.minTermMonths}–
-                    {s.maxTermMonths} {t('applications.termUnit')} · %{s.interestRate}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {selectedSubType && (
-              <p className="muted form-rate-hint">
-                {t('applications.interestRate')}: %{selectedSubType.interestRate}
-              </p>
-            )}
-            <label>
-              {t('applications.amount')}
-              <select
-                value={form.requestedAmount}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, requestedAmount: e.target.value }))
-                }
-                required
-              >
-                {(selectedSubType?.amountOptions ?? []).map((amount) => (
-                  <option key={amount} value={amount}>
-                    {formatMoney(amount, selectedSubType?.currencyCode, i18n.language)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              {t('applications.term')}
-              <select
-                value={form.requestedTermMonths}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, requestedTermMonths: e.target.value }))
-                }
-                required
-              >
-                {(selectedSubType?.termOptions ?? []).map((term) => (
-                  <option key={term} value={term}>
-                    {term} {t('applications.termUnit')}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label>
-              {t('applications.monthlyIncome')}
-              {selectedSubType?.currencyCode
-                ? ` (${currencySymbol(selectedSubType.currencyCode)})`
-                : ''}
-              <input
-                type="number"
-                inputMode="decimal"
-                min={1}
-                step={1}
-                required
-                value={form.monthlyIncome}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, monthlyIncome: e.target.value }))
-                }
-                placeholder={t('applications.monthlyIncomeHint')}
-              />
-            </label>
-            <label>
-              {t('applications.existingDebt')}
-              {selectedSubType?.currencyCode
-                ? ` (${currencySymbol(selectedSubType.currencyCode)})`
-                : ''}
-              <input
-                type="number"
-                inputMode="decimal"
-                min={0}
-                step={1}
-                value={form.existingDebtAmount}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, existingDebtAmount: e.target.value }))
-                }
-                placeholder={t('applications.existingDebtHint')}
-              />
-            </label>
-            <label>
-              {t('applications.purpose')}
-              <input
-                type="text"
-                value={form.purpose}
-                onChange={(e) =>
-                  setForm((prev) => ({ ...prev, purpose: e.target.value }))
-                }
-              />
-            </label>
-
-            <fieldset className="documents-upload create-documents">
-              <legend>{t('applications.documentsTitle')}</legend>
-              <p className="muted">{t('applications.createDocumentsHint')}</p>
+                {t('common.close')}
+              </button>
+            </div>
+            {error && <p className="error-text">{error}</p>}
+            <form className="form" onSubmit={onCreate}>
               <label>
-                {t('applications.documentType')}
+                {t('applications.creditType')}
                 <select
-                  value={createDocumentType}
-                  onChange={(e) =>
-                    setCreateDocumentType(e.target.value as CreditDocumentType)
-                  }
-                  disabled={creating}
+                  value={form.creditSubTypeId}
+                  onChange={(e) => onSubTypeChange(e.target.value)}
+                  required
                 >
-                  <option value="IdentityDocument">
-                    {t('applications.documentTypes.IdentityDocument')}
-                  </option>
-                  <option value="IncomeProof">
-                    {t('applications.documentTypes.IncomeProof')}
-                  </option>
-                  <option value="Other">{t('applications.documentTypes.Other')}</option>
+                  {subTypes.length === 0 && (
+                    <option value="">{t('common.empty')}</option>
+                  )}
+                  {subTypes.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.name} · {formatMoney(s.minAmount, s.currencyCode, i18n.language)} –{' '}
+                      {formatMoney(s.maxAmount, s.currencyCode, i18n.language)} · {s.minTermMonths}–
+                      {s.maxTermMonths} {t('applications.termUnit')} · %{s.interestRate}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {selectedSubType && (
+                <p className="muted form-rate-hint">
+                  {t('applications.interestRate')}: %{selectedSubType.interestRate}
+                </p>
+              )}
+              <label>
+                {t('applications.amount')}
+                <select
+                  value={form.requestedAmount}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, requestedAmount: e.target.value }))
+                  }
+                  required
+                >
+                  {(selectedSubType?.amountOptions ?? []).map((amount) => (
+                    <option key={amount} value={amount}>
+                      {formatMoney(amount, selectedSubType?.currencyCode, i18n.language)}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label>
-                {t('applications.documentFile')}
-                <FilePicker
-                  accept=".pdf,image/jpeg,image/png,application/pdf"
-                  multiple
-                  disabled={creating}
-                  files={createDocumentFiles}
-                  onFilesChange={setCreateDocumentFiles}
+                {t('applications.term')}
+                <select
+                  value={form.requestedTermMonths}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, requestedTermMonths: e.target.value }))
+                  }
+                  required
+                >
+                  {(selectedSubType?.termOptions ?? []).map((term) => (
+                    <option key={term} value={term}>
+                      {term} {t('applications.termUnit')}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                {t('applications.monthlyIncome')}
+                {selectedSubType?.currencyCode
+                  ? ` (${currencySymbol(selectedSubType.currencyCode)})`
+                  : ''}
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min={1}
+                  step={1}
+                  required
+                  value={form.monthlyIncome}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, monthlyIncome: e.target.value }))
+                  }
+                  placeholder={t('applications.monthlyIncomeHint')}
                 />
               </label>
-            </fieldset>
+              <label>
+                {t('applications.existingDebt')}
+                {selectedSubType?.currencyCode
+                  ? ` (${currencySymbol(selectedSubType.currencyCode)})`
+                  : ''}
+                <input
+                  type="number"
+                  inputMode="decimal"
+                  min={0}
+                  step={1}
+                  value={form.existingDebtAmount}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, existingDebtAmount: e.target.value }))
+                  }
+                  placeholder={t('applications.existingDebtHint')}
+                />
+              </label>
+              <label>
+                {t('applications.purpose')}
+                <input
+                  type="text"
+                  value={form.purpose}
+                  onChange={(e) =>
+                    setForm((prev) => ({ ...prev, purpose: e.target.value }))
+                  }
+                />
+              </label>
 
-            <button type="submit" className="btn primary" disabled={creating || !form.creditSubTypeId}>
-              {creating ? t('common.loading') : t('applications.create')}
-            </button>
-          </form>
+              <fieldset className="documents-upload create-documents">
+                <legend>{t('applications.documentsTitle')}</legend>
+                <p className="muted">{t('applications.createDocumentsHint')}</p>
+                <label>
+                  {t('applications.documentType')}
+                  <select
+                    value={createDocumentType}
+                    onChange={(e) =>
+                      setCreateDocumentType(e.target.value as CreditDocumentType)
+                    }
+                    disabled={creating}
+                  >
+                    <option value="IdentityDocument">
+                      {t('applications.documentTypes.IdentityDocument')}
+                    </option>
+                    <option value="IncomeProof">
+                      {t('applications.documentTypes.IncomeProof')}
+                    </option>
+                    <option value="Other">{t('applications.documentTypes.Other')}</option>
+                  </select>
+                </label>
+                <label>
+                  {t('applications.documentFile')}
+                  <FilePicker
+                    accept=".pdf,image/jpeg,image/png,application/pdf"
+                    multiple
+                    disabled={creating}
+                    files={createDocumentFiles}
+                    onFilesChange={setCreateDocumentFiles}
+                  />
+                </label>
+              </fieldset>
 
-          {paymentPlan && paymentPlan.installments.length > 0 && (
-            <div className="payment-plan">
-              <h3>{t('paymentPlan.title')}</h3>
-              <p className="muted">
-                {t('paymentPlan.rateLine', { rate: paymentPlan.interestRate })}
-              </p>
-              <p className="muted">
-                {t('paymentPlan.summary', {
-                  monthly: formatMoney(
-                    paymentPlan.monthlyPayment,
-                    paymentPlan.currencyCode,
-                    i18n.language,
-                  ),
-                  total: formatMoney(
-                    paymentPlan.totalPayment,
-                    paymentPlan.currencyCode,
-                    i18n.language,
-                  ),
-                  interest: formatMoney(
-                    paymentPlan.totalInterest,
-                    paymentPlan.currencyCode,
-                    i18n.language,
-                  ),
-                })}
-              </p>
-              <div className="payment-plan-actions">
+              <div className="actions-cell">
                 <button
-                  type="button"
-                  className="btn ghost"
-                  disabled={planExportBusy}
-                  onClick={() => void onDownloadCreatePlan()}
+                  type="submit"
+                  className="btn primary"
+                  disabled={creating || !form.creditSubTypeId}
                 >
-                  {planExportBusy ? t('common.loading') : t('paymentPlan.downloadPdf')}
+                  {creating ? t('common.loading') : t('applications.create')}
                 </button>
                 <button
                   type="button"
                   className="btn ghost"
-                  disabled={planExportBusy}
-                  onClick={() => void onPrintCreatePlan()}
+                  onClick={closeCreateModal}
+                  disabled={creating}
                 >
-                  {t('paymentPlan.print')}
-                </button>
-                <button
-                  type="button"
-                  className="btn ghost"
-                  aria-expanded={planTableOpen}
-                  onClick={() => setPlanTableOpen((open) => !open)}
-                >
-                  {planTableOpen
-                    ? t('paymentPlan.hideInstallments')
-                    : t('paymentPlan.showInstallments', {
-                        count: paymentPlan.installments.length,
-                      })}
+                  {t('common.cancel')}
                 </button>
               </div>
-              {planTableOpen && (
-                <div className="table-wrap payment-plan-table-scroll">
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>{t('paymentPlan.month')}</th>
-                        <th>{t('paymentPlan.payment')}</th>
-                        <th>{t('paymentPlan.principal')}</th>
-                        <th>{t('paymentPlan.interest')}</th>
-                        <th>{t('paymentPlan.balance')}</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {paymentPlan.installments.map((row) => (
-                        <tr key={row.month}>
-                          <td>{row.month}</td>
-                          <td>
-                            {formatMoney(row.payment, paymentPlan.currencyCode, i18n.language)}
-                          </td>
-                          <td>
-                            {formatMoney(row.principal, paymentPlan.currencyCode, i18n.language)}
-                          </td>
-                          <td>
-                            {formatMoney(row.interest, paymentPlan.currencyCode, i18n.language)}
-                          </td>
-                          <td>
-                            {formatMoney(
-                              row.remainingBalance,
-                              paymentPlan.currencyCode,
-                              i18n.language,
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+            </form>
+
+            {paymentPlan && paymentPlan.installments.length > 0 && (
+              <div className="payment-plan">
+                <h3>{t('paymentPlan.title')}</h3>
+                <p className="muted">
+                  {t('paymentPlan.rateLine', { rate: paymentPlan.interestRate })}
+                </p>
+                <p className="muted">
+                  {t('paymentPlan.summary', {
+                    monthly: formatMoney(
+                      paymentPlan.monthlyPayment,
+                      paymentPlan.currencyCode,
+                      i18n.language,
+                    ),
+                    total: formatMoney(
+                      paymentPlan.totalPayment,
+                      paymentPlan.currencyCode,
+                      i18n.language,
+                    ),
+                    interest: formatMoney(
+                      paymentPlan.totalInterest,
+                      paymentPlan.currencyCode,
+                      i18n.language,
+                    ),
+                  })}
+                </p>
+                <div className="payment-plan-actions">
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    disabled={planExportBusy}
+                    onClick={() => void onDownloadCreatePlan()}
+                  >
+                    {planExportBusy ? t('common.loading') : t('paymentPlan.downloadPdf')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    disabled={planExportBusy}
+                    onClick={() => void onPrintCreatePlan()}
+                  >
+                    {t('paymentPlan.print')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    aria-expanded={planTableOpen}
+                    onClick={() => setPlanTableOpen((open) => !open)}
+                  >
+                    {planTableOpen
+                      ? t('paymentPlan.hideInstallments')
+                      : t('paymentPlan.showInstallments', {
+                          count: paymentPlan.installments.length,
+                        })}
+                  </button>
                 </div>
-              )}
-            </div>
-          )}
+                {planTableOpen && (
+                  <div className="table-wrap payment-plan-table-scroll">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>{t('paymentPlan.month')}</th>
+                          <th>{t('paymentPlan.payment')}</th>
+                          <th>{t('paymentPlan.principal')}</th>
+                          <th>{t('paymentPlan.interest')}</th>
+                          <th>{t('paymentPlan.balance')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {paymentPlan.installments.map((row) => (
+                          <tr key={row.month}>
+                            <td>{row.month}</td>
+                            <td>
+                              {formatMoney(row.payment, paymentPlan.currencyCode, i18n.language)}
+                            </td>
+                            <td>
+                              {formatMoney(row.principal, paymentPlan.currencyCode, i18n.language)}
+                            </td>
+                            <td>
+                              {formatMoney(row.interest, paymentPlan.currencyCode, i18n.language)}
+                            </td>
+                            <td>
+                              {formatMoney(
+                                row.remainingBalance,
+                                paymentPlan.currencyCode,
+                                i18n.language,
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       <div className="list-toolbar">
         <h1 className={isStaff ? undefined : 'section-title'}>{t('applications.title')}</h1>
+        {!isStaff && (
+          <button
+            type="button"
+            className="btn primary"
+            onClick={() => {
+              setError(null)
+              setShowCreateModal(true)
+            }}
+          >
+            {t('applications.newTitle')}
+          </button>
+        )}
         <label className="filter-label search-label">
           {t('applications.search')}
           <input
@@ -981,7 +1037,7 @@ export function ApplicationsPage() {
       )}
 
       {loading && <p>{t('common.loading')}</p>}
-      {error && <p className="error-text">{error}</p>}
+      {error && !showCreateModal && <p className="error-text">{error}</p>}
       {success && <p className="success-text">{success}</p>}
       {!loading && !error && data && data.items.length === 0 && (
         <div className="empty-state">
