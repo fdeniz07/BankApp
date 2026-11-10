@@ -1,8 +1,8 @@
-# FRD — Kredi kararı: evrak kapısı + onay yetkisi
+﻿# FRD — Kredi kararı: evrak kapısı + onay yetkisi
 
 | Alan | Değer |
 |------|--------|
-| Üst BRD | [brd.tr.md](brd.tr.md) — BR-CR-07, BR-CR-08 |
+| Üst BRD | [brd.tr.md](brd.md) — BR-CR-07, BR-CR-08 |
 | Modüller | Credit (Application / WebApi / client) |
 | Son güncelleme | 2026-11-02 |
 
@@ -128,4 +128,4 @@ Ek kontroller (sırayla, mevcut kurallardan sonra):
 - Entity: `Branch.MaxApprovalAmount`
 - Controller: `CreditDocumentsController.GetConfig`
 - Client: `creditDocumentsConfigApi.ts`, `ApplicationDetailPage.tsx`, `BranchesPage.tsx`
-- Learning: [30-approve-gate-authority.tr.md](../learning/30-approve-gate-authority.tr.md)
+- Learning: [30-approve-gate-authority.tr.md](../../learning/tr/30-approve-gate-authority.md)

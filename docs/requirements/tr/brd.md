@@ -1,4 +1,4 @@
-# BRD — BankApp (Business Requirements Document)
+﻿# BRD — BankApp (Business Requirements Document)
 
 | Alan | Değer |
 |------|--------|
@@ -6,7 +6,7 @@
 | Durum | Canlı (lab); Continuous documentation |
 | Dil | Türkçe (birincil) |
 | Son güncelleme | 2026-11-02 |
-| İlgili | [roadmap](../roadmap.tr.md) · [history](../history.tr.md) · [FRD kredi kararı](frd-credit-decision.tr.md) |
+| İlgili | [roadmap](../../roadmap.tr.md) · [history](../../history.tr.md) · [FRD kredi kararı](frd-credit-decision.md) |
 
 ---
 
@@ -152,7 +152,7 @@ Durum: **Yapıldı** | **Kısmi** | **Planlı**
 6. **ApprovalAuthority** açıkken pozisyon limiti aşımı onaylanamaz; BankManager/SuperAdmin (config) muaf.
 7. Kritik yazmalar **Idempotency-Key** ile güvenli tekrar edilir.
 
-Ayrıntılı davranış: [frd-credit-decision.tr.md](frd-credit-decision.tr.md).
+Ayrıntılı davranış: [frd-credit-decision.tr.md](frd-credit-decision.md).
 
 ---
 
