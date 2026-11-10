@@ -8,11 +8,36 @@ import { mapApiError } from '../utils/mapApiError'
 
 const CURRENCIES = ['TRY', 'EUR', 'USD'] as const
 
+type BranchFormState = {
+  code: string
+  name: string
+  city: string
+  isActive: boolean
+  maxApprovalAmount: string
+  maxApprovalCurrencyCode: (typeof CURRENCIES)[number]
+}
+
+const emptyForm = (): BranchFormState => ({
+  code: '',
+  name: '',
+  city: '',
+  isActive: true,
+  maxApprovalAmount: '',
+  maxApprovalCurrencyCode: 'TRY',
+})
+
 function parseOptionalAmount(raw: string): number | null {
   const trimmed = raw.trim()
   if (!trimmed) return null
   const n = Number(trimmed.replace(',', '.'))
   return Number.isFinite(n) && n > 0 ? n : null
+}
+
+function currencyFromItem(item: BranchListItem): (typeof CURRENCIES)[number] {
+  const cc = (item.maxApprovalCurrencyCode || 'TRY').toUpperCase()
+  return (CURRENCIES as readonly string[]).includes(cc)
+    ? (cc as (typeof CURRENCIES)[number])
+    : 'TRY'
 }
 
 export function BranchesPage() {
@@ -22,14 +47,10 @@ export function BranchesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
-  const [form, setForm] = useState({
-    code: '',
-    name: '',
-    city: '',
-    isActive: true,
-    maxApprovalAmount: '',
-    maxApprovalCurrencyCode: 'TRY' as (typeof CURRENCIES)[number],
-  })
+  const [showCreate, setShowCreate] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [savingEdit, setSavingEdit] = useState(false)
+  const [form, setForm] = useState<BranchFormState>(emptyForm)
   const [editing, setEditing] = useState<BranchListItem | null>(null)
   const [editMaxApproval, setEditMaxApproval] = useState('')
   const [editCurrency, setEditCurrency] = useState<(typeof CURRENCIES)[number]>('TRY')
@@ -56,10 +77,43 @@ export function BranchesPage() {
     )
   }
 
+  function openCreate() {
+    setEditing(null)
+    setForm(emptyForm())
+    setError(null)
+    setShowCreate(true)
+  }
+
+  function closeCreate() {
+    if (creating) return
+    setShowCreate(false)
+    setForm(emptyForm())
+  }
+
+  function openEdit(item: BranchListItem) {
+    setShowCreate(false)
+    setError(null)
+    setEditing({ ...item })
+    setEditMaxApproval(
+      item.maxApprovalAmount != null && item.maxApprovalAmount > 0
+        ? String(item.maxApprovalAmount)
+        : '',
+    )
+    setEditCurrency(currencyFromItem(item))
+  }
+
+  function closeEdit() {
+    if (savingEdit) return
+    setEditing(null)
+    setEditMaxApproval('')
+    setEditCurrency('TRY')
+  }
+
   async function onCreate(e: FormEvent) {
     e.preventDefault()
     setError(null)
     setSuccess(null)
+    setCreating(true)
     try {
       const amount = parseOptionalAmount(form.maxApprovalAmount)
       await createBranch({
@@ -70,18 +124,14 @@ export function BranchesPage() {
         maxApprovalAmount: amount,
         maxApprovalCurrencyCode: amount != null ? form.maxApprovalCurrencyCode : null,
       })
-      setForm({
-        code: '',
-        name: '',
-        city: '',
-        isActive: true,
-        maxApprovalAmount: '',
-        maxApprovalCurrencyCode: 'TRY',
-      })
+      setForm(emptyForm())
+      setShowCreate(false)
       setSuccess(t('branches.createSuccess'))
       await load()
     } catch (err) {
       setError(mapApiError(err, t))
+    } finally {
+      setCreating(false)
     }
   }
 
@@ -90,6 +140,7 @@ export function BranchesPage() {
     if (!editing) return
     setError(null)
     setSuccess(null)
+    setSavingEdit(true)
     try {
       const amount = parseOptionalAmount(editMaxApproval)
       await updateBranch({
@@ -108,22 +159,9 @@ export function BranchesPage() {
       await load()
     } catch (err) {
       setError(mapApiError(err, t))
+    } finally {
+      setSavingEdit(false)
     }
-  }
-
-  function startEdit(item: BranchListItem) {
-    setEditing(item)
-    setEditMaxApproval(
-      item.maxApprovalAmount != null && item.maxApprovalAmount > 0
-        ? String(item.maxApprovalAmount)
-        : '',
-    )
-    const cc = (item.maxApprovalCurrencyCode || 'TRY').toUpperCase()
-    setEditCurrency(
-      (CURRENCIES as readonly string[]).includes(cc)
-        ? (cc as (typeof CURRENCIES)[number])
-        : 'TRY',
-    )
   }
 
   function formatCap(value?: number | null, currency?: string | null) {
@@ -133,159 +171,15 @@ export function BranchesPage() {
 
   return (
     <section className="panel">
-      <h1>{t('branches.title')}</h1>
-      <p className="muted">{t('branches.hint')}</p>
-      {error && <p className="error-text">{error}</p>}
-      {success && <p className="success-text">{success}</p>}
-
-      <form className="form inline-form" onSubmit={onCreate}>
-        <h2>{t('branches.newBranch')}</h2>
-        <label>
-          {t('branches.code')}
-          <input
-            value={form.code}
-            onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-            required
-            maxLength={20}
-          />
-        </label>
-        <label>
-          {t('branches.name')}
-          <input
-            value={form.name}
-            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-            required
-            maxLength={150}
-          />
-        </label>
-        <label>
-          {t('branches.city')}
-          <input
-            value={form.city}
-            onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-            maxLength={100}
-          />
-        </label>
-        <label>
-          {t('branches.maxApprovalAmount')}
-          <input
-            type="number"
-            min={0}
-            step="0.01"
-            value={form.maxApprovalAmount}
-            onChange={(e) => setForm((f) => ({ ...f, maxApprovalAmount: e.target.value }))}
-            placeholder={t('branches.maxApprovalPlaceholder')}
-          />
-        </label>
-        <label>
-          {t('branches.currency')}
-          <select
-            value={form.maxApprovalCurrencyCode}
-            onChange={(e) =>
-              setForm((f) => ({
-                ...f,
-                maxApprovalCurrencyCode: e.target.value as (typeof CURRENCIES)[number],
-              }))
-            }
-            disabled={!form.maxApprovalAmount.trim()}
-          >
-            {CURRENCIES.map((c) => (
-              <option key={c} value={c}>
-                {currencySymbol(c)} ({c})
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={form.isActive}
-            onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-          />
-          <span>{t('branches.active')}</span>
-        </label>
-        <button type="submit" className="btn primary">
-          {t('branches.create')}
+      <div className="page-header-row">
+        <h1>{t('branches.title')}</h1>
+        <button type="button" className="btn primary" onClick={openCreate}>
+          {t('branches.newBranch')}
         </button>
-      </form>
-
-      {editing && (
-        <form className="form inline-form" onSubmit={onSaveEdit}>
-          <h2>{t('branches.editBranch')}</h2>
-          <label>
-            {t('branches.code')}
-            <input
-              value={editing.code}
-              onChange={(e) => setEditing({ ...editing, code: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('branches.name')}
-            <input
-              value={editing.name}
-              onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('branches.city')}
-            <input
-              value={editing.city ?? ''}
-              onChange={(e) => setEditing({ ...editing, city: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('branches.maxApprovalAmount')}
-            <input
-              type="number"
-              min={0}
-              step="0.01"
-              value={editMaxApproval}
-              onChange={(e) => setEditMaxApproval(e.target.value)}
-              placeholder={t('branches.maxApprovalPlaceholder')}
-            />
-          </label>
-          <label>
-            {t('branches.currency')}
-            <select
-              value={editCurrency}
-              onChange={(e) => setEditCurrency(e.target.value as (typeof CURRENCIES)[number])}
-              disabled={!editMaxApproval.trim()}
-            >
-              {CURRENCIES.map((c) => (
-                <option key={c} value={c}>
-                  {currencySymbol(c)} ({c})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={editing.isActive}
-              onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
-            />
-            <span>{t('branches.active')}</span>
-          </label>
-          <div className="row-actions">
-            <button type="submit" className="btn primary">
-              {t('common.save')}
-            </button>
-            <button
-              type="button"
-              className="btn ghost"
-              onClick={() => {
-                setEditing(null)
-                setEditMaxApproval('')
-                setEditCurrency('TRY')
-              }}
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
-        </form>
-      )}
+      </div>
+      <p className="muted">{t('branches.hint')}</p>
+      {error && !showCreate && !editing && <p className="error-text">{error}</p>}
+      {success && <p className="success-text">{success}</p>}
 
       {loading ? (
         <p>{t('common.loading')}</p>
@@ -310,7 +204,7 @@ export function BranchesPage() {
                 <td>{formatCap(item.maxApprovalAmount, item.maxApprovalCurrencyCode)}</td>
                 <td>{item.isActive ? t('branches.active') : t('branches.inactive')}</td>
                 <td>
-                  <button type="button" className="btn ghost" onClick={() => startEdit(item)}>
+                  <button type="button" className="btn ghost" onClick={() => openEdit(item)}>
                     {t('common.edit')}
                   </button>
                 </td>
@@ -318,6 +212,177 @@ export function BranchesPage() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {showCreate && (
+        <div
+          className="staff-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="branch-create-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeCreate()
+          }}
+        >
+          <form className="staff-modal-panel form" onSubmit={onCreate}>
+            <h2 id="branch-create-title">{t('branches.newBranch')}</h2>
+            {error && <p className="error-text">{error}</p>}
+            <label>
+              {t('branches.code')}
+              <input
+                value={form.code}
+                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
+                required
+                maxLength={20}
+                autoComplete="off"
+              />
+            </label>
+            <label>
+              {t('branches.name')}
+              <input
+                value={form.name}
+                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                required
+                maxLength={150}
+              />
+            </label>
+            <label>
+              {t('branches.city')}
+              <input
+                value={form.city}
+                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                maxLength={100}
+              />
+            </label>
+            <label>
+              {t('branches.maxApprovalAmount')}
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={form.maxApprovalAmount}
+                onChange={(e) => setForm((f) => ({ ...f, maxApprovalAmount: e.target.value }))}
+                placeholder={t('branches.maxApprovalPlaceholder')}
+              />
+            </label>
+            <label>
+              {t('branches.currency')}
+              <select
+                value={form.maxApprovalCurrencyCode}
+                onChange={(e) =>
+                  setForm((f) => ({
+                    ...f,
+                    maxApprovalCurrencyCode: e.target.value as (typeof CURRENCIES)[number],
+                  }))
+                }
+                disabled={!form.maxApprovalAmount.trim()}
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c} value={c}>
+                    {currencySymbol(c)} ({c})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={form.isActive}
+                onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
+              />
+              <span>{t('branches.active')}</span>
+            </label>
+            <div className="actions-cell">
+              <button type="submit" className="btn success" disabled={creating}>
+                {creating ? t('common.loading') : t('branches.create')}
+              </button>
+              <button type="button" className="btn ghost" onClick={closeCreate} disabled={creating}>
+                {t('common.cancel')}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {editing && (
+        <div
+          className="staff-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="branch-edit-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeEdit()
+          }}
+        >
+          <form className="staff-modal-panel form" onSubmit={onSaveEdit}>
+            <h2 id="branch-edit-title">{t('branches.editBranch')}</h2>
+            {error && <p className="error-text">{error}</p>}
+            <label>
+              {t('branches.code')}
+              <input
+                value={editing.code}
+                onChange={(e) => setEditing({ ...editing, code: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('branches.name')}
+              <input
+                value={editing.name}
+                onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('branches.city')}
+              <input
+                value={editing.city ?? ''}
+                onChange={(e) => setEditing({ ...editing, city: e.target.value })}
+              />
+            </label>
+            <label>
+              {t('branches.maxApprovalAmount')}
+              <input
+                type="number"
+                min={0}
+                step="0.01"
+                value={editMaxApproval}
+                onChange={(e) => setEditMaxApproval(e.target.value)}
+                placeholder={t('branches.maxApprovalPlaceholder')}
+              />
+            </label>
+            <label>
+              {t('branches.currency')}
+              <select
+                value={editCurrency}
+                onChange={(e) => setEditCurrency(e.target.value as (typeof CURRENCIES)[number])}
+                disabled={!editMaxApproval.trim()}
+              >
+                {CURRENCIES.map((c) => (
+                  <option key={c} value={c}>
+                    {currencySymbol(c)} ({c})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                checked={editing.isActive}
+                onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
+              />
+              <span>{t('branches.active')}</span>
+            </label>
+            <div className="actions-cell">
+              <button type="submit" className="btn primary" disabled={savingEdit}>
+                {savingEdit ? t('common.loading') : t('common.save')}
+              </button>
+              <button type="button" className="btn ghost" onClick={closeEdit} disabled={savingEdit}>
+                {t('common.cancel')}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
     </section>
   )
