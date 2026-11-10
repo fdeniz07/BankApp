@@ -1,4 +1,4 @@
-# Portable Accessibility Kit (a11y)
+﻿# Portable Accessibility Kit (a11y)
 
 Framework-light accessibility assistant you can **copy into another SPA** (React preferred for the UI shell; core works without React).
 
@@ -9,8 +9,8 @@ Inspired by commercial widgets (e.g. Eye-Able) but **self-owned lab code** — n
 | File | Role |
 |------|------|
 | `core.ts` | Prefs, localStorage, `applyA11yPrefs`, TTS helpers, `createA11yController` |
-| `a11y-assistant.css` | FAB + panel + `data-a11y-*` visual hooks |
-| `AccessibilityAssistant.tsx` | React dock UI |
+| `a11y-assistant.css` | FAB + panel + white icon tiles + `data-a11y-*` hooks (no panel scrollbars) |
+| `AccessibilityAssistant.tsx` | React dock UI with per-action SVG icons |
 | `index.ts` | Public exports |
 
 ## Features
@@ -105,4 +105,4 @@ Override `--a11y-fab` on `:root` / `[data-theme="dark"]`.
 
 ## BankApp docs
 
-Turkish learning chapter: `docs/learning/34-a11y-portable-kit.tr.md`.
+Turkish learning chapter: `docs/learning/tr/34-a11y-portable-kit.md`.

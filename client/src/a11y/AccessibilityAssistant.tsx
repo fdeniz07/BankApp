@@ -73,16 +73,140 @@ function SvgFilters() {
   )
 }
 
-function IconPerson() {
+function Glyph({ children, size = 18 }: { children: ReactNode; size?: number }) {
   return (
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-      <circle cx="12" cy="5" r="2.2" fill="currentColor" />
-      <path
-        d="M7 9.5h10l-1.2 3.2H8.2L7 9.5zm2.2 4.2h5.6l1.4 6.1h-2.1l-.7-3H10.6l-.7 3H7.8l1.4-6.1z"
-        fill="currentColor"
-      />
+    <svg viewBox="0 0 24 24" width={size} height={size} aria-hidden="true" focusable="false">
+      {children}
     </svg>
   )
+}
+
+const Icons = {
+  person: (
+    <Glyph size={28}>
+      <circle cx="12" cy="5" r="2.4" fill="currentColor" />
+      <path
+        d="M6.5 9.3h11l-1.3 3.4H7.8L6.5 9.3zm2.3 4.4h6.2l1.5 6.4h-2.3l-.75-3.2H10.05l-.75 3.2H7.3l1.5-6.4z"
+        fill="currentColor"
+      />
+    </Glyph>
+  ),
+  sun: (
+    <Glyph>
+      <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path
+        d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.1 5.1l1.6 1.6M17.3 17.3l1.6 1.6M18.9 5.1l-1.6 1.6M6.7 17.3l-1.6 1.6"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </Glyph>
+  ),
+  moon: (
+    <Glyph>
+      <path
+        d="M16.5 3.5a8.5 8.5 0 1 0 4 12.4A7 7 0 1 1 16.5 3.5z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+    </Glyph>
+  ),
+  contrast: (
+    <Glyph>
+      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 4a8 8 0 0 1 0 16V4z" fill="currentColor" />
+    </Glyph>
+  ),
+  blueFilter: (
+    <Glyph>
+      <circle cx="12" cy="12" r="7" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.35" />
+    </Glyph>
+  ),
+  hideImages: (
+    <Glyph>
+      <rect x="3.5" y="5.5" width="17" height="13" rx="2" fill="none" stroke="currentColor" strokeWidth="1.8" />
+      <circle cx="9" cy="10.5" r="1.5" fill="currentColor" />
+      <path d="M4.5 16.5l4.5-4 3.2 2.8 3-3.3 4.3 4.5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
+      <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Glyph>
+  ),
+  underline: (
+    <Glyph>
+      <path d="M7 6v6.5a5 5 0 0 0 10 0V6" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M5.5 19.5h13" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Glyph>
+  ),
+  reduceMotion: (
+    <Glyph>
+      <rect x="7" y="5" width="3.2" height="14" rx="1" fill="currentColor" />
+      <rect x="13.8" y="5" width="3.2" height="14" rx="1" fill="currentColor" />
+    </Glyph>
+  ),
+  colorFilter: (
+    <Glyph>
+      <circle cx="9.5" cy="10" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="14.5" cy="10" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+      <circle cx="12" cy="14.5" r="4.2" fill="none" stroke="currentColor" strokeWidth="1.6" />
+    </Glyph>
+  ),
+  speak: (
+    <Glyph>
+      <path d="M4 10v4h3.2L12 18V6L7.2 10H4z" fill="currentColor" />
+      <path
+        d="M15.2 9.2a3.2 3.2 0 0 1 0 5.6M17.5 7a5.5 5.5 0 0 1 0 10"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+    </Glyph>
+  ),
+  stop: (
+    <Glyph>
+      <rect x="6.5" y="6.5" width="11" height="11" rx="1.5" fill="currentColor" />
+    </Glyph>
+  ),
+  reset: (
+    <Glyph>
+      <path
+        d="M6.2 9.2A7 7 0 1 1 5 12"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <path d="M6.2 5.2v4.2H10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+    </Glyph>
+  ),
+  hide: (
+    <Glyph>
+      <path
+        d="M2.8 12s3.4-6 9.2-6 9.2 6 9.2 6-3.4 6-9.2 6-9.2-6-9.2-6z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+      />
+      <circle cx="12" cy="12" r="2.4" fill="none" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M4 4l16 16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Glyph>
+  ),
+  fontDown: (
+    <Glyph>
+      <path d="M5 17L10 5h2l5 12h-2.2l-1-2.6H8.2L7.2 17H5zM9 12.2h4.2L11.1 7.2 9 12.2z" fill="currentColor" />
+      <path d="M18 15h4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Glyph>
+  ),
+  fontUp: (
+    <Glyph>
+      <path d="M4 17L9.5 4h2L17 17h-2.3l-1.1-2.8H7.4L6.3 17H4zM8.2 12h5.1L10.75 6.4 8.2 12z" fill="currentColor" />
+      <path d="M19 12v6M16 15h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </Glyph>
+  ),
 }
 
 function Row({
@@ -153,7 +277,7 @@ export function AccessibilityAssistant({
           aria-label={labels.toggle}
           title={labels.toggle}
         >
-          <IconPerson />
+          {Icons.person}
         </button>
       </>
     )
@@ -179,14 +303,14 @@ export function AccessibilityAssistant({
 
             <Row
               label={labels.light}
-              icon="Aa"
+              icon={Icons.sun}
               active={prefs.theme === 'light'}
               pressed={prefs.theme === 'light'}
               onClick={() => patch({ theme: 'light' })}
             />
             <Row
               label={labels.dark}
-              icon="Aa"
+              icon={Icons.moon}
               active={prefs.theme === 'dark'}
               pressed={prefs.theme === 'dark'}
               onClick={() => patch({ theme: 'dark' })}
@@ -195,83 +319,89 @@ export function AccessibilityAssistant({
             <div className="a11y-font-row">
               <button
                 type="button"
-                className="a11y-item"
+                className="a11y-item a11y-font-btn"
                 onClick={() => patch({ fontScale: bumpFontScale(prefs.fontScale, -1) })}
                 disabled={prefs.fontScale === 100}
                 aria-label={labels.fontDown}
               >
-                A−
+                <span className="a11y-item-icon">{Icons.fontDown}</span>
               </button>
               <span className="a11y-item-meta" aria-live="polite">
                 {prefs.fontScale}%
               </span>
               <button
                 type="button"
-                className="a11y-item"
+                className="a11y-item a11y-font-btn"
                 onClick={() => patch({ fontScale: bumpFontScale(prefs.fontScale, 1) })}
                 disabled={prefs.fontScale === 160}
                 aria-label={labels.fontUp}
               >
-                A+
+                <span className="a11y-item-icon">{Icons.fontUp}</span>
               </button>
             </div>
 
             <Row
               label={labels.contrast}
-              icon="C"
+              icon={Icons.contrast}
               active={prefs.contrast}
               pressed={prefs.contrast}
               onClick={() => patch({ contrast: !prefs.contrast })}
             />
             <Row
               label={labels.blueFilter}
-              icon="BF"
+              icon={Icons.blueFilter}
               active={prefs.blueFilter}
               pressed={prefs.blueFilter}
               onClick={() => patch({ blueFilter: !prefs.blueFilter })}
             />
             <Row
               label={labels.hideImages}
-              icon="IMG"
+              icon={Icons.hideImages}
               active={prefs.hideImages}
               pressed={prefs.hideImages}
               onClick={() => patch({ hideImages: !prefs.hideImages })}
             />
             <Row
               label={labels.underlineLinks}
-              icon="U"
+              icon={Icons.underline}
               active={prefs.underlineLinks}
               pressed={prefs.underlineLinks}
               onClick={() => patch({ underlineLinks: !prefs.underlineLinks })}
             />
             <Row
               label={labels.reduceMotion}
-              icon="RM"
+              icon={Icons.reduceMotion}
               active={prefs.reduceMotion}
               pressed={prefs.reduceMotion}
               onClick={() => patch({ reduceMotion: !prefs.reduceMotion })}
             />
 
-            <label className="a11y-item-label" style={{ padding: '0.25rem 0.5rem', opacity: 0.85 }}>
-              {labels.colorFilter}
-            </label>
-            <select
-              className="a11y-select"
-              value={prefs.colorFilter}
-              onChange={(e) => patch({ colorFilter: e.target.value as A11yColorFilter })}
-              aria-label={labels.colorFilter}
-            >
-              <option value="none">{labels.colorNone}</option>
-              <option value="protanopia">{labels.colorProtanopia}</option>
-              <option value="deuteranopia">{labels.colorDeuteranopia}</option>
-              <option value="tritanopia">{labels.colorTritanopia}</option>
-            </select>
+            <div className="a11y-color-row">
+              <span className="a11y-item-icon" aria-hidden="true">
+                {Icons.colorFilter}
+              </span>
+              <label className="a11y-color-label" htmlFor="a11y-color-filter">
+                {labels.colorFilter}
+              </label>
+              <select
+                id="a11y-color-filter"
+                className="a11y-select"
+                value={prefs.colorFilter}
+                onChange={(e) => patch({ colorFilter: e.target.value as A11yColorFilter })}
+                aria-label={labels.colorFilter}
+              >
+                <option value="none">{labels.colorNone}</option>
+                <option value="protanopia">{labels.colorProtanopia}</option>
+                <option value="deuteranopia">{labels.colorDeuteranopia}</option>
+                <option value="tritanopia">{labels.colorTritanopia}</option>
+              </select>
+            </div>
 
-            <Row label={labels.speak} icon="TTS" onClick={() => speakPageText(speechLang)} />
-            <Row label={labels.stopSpeak} icon="STOP" onClick={() => stopSpeaking()} />
+            <Row label={labels.speak} icon={Icons.speak} onClick={() => speakPageText(speechLang)} />
+            <Row label={labels.stopSpeak} icon={Icons.stop} onClick={() => stopSpeaking()} />
             <Row
               label={labels.reset}
-              icon="RST"
+              icon={Icons.reset}
               onClick={() => {
                 stopSpeaking()
                 controller.reset()
@@ -280,7 +410,7 @@ export function AccessibilityAssistant({
             />
             <Row
               label={labels.hideAssistant}
-              icon="HID"
+              icon={Icons.hide}
               onClick={() => patch({ assistantHidden: true, panelOpen: false })}
             />
           </div>
@@ -294,7 +424,7 @@ export function AccessibilityAssistant({
           aria-label={labels.toggle}
           title={labels.toggle}
         >
-          <IconPerson />
+          {Icons.person}
         </button>
       </div>
     </>
