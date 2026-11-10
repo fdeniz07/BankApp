@@ -140,6 +140,8 @@
     "hintSuperAdmin": "SuperAdmin: superadmin@bank.local",
     "hintCustomer": "Müşteri: customer.tr@ · customer.de@ · customer.en@bank.local",
     "hintKeycloak": "Keycloak ile giriş (lab): staff.tr@ / manager.tr@ / customer.tr@ / superadmin@ — aynı Demo123!",
+    "labTitle": "Demo hesaplar (lab)",
+    "labEmails": "E-posta listesi",
     "demoFill": "Formu doldur",
     "demoStaff": "Personel",
     "demoManager": "Yönetici",

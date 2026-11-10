@@ -140,6 +140,8 @@
     "hintSuperAdmin": "SuperAdmin: superadmin@bank.local",
     "hintCustomer": "Customer: customer.tr@ · customer.de@ · customer.en@bank.local",
     "hintKeycloak": "Keycloak sign-in (lab): staff.tr@ / manager.tr@ / customer.tr@ / superadmin@ — same Demo123!",
+    "labTitle": "Demo accounts (lab)",
+    "labEmails": "Email list",
     "demoFill": "Fill form",
     "demoStaff": "Staff",
     "demoManager": "Manager",

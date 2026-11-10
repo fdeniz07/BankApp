@@ -379,25 +379,55 @@ h2 {
   min-height: 100vh;
   display: grid;
   place-items: center;
-  padding: 1.5rem;
+  padding: 1rem;
+  box-sizing: border-box;
 }
 
+/* Narrow card for register / confirm / Keycloak callback */
 .login-card {
   width: min(420px, 100%);
   background: var(--surface);
   border: 1px solid var(--line);
   box-shadow: var(--shadow);
   padding: 1.5rem;
+  box-sizing: border-box;
+}
+
+.login-shell {
+  width: min(960px, 100%);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 1.35rem 1.5rem;
+  box-sizing: border-box;
 }
 
 .login-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
 }
 
 .login-header h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2.5vw, 1.75rem);
+}
+
+.login-body {
+  display: grid;
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.login-main h2 {
+  margin: 0 0 0.35rem;
+}
+
+.login-main .muted {
   margin: 0;
 }
 
@@ -420,6 +450,119 @@ h2 {
 
 .login-keycloak-btn {
   width: 100%;
+}
+
+.register-footer {
+  margin: 1rem 0 0;
+}
+
+.login-aside {
+  min-width: 0;
+}
+
+.login-lab-panel {
+  border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface) 88%, var(--ink) 12%);
+  padding: 0.65rem 0.85rem 0.85rem;
+}
+
+.login-lab-summary {
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+  padding: 0.35rem 0;
+}
+
+.login-lab-summary::-webkit-details-marker {
+  display: none;
+}
+
+.login-lab-summary::before {
+  content: '▸ ';
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.login-lab-panel[open] > .login-lab-summary::before {
+  transform: rotate(90deg);
+}
+
+.login-lab-body {
+  margin-top: 0.55rem;
+}
+
+.login-hint-details {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+}
+
+.login-hint-details summary {
+  cursor: pointer;
+  color: var(--muted);
+}
+
+.login-hint-list {
+  margin-top: 0.45rem;
+  display: grid;
+  gap: 0.3rem;
+}
+
+.login-hint-list p {
+  margin: 0;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .login-page {
+    padding: 1.75rem;
+  }
+
+  .login-shell {
+    padding: 1.5rem 1.75rem 1.75rem;
+  }
+
+  .login-body {
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: 1.75rem;
+  }
+
+  .login-lab-panel {
+    position: sticky;
+    top: 1rem;
+    padding: 1rem 1.1rem 1.15rem;
+  }
+
+  /* Desktop: lab panel stays open; summary is decorative heading */
+  .login-lab-summary {
+    pointer-events: none;
+  }
+
+  .login-lab-summary::before {
+    content: none;
+  }
+}
+
+@media (max-width: 479px) {
+  .login-page {
+    padding: 0.65rem;
+    place-items: stretch;
+  }
+
+  .login-shell {
+    border-left: none;
+    border-right: none;
+    box-shadow: none;
+    min-height: 100vh;
+  }
+
+  .login-demo-grid {
+    gap: 0.35rem;
+  }
+
+  .login-demo-chip {
+    flex: 1 1 calc(50% - 0.35rem);
+    text-align: center;
+  }
 }
 
 .form label {
@@ -558,34 +701,25 @@ a.btn:hover {
   box-shadow: 0 5px 16px rgba(44, 69, 102, 0.4);
 }
 
-.hints {
-  margin-top: 1.25rem;
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-.hints p {
-  margin: 0.25rem 0;
-}
-
 .login-demo-password {
   font-weight: 600;
   color: var(--text);
+  margin: 0 0 0.35rem;
 }
 
 .login-demo-caption {
-  margin-top: 0.75rem !important;
+  margin: 0 0 0.45rem !important;
 }
 
 .login-demo-grid {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin: 0.4rem 0 0.75rem;
+  margin: 0.15rem 0 0.35rem;
 }
 
 .login-demo-chip {
-  padding: 0.25rem 0.55rem;
+  padding: 0.35rem 0.55rem;
   font-size: 0.78rem;
 }
 

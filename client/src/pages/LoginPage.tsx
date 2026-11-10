@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/AuthContext'
@@ -15,6 +15,7 @@ function isManagerUser(): boolean {
 /** Unified lab password — matches IdentitySeed / BranchLocaleMap.DemoPassword */
 const DEMO_PASSWORD = 'Demo123!'
 const DEFAULT_EMAIL = 'staff.tr@bank.local'
+const DESKTOP_MQ = '(min-width: 768px)'
 
 const DEMO_ACCOUNTS = [
   { role: 'staff' as const, locale: 'IST', email: 'staff.tr@bank.local' },
@@ -43,6 +44,17 @@ export function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [keycloakLoading, setKeycloakLoading] = useState(false)
+  const [labOpen, setLabOpen] = useState(() =>
+    typeof window !== 'undefined' ? window.matchMedia(DESKTOP_MQ).matches : true,
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP_MQ)
+    const sync = () => setLabOpen(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   if (isAuthenticated) return <Navigate to={homePath(isManager)} replace />
 
@@ -73,104 +85,128 @@ export function LoginPage() {
     return t('login.demoCustomer')
   }
 
-  return (
-    <div className="login-page">
-      <div className="login-card">
-        <div className="login-header">
-          <h1>{t('appName')}</h1>
-          <LanguageSwitcher />
-        </div>
-        <h2>{t('login.title')}</h2>
-        <p className="muted">{t('login.subtitle')}</p>
-        <form onSubmit={onSubmit} className="form">
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="username"
-            />
-          </label>
-          <label>
-            {t('login.password')}
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
-          </label>
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={rememberMe}
-              onChange={(e) => setRememberMe(e.target.checked)}
-            />
-            <span>{t('login.rememberMe')}</span>
-          </label>
-          {error && <p className="error-text">{error}</p>}
-          <button type="submit" className="btn primary" disabled={loading || keycloakLoading}>
-            {loading ? t('common.loading') : t('login.submit')}
+  const labPanel = (
+    <>
+      <p className="login-demo-password">{t('login.hintPassword')}</p>
+      <p className="login-demo-caption muted">{t('login.demoFill')}</p>
+      <div className="login-demo-grid" role="group" aria-label={t('login.demoFill')}>
+        {DEMO_ACCOUNTS.map((account) => (
+          <button
+            key={account.email}
+            type="button"
+            className="btn ghost login-demo-chip"
+            onClick={() => fillDemo(account.email)}
+            title={account.email}
+          >
+            {roleLabel(account.role)} {account.locale}
           </button>
-        </form>
-        {keycloakEnabled && (
-          <div className="login-keycloak">
-            <p className="muted login-or">{t('login.or')}</p>
-            <button
-              type="button"
-              className="btn ghost login-keycloak-btn"
-              disabled={loading || keycloakLoading}
-              onClick={async () => {
-                setError(null)
-                setKeycloakLoading(true)
-                try {
-                  await loginWithKeycloak()
-                } catch {
-                  setError(t('login.keycloakError'))
-                  setKeycloakLoading(false)
-                }
-              }}
-            >
-              {keycloakLoading ? t('common.loading') : t('login.keycloak')}
-            </button>
-          </div>
-        )}
-        <p className="muted register-footer">
-          {t('login.noAccount')}{' '}
-          <Link to="/register">{t('login.goRegister')}</Link>
-        </p>
-        <div className="hints">
-          <p className="login-demo-password">{t('login.hintPassword')}</p>
-          <p className="login-demo-caption">{t('login.demoFill')}</p>
-          <div className="login-demo-grid" role="group" aria-label={t('login.demoFill')}>
-            {DEMO_ACCOUNTS.map((account) => (
-              <button
-                key={account.email}
-                type="button"
-                className="btn ghost login-demo-chip"
-                onClick={() => fillDemo(account.email)}
-                title={account.email}
-              >
-                {roleLabel(account.role)} {account.locale}
-              </button>
-            ))}
-            <button
-              type="button"
-              className="btn ghost login-demo-chip"
-              onClick={() => fillDemo('superadmin@bank.local')}
-              title="superadmin@bank.local"
-            >
-              SuperAdmin
-            </button>
-          </div>
+        ))}
+        <button
+          type="button"
+          className="btn ghost login-demo-chip"
+          onClick={() => fillDemo('superadmin@bank.local')}
+          title="superadmin@bank.local"
+        >
+          SuperAdmin
+        </button>
+      </div>
+      <details className="login-hint-details">
+        <summary>{t('login.labEmails')}</summary>
+        <div className="login-hint-list">
           <p>{t('login.hintStaff')}</p>
           <p>{t('login.hintManager')}</p>
           <p>{t('login.hintCustomer')}</p>
           <p>{t('login.hintSuperAdmin')}</p>
           {keycloakEnabled && <p>{t('login.hintKeycloak')}</p>}
+        </div>
+      </details>
+    </>
+  )
+
+  return (
+    <div className="login-page">
+      <div className="login-shell">
+        <div className="login-header">
+          <h1>{t('appName')}</h1>
+          <LanguageSwitcher />
+        </div>
+
+        <div className="login-body">
+          <section className="login-main" aria-labelledby="login-heading">
+            <h2 id="login-heading">{t('login.title')}</h2>
+            <p className="muted">{t('login.subtitle')}</p>
+            <form onSubmit={onSubmit} className="form">
+              <label>
+                {t('login.email')}
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="username"
+                />
+              </label>
+              <label>
+                {t('login.password')}
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+              </label>
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                <span>{t('login.rememberMe')}</span>
+              </label>
+              {error && <p className="error-text">{error}</p>}
+              <button type="submit" className="btn primary" disabled={loading || keycloakLoading}>
+                {loading ? t('common.loading') : t('login.submit')}
+              </button>
+            </form>
+            {keycloakEnabled && (
+              <div className="login-keycloak">
+                <p className="muted login-or">{t('login.or')}</p>
+                <button
+                  type="button"
+                  className="btn ghost login-keycloak-btn"
+                  disabled={loading || keycloakLoading}
+                  onClick={async () => {
+                    setError(null)
+                    setKeycloakLoading(true)
+                    try {
+                      await loginWithKeycloak()
+                    } catch {
+                      setError(t('login.keycloakError'))
+                      setKeycloakLoading(false)
+                    }
+                  }}
+                >
+                  {keycloakLoading ? t('common.loading') : t('login.keycloak')}
+                </button>
+              </div>
+            )}
+            <p className="muted register-footer">
+              {t('login.noAccount')}{' '}
+              <Link to="/register">{t('login.goRegister')}</Link>
+            </p>
+          </section>
+
+          <aside className="login-aside" aria-label={t('login.labTitle')}>
+            <details
+              className="login-lab-panel"
+              open={labOpen}
+              onToggle={(e) => setLabOpen((e.target as HTMLDetailsElement).open)}
+            >
+              <summary className="login-lab-summary">{t('login.labTitle')}</summary>
+              <div className="login-lab-body">{labPanel}</div>
+            </details>
+          </aside>
         </div>
       </div>
     </div>
