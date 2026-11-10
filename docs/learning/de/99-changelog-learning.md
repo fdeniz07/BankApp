@@ -19,5 +19,6 @@ Neue / aktualisierte Kapitel chronologisch. Datumsquelle oft der TR-Changelog; E
 | 2026-11-10 | Kapitel `26`: Pending-Löschen + Vorschau (TR/EN/DE) |
 | 2026-11-10 | Kapitel `28`: Manager-Personal-UI nur eigene Filiale; Navbar-Filial-Chip (TR/EN/DE) |
 | 2026-11-10 | Screenshot-Galerien + README: neue Aufnahmen (SuperAdmin/Keycloak/Kibana/Redis); kaputte Pfade behoben; Learning `06`/`08`/`18`/`28`/`31`–`33` |
+| 2026-11-10 | Eingebettete Screenshots: `07` Seq, `18` Prom/Grafana, `22`/`29` Briefvorlage, `31` Kibana, `34` a11y (TR/EN/DE) |
 
 Vollständige TR-Historie: [99-changelog-learning.md](../tr/99-changelog-learning.md)

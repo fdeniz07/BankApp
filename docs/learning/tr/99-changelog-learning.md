@@ -58,3 +58,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-10 | `26` evrak: Pending silme + önizleme + UI hizalama notları (TR/EN/DE) |
 | 2026-11-10 | `28`: Manager personel UI yalnız kendi şube; navbar şube chip (TR/EN/DE) |
 | 2026-11-10 | Screenshot galerileri + README: yeni yakalar (SuperAdmin/Keycloak/Kibana/Redis); kırık yollar düzeltildi; learning `06`/`08`/`18`/`28`/`31`–`33` |
+| 2026-11-10 | Learning gömülü ekranlar: `07` Seq, `18` Prom/Grafana, `22`/`29` mektup kalıbı, `31` Kibana, `34` a11y (TR/EN/DE) |

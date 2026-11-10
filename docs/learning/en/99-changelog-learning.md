@@ -19,5 +19,6 @@ New / updated chapters are listed chronologically. Source of truth for dates is 
 | 2026-11-10 | Chapter `26`: Pending document delete + preview notes (TR/EN/DE) |
 | 2026-11-10 | Chapter `28`: Manager staff UI own-branch only; navbar branch chip (TR/EN/DE) |
 | 2026-11-10 | Screenshot galleries + README: new captures (SuperAdmin/Keycloak/Kibana/Redis); fixed broken paths; learning `06`/`08`/`18`/`28`/`31`–`33` |
+| 2026-11-10 | Embedded screenshots in learning: `07` Seq, `18` Prom/Grafana, `22`/`29` letter template, `31` Kibana, `34` a11y (TR/EN/DE) |
 
 Full TR history: [99-changelog-learning.md](../tr/99-changelog-learning.md)
