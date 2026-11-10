@@ -132,7 +132,9 @@ infra/README.md
 Exception → LoggingBehavior / middleware → Serilog → event list in Seq UI.  
 With OTel on, the same request’s TraceId matches in Grafana + Seq.
 
-Screenshot: [`Logs on Seq.png`](../../assets/screenshots/en/Logs%20on%20Seq.png)
+Screen (Seq Events — structured log list):
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq logs UI" width="720" />
 
 ## Beginner lab
 

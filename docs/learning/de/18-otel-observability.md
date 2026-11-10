@@ -94,11 +94,19 @@ docs/assets/screenshots/en/Metrics on Grafana.png
 docs/assets/screenshots/en/Metrics on Grafana - 2.png
 ```
 
-Screenshots: [`Metrics on Grafana.png`](../../assets/screenshots/en/Metrics%20on%20Grafana.png) · [`Metrics on Grafana - 2.png`](../../assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png)
-
 ## Mini-Ablauf
 
 HTTP-Request → AspNetCore-Instrumentation-Span → OTLP Collector → Tempo/Prometheus → Grafiken in Grafana.
+
+Prometheus (Scrape-Ziele):
+
+<img src="../../assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus-Metriken" width="720" />
+
+Grafana-Dashboard:
+
+<img src="../../assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana-Metrikpanel" width="720" />
+
+<img src="../../assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png" alt="Grafana weiteres Panel" width="720" />
 
 ## Einsteiger-Lab
 

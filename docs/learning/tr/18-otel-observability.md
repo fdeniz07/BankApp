@@ -97,11 +97,19 @@ docs/assets/screenshots/en/Metrics on Grafana.png
 docs/assets/screenshots/en/Metrics on Grafana - 2.png
 ```
 
-Ekran: [`Metrics on Grafana.png`](../../assets/screenshots/en/Metrics%20on%20Grafana.png) · [`Metrics on Grafana - 2.png`](../../assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png)
-
 ## Mini akış
 
 HTTP istek → AspNetCore instrumentation span → OTLP collector → Tempo/Prometheus → Grafana’da grafik.
+
+Prometheus (hedef scrape):
+
+<img src="../../assets/screenshots/en/Metrics%20on%20Prometheus.png" alt="Prometheus metrikleri" width="720" />
+
+Grafana dashboard:
+
+<img src="../../assets/screenshots/en/Metrics%20on%20Grafana.png" alt="Grafana metrik paneli" width="720" />
+
+<img src="../../assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png" alt="Grafana ek panel" width="720" />
 
 ## Yeni başlayan lab
 

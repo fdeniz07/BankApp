@@ -132,7 +132,9 @@ infra/README.md
 Exception → LoggingBehavior / middleware → Serilog → Seq UI’da event listesi.  
 OTel açıksa aynı isteğin TraceId’si Grafana + Seq’te eşleşir.
 
-Ekran örneği: [`Logs on Seq.png`](../../assets/screenshots/en/Logs%20on%20Seq.png)
+Ekran (Seq Events — yapısal log listesi):
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq log ekranı" width="720" />
 
 ## Yeni başlayan lab
 

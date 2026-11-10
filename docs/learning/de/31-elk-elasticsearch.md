@@ -130,7 +130,9 @@ Browser: http://localhost:5601
 3. Zweite Data View: `bankapp-credit-applications`
 4. Lens / Dashboard: Torten-/Balkendiagramm nach `status` (Zeitraum: Last 1 year)
 
-Screenshot: [`Results from ElasticSearch on Kibana.png`](../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png)
+Bildschirm (Kibana — Antragsstatus / Discover):
+
+<img src="../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png" alt="Kibana Elasticsearch-Ergebnisse" width="720" />
 
 ### WebApi + Suche
 

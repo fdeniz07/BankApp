@@ -135,7 +135,9 @@ Browser: http://localhost:5601
 3. Second data view: `bankapp-credit-applications` (product search index)
 4. Lens / Dashboard: pie or bar by `status` (time range: Last 1 year)
 
-Screenshot: [`Results from ElasticSearch on Kibana.png`](../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png)
+Screen (Kibana — application status chart / Discover):
+
+<img src="../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png" alt="Kibana Elasticsearch results" width="720" />
 
 ### WebApi + search
 

@@ -136,7 +136,9 @@ Tarayıcı: http://localhost:5601
 3. İkinci data view: `bankapp-credit-applications` (ürün araması index’i)  
 4. Lens / Dashboard: `status` alanına göre pasta/çubuk (zaman aralığı: Last 1 year)
 
-Ekran örneği: [`Results from ElasticSearch on Kibana.png`](../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png)
+Ekran (Kibana — başvuru status dağılımı / Discover):
+
+<img src="../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png" alt="Kibana Elasticsearch sonuçları" width="720" />
 
 ### WebApi + arama
 
