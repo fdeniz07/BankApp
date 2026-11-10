@@ -9,5 +9,6 @@ public static class CreditApplicationDocumentMessages
     public const string InvalidContent = "Document content does not match the declared type.";
     public const string InvalidDocumentType = "Document type is invalid.";
     public const string OnlyPendingCanUpload = "Documents can only be uploaded while the application is Pending.";
+    public const string OnlyPendingCanDelete = "Documents can only be deleted while the application is Pending.";
     public const string MaxDocumentsExceeded = "At most 10 documents are allowed per application.";
 }

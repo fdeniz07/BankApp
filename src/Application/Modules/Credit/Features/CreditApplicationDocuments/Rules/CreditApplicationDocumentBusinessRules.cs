@@ -75,6 +75,14 @@ public class CreditApplicationDocumentBusinessRules : BaseBusinessRules
         return Task.CompletedTask;
     }
 
+    public Task ApplicationShouldBePendingForDelete(CreditApplication application)
+    {
+        if (application.Status != CreditApplicationStatus.Pending)
+            throw new BusinessException(CreditApplicationDocumentMessages.OnlyPendingCanDelete);
+
+        return Task.CompletedTask;
+    }
+
     public async Task ApplicationShouldNotExceedDocumentLimit(Guid applicationId)
     {
         int count = await _documentRepository.CountAsync(d => d.CreditApplicationId == applicationId && !d.IsDeleted);

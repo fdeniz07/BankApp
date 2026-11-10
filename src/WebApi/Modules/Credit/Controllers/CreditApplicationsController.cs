@@ -1,3 +1,4 @@
+using Application.Modules.Credit.Features.CreditApplicationDocuments.Commands.Delete;
 using Application.Modules.Credit.Features.CreditApplicationDocuments.Commands.Upload;
 using Application.Modules.Credit.Features.CreditApplicationDocuments.Queries.Download;
 using Application.Modules.Credit.Features.CreditApplicationDocuments.Queries.GetList;
@@ -194,6 +195,21 @@ public class CreditApplicationsController : BaseController
                 DocumentId = documentId
             });
         return File(file.Content, file.ContentType, file.FileName);
+    }
+
+    [HttpDelete("{id}/documents/{documentId}")]
+    [EnableRateLimiting(RateLimitPolicies.Write)]
+    public async Task<IActionResult> DeleteDocument(
+        [FromRoute] Guid id,
+        [FromRoute] Guid documentId)
+    {
+        DeleteCreditApplicationDocumentResponse response = await Mediator.Send(
+            new DeleteCreditApplicationDocumentRequest
+            {
+                CreditApplicationId = id,
+                DocumentId = documentId
+            });
+        return Ok(response);
     }
 
     [HttpPost]

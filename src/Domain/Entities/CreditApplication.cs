@@ -125,6 +125,17 @@ public class CreditApplication : AggregateRoot
             DateTimeOffset.UtcNow));
     }
 
+    /// <summary>Raises realtime/outbox event after a document is removed while Pending.</summary>
+    public void RecordDocumentDeleted(string documentType)
+    {
+        Raise(new CreditApplicationDocumentDeleted(
+            Id,
+            ApplicationNumber,
+            CustomerId,
+            documentType,
+            DateTimeOffset.UtcNow));
+    }
+
     private static string? TrimTemplate(string? name)
     {
         if (string.IsNullOrWhiteSpace(name))
