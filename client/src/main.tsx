@@ -8,16 +8,10 @@ import './styles/tailwind.css'
 import './index.css'
 import 'react-toastify/dist/ReactToastify.css'
 import App from './App.tsx'
+import { applyA11yPrefs, BANKAPP_A11Y_KEYS, readA11yPrefs } from './a11y'
 
 ;(() => {
-  const root = document.documentElement
-  const theme = localStorage.getItem('bankapp-theme') === 'dark' ? 'dark' : 'light'
-  const contrast = localStorage.getItem('bankapp-contrast') === '1' ? 'high' : 'normal'
-  const font = Number(localStorage.getItem('bankapp-font-scale') ?? '100')
-  const scale = font === 112 || font === 125 || font === 140 ? font / 100 : 1
-  root.setAttribute('data-theme', theme)
-  root.setAttribute('data-contrast', contrast)
-  root.style.setProperty('--font-scale', String(scale))
+  applyA11yPrefs(readA11yPrefs(BANKAPP_A11Y_KEYS))
 })()
 
 createRoot(document.getElementById('root')!).render(
