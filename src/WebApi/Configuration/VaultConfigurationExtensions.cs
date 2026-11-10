@@ -1,16 +1,23 @@
 using System.Net.Http.Headers;
+using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace WebApi.Configuration;
 
 /// <summary>
-/// Lab: optionally overlay TokenOptions:SecurityKey from Vault KV v2 (secret/bankapp).
-/// On failure, keeps existing configuration (Compose /.env fallback).
+/// Lab/prod-shaped: AppRole login + KV v2 reads for JWT / database / messaging.
+/// Overlays TokenOptions, ConnectionStrings password, and RabbitMq credentials.
+/// Observability secrets stay out of the WebApi policy (not read here).
 /// </summary>
 public static class VaultConfigurationExtensions
 {
+    private static readonly Regex PasswordInConnectionString = new(
+        @"(?i)(Password|Pwd)\s*=\s*([^;]*)",
+        RegexOptions.Compiled);
+
     public static async Task ApplyVaultSecretsAsync(
         this ConfigurationManager configuration,
         CancellationToken cancellationToken = default)
@@ -24,73 +31,320 @@ public static class VaultConfigurationExtensions
             return;
         }
 
-        if (string.IsNullOrWhiteSpace(vault.Address) || string.IsNullOrWhiteSpace(vault.Token))
+        try
         {
-            Log.Warning("Vault enabled but Address/Token missing; keeping existing TokenOptions.");
+            await ApplyVaultSecretsCoreAsync(configuration, vault, cancellationToken);
+        }
+        catch (Exception ex) when (ex is not VaultFailClosedException)
+        {
+            if (vault.FailClosed)
+            {
+                Log.Error(ex, "Vault overlay failed and FailClosed=true; aborting startup.");
+                throw new VaultFailClosedException("Vault secret overlay failed (FailClosed=true).", ex);
+            }
+
+            Log.Warning(ex, "Vault unreachable or login failed; keeping existing configuration.");
+        }
+    }
+
+    private static async Task ApplyVaultSecretsCoreAsync(
+        ConfigurationManager configuration,
+        VaultOptions vault,
+        CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(vault.Address))
+        {
+            FailOrWarn(vault, "Vault enabled but Address missing.");
+            return;
+        }
+
+        string? clientToken = await ResolveClientTokenAsync(vault, cancellationToken);
+        if (string.IsNullOrWhiteSpace(clientToken))
+        {
+            FailOrWarn(vault, "Vault enabled but AppRole/Token credentials missing or login failed.");
             return;
         }
 
         string mount = vault.MountPath.Trim('/');
-        string path = vault.SecretPath.Trim('/');
-        string url = $"{vault.Address.TrimEnd('/')}/v1/{mount}/data/{path}";
+        string jwtPath = FirstNonEmpty(vault.JwtSecretPath, vault.SecretPath, "bankapp/jwt");
+        string databasePath = vault.DatabaseSecretPath.Trim('/');
+        string messagingPath = vault.MessagingSecretPath.Trim('/');
+
+        Dictionary<string, string?> overlay = new(StringComparer.OrdinalIgnoreCase);
+
+        JsonElement? jwtData = await ReadKvDataAsync(vault.Address, mount, jwtPath, clientToken, cancellationToken);
+        if (jwtData is null)
+        {
+            FailOrWarn(vault, $"Vault read failed for {mount}/data/{jwtPath}.");
+            return;
+        }
+
+        ApplyJwtOverlay(jwtData.Value, overlay);
+        if (!overlay.ContainsKey("TokenOptions:SecurityKey"))
+        {
+            FailOrWarn(vault, $"Vault path {jwtPath} has no jwt_security_key.");
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(databasePath))
+        {
+            JsonElement? dbData = await ReadKvDataAsync(
+                vault.Address, mount, databasePath, clientToken, cancellationToken);
+            if (dbData is null)
+            {
+                FailOrWarn(vault, $"Vault read failed for {mount}/data/{databasePath}.");
+                return;
+            }
+
+            ApplyDatabaseOverlay(configuration, dbData.Value, overlay);
+        }
+
+        if (!string.IsNullOrWhiteSpace(messagingPath))
+        {
+            JsonElement? mqData = await ReadKvDataAsync(
+                vault.Address, mount, messagingPath, clientToken, cancellationToken);
+            if (mqData is null)
+            {
+                FailOrWarn(vault, $"Vault read failed for {mount}/data/{messagingPath}.");
+                return;
+            }
+
+            ApplyMessagingOverlay(mqData.Value, overlay);
+        }
+
+        configuration.AddInMemoryCollection(overlay!);
+
+        Log.Information(
+            "Vault overlay applied via AppRole/token (JWT{Previous}, SQL password patch={Sql}, RabbitMq={Mq}).",
+            overlay.ContainsKey("TokenOptions:SecurityKeyPrevious") ? " + Previous" : string.Empty,
+            overlay.ContainsKey("ConnectionStrings:BankingConnectionString"),
+            overlay.ContainsKey("RabbitMq:Password") || overlay.ContainsKey("RabbitMq:UserName"));
+    }
+
+    private static void FailOrWarn(VaultOptions vault, string message)
+    {
+        if (vault.FailClosed)
+            throw new VaultFailClosedException(message);
+
+        Log.Warning("{Message} Keeping existing configuration.", message);
+    }
+
+    private static async Task<string?> ResolveClientTokenAsync(
+        VaultOptions vault,
+        CancellationToken cancellationToken)
+    {
+        string roleId = ReadCredential(vault.RoleId, vault.RoleIdFile);
+        string secretId = ReadCredential(vault.SecretId, vault.SecretIdFile);
+
+        if (!string.IsNullOrWhiteSpace(roleId) && !string.IsNullOrWhiteSpace(secretId))
+        {
+            string? token = await LoginAppRoleAsync(vault.Address, roleId, secretId, cancellationToken);
+            if (!string.IsNullOrWhiteSpace(token))
+                return token;
+
+            Log.Warning("Vault AppRole login failed.");
+            return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(vault.Token))
+        {
+            Log.Warning("Vault using static Token (prefer AppRole in Compose lab).");
+            return vault.Token;
+        }
+
+        return null;
+    }
+
+    private static string ReadCredential(string inline, string filePath)
+    {
+        if (!string.IsNullOrWhiteSpace(inline))
+            return inline.Trim();
+
+        if (string.IsNullOrWhiteSpace(filePath))
+            return string.Empty;
 
         try
         {
-            using HttpClient client = new() { Timeout = TimeSpan.FromSeconds(5) };
-            client.DefaultRequestHeaders.Add("X-Vault-Token", vault.Token);
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-            using HttpResponseMessage response = await client.GetAsync(url, cancellationToken);
-            if (!response.IsSuccessStatusCode)
+            if (!File.Exists(filePath))
             {
-                Log.Warning(
-                    "Vault read failed ({StatusCode}) at {Url}; keeping existing TokenOptions.",
-                    (int)response.StatusCode,
-                    url);
-                return;
+                Log.Warning("Vault credential file missing: {Path}", filePath);
+                return string.Empty;
             }
 
-            await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-            using JsonDocument doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
-
-            if (!doc.RootElement.TryGetProperty("data", out JsonElement dataWrapper)
-                || !dataWrapper.TryGetProperty("data", out JsonElement data))
-            {
-                Log.Warning("Vault response missing data.data; keeping existing TokenOptions.");
-                return;
-            }
-
-            Dictionary<string, string?> overlay = new(StringComparer.OrdinalIgnoreCase);
-
-            if (data.TryGetProperty("jwt_security_key", out JsonElement jwtEl))
-            {
-                string? jwtKey = jwtEl.GetString();
-                if (!string.IsNullOrWhiteSpace(jwtKey))
-                    overlay["TokenOptions:SecurityKey"] = jwtKey;
-            }
-
-            if (data.TryGetProperty("jwt_security_key_previous", out JsonElement prevEl))
-            {
-                string? prevKey = prevEl.GetString();
-                if (!string.IsNullOrWhiteSpace(prevKey))
-                    overlay["TokenOptions:SecurityKeyPrevious"] = prevKey;
-            }
-
-            if (overlay.Count == 0)
-            {
-                Log.Warning("Vault secret/bankapp has no jwt_security_key; keeping existing TokenOptions.");
-                return;
-            }
-
-            configuration.AddInMemoryCollection(overlay!);
-            Log.Information(
-                "Vault overlay applied from {Url} (TokenOptions:SecurityKey{Previous}).",
-                url,
-                overlay.ContainsKey("TokenOptions:SecurityKeyPrevious") ? " + Previous" : string.Empty);
+            return File.ReadAllText(filePath).Trim();
         }
         catch (Exception ex)
         {
-            Log.Warning(ex, "Vault unreachable; keeping existing TokenOptions from configuration.");
+            Log.Warning(ex, "Vault credential file unreadable: {Path}", filePath);
+            return string.Empty;
         }
+    }
+
+    private static async Task<string?> LoginAppRoleAsync(
+        string address,
+        string roleId,
+        string secretId,
+        CancellationToken cancellationToken)
+    {
+        string url = $"{address.TrimEnd('/')}/v1/auth/approle/login";
+        using HttpClient client = CreateHttpClient();
+        using StringContent body = new(
+            JsonSerializer.Serialize(new { role_id = roleId, secret_id = secretId }),
+            Encoding.UTF8,
+            "application/json");
+
+        using HttpResponseMessage response = await client.PostAsync(url, body, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            Log.Warning(
+                "Vault AppRole login HTTP {StatusCode} at {Url}",
+                (int)response.StatusCode,
+                url);
+            return null;
+        }
+
+        await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using JsonDocument doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+        if (doc.RootElement.TryGetProperty("auth", out JsonElement auth)
+            && auth.TryGetProperty("client_token", out JsonElement tokenEl))
+        {
+            return tokenEl.GetString();
+        }
+
+        return null;
+    }
+
+    private static async Task<JsonElement?> ReadKvDataAsync(
+        string address,
+        string mount,
+        string secretPath,
+        string clientToken,
+        CancellationToken cancellationToken)
+    {
+        string path = secretPath.Trim('/');
+        string url = $"{address.TrimEnd('/')}/v1/{mount}/data/{path}";
+
+        using HttpClient client = CreateHttpClient();
+        client.DefaultRequestHeaders.Add("X-Vault-Token", clientToken);
+
+        using HttpResponseMessage response = await client.GetAsync(url, cancellationToken);
+        if (!response.IsSuccessStatusCode)
+        {
+            Log.Warning(
+                "Vault KV read failed ({StatusCode}) at {Url}",
+                (int)response.StatusCode,
+                url);
+            return null;
+        }
+
+        await using Stream stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+        using JsonDocument doc = await JsonDocument.ParseAsync(stream, cancellationToken: cancellationToken);
+
+        if (!doc.RootElement.TryGetProperty("data", out JsonElement dataWrapper)
+            || !dataWrapper.TryGetProperty("data", out JsonElement data))
+        {
+            Log.Warning("Vault response missing data.data at {Url}", url);
+            return null;
+        }
+
+        return data.Clone();
+    }
+
+    private static void ApplyJwtOverlay(JsonElement data, Dictionary<string, string?> overlay)
+    {
+        if (data.TryGetProperty("jwt_security_key", out JsonElement jwtEl))
+        {
+            string? jwtKey = jwtEl.GetString();
+            if (!string.IsNullOrWhiteSpace(jwtKey))
+                overlay["TokenOptions:SecurityKey"] = jwtKey;
+        }
+
+        if (data.TryGetProperty("jwt_security_key_previous", out JsonElement prevEl))
+        {
+            string? prevKey = prevEl.GetString();
+            if (!string.IsNullOrWhiteSpace(prevKey))
+                overlay["TokenOptions:SecurityKeyPrevious"] = prevKey;
+        }
+    }
+
+    private static void ApplyDatabaseOverlay(
+        IConfiguration configuration,
+        JsonElement data,
+        Dictionary<string, string?> overlay)
+    {
+        if (!data.TryGetProperty("mssql_sa_password", out JsonElement pwdEl))
+            return;
+
+        string? password = pwdEl.GetString();
+        if (string.IsNullOrWhiteSpace(password))
+            return;
+
+        string? current = configuration.GetConnectionString("BankingConnectionString");
+        if (string.IsNullOrWhiteSpace(current))
+        {
+            Log.Warning("Vault has mssql_sa_password but ConnectionStrings:BankingConnectionString is empty.");
+            return;
+        }
+
+        overlay["ConnectionStrings:BankingConnectionString"] = PatchConnectionStringPassword(current, password);
+    }
+
+    private static void ApplyMessagingOverlay(JsonElement data, Dictionary<string, string?> overlay)
+    {
+        if (data.TryGetProperty("rabbitmq_username", out JsonElement userEl))
+        {
+            string? user = userEl.GetString();
+            if (!string.IsNullOrWhiteSpace(user))
+                overlay["RabbitMq:UserName"] = user;
+        }
+
+        if (data.TryGetProperty("rabbitmq_password", out JsonElement pwdEl))
+        {
+            string? password = pwdEl.GetString();
+            if (!string.IsNullOrWhiteSpace(password))
+                overlay["RabbitMq:Password"] = password;
+        }
+    }
+
+    internal static string PatchConnectionStringPassword(string connectionString, string password)
+    {
+        if (PasswordInConnectionString.IsMatch(connectionString))
+            return PasswordInConnectionString.Replace(connectionString, $"$1={password}");
+
+        string trimmed = connectionString.TrimEnd();
+        if (!trimmed.EndsWith(';'))
+            trimmed += ";";
+        return trimmed + $"Password={password};";
+    }
+
+    private static HttpClient CreateHttpClient()
+    {
+        HttpClient client = new() { Timeout = TimeSpan.FromSeconds(5) };
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        return client;
+    }
+
+    private static string FirstNonEmpty(params string[] values)
+    {
+        foreach (string value in values)
+        {
+            if (!string.IsNullOrWhiteSpace(value))
+                return value.Trim('/');
+        }
+
+        return string.Empty;
+    }
+}
+
+public sealed class VaultFailClosedException : Exception
+{
+    public VaultFailClosedException(string message)
+        : base(message)
+    {
+    }
+
+    public VaultFailClosedException(string message, Exception innerException)
+        : base(message, innerException)
+    {
     }
 }

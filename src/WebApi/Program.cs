@@ -17,7 +17,7 @@ try
     var builder = WebApplication.CreateBuilder(args);
     builder.Host.UseCoreSerilog();
 
-    // Lab: optional JWT key from Vault KV (secret/bankapp); falls back to env/appsettings.
+    // Lab/Compose: AppRole → KV secret/bankapp/{jwt,database,messaging}; FailClosed in Compose.
     await builder.Configuration.ApplyVaultSecretsAsync();
 
     builder.Services.AddWebApiInfrastructure(builder.Configuration);
