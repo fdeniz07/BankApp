@@ -14,6 +14,9 @@ const BRANCH_CLAIM = 'branchId'
 const DISPLAY_NAME_CLAIM = 'displayName'
 const CUSTOMER_CATEGORY_CLAIM = 'customerCategory'
 
+/** Ignore Keycloak realm noise (offline_access, default-roles-*, uma_authorization, …). */
+const APP_ROLES = new Set(['BankStaff', 'BankManager', 'SuperAdmin', 'Customer'])
+
 export type CustomerCategory = 'Individual' | 'Corporate'
 
 export interface AuthUser {
@@ -138,10 +141,17 @@ export function getAuthUser(): AuthUser | null {
   // Local BankApp JWT uses ClaimTypes.Role URI; Keycloak realm mapper emits `role`.
   const roles = [
     ...new Set([...claimValues(payload, ROLE_CLAIM), ...claimValues(payload, 'role')]),
-  ]
+  ].filter((r) => APP_ROLES.has(r))
   const customerId = claimValues(payload, CUSTOMER_CLAIM)[0]
   const branchId = claimValues(payload, BRANCH_CLAIM)[0]
-  const displayName = claimValues(payload, DISPLAY_NAME_CLAIM)[0]
+  const displayName =
+    claimValues(payload, DISPLAY_NAME_CLAIM)[0] ||
+    claimValues(payload, 'name')[0] ||
+    [claimValues(payload, 'given_name')[0], claimValues(payload, 'family_name')[0]]
+      .filter(Boolean)
+      .join(' ')
+      .trim() ||
+    undefined
   const categoryRaw = claimValues(payload, CUSTOMER_CATEGORY_CLAIM)[0]
   const customerCategory =
     categoryRaw === 'Individual' || categoryRaw === 'Corporate' ? categoryRaw : undefined
