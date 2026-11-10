@@ -5,7 +5,7 @@
 **Amaç:** BankApp’i geliştirirken hem ürünü ilerletmek hem de modern bir tech stack’i *neden* kullanıldığını anlayarak öğrenmek.  
 **İlişkili:** [roadmap.tr.md](roadmap.tr.md) · [architecture-notes.tr.md](architecture-notes.tr.md) · [README.tr.md](../README.tr.md)
 
-> **Sıfırdan / komut / sınıf / paket derinliği:** [learning/tr/00-index.md](learning/tr/00-index.md) · [EN](learning/en/00-index.md) · [DE](learning/de/00-index.md) (EN/DE şu an `01`–`09`; sonrası TR).
+> **Sıfırdan / komut / sınıf / paket derinliği:** [learning/tr/00-index.md](learning/tr/00-index.md) · [EN](learning/en/00-index.md) · [DE](learning/de/00-index.md) (üç dilde `01`–`34`; hub: [learning/README.md](learning/README.md)).
 
 Bu belge “ne kurduk?” listesi değil; her madde için **ne / neden burada / avantaj / trade-off / repoda örnek** verir.
 

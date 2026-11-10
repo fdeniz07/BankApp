@@ -5,7 +5,7 @@
 **Goal:** Grow BankApp as a product while learning *why* each piece of the stack exists.  
 **Related:** [roadmap.en.md](roadmap.en.md) · [architecture-notes.en.md](architecture-notes.en.md) · [README.md](../README.md)
 
-> **Beginner deep-dive (commands, classes, packages, build order):** [learning/en/00-index.md](learning/en/00-index.md) (EN chapters 01–09; later chapters still link to TR until mirrored) · [TR index](learning/tr/00-index.md) · [DE index](learning/de/00-index.md).
+> **Beginner deep-dive (commands, classes, packages, build order):** [learning/en/00-index.md](learning/en/00-index.md) · [TR index](learning/tr/00-index.md) · [DE index](learning/de/00-index.md) (full `01`–`34` in all three languages; hub: [learning/README.md](learning/README.md)).
 
 Not a dump of “what we installed” — each item covers **what / why here / benefits / trade-offs / repo example**.
 

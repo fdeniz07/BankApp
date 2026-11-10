@@ -5,7 +5,7 @@
 **Ziel:** BankApp als Produkt weiterbauen und gleichzeitig verstehen, *warum* der Stack so gewählt ist.  
 **Verwandt:** [roadmap.de.md](roadmap.de.md) · [architecture-notes.de.md](architecture-notes.de.md) · [README.de.md](../README.de.md)
 
-> **Einsteiger-Tiefenwissen (Befehle, Klassen, Pakete, Baureihenfolge):** [learning/de/00-index.md](learning/de/00-index.md) (DE-Kapitel 01–09; spätere Kapitel vorerst TR) · [TR-Index](learning/tr/00-index.md) · [EN-Index](learning/en/00-index.md).
+> **Einsteiger-Tiefenwissen (Befehle, Klassen, Pakete, Baureihenfolge):** [learning/de/00-index.md](learning/de/00-index.md) · [TR-Index](learning/tr/00-index.md) · [EN-Index](learning/en/00-index.md) (vollständig `01`–`34` in allen drei Sprachen; Hub: [learning/README.md](learning/README.md)).
 
 Kein Installationskatalog — jeder Punkt: **Was / Warum hier / Vorteil / Trade-off / Repo-Beispiel**.
 
