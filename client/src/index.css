@@ -1246,6 +1246,26 @@ html[data-theme="dark"] .chip-btn.active {
   gap: 0.75rem;
 }
 
+.staff-modal-panel.create-application-modal {
+  width: min(720px, 100%);
+}
+
+.staff-modal-panel.create-application-modal .form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.staff-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.staff-modal-header h2 {
+  margin: 0;
+}
+
 .avatar-crop-overlay {
   position: fixed;
   inset: 0;
@@ -1472,8 +1492,8 @@ html[data-theme="dark"] .chip-btn.active {
 
 .consent-banner {
   position: fixed;
-  left: 4.75rem;
-  right: 1rem;
+  left: 1rem;
+  right: 6.5rem;
   bottom: 1rem;
   z-index: 35;
   display: flex;
@@ -1542,6 +1562,7 @@ html[data-theme="dark"] .chip-btn.active {
 
   .consent-banner {
     left: 1rem;
-    bottom: 4.5rem;
+    right: 1rem;
+    bottom: 1rem;
   }
 }
