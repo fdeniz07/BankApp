@@ -271,8 +271,7 @@ export function AccessibilityAssistant({
         <SvgFilters />
         <button
           type="button"
-          className={`a11y-fab${className ? ` ${className}` : ''}`}
-          style={{ position: 'fixed', right: '1rem', bottom: '1rem', zIndex: 45 }}
+          className={`a11y-fab a11y-fab-solo${className ? ` ${className}` : ''}`}
           onClick={() => patch({ assistantHidden: false, panelOpen: true })}
           aria-label={labels.toggle}
           title={labels.toggle}

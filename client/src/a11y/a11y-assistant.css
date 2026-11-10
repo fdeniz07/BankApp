@@ -37,6 +37,20 @@
   flex-shrink: 0;
 }
 
+/* Standalone FAB (assistant hidden) — same fixed anchor as dock */
+.a11y-fab-solo {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 45;
+}
+
+/* Lift above cookie/privacy consent so Accept is clickable */
+body:has(.consent-banner) .a11y-dock,
+body:has(.consent-banner) .a11y-fab-solo {
+  bottom: 5.75rem;
+}
+
 .a11y-fab svg {
   width: 1.85rem;
   height: 1.85rem;
@@ -278,11 +292,17 @@ html[data-a11y-color-filter='tritanopia'] {
 }
 
 @media (max-width: 640px) {
-  .a11y-dock {
+  .a11y-dock,
+  .a11y-fab-solo {
     right: 0.65rem;
     bottom: 0.65rem;
     left: auto;
     max-width: calc(100vw - 1.1rem);
+  }
+
+  body:has(.consent-banner) .a11y-dock,
+  body:has(.consent-banner) .a11y-fab-solo {
+    bottom: 5.5rem;
   }
 
   .a11y-panel {
