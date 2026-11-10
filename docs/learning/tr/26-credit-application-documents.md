@@ -25,6 +25,7 @@ flowchart LR
 - Pending başvuruya müşteri veya personel evrak yükler (lab; onay için henüz zorunlu değil).
 - Türler: `IdentityDocument`, `IncomeProof`, `Other` (SmartEnum).
 - Limit: ≤ 5 MB; PDF / JPEG / PNG; başvuru başına en fazla 10 dosya.
+- Pending iken **önizleme / indirme / kaldırma** (soft-delete + disk silme); kaldırmada tarayıcı onayı (i18n).
 - Compose volume: `credit-document-uploads` → `/app/App_Data/credit-documents`.
 
 ## Ne zaman eklendi?
@@ -106,6 +107,7 @@ curl -L -H "Authorization: Bearer <TOKEN>" `
 | `CreditDocumentType` | SmartEnum |
 | `ICreditDocumentStorage` / `LocalCreditDocumentStorage` | Disk I/O |
 | `UploadCreditApplicationDocumentRequest` | MediatR upload |
+| `DeleteCreditApplicationDocumentRequest` | MediatR silme (Pending) |
 | `CreditApplicationDocumentBusinessRules` | Boyut / tip / Pending / limit |
 
 ## Repoda nerede?
@@ -123,15 +125,16 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini akış
 
 1. Müşteri **yeni başvuru** formunda (isteğe bağlı) dosya seçer → kayıt → `POST` create → ardından `POST …/documents` → detay sayfasına yönlenir.  
-2. Veya mevcut **Pending** başvuru detayında Evraklar paneli → yükle / liste / indir.
+2. Veya mevcut **Pending** başvuru detayında Evraklar paneli → yükle / liste / önizle / indir / kaldır.
 
 ## Yeni başlayan lab
 
 1. Müşteri token ile Pending başvuru aç veya oluştur.
 2. Detayda küçük bir PDF yükle → listede görünür.
-3. İndir → dosya açılır.
-4. Token’sız download URL dene → 401.
-5. `docker volume ls` → `bankapp-credit-document-uploads` var.
+3. Önizle (modal) ve İndir → dosya açılır.
+4. Kaldır → onay penceresi → listeden düşer; zorunlu tür silinirse “Evrak eksik” geri gelebilir.
+5. Token’sız download URL dene → 401.
+6. `docker volume ls` → `bankapp-credit-document-uploads` var.
 
 ## Sık yapılan hatalar
 

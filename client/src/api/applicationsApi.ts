@@ -203,3 +203,10 @@ export function uploadApplicationDocument(
 export function downloadApplicationDocument(applicationId: string, documentId: string) {
   return apiDownload(`/api/CreditApplications/${applicationId}/documents/${documentId}/download`)
 }
+
+export function deleteApplicationDocument(applicationId: string, documentId: string) {
+  return apiRequest<{ id: string; creditApplicationId: string; documentType: string }>(
+    `/api/CreditApplications/${applicationId}/documents/${documentId}`,
+    { method: 'DELETE' },
+  )
+}

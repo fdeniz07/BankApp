@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   approveApplication,
+  deleteApplicationDocument,
   downloadApplicationDocument,
   exportPaymentPlan,
   getApplicationById,
@@ -81,6 +82,11 @@ export function ApplicationDetailPage() {
   const [documentType, setDocumentType] = useState<CreditDocumentType>('IdentityDocument')
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [documentBusy, setDocumentBusy] = useState(false)
+  const [preview, setPreview] = useState<{
+    url: string
+    contentType: string
+    fileName: string
+  } | null>(null)
   const [approveGateMode, setApproveGateMode] = useState<ApproveGateMode>('None')
   const [maxApprovalAmount, setMaxApprovalAmount] = useState<number | null>(null)
   const [positionMaxApprovalAmount, setPositionMaxApprovalAmount] = useState<number | null>(null)
@@ -463,6 +469,56 @@ export function ApplicationDetailPage() {
     }
   }
 
+  function closeDocumentPreview() {
+    if (preview?.url) URL.revokeObjectURL(preview.url)
+    setPreview(null)
+  }
+
+  async function onPreviewDocument(doc: CreditApplicationDocumentItem) {
+    if (!id) return
+    setDocumentBusy(true)
+    setError(null)
+    try {
+      const file = await downloadApplicationDocument(id, doc.id)
+      const url = URL.createObjectURL(file.blob)
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+      setPreview({
+        url,
+        contentType: file.contentType || doc.contentType || file.blob.type,
+        fileName: file.fileName || doc.originalFileName,
+      })
+    } catch (err) {
+      setError(mapApiError(err, t))
+    } finally {
+      setDocumentBusy(false)
+    }
+  }
+
+  async function onDeleteDocument(doc: CreditApplicationDocumentItem) {
+    if (!id || item?.status !== 'Pending') return
+    if (!window.confirm(t('applications.confirmDeleteDocument'))) return
+    setDocumentBusy(true)
+    setMessage(null)
+    setError(null)
+    try {
+      await deleteApplicationDocument(id, doc.id)
+      setMessage(t('applications.documentDeleteSuccess'))
+      await loadDocuments(id)
+      const refreshed = await getApplicationById(id)
+      setItem(refreshed)
+    } catch (err) {
+      setError(mapApiError(err, t))
+    } finally {
+      setDocumentBusy(false)
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (preview?.url) URL.revokeObjectURL(preview.url)
+    }
+  }, [preview?.url])
+
   function selectedTemplateLabel(kind: DecisionTemplateKind) {
     const key = kind === 'Approve' ? approveTemplateKey : rejectTemplateKey
     const opt = templateOptions(kind).find((o) => o.key === key)
@@ -735,13 +791,13 @@ export function ApplicationDetailPage() {
 
         {item.status === 'Pending' && (
           <form
-            className="documents-upload"
+            className="documents-upload documents-upload-aligned"
             onSubmit={(e) => {
               e.preventDefault()
               void onUploadDocument()
             }}
           >
-            <label>
+            <label className="documents-upload-type">
               {t('applications.documentType')}
               <select
                 value={documentType}
@@ -755,7 +811,7 @@ export function ApplicationDetailPage() {
                 <option value="Other">{t('applications.documentTypes.Other')}</option>
               </select>
             </label>
-            <label>
+            <label className="documents-upload-file">
               {t('applications.documentFile')}
               <FilePicker
                 accept=".pdf,image/jpeg,image/png,application/pdf"
@@ -764,7 +820,11 @@ export function ApplicationDetailPage() {
                 onFileChange={setDocumentFile}
               />
             </label>
-            <button type="submit" className="btn" disabled={documentBusy || !documentFile}>
+            <button
+              type="submit"
+              className="btn documents-upload-submit"
+              disabled={documentBusy || !documentFile}
+            >
               {documentBusy ? t('common.loading') : t('applications.documentUpload')}
             </button>
           </form>
@@ -785,19 +845,76 @@ export function ApplicationDetailPage() {
                   {' · '}
                   {(doc.sizeBytes / 1024).toFixed(0)} KB
                 </span>
-                <button
-                  type="button"
-                  className="btn ghost"
-                  disabled={documentBusy}
-                  onClick={() => void onDownloadDocument(doc.id)}
-                >
-                  {t('applications.documentDownload')}
-                </button>
+                <div className="documents-list-actions">
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    disabled={documentBusy}
+                    onClick={() => void onPreviewDocument(doc)}
+                  >
+                    {t('applications.documentPreview')}
+                  </button>
+                  <button
+                    type="button"
+                    className="btn ghost"
+                    disabled={documentBusy}
+                    onClick={() => void onDownloadDocument(doc.id)}
+                  >
+                    {t('applications.documentDownload')}
+                  </button>
+                  {item.status === 'Pending' && (
+                    <button
+                      type="button"
+                      className="btn danger"
+                      disabled={documentBusy}
+                      onClick={() => void onDeleteDocument(doc)}
+                    >
+                      {t('applications.documentDelete')}
+                    </button>
+                  )}
+                </div>
               </li>
             ))}
           </ul>
         )}
       </section>
+
+      {preview && (
+        <div
+          className="staff-modal-overlay document-preview-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="document-preview-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) closeDocumentPreview()
+          }}
+        >
+          <div className="staff-modal-panel document-preview-panel">
+            <div className="staff-modal-header">
+              <h2 id="document-preview-title">{t('applications.documentPreviewTitle')}</h2>
+              <button type="button" className="btn ghost" onClick={closeDocumentPreview}>
+                {t('common.close')}
+              </button>
+            </div>
+            <p className="muted document-preview-name">{preview.fileName}</p>
+            {preview.contentType.startsWith('image/') ? (
+              <img
+                src={preview.url}
+                alt={preview.fileName}
+                className="document-preview-image"
+              />
+            ) : preview.contentType.includes('pdf') ? (
+              <iframe
+                title={preview.fileName}
+                src={preview.url}
+                className="document-preview-frame"
+              />
+            ) : (
+              <p className="muted">{t('applications.documentPreviewUnavailable')}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       {paymentPlan && paymentPlan.installments.length > 0 && (
         <div className="payment-plan panel">

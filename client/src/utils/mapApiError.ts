@@ -47,6 +47,8 @@ const MESSAGE_KEYS: Record<string, string> = {
   'Document type is invalid.': 'errors.documentTypeInvalid',
   'Documents can only be uploaded while the application is Pending.':
     'errors.documentOnlyPending',
+  'Documents can only be deleted while the application is Pending.':
+    'errors.documentOnlyPendingDelete',
   'At most 10 documents are allowed per application.': 'errors.documentMaxExceeded',
   'Credit application document not found.': 'errors.documentNotFound',
   'One or more validation errors occurred.': 'errors.validation',

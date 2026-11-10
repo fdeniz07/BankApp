@@ -25,6 +25,7 @@ flowchart LR
 - Customer or staff upload on **Pending** applications (lab; not yet mandatory for approval).
 - Types: `IdentityDocument`, `IncomeProof`, `Other` (SmartEnum).
 - Limits: ≤ 5 MB; PDF / JPEG / PNG; max 10 files per application.
+- While Pending: **preview / download / remove** (soft-delete + disk delete); remove asks for confirm (i18n).
 - Compose volume: `credit-document-uploads` → `/app/App_Data/credit-documents`.
 
 ## When added?
@@ -103,6 +104,7 @@ curl -L -H "Authorization: Bearer <TOKEN>" `
 | `CreditDocumentType` | SmartEnum |
 | `ICreditDocumentStorage` / `LocalCreditDocumentStorage` | Disk I/O |
 | `UploadCreditApplicationDocumentRequest` | MediatR upload |
+| `DeleteCreditApplicationDocumentRequest` | MediatR delete (Pending) |
 | `CreditApplicationDocumentBusinessRules` | Size / type / Pending / limit |
 
 ## Where in the repo?
@@ -120,15 +122,16 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini flow
 
 1. Customer picks optional files on **new application** → save → `POST` create → then `POST …/documents` → redirect to detail.  
-2. Or on existing **Pending** detail: Documents panel → upload / list / download.
+2. Or on existing **Pending** detail: Documents panel → upload / list / preview / download / remove.
 
 ## Beginner lab
 
 1. Customer token → Pending application.
 2. Upload small PDF on detail → appears in list.
-3. Download → file opens.
-4. Download without token → 401.
-5. `docker volume ls` → `bankapp-credit-document-uploads`.
+3. Preview (modal) and Download → file opens.
+4. Remove → confirm dialog → disappears; missing-docs badge may return.
+5. Download without token → 401.
+6. `docker volume ls` → `bankapp-credit-document-uploads`.
 
 ## Common mistakes
 

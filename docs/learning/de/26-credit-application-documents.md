@@ -26,6 +26,7 @@ flowchart LR
 - Upload für Pending-Anträge (Lab; noch nicht Pflicht für Genehmigung).
 - Typen: `IdentityDocument`, `IncomeProof`, `Other` (SmartEnum).
 - ≤ 5 MB; PDF/JPEG/PNG; max. 10 Dateien pro Antrag.
+- Bei Pending: **Vorschau / Download / Entfernen** (Soft-Delete + Disk); Entfernen mit Bestätigung (i18n).
 - Compose-Volume `credit-document-uploads` → `/app/App_Data/credit-documents`.
 
 ## Wann hinzugefügt?
@@ -98,7 +99,8 @@ curl -L -H "Authorization: Bearer <TOKEN>" `
 | `CreditApplicationDocument` | Entity |
 | `CreditDocumentType` | SmartEnum |
 | `ICreditDocumentStorage` / `LocalCreditDocumentStorage` | Disk-I/O |
-| `UploadCreditApplicationDocumentRequest` | MediatR |
+| `UploadCreditApplicationDocumentRequest` | MediatR Upload |
+| `DeleteCreditApplicationDocumentRequest` | MediatR Löschen (Pending) |
 | `CreditApplicationDocumentBusinessRules` | Größe / Typ / Pending / Limit |
 
 ## Wo im Repo?
@@ -116,13 +118,15 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini-Ablauf
 
 1. Neuer Antrag optional mit Datei → create → `POST …/documents` → Detailseite.  
-2. Oder Pending-Detail: Panel „Dokumente“ → hochladen / liste / download.
+2. Oder Pending-Detail: Panel „Dokumente“ → hochladen / Liste / Vorschau / Download / Entfernen.
 
 ## Einstiegs-Lab
 
 1. Pending-Antrag → kleines PDF hochladen.
-2. Download mit Bearer → Datei ok; ohne Token → 401.
-3. Volume `bankapp-credit-document-uploads` prüfen.
+2. Vorschau (Modal) und Download → Datei ok.
+3. Entfernen → Bestätigung → Liste aktualisiert; „Unterlagen fehlen“ kann zurückkehren.
+4. Download ohne Token → 401.
+5. Volume `bankapp-credit-document-uploads` prüfen.
 
 ## Häufige Fehler
 
