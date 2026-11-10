@@ -133,7 +133,10 @@ Tarayıcı: http://localhost:5601
 
 1. Stack Management → Data Views → `bankapp-logs-*` (timestamp alanı)  
 2. Discover → logları filtrele  
-3. İkinci data view: `bankapp-credit-applications` (ürün araması index’i)
+3. İkinci data view: `bankapp-credit-applications` (ürün araması index’i)  
+4. Lens / Dashboard: `status` alanına göre pasta/çubuk (zaman aralığı: Last 1 year)
+
+Ekran örneği: [`Results from ElasticSearch on Kibana.png`](../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png)
 
 ### WebApi + arama
 

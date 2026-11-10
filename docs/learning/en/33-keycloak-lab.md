@@ -117,6 +117,11 @@ curl.exe -s "http://localhost:8080/api/Profile" `
 
 **Check:** Network shows API requests with Keycloak JWT `Authorization: Bearer`; UI roles from `role` claim.
 
+Screenshots:
+
+- SPA Keycloak login: [`Login with Keycloak.png`](../../assets/screenshots/en/Login%20with%20Keycloak.png)
+- Admin console: [`Keycloak Management.png`](../../assets/screenshots/en/Keycloak%20Management.png)
+
 ### Re-import realm
 
 ```powershell

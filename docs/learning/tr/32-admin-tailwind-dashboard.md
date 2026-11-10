@@ -27,7 +27,7 @@ flowchart LR
 - Personel / müşteri hâlâ `/applications` karşılama paneli kullanır
 - Compose client imajı: `manualChunks` + `gzip_static`
 
-Ekran: [Bank Manager dashboard](../../screenshots/bank-manager.en.md)
+Ekran: [Bank Manager dashboard](../../screenshots/bank-manager.en.md) · [SuperAdmin gallery](../../screenshots/super-admin.en.md)
 
 ## Ne zaman eklendi?
 

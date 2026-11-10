@@ -18,5 +18,6 @@ New / updated chapters are listed chronologically. Source of truth for dates is 
 | 2026-11-10 | TR/EN/DE enrich `23`–`31`, `33`–`34` (skip `32`): 2+ Mermaid, analogy, Beginner lab, Common mistakes; Keycloak/a11y lab accuracy preserved |
 | 2026-11-10 | Chapter `26`: Pending document delete + preview notes (TR/EN/DE) |
 | 2026-11-10 | Chapter `28`: Manager staff UI own-branch only; navbar branch chip (TR/EN/DE) |
+| 2026-11-10 | Screenshot galleries + README: new captures (SuperAdmin/Keycloak/Kibana/Redis); fixed broken paths; learning `06`/`08`/`18`/`28`/`31`–`33` |
 
 Full TR history: [99-changelog-learning.md](../tr/99-changelog-learning.md)

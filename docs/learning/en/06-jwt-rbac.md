@@ -88,7 +88,12 @@ src/Core/Application/Pipelines/Authorization/
 
 Login → compare hash → write roles into JWT claims → client puts token in header → every MediatR command checks roles.
 
-Screenshot (login): [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
+Screenshots:
+
+- Login: [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
+- Dark theme: [`Login Page - Dark Theme.png`](../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png)
+- Register: [`Register Page.png`](../../assets/screenshots/en/Register%20Page.png)
+- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
 
 ## Beginner lab
 

@@ -119,6 +119,12 @@ Lab password (all demo accounts): `Demo123!` — Staff/Manager/Customer × `tr` 
 3. `superadmin@` updates CHI-01 on Branches page; approves any application.
 4. `manager.nyc@` deactivates same-branch staff on Staff page; no Edit/Inactive/Role on another manager row; “Manager” create checkbox hidden. SuperAdmin can do both.
 
+Screenshots:
+
+- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
+- SuperAdmin branches: [`Super Admin - Branch Management.png`](../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png)
+- Gallery: [super-admin.en.md](../../screenshots/super-admin.en.md)
+
 ## Beginner lab
 
 1. `staff.nyc@` — NYC applications only.

@@ -91,7 +91,10 @@ src/WebApi/… OpenTelemetry setup
 infra/docker-compose.yml
 infra/otel/ (falls Collector-Config)
 docs/assets/screenshots/en/Metrics on Grafana.png
+docs/assets/screenshots/en/Metrics on Grafana - 2.png
 ```
+
+Screenshots: [`Metrics on Grafana.png`](../../assets/screenshots/en/Metrics%20on%20Grafana.png) · [`Metrics on Grafana - 2.png`](../../assets/screenshots/en/Metrics%20on%20Grafana%20-%202.png)
 
 ## Mini-Ablauf
 

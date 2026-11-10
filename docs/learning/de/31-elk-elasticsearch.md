@@ -128,6 +128,9 @@ Browser: http://localhost:5601
 1. Stack Management → Data Views → `bankapp-logs-*` (Timestamp-Feld)
 2. Discover → Logs filtern
 3. Zweite Data View: `bankapp-credit-applications`
+4. Lens / Dashboard: Torten-/Balkendiagramm nach `status` (Zeitraum: Last 1 year)
+
+Screenshot: [`Results from ElasticSearch on Kibana.png`](../../assets/screenshots/en/Results%20from%20ElasticSearch%20on%20Kibana.png)
 
 ### WebApi + Suche
 

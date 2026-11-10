@@ -27,7 +27,7 @@ flowchart LR
 - Staff / customer still use the `/applications` home panel
 - Compose client image: `manualChunks` + `gzip_static`
 
-Screen: [Bank Manager dashboard](../../screenshots/bank-manager.en.md)
+Screen: [Bank Manager dashboard](../../screenshots/bank-manager.en.md) · [SuperAdmin gallery](../../screenshots/super-admin.en.md)
 
 ## When added?
 

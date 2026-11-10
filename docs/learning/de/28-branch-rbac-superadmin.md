@@ -115,6 +115,12 @@ Lab-Passwort (alle Demo-Konten): `Demo123!` — Personal/Manager/Kunde × `tr` /
 3. `superadmin@` aktualisiert CHI-01 auf der Filialseite; genehmigt beliebigen Antrag.
 4. `manager.nyc@` setzt Staff derselben Filiale inaktiv; bei anderem Manager keine Zeilen Bearbeiten/Inaktiv/Rolle; Create-Checkbox „Manager“ unsichtbar. SuperAdmin kann beides.
 
+Screenshots:
+
+- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
+- SuperAdmin-Filialen: [`Super Admin - Branch Management.png`](../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png)
+- Galerie: [super-admin.en.md](../../screenshots/super-admin.en.md)
+
 ## Einstiegs-Lab
 
 1. `staff.nyc@` — nur NYC-Anträge.

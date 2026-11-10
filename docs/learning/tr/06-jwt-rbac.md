@@ -88,7 +88,12 @@ src/Core/Application/Pipelines/Authorization/
 
 Login → hash karşılaştır → JWT claim’lere roller yaz → client header’a koy → her MediatR command’de rol kontrolü.
 
-Ekran örneği (giriş): [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
+Ekran örnekleri:
+
+- Giriş: [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
+- Koyu tema: [`Login Page - Dark Theme.png`](../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png)
+- Kayıt: [`Register Page.png`](../../assets/screenshots/en/Register%20Page.png)
+- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
 
 ## Yeni başlayan lab
 

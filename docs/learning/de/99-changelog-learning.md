@@ -18,5 +18,6 @@ Neue / aktualisierte Kapitel chronologisch. Datumsquelle oft der TR-Changelog; E
 | 2026-11-10 | TR/EN/DE Anreicherung `23`–`31`, `33`–`34` (ohne `32`): ≥2 Mermaid, Analogie, Einstiegs-Lab, Häufige Fehler; Keycloak/a11y-Lab-Notizen unverändert |
 | 2026-11-10 | Kapitel `26`: Pending-Löschen + Vorschau (TR/EN/DE) |
 | 2026-11-10 | Kapitel `28`: Manager-Personal-UI nur eigene Filiale; Navbar-Filial-Chip (TR/EN/DE) |
+| 2026-11-10 | Screenshot-Galerien + README: neue Aufnahmen (SuperAdmin/Keycloak/Kibana/Redis); kaputte Pfade behoben; Learning `06`/`08`/`18`/`28`/`31`–`33` |
 
 Vollständige TR-Historie: [99-changelog-learning.md](../tr/99-changelog-learning.md)

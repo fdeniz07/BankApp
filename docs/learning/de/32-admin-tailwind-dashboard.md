@@ -27,7 +27,7 @@ flowchart LR
 - Personal / Kunde nutzen weiter `/applications` als Startpanel
 - Compose-Client-Image: `manualChunks` + `gzip_static`
 
-Bildschirm: [Bank Manager dashboard](../../screenshots/bank-manager.en.md)
+Bildschirm: [Bank Manager dashboard](../../screenshots/bank-manager.en.md) · [SuperAdmin-Galerie](../../screenshots/super-admin.en.md)
 
 ## Wann hinzugefügt?
 

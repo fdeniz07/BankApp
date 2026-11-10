@@ -113,6 +113,11 @@ curl.exe -s "http://localhost:8080/api/Profile" `
 
 **Check:** API-Requests mit Keycloak-JWT; UI-Rollen aus `role`-Claim.
 
+Screenshots:
+
+- SPA Keycloak-Login: [`Login with Keycloak.png`](../../assets/screenshots/en/Login%20with%20Keycloak.png)
+- Admin-Konsole: [`Keycloak Management.png`](../../assets/screenshots/en/Keycloak%20Management.png)
+
 ### Realm neu importieren
 
 ```powershell

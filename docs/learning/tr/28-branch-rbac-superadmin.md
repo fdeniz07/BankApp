@@ -116,6 +116,12 @@ Lab şifresi (tüm demo hesaplar): `Demo123!` — Personel/Yönetici/Müşteri �
 3. `superadmin@` Şubeler sayfasından CHI-01 günceller; herhangi bir başvuruyu onaylar.
 4. `manager.nyc@` Personel’de aynı şube staff’ı pasif eder; başka manager satırında Düzenle/Pasif/Rol yok; “Yönetici” create checkbox görünmez. SuperAdmin her ikisini de yapar.
 
+Ekran örnekleri:
+
+- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
+- SuperAdmin şubeler: [`Super Admin - Branch Management.png`](../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png)
+- Galeri: [super-admin.en.md](../../screenshots/super-admin.en.md)
+
 ## Yeni başlayan lab
 
 1. `staff.nyc@` login → başvuru listesinde yalnız NYC.

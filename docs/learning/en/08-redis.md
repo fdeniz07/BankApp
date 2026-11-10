@@ -66,6 +66,8 @@ docker compose exec redis redis-cli KEYS "*"
 Browser: `http://localhost:5540` → **Add Redis database** → Host **`redis`**, Port **`6379`**, no password.  
 (`localhost` from the Insight container does not reach Redis; use the Compose service name.)
 
+Screenshot: [`Cache on Redis Insight.png`](../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png)
+
 HTTP side:
 
 ```http
