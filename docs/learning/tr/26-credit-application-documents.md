@@ -127,6 +127,14 @@ client/src/pages/ApplicationDetailPage.tsx
 1. Müşteri **yeni başvuru** formunda (isteğe bağlı) dosya seçer → kayıt → `POST` create → ardından `POST …/documents` → detay sayfasına yönlenir.  
 2. Veya mevcut **Pending** başvuru detayında Evraklar paneli → yükle / liste / önizle / indir / kaldır.
 
+Ekran (müşteri — modalda evrak yükleme):
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20New%20Credit%20application-4-file%20upload.png" alt="Yeni başvuruda evrak yükleme" width="720" />
+
+Personel Pending detay (evrak paneli):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-1%20(Pending).png" alt="Pending başvuru evrakları" width="720" />
+
 ## Yeni başlayan lab
 
 1. Müşteri token ile Pending başvuru aç veya oluştur.

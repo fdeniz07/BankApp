@@ -187,7 +187,9 @@ infra/README.md
 
 `compose up` → SQL healthy → WebApi migrate/seed → client nginx → tarayıcıda login.
 
-Ekran örneği: [`Containers on Docker.png`](../../assets/screenshots/en/Containers%20on%20Docker.png)
+Ekran (Compose container’lar):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker container listesi" width="720" />
 
 ## Yeni başlayan lab
 

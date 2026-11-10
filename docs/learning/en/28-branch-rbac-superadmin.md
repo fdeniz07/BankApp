@@ -119,11 +119,23 @@ Lab password (all demo accounts): `Demo123!` — Staff/Manager/Customer × `tr` 
 3. `superadmin@` updates CHI-01 on Branches page; approves any application.
 4. `manager.nyc@` deactivates same-branch staff on Staff page; no Edit/Inactive/Role on another manager row; “Manager” create checkbox hidden. SuperAdmin can do both.
 
-Screenshots:
+Screen (403 — cross-branch/role deny):
 
-- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
-- SuperAdmin branches: [`Super Admin - Branch Management.png`](../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png)
-- Gallery: [super-admin.en.md](../../screenshots/super-admin.en.md)
+<img src="../../assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 permission denied" width="720" />
+
+SuperAdmin branch management:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png" alt="SuperAdmin branch management" width="720" />
+
+Adding a new branch:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management%20-%20adding%20new%20branch.png" alt="SuperAdmin add new branch" width="720" />
+
+Manager staff (own-branch actions):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Staff%20Management.png" alt="Manager staff management" width="720" />
+
+Gallery: [super-admin.en.md](../../screenshots/super-admin.en.md)
 
 ## Beginner lab
 

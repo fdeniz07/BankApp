@@ -138,6 +138,10 @@ docs/assets/screenshots/en/Queues on RabbitMQ.png
 docs/learning/tr/22-decision-letter-email.md
 ```
 
+Ekran (RabbitMQ Management — kuyruklar):
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ kuyrukları" width="720" />
+
 ## Mini akış
 
 Kayıt → token üret → `email-confirmation` → consumer log/Seq → kullanıcı link ile confirm → login.  

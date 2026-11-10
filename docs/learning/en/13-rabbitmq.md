@@ -138,6 +138,10 @@ docs/assets/screenshots/en/Queues on RabbitMQ.png
 docs/learning/tr/22-decision-letter-email.md
 ```
 
+Screen (RabbitMQ Management — queues):
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ queues" width="720" />
+
 ## Mini flow
 
 Register → generate token → `email-confirmation` → consumer log/Seq → user confirms via link → login.  

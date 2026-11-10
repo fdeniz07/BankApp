@@ -1,4 +1,4 @@
-﻿# 01 — .NET- und C#-Grundlagen
+# 01 — .NET- und C#-Grundlagen
 
 [← Inhalt](00-index.md) · [Weiter: Clean Architecture →](02-clean-architecture.md)
 
@@ -108,7 +108,9 @@ src/Core/Core.csproj
 2. `dotnet run --project src/WebApi` → Der Kestrel-Webserver startet.  
 3. Browser / React-Client sendet HTTP-Anfragen an die API unter `http://localhost:…`.
 
-Screenshot (API-Doku): [`Api Documents with Scalar.png`](../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png)
+Bildschirm (Scalar API-Doku):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API-Dokumentation" width="720" />
 
 ## Einstiegs-Lab
 

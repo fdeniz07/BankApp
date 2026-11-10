@@ -1,4 +1,4 @@
-﻿# 27 — Şube / branch modeli
+# 27 — Şube / branch modeli
 
 [← Önceki](26-credit-application-documents.md) · [İçindekiler](00-index.md)
 
@@ -88,6 +88,10 @@ client/src/pages/ApplicationDetailPage.tsx
 ## Mini akış
 
 Seed şube → staff BranchId → personel onaylar → başvuruda DecisionBranch* dolar → detay UI’da “Karar şubesi”.
+
+Ekran (Manager — şubeye göre kredi filtresi):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credits%20filtered%20by%20Branch%20.png" alt="Şubeye göre filtrelenmiş krediler" width="720" />
 
 ## Yeni başlayan lab
 

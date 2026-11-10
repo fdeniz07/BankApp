@@ -117,10 +117,13 @@ curl.exe -s "http://localhost:8080/api/Profile" `
 
 **Kontrol:** Network’te API istekleri `Authorization: Bearer` Keycloak JWT; UI rolleri (`role` claim) doğru.
 
-Ekran örnekleri:
+Ekran (SPA — Keycloak ile giriş):
 
-- SPA Keycloak girişi: [`Login with Keycloak.png`](../../assets/screenshots/en/Login%20with%20Keycloak.png)
-- Admin konsol: [`Keycloak Management.png`](../../assets/screenshots/en/Keycloak%20Management.png)
+<img src="../../assets/screenshots/en/Login%20with%20Keycloak.png" alt="Keycloak ile giriş" width="720" />
+
+Keycloak Admin Console:
+
+<img src="../../assets/screenshots/en/Keycloak%20Management.png" alt="Keycloak yönetimi" width="720" />
 
 ### Realm yeniden import
 

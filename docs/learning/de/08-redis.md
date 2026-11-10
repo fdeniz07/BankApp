@@ -1,4 +1,4 @@
-﻿# 08 — Redis (Cache und Idempotency)
+# 08 — Redis (Cache und Idempotency)
 
 [← Zurück](07-serilog-seq.md) · [Inhalt](00-index.md) · [Weiter →](09-docker-compose.md)
 
@@ -66,7 +66,9 @@ docker compose exec redis redis-cli KEYS "*"
 Browser: `http://localhost:5540` → **Add Redis database** → Host **`redis`**, Port **`6379`**, kein Passwort.  
 (`localhost` erreicht Redis aus dem Insight-Container nicht; Compose-Dienstname verwenden.)
 
-Screenshot: [`Cache on Redis Insight.png`](../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png)
+Bildschirm (Redis Insight):
+
+<img src="../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight Cache" width="720" />
 
 HTTP-Seite:
 

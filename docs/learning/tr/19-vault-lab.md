@@ -232,6 +232,10 @@ infra/.env.example
 vault-seed `jwt_security_key` yazar → WebApi start → overlay → JWT imza current key ile.  
 Rotate script → previous + new current → WebApi recreate → eski token previous ile doğrulanır, yeni login current ile.
 
+Ekran (Vault UI — secrets; token/değerleri paylaşma):
+
+<img src="../../assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
+
 ## Yeni başlayan lab
 
 1. `docker compose up -d vault` → `docker compose up vault-seed` → UI :8200 token ile giriş.

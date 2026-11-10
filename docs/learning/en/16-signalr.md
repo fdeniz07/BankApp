@@ -85,6 +85,14 @@ client/src/realtime/
 
 Staff approves → Outbox → Consumer → Hub groups → customer browser shows success toast + `formatMoney(currencyCode)`.
 
+Screen (approve/reject UI — toast trigger):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%201.png" alt="Credit approve/reject panel" width="720" />
+
+Customer credit list (live-update target):
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20Credit%20List%20filtered%20by%20Pending.png" alt="Customer pending credit list" width="720" />
+
 ## Beginner lab
 
 1. Start API + client with Compose.

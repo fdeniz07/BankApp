@@ -115,7 +115,9 @@ src/Core/Core.csproj
 2. `dotnet run --project src/WebApi` → Kestrel web server starts.  
 3. Browser / React client sends HTTP requests to the API at `http://localhost:…`.
 
-Screenshot (API docs): [`Api Documents with Scalar.png`](../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png)
+Screen (Scalar API docs):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API documentation" width="720" />
 
 ## Beginner lab
 

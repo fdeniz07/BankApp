@@ -1,4 +1,4 @@
-﻿# 06 — JWT und RBAC
+# 06 — JWT und RBAC
 
 [← Zurück](05-validation-smartenum.md) · [Inhalt](00-index.md) · [Weiter →](07-serilog-seq.md)
 
@@ -88,12 +88,21 @@ src/Core/Application/Pipelines/Authorization/
 
 Login → Hash-Vergleich → Rollen in JWT-Claims → Client setzt Header → bei jedem MediatR-Command Rollenprüfung.
 
-Screenshots:
+Bildschirm (Login + Datenschutz):
 
-- Login: [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
-- Dark Theme: [`Login Page - Dark Theme.png`](../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png)
-- Registrierung: [`Register Page.png`](../../assets/screenshots/en/Register%20Page.png)
-- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
+<img src="../../assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login-Seite und Datenschutzbanner" width="720" />
+
+Dark Theme:
+
+<img src="../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png" alt="Login-Seite Dark Theme" width="720" />
+
+Registrierung:
+
+<img src="../../assets/screenshots/en/Register%20Page.png" alt="Registrierungsseite" width="720" />
+
+403 (keine Berechtigung):
+
+<img src="../../assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 Zugriff verweigert" width="720" />
 
 ## Einstiegs-Lab
 

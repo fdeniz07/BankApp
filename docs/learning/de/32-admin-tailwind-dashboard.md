@@ -120,6 +120,18 @@ docker compose --env-file .env up -d --build client
 3. Link „Ausstehend“ → `/applications?status=Pending`  
 4. `npm run build` → Vendor-Chunks + `.gz` → nginx `gzip_static`
 
+Bildschirm (Manager-Dashboard):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Manager-Dashboard" width="720" />
+
+SuperAdmin-Dashboard:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Dashboard.png" alt="SuperAdmin-Dashboard" width="720" />
+
+Kreditarten-Verwaltung (Manager):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Types%20Management.png" alt="Kreditarten-Verwaltung" width="720" />
+
 ## Einstiegs-Lab
 
 1. Mit `manager.*@bank.local` anmelden → Adresszeile `/dashboard`.

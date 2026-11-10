@@ -91,6 +91,14 @@ To turn Soft into Hard in Development, change `ApproveGateMode` in `appsettings.
 
 Staff opens detail → `GET config` → Soft: confirm when docs missing; Hard: button locked → if DoA on, amount checked against `min(position, branch)` (UI shows breakdown) → Approve handler applies same rules on server.
 
+Screen (Pending detail — approve/reject + documents context):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-2%20(Pending).png" alt="Pending credit detail approve panel" width="720" />
+
+Approve/reject dialog:
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%202.png" alt="Approve/reject dialog" width="720" />
+
 ## Where it helps
 
 - [ ] Development Soft: approve without docs passes after confirm

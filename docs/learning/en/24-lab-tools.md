@@ -335,6 +335,14 @@ docs/learning/en/08-redis.md  # Insight connection note
 
 Repeat with approve + `Idempotency-Key` → Redis idempotency record + RabbitMQ `decision-letter` / domain event queue.
 
+Screens (lab tool slice):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar" width="720" />
+
+<img src="../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight" width="720" />
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ" width="720" />
+
 ## Beginner lab
 
 1. `cd infra` → `docker compose --env-file .env up -d --build` → check `ps` healthy.

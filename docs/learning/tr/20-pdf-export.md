@@ -1,4 +1,4 @@
-﻿# 20 — QuestPDF ve ödeme planı export
+# 20 — QuestPDF ve ödeme planı export
 
 [← Önceki](19-vault-lab.md) · [İçindekiler](00-index.md) · [Sonraki →](21-ci-github-actions.md)
 
@@ -89,6 +89,14 @@ docs/screenshots/bank-manager.en.md
 ## Mini akış
 
 UI “PDF” → `locale` + plan → handler hesaplar → QuestPDF document → dosya indir / print dialog.
+
+Ekran (ödeme planı Print & PDF):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Details%20-%20Payment%20Schedule%20-%20Print%26Pdf.png" alt="Ödeme planı yazdır ve PDF" width="720" />
+
+Ödeme planı (detay):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Details%20-%20Payment%20Schedule.png" alt="Ödeme planı detayı" width="720" />
 
 ## Yeni başlayan lab
 

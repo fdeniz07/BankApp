@@ -124,6 +124,14 @@ client/src/pages/ApplicationDetailPage.tsx
 1. Customer picks optional files on **new application** → save → `POST` create → then `POST …/documents` → redirect to detail.  
 2. Or on existing **Pending** detail: Documents panel → upload / list / preview / download / remove.
 
+Screen (customer — document upload in modal):
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20New%20Credit%20application-4-file%20upload.png" alt="Document upload on new application" width="720" />
+
+Staff Pending detail (documents panel):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-1%20(Pending).png" alt="Pending application documents" width="720" />
+
 ## Beginner lab
 
 1. Customer token → Pending application.

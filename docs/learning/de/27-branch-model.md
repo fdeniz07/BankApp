@@ -82,6 +82,10 @@ client/src/pages/ApplicationDetailPage.tsx
 
 Seed-Filiale → Staff `BranchId` → Mitarbeiter genehmigt → `DecisionBranch*` am Antrag → UI „Entscheidungsfiliale“.
 
+Bildschirm (Manager — Kredite nach Filiale gefiltert):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credits%20filtered%20by%20Branch%20.png" alt="Nach Filiale gefilterte Kredite" width="720" />
+
 ## Einstiegs-Lab
 
 1. `staff.tr@bank.local` — Filiale im Profil.

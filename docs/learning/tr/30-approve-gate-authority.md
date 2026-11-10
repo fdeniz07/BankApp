@@ -1,4 +1,4 @@
-﻿# 30 — Onay evrak kapısı + yetki tavanı (DoA)
+# 30 — Onay evrak kapısı + yetki tavanı (DoA)
 
 [← Önceki](29-decision-letter-templates.md) · [İçindekiler](00-index.md) · [Sonraki →](31-elk-elasticsearch.md)
 
@@ -95,6 +95,14 @@ Development’ta Soft’u Hard yapmak için `appsettings.Development.json` için
 ## Mini akış
 
 Personel detayı açar → `GET config` → Soft ise eksik evrakta confirm; Hard ise buton kilitli → DoA açıksa tutar `min(pozisyon, şube)` tavana bakılır (UI kaynak kırılımı gösterir) → Approve handler aynı kuralları sunucuda uygular.
+
+Ekran (Pending detay — onay/red + evrak bağlamı):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-2%20(Pending).png" alt="Pending kredi detayı onay paneli" width="720" />
+
+Onay/red diyalogu:
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%202.png" alt="Onay/red diyalogu" width="720" />
 
 ## Nerede işe yarar?
 

@@ -187,7 +187,9 @@ infra/README.md
 
 `compose up` → SQL healthy → WebApi migrate/seed → client nginx → login in the browser.
 
-Screenshot: [`Containers on Docker.png`](../../assets/screenshots/en/Containers%20on%20Docker.png)
+Screen (Compose containers):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker container list" width="720" />
 
 ## Beginner lab
 

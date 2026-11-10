@@ -113,10 +113,13 @@ curl.exe -s "http://localhost:8080/api/Profile" `
 
 **Check:** API-Requests mit Keycloak-JWT; UI-Rollen aus `role`-Claim.
 
-Screenshots:
+Bildschirm (SPA — Mit Keycloak anmelden):
 
-- SPA Keycloak-Login: [`Login with Keycloak.png`](../../assets/screenshots/en/Login%20with%20Keycloak.png)
-- Admin-Konsole: [`Keycloak Management.png`](../../assets/screenshots/en/Keycloak%20Management.png)
+<img src="../../assets/screenshots/en/Login%20with%20Keycloak.png" alt="Login mit Keycloak" width="720" />
+
+Keycloak Admin Console:
+
+<img src="../../assets/screenshots/en/Keycloak%20Management.png" alt="Keycloak-Verwaltung" width="720" />
 
 ### Realm neu importieren
 

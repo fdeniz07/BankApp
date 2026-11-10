@@ -196,6 +196,10 @@ infra/.env.example
 vault-seed schreibt `jwt_security_key` → WebApi-Start → Overlay → JWT-Signatur mit current key.  
 Rotate-Script → previous + neuer current → WebApi recreate → alte Tokens über previous, neue Logins über current.
 
+Bildschirm (Vault UI — Secrets; Tokens/Werte nicht teilen):
+
+<img src="../../assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault Secrets" width="720" />
+
 ## Einsteiger-Lab
 
 Vault + seed → `kv get` → WebApi-Log Overlay → Login → optional JWT-Rotate testen.

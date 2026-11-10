@@ -139,6 +139,10 @@ docs/learning/tr/22-decision-letter-email.md
 Registrierung → Token → `email-confirmation` → Consumer log/Seq → Nutzer bestätigt per Link → Login.  
 Approve/Reject → Outbox → `domain-events` (+ `decision-letter`) → SignalR / Seq.
 
+Bildschirm (RabbitMQ Management — Queues):
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ-Queues" width="720" />
+
 ## Einsteiger-Lab
 
 1. `docker compose up -d rabbitmq webapi`  

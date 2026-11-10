@@ -115,7 +115,9 @@ src/Core/Core.csproj
 2. `dotnet run --project src/WebApi` → Kestrel web sunucusu ayağa kalkar.  
 3. Tarayıcı / React istemci `http://localhost:…` üzerinden API’ye HTTP isteği atar.
 
-Ekran örneği (API dokümantasyonu): [`Api Documents with Scalar.png`](../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png)
+Ekran (Scalar API dokümantasyonu):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API dokümantasyonu" width="720" />
 
 ## Yeni başlayan lab
 

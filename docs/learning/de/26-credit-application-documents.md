@@ -120,6 +120,14 @@ client/src/pages/ApplicationDetailPage.tsx
 1. Neuer Antrag optional mit Datei → create → `POST …/documents` → Detailseite.  
 2. Oder Pending-Detail: Panel „Dokumente“ → hochladen / Liste / Vorschau / Download / Entfernen.
 
+Bildschirm (Kunde — Dokument-Upload im Modal):
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20New%20Credit%20application-4-file%20upload.png" alt="Dokument-Upload bei neuem Antrag" width="720" />
+
+Mitarbeiter Pending-Detail (Dokumente-Panel):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-1%20(Pending).png" alt="Pending-Antrag Dokumente" width="720" />
+
 ## Einstiegs-Lab
 
 1. Pending-Antrag → kleines PDF hochladen.

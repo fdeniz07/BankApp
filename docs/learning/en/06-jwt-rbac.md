@@ -1,4 +1,4 @@
-﻿# 06 — JWT and RBAC
+# 06 — JWT and RBAC
 
 [← Previous](05-validation-smartenum.md) · [Contents](00-index.md) · [Next →](07-serilog-seq.md)
 
@@ -88,12 +88,21 @@ src/Core/Application/Pipelines/Authorization/
 
 Login → compare hash → write roles into JWT claims → client puts token in header → every MediatR command checks roles.
 
-Screenshots:
+Screen (login + privacy):
 
-- Login: [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
-- Dark theme: [`Login Page - Dark Theme.png`](../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png)
-- Register: [`Register Page.png`](../../assets/screenshots/en/Register%20Page.png)
-- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
+<img src="../../assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login page and privacy banner" width="720" />
+
+Dark theme:
+
+<img src="../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png" alt="Login page dark theme" width="720" />
+
+Register:
+
+<img src="../../assets/screenshots/en/Register%20Page.png" alt="Register page" width="720" />
+
+403 (unauthorized):
+
+<img src="../../assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 permission denied" width="720" />
 
 ## Beginner lab
 

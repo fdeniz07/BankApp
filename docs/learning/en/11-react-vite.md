@@ -88,7 +88,13 @@ client/Dockerfile
 
 `npm run dev` → Login → token in localStorage/context → ApplicationsPage loads list → SignalR toast.
 
-Screenshot (staff dashboard): [`Bank Employee Page - Dashboard.png`](../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png)
+Screen (staff SPA dashboard):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png" alt="Bank employee dashboard" width="720" />
+
+Customer SPA dashboard:
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard.png" alt="Customer dashboard" width="720" />
 
 ## Beginner lab
 

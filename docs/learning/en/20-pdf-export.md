@@ -90,6 +90,14 @@ docs/screenshots/bank-manager.en.md
 
 UI “PDF” → `locale` + plan → handler computes → QuestPDF document → file download / print dialog.
 
+Screen (payment schedule Print & PDF):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Details%20-%20Payment%20Schedule%20-%20Print%26Pdf.png" alt="Payment schedule print and PDF" width="720" />
+
+Payment schedule (detail):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Details%20-%20Payment%20Schedule.png" alt="Payment schedule detail" width="720" />
+
 ## Beginner lab
 
 1. Open an approved application detail (payment plan visible).

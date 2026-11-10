@@ -1,4 +1,4 @@
-﻿# 06 — JWT ve RBAC
+# 06 — JWT ve RBAC
 
 [← Önceki](05-validation-smartenum.md) · [İçindekiler](00-index.md) · [Sonraki →](07-serilog-seq.md)
 
@@ -88,12 +88,21 @@ src/Core/Application/Pipelines/Authorization/
 
 Login → hash karşılaştır → JWT claim’lere roller yaz → client header’a koy → her MediatR command’de rol kontrolü.
 
-Ekran örnekleri:
+Ekran (giriş + gizlilik):
 
-- Giriş: [`Login Page and Privacy.png`](../../assets/screenshots/en/Login%20Page%20and%20Privacy.png)
-- Koyu tema: [`Login Page - Dark Theme.png`](../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png)
-- Kayıt: [`Register Page.png`](../../assets/screenshots/en/Register%20Page.png)
-- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
+<img src="../../assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Giriş sayfası ve gizlilik bandı" width="720" />
+
+Koyu tema:
+
+<img src="../../assets/screenshots/en/Login%20Page%20-%20Dark%20Theme.png" alt="Giriş sayfası koyu tema" width="720" />
+
+Kayıt:
+
+<img src="../../assets/screenshots/en/Register%20Page.png" alt="Kayıt sayfası" width="720" />
+
+403 (yetkisiz erişim):
+
+<img src="../../assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 yetki reddi" width="720" />
 
 ## Yeni başlayan lab
 

@@ -89,6 +89,14 @@ Soft in Development auf Hard: in `appsettings.Development.json` `ApproveGateMode
 
 Personal öffnet Detail → `GET config` → bei Soft Confirm bei fehlenden Dokumenten; bei Hard gesperrter Button → bei DoA an: Betrag gegen `min(Position, Filiale)` (UI zeigt Aufschlüsselung) → Approve-Handler wendet dieselben Regeln serverseitig an.
 
+Bildschirm (Pending-Detail — Genehmigen/Ablehnen + Dokumente):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Credit%20Details%20-2%20(Pending).png" alt="Pending Kreditdetail Genehmigungspanel" width="720" />
+
+Genehmigen/Ablehnen-Dialog:
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%202.png" alt="Genehmigen/Ablehnen-Dialog" width="720" />
+
 ## Einstiegs-Lab
 
 1. `GET /api/CreditDocuments/config` — `approveGateMode`, Limits lesen.

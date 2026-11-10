@@ -259,6 +259,14 @@ docs/learning/de/08-redis.md
 5. Optional Grafana HTTP-Dauer / Trace.  
 Dasselbe mit Approve + Idempotency-Key → Redis + Rabbit `decision-letter`.
 
+Bildschirme (Lab-Tool-Ausschnitt):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar" width="720" />
+
+<img src="../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight" width="720" />
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ" width="720" />
+
 ## Einstiegs-Lab
 
 1. `docker compose up -d --build` → `ps` healthy.

@@ -1,4 +1,4 @@
-﻿# 09 — Docker Compose
+# 09 — Docker Compose
 
 [← Zurück](08-redis.md) · [Inhalt](00-index.md) · [Weiter →](10-testing.md)
 
@@ -187,7 +187,9 @@ infra/README.md
 
 `compose up` → SQL healthy → WebApi migrate/seed → Client nginx → Login im Browser.
 
-Screenshot: [`Containers on Docker.png`](../../assets/screenshots/en/Containers%20on%20Docker.png)
+Bildschirm (Compose-Container):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker-Containerliste" width="720" />
 
 ## Einstiegs-Lab
 

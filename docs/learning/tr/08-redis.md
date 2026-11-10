@@ -66,7 +66,9 @@ docker compose exec redis redis-cli KEYS "*"
 Tarayıcı: `http://localhost:5540` → **Add Redis database** → Host **`redis`**, Port **`6379`**, şifre yok.  
 (`localhost` Insight konteynerinden Redis’e gitmez; Compose servis adı kullanılır.)
 
-Ekran örneği: [`Cache on Redis Insight.png`](../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png)
+Ekran (Redis Insight):
+
+<img src="../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight önbellek" width="720" />
 
 HTTP tarafı:
 

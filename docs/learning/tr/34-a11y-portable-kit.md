@@ -109,7 +109,7 @@ Kullanıcı FAB’a basar → panel açılır (`panelOpen`) → “Yüksek kontr
 
 Ekran (FAB + panel — tema / font / kontrast):
 
-<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Erişilebilirlik asistanı paneli" width="720" />
+<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Erişilebilirlik asistanı paneli" width="360" />
 
 ## Nerede işe yarar?
 

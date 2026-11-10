@@ -1,4 +1,4 @@
-﻿# 28 — Şube RBAC + SuperAdmin
+# 28 — Şube RBAC + SuperAdmin
 
 [← Önceki](27-branch-model.md) · [İçindekiler](00-index.md)
 
@@ -116,11 +116,23 @@ Lab şifresi (tüm demo hesaplar): `Demo123!` — Personel/Yönetici/Müşteri �
 3. `superadmin@` Şubeler sayfasından CHI-01 günceller; herhangi bir başvuruyu onaylar.
 4. `manager.nyc@` Personel’de aynı şube staff’ı pasif eder; başka manager satırında Düzenle/Pasif/Rol yok; “Yönetici” create checkbox görünmez. SuperAdmin her ikisini de yapar.
 
-Ekran örnekleri:
+Ekran (403 — şube/rol dışı yazma):
 
-- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
-- SuperAdmin şubeler: [`Super Admin - Branch Management.png`](../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png)
-- Galeri: [super-admin.en.md](../../screenshots/super-admin.en.md)
+<img src="../../assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 yetki reddi" width="720" />
+
+SuperAdmin şube yönetimi:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png" alt="SuperAdmin şube yönetimi" width="720" />
+
+Yeni şube ekleme:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management%20-%20adding%20new%20branch.png" alt="SuperAdmin yeni şube ekleme" width="720" />
+
+Manager personel (kendi şube aksiyonları):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Staff%20Management.png" alt="Manager personel yönetimi" width="720" />
+
+Galeri: [super-admin.en.md](../../screenshots/super-admin.en.md)
 
 ## Yeni başlayan lab
 

@@ -115,11 +115,23 @@ Lab-Passwort (alle Demo-Konten): `Demo123!` — Personal/Manager/Kunde × `tr` /
 3. `superadmin@` aktualisiert CHI-01 auf der Filialseite; genehmigt beliebigen Antrag.
 4. `manager.nyc@` setzt Staff derselben Filiale inaktiv; bei anderem Manager keine Zeilen Bearbeiten/Inaktiv/Rolle; Create-Checkbox „Manager“ unsichtbar. SuperAdmin kann beides.
 
-Screenshots:
+Bildschirm (403 — Filial-/Rollenverweigerung):
 
-- 403: [`403 Permission Denied Page.png`](../../assets/screenshots/en/403%20Permission%20Denied%20Page.png)
-- SuperAdmin-Filialen: [`Super Admin - Branch Management.png`](../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png)
-- Galerie: [super-admin.en.md](../../screenshots/super-admin.en.md)
+<img src="../../assets/screenshots/en/403%20Permission%20Denied%20Page.png" alt="403 Zugriff verweigert" width="720" />
+
+SuperAdmin Filialverwaltung:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management.png" alt="SuperAdmin Filialverwaltung" width="720" />
+
+Neue Filiale hinzufügen:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Branch%20Management%20-%20adding%20new%20branch.png" alt="SuperAdmin neue Filiale" width="720" />
+
+Manager Personal (eigene Filiale):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Staff%20Management.png" alt="Manager Personalverwaltung" width="720" />
+
+Galerie: [super-admin.en.md](../../screenshots/super-admin.en.md)
 
 ## Einstiegs-Lab
 

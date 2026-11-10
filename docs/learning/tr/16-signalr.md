@@ -1,4 +1,4 @@
-﻿# 16 — SignalR
+# 16 — SignalR
 
 [← Önceki](15-saga.md) · [İçindekiler](00-index.md) · [Sonraki →](17-modular-monolith.md)
 
@@ -84,6 +84,14 @@ client/src/realtime/
 ## Mini akış
 
 Personel onaylar → Outbox → Consumer → Hub grupları → müşteri tarayıcısında success toast + `formatMoney(currencyCode)`.
+
+Ekran (onay/red UI — toast tetikleyicisi):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%201.png" alt="Kredi onay/red paneli" width="720" />
+
+Müşteri kredi listesi (canlı güncelleme hedefi):
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20Credit%20List%20filtered%20by%20Pending.png" alt="Müşteri bekleyen kredi listesi" width="720" />
 
 ## Yeni başlayan lab
 

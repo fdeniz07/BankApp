@@ -85,6 +85,14 @@ client/src/realtime/
 
 Staff genehmigt → Outbox → Consumer → Hub-Gruppen → Kunden-Browser zeigt Success-Toast + `formatMoney(currencyCode)`.
 
+Bildschirm (Genehmigen/Ablehnen-UI — Toast-Auslöser):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%201.png" alt="Kredit Genehmigen/Ablehnen-Panel" width="720" />
+
+Kunden-Kreditliste (Ziel der Live-Aktualisierung):
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20Credit%20List%20filtered%20by%20Pending.png" alt="Kunden-Liste ausstehender Kredite" width="720" />
+
 ## Einstiegs-Lab
 
 1. API + Client mit Compose starten.

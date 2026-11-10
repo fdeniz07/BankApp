@@ -232,6 +232,10 @@ infra/.env.example
 vault-seed writes `jwt_security_key` → WebApi starts → overlay → JWT signed with current key.  
 Rotate script → previous + new current → WebApi recreate → old token validates with previous, new login with current.
 
+Screen (Vault UI — secrets; do not share tokens/values):
+
+<img src="../../assets/screenshots/en/Secrets%20on%20Hashicorp%20Vault.png" alt="HashiCorp Vault secrets" width="720" />
+
 ## Beginner lab
 
 1. `docker compose up -d vault` then `docker compose up vault-seed` — UI :8200 with token.

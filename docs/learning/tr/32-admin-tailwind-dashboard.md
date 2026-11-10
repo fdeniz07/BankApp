@@ -1,4 +1,4 @@
-﻿# 32 — Admin karşılama dashboard (Tailwind + paket sıkıştırma)
+# 32 — Admin karşılama dashboard (Tailwind + paket sıkıştırma)
 
 [← Önceki](31-elk-elasticsearch.md) · [İçindekiler](00-index.md) · [Sonraki →](33-keycloak-lab.md)
 
@@ -119,6 +119,18 @@ docker compose --env-file .env up -d --build client
 2. Sayfa `getDashboardSummary` çeker → KPI kartları  
 3. “Bekleyen” linki → `/applications?status=Pending`  
 4. `npm run build` → vendor chunk’lar + `.gz` → nginx `gzip_static`
+
+Ekran (Manager dashboard):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Dashboard.png" alt="Manager dashboard" width="720" />
+
+SuperAdmin dashboard:
+
+<img src="../../assets/screenshots/en/Admin/Super%20Admin%20-%20Dashboard.png" alt="SuperAdmin dashboard" width="720" />
+
+Kredi türü yönetimi (Manager):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Types%20Management.png" alt="Kredi türü yönetimi" width="720" />
 
 ## Yeni başlayan lab
 

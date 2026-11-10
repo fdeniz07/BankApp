@@ -109,7 +109,7 @@ User taps FAB → panel opens (`panelOpen`) → “High contrast” → `control
 
 Screen (FAB + panel — theme / font / contrast):
 
-<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Accessibility assistant panel" width="720" />
+<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Accessibility assistant panel" width="360" />
 
 ## Where it helps
 

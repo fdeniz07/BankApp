@@ -90,6 +90,14 @@ docs/screenshots/bank-manager.en.md
 
 UI „PDF“ → `locale` + Plan → Handler rechnet → QuestPDF-Dokument → Download / Druckdialog.
 
+Bildschirm (Zahlungsplan Drucken & PDF):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Details%20-%20Payment%20Schedule%20-%20Print%26Pdf.png" alt="Zahlungsplan Drucken und PDF" width="720" />
+
+Zahlungsplan (Detail):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credit%20Details%20-%20Payment%20Schedule.png" alt="Zahlungsplan-Detail" width="720" />
+
 ## Einstiegs-Lab
 
 1. Detail einer genehmigten Bewerbung öffnen (Zahlungsplan sichtbar).

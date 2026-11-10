@@ -1,4 +1,4 @@
-﻿# 11 — React, Vite ve TypeScript
+# 11 — React, Vite ve TypeScript
 
 [← Önceki](10-testing.md) · [İçindekiler](00-index.md) · [Sonraki →](12-i18n-ux.md)
 
@@ -88,7 +88,13 @@ client/Dockerfile
 
 `npm run dev` → Login → token localStorage/context → ApplicationsPage list çeker → SignalR toast.
 
-Ekran örneği (personel dashboard): [`Bank Employee Page - Dashboard.png`](../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png)
+Ekran (personel SPA dashboard):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Dashboard.png" alt="Personel dashboard" width="720" />
+
+Müşteri SPA dashboard:
+
+<img src="../../assets/screenshots/en/Customer/Customer%20Page%20-%20Dashboard.png" alt="Müşteri dashboard" width="720" />
 
 ## Yeni başlayan lab
 

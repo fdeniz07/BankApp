@@ -104,7 +104,7 @@ Nutzer tippt FAB → Panel öffnet (`panelOpen`) → „Hoher Kontrast“ → `c
 
 Bildschirm (FAB + Panel — Theme / Schrift / Kontrast):
 
-<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Barrierefreiheits-Assistentenpanel" width="720" />
+<img src="../../assets/screenshots/en/Accessiblity%20Settings.png" alt="Barrierefreiheits-Assistentenpanel" width="360" />
 
 ## Wo hilft es?
 

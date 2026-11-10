@@ -323,6 +323,14 @@ docs/learning/tr/08-redis.md  # Insight bağlantı notu
 
 Aynı zinciri approve + `Idempotency-Key` ile tekrarla → Redis’te idempotency kaydı + RabbitMQ’da decision-letter / domain event kuyruğu.
 
+Ekranlar (lab araçlarından bir kesit):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar" width="720" />
+
+<img src="../../assets/screenshots/en/Cache%20on%20Redis%20Insight.png" alt="Redis Insight" width="720" />
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ" width="720" />
+
 ## Yeni başlayan lab
 
 1. `cd infra` → `docker compose --env-file .env up -d --build` → `ps` ile healthy kontrol.

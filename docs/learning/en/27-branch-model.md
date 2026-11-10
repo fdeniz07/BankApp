@@ -95,6 +95,10 @@ client/src/pages/ApplicationDetailPage.tsx
 
 Seed branches → staff `BranchId` → staff approves → application gets `DecisionBranch*` → detail UI shows “Decision branch”.
 
+Screen (Manager — credits filtered by branch):
+
+<img src="../../assets/screenshots/en/Bank%20Manager/Bank%20Manager%20Page%20-%20Credits%20filtered%20by%20Branch%20.png" alt="Credits filtered by branch" width="720" />
+
 ## Beginner lab
 
 1. Login as `staff.tr@bank.local` — branch on profile.
