@@ -43,3 +43,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-07 | `33`: Google/GitHub Identity Brokering lab notları |
 | 2026-11-07 | `19`: Vault Raft HA Compose lab (3-node) |
 | 2026-11-07 | README / tech-learning / `00-index` / infra README: Keycloak SPA + Vault/Raft senkron |
+| 2026-11-10 | `34-a11y-portable-kit.tr.md` — taşınabilir a11y klasörü (`client/src/a11y/`) + Eye-Able benzeri lab asistan |

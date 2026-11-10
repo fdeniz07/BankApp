@@ -1,6 +1,6 @@
 # 33 — Keycloak lab (Compose + dual JWT)
 
-[← Önceki](32-admin-tailwind-dashboard.tr.md) · [İçindekiler](00-index.tr.md)
+[← Önceki](32-admin-tailwind-dashboard.tr.md) · [İçindekiler](00-index.tr.md) · [Sonraki →](34-a11y-portable-kit.tr.md)
 
 İlgili: [06 JWT / RBAC](06-jwt-rbac.tr.md) · [19 Vault](19-vault-lab.tr.md) · [09 Docker Compose](09-docker-compose.tr.md)
 

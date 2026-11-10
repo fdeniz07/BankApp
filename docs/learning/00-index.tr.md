@@ -64,6 +64,7 @@ Sıfırdan teknoloji rehberi — **bu projede gerçekten kullanılan** stack’l
 | Search / Observability | ELK + başvuru/personel/müşteri/kredi türü arama + facets | [31](31-elk-elasticsearch.tr.md) |
 | UX / DevOps | Admin Tailwind dashboard + Vite chunk/gzip | [32](32-admin-tailwind-dashboard.tr.md) |
 | Security / Lab | Keycloak (Compose + dual JWT + SPA PKCE + sosyal IdP) | [33](33-keycloak-lab.tr.md) |
+| UX / Lab | Taşınabilir erişilebilirlik kiti (a11y asistan) | [34](34-a11y-portable-kit.tr.md) |
 
 Gereksinim (BRD/FRD): [docs/requirements/00-index.tr.md](../requirements/00-index.tr.md)
 
