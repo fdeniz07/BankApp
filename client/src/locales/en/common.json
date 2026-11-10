@@ -14,6 +14,7 @@
     "staff": "Staff",
     "branches": "Branches",
     "profile": "Profile",
+    "branch": "Branch",
     "logout": "Log out"
   },
   "adminDashboard": {
@@ -48,7 +49,7 @@
   "staff": {
     "title": "Staff management",
     "managerOnly": "This page is for bank managers only.",
-    "hint": "Create and update staff in your branch. Mutating other managers and assigning the manager role is SuperAdmin-only. Branch / text / role filters use Elasticsearch (SQL fallback).",
+    "hint": "Create and update staff in your branch. You can view other branches; edit / deactivate apply only in your own branch. Mutating other managers and assigning the manager role is SuperAdmin-only. Branch / text / role filters use Elasticsearch (SQL fallback).",
     "newStaff": "New staff",
     "editStaff": "Edit staff",
     "create": "Create",
@@ -244,6 +245,7 @@
     "save": "Save",
     "edit": "Edit",
     "cancel": "Cancel",
+    "close": "Close",
     "actions": "Actions",
     "details": "Details",
     "yes": "Yes",
@@ -445,7 +447,13 @@
     "documentFile": "File",
     "documentUpload": "Upload",
     "documentDownload": "Download",
+    "documentPreview": "Preview",
+    "documentDelete": "Remove",
     "documentUploadSuccess": "Document uploaded.",
+    "documentDeleteSuccess": "Document removed.",
+    "confirmDeleteDocument": "Are you sure you want to remove this document?",
+    "documentPreviewTitle": "Document preview",
+    "documentPreviewUnavailable": "This file type cannot be previewed; use download instead.",
     "documentTypes": {
       "IdentityDocument": "Identity",
       "IncomeProof": "Income proof",
@@ -540,6 +548,7 @@
     "documentInvalidContent": "Document content does not match the declared type.",
     "documentTypeInvalid": "Document type is invalid.",
     "documentOnlyPending": "Documents can only be uploaded while the application is Pending.",
+    "documentOnlyPendingDelete": "Documents can only be deleted while the application is Pending.",
     "documentMaxExceeded": "At most 10 documents are allowed per application.",
     "documentNotFound": "Document not found.",
     "unauthorized": "Your session expired. Please sign in again."

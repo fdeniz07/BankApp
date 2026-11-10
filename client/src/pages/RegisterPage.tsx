@@ -85,53 +85,69 @@ export function RegisterPage() {
         </div>
         <h2>{t('register.title')}</h2>
         <p className="muted">{t('register.subtitle')}</p>
-        <form onSubmit={onSubmit} className="form">
-          <label>
-            {t('profile.firstName')}
-            <input
-              value={form.firstName}
-              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.lastName')}
-            <input
-              value={form.lastName}
-              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              required
-              autoComplete="email"
-            />
-          </label>
-          <label>
-            {t('login.password')}
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              required
-              minLength={6}
-              autoComplete="new-password"
-            />
-          </label>
-          <label>
-            {t('profile.phone')}
-            <input
-              value={form.phoneNumber}
-              onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
+        <form onSubmit={onSubmit} className="form profile-form">
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.firstName')}
+              <input
+                value={form.firstName}
+                onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('profile.lastName')}
+              <input
+                value={form.lastName}
+                onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('login.email')}
+              <input
+                type="email"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
+                required
+                autoComplete="email"
+              />
+            </label>
+            <label>
+              {t('login.password')}
+              <input
+                type="password"
+                value={form.password}
+                onChange={(e) => setForm({ ...form, password: e.target.value })}
+                required
+                minLength={6}
+                autoComplete="new-password"
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.phone')}
+              <input
+                value={form.phoneNumber}
+                onChange={(e) => setForm({ ...form, phoneNumber: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('customers.nationalId')}
+              <input
+                value={form.nationalId}
+                onChange={(e) => setForm({ ...form, nationalId: e.target.value })}
+                required
+                minLength={11}
+                maxLength={11}
+              />
+            </label>
+          </div>
+          <label className="form-row-full">
             {t('profile.address')}
             <input
               value={form.address}
@@ -139,52 +155,46 @@ export function RegisterPage() {
               required
             />
           </label>
-          <label>
-            {t('customers.nationalId')}
-            <input
-              value={form.nationalId}
-              onChange={(e) => setForm({ ...form, nationalId: e.target.value })}
-              required
-              minLength={11}
-              maxLength={11}
-            />
-          </label>
-          <label>
-            {t('customers.dateOfBirth')}
-            <input
-              type="date"
-              value={form.dateOfBirth}
-              onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('customers.gender')}
-            <select
-              value={form.gender}
-              onChange={(e) => setForm({ ...form, gender: e.target.value as Gender })}
-              required
-            >
-              {GENDERS.map((g) => (
-                <option key={g} value={g}>
-                  {t(`gender.${g}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('customers.motherName')}
-            <input
-              value={form.motherName}
-              onChange={(e) => setForm({ ...form, motherName: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('customers.fatherName')}
-            <input
-              value={form.fatherName}
-              onChange={(e) => setForm({ ...form, fatherName: e.target.value })}
-            />
-          </label>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.dateOfBirth')}
+              <input
+                type="date"
+                value={form.dateOfBirth}
+                onChange={(e) => setForm({ ...form, dateOfBirth: e.target.value })}
+              />
+            </label>
+            <label>
+              {t('customers.gender')}
+              <select
+                value={form.gender}
+                onChange={(e) => setForm({ ...form, gender: e.target.value as Gender })}
+                required
+              >
+                {GENDERS.map((g) => (
+                  <option key={g} value={g}>
+                    {t(`gender.${g}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.motherName')}
+              <input
+                value={form.motherName}
+                onChange={(e) => setForm({ ...form, motherName: e.target.value })}
+              />
+            </label>
+            <label>
+              {t('customers.fatherName')}
+              <input
+                value={form.fatherName}
+                onChange={(e) => setForm({ ...form, fatherName: e.target.value })}
+              />
+            </label>
+          </div>
           {error && <p className="error-text">{error}</p>}
           <button type="submit" className="btn primary" disabled={loading}>
             {loading ? t('common.loading') : t('register.submit')}

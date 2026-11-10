@@ -293,6 +293,16 @@ h2 {
   color: var(--muted);
 }
 
+.branch-chip {
+  color: var(--accent);
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 12rem;
+}
+
 .page {
   max-width: 1100px;
   margin: 0 auto;
@@ -898,6 +908,31 @@ th {
   min-width: 7rem;
 }
 
+/* flex on <td> breaks border-collapse → kaymış satır çizgileri */
+td.actions-cell {
+  display: table-cell;
+  vertical-align: middle;
+  min-width: 8rem;
+  width: 1%;
+  white-space: nowrap;
+}
+
+td.actions-cell > .btn {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 0.45rem;
+}
+
+td.actions-cell > .btn:last-child {
+  margin-bottom: 0;
+}
+
+td.actions-cell .btn:hover:not(:disabled),
+td.actions-cell .btn:active:not(:disabled) {
+  transform: none;
+}
+
 .actions-cell .btn {
   display: inline-flex;
   width: 100%;
@@ -909,6 +944,7 @@ th {
   text-align: center;
   white-space: nowrap;
   overflow: visible;
+  box-sizing: border-box;
 }
 
 .danger-text {
@@ -1062,6 +1098,7 @@ th {
 .chip-row {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 0.5rem;
   margin: 0.75rem 0 1rem;
 }
@@ -1099,14 +1136,21 @@ th {
 }
 
 .chip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
   border: 1px solid var(--line);
   background: var(--surface);
   color: var(--ink);
   font: inherit;
   font-weight: 600;
-  padding: 0.4rem 0.85rem;
+  line-height: 1.2;
+  min-height: 2.15rem;
+  padding: 0.35rem 0.85rem;
   border-radius: 6px;
   cursor: pointer;
+  vertical-align: middle;
 }
 
 .chip-btn.active {
@@ -1208,8 +1252,13 @@ html[data-theme="dark"] .chip-btn.active {
   display: flex;
   flex-wrap: wrap;
   gap: 0.85rem 1.25rem;
-  align-items: end;
+  align-items: flex-end;
   margin: 0.75rem 0 1rem;
+}
+
+.staff-filters .chip-row {
+  margin: 0;
+  align-self: flex-end;
 }
 
 .staff-search {
@@ -1246,13 +1295,118 @@ html[data-theme="dark"] .chip-btn.active {
   gap: 0.75rem;
 }
 
-.staff-modal-panel.create-application-modal {
-  width: min(720px, 100%);
+.staff-modal-panel.wide {
+  width: min(760px, 100%);
 }
 
-.staff-modal-panel.create-application-modal .form {
+.staff-modal-panel.wide .form-row,
+.staff-modal-panel.form .form-row {
   display: grid;
   gap: 0.75rem;
+}
+
+.staff-modal-panel.create-application-modal {
+  width: min(760px, 100%);
+  max-height: min(92vh, 900px);
+  overflow: auto;
+  padding: 1rem 1.15rem;
+  gap: 0.55rem;
+}
+
+.staff-modal-panel.create-application-modal .staff-modal-header h2 {
+  font-size: 1.15rem;
+}
+
+.staff-modal-panel.create-application-modal .staff-modal-header .muted {
+  margin: 0.2rem 0 0;
+  font-size: 0.85rem;
+}
+
+.staff-modal-panel.create-application-modal .form,
+.staff-modal-panel.create-application-modal .create-application-form {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.form-row {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.form-row-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-row-full {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.profile-form {
+  max-width: 56rem;
+  gap: 0.75rem;
+}
+
+.profile-form .form-row {
+  gap: 0.75rem;
+}
+
+.staff-modal-panel.create-application-modal .form-row {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.staff-modal-panel.create-application-modal .form-row-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.staff-modal-panel.create-application-modal .form-row-credit-type {
+  gap: 0.25rem;
+}
+
+.staff-modal-panel.create-application-modal .form-rate-hint {
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.staff-modal-panel.create-application-modal .documents-upload.create-documents {
+  padding: 0.55rem 0.7rem;
+  margin: 0.15rem 0 0.25rem;
+  gap: 0.45rem;
+}
+
+.staff-modal-panel.create-application-modal .create-documents-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+.staff-modal-panel.create-application-modal .payment-plan {
+  margin-top: 0.35rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid var(--line);
+}
+
+.staff-modal-panel.create-application-modal .payment-plan h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+}
+
+.staff-modal-panel.create-application-modal .payment-plan > .muted {
+  margin: 0.15rem 0;
+  font-size: 0.85rem;
+}
+
+.staff-modal-panel.create-application-modal .actions-cell {
+  margin-top: 0.15rem;
+}
+
+@media (max-width: 640px) {
+  .form-row-2,
+  .staff-modal-panel.create-application-modal .form-row-2 {
+    grid-template-columns: 1fr;
+  }
 }
 
 .staff-modal-header {
@@ -1379,6 +1533,31 @@ html[data-theme="dark"] .chip-btn.active {
   margin: 0.75rem 0 1rem;
 }
 
+.documents-upload.documents-upload-aligned {
+  display: grid;
+  grid-template-columns: minmax(10rem, 13rem) minmax(14rem, 1fr) auto;
+  align-items: end;
+  gap: 0.75rem 1rem;
+}
+
+.documents-upload.documents-upload-aligned label {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.documents-upload.documents-upload-aligned .documents-upload-submit {
+  align-self: end;
+  height: fit-content;
+  margin-bottom: 0.05rem;
+}
+
+.documents-upload.documents-upload-aligned .file-picker {
+  min-height: 2.4rem;
+  align-items: center;
+}
+
 .documents-upload.create-documents {
   width: 100%;
   align-items: stretch;
@@ -1417,6 +1596,51 @@ html[data-theme="dark"] .chip-btn.active {
   gap: 0.5rem;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--line);
+}
+
+.documents-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.document-preview-panel {
+  width: min(920px, 100%);
+  max-height: min(92vh, 960px);
+}
+
+.document-preview-name {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.document-preview-image {
+  display: block;
+  max-width: 100%;
+  max-height: min(70vh, 720px);
+  margin: 0 auto;
+  object-fit: contain;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.document-preview-frame {
+  width: 100%;
+  height: min(70vh, 720px);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #fff;
+}
+
+@media (max-width: 720px) {
+  .documents-upload.documents-upload-aligned {
+    grid-template-columns: 1fr;
+  }
+
+  .documents-upload.documents-upload-aligned .documents-upload-submit {
+    width: 100%;
+  }
 }
 
 .lang-switch select {

@@ -224,74 +224,80 @@ export function BranchesPage() {
             if (e.target === e.currentTarget) closeCreate()
           }}
         >
-          <form className="staff-modal-panel form" onSubmit={onCreate}>
+          <form className="staff-modal-panel wide form" onSubmit={onCreate}>
             <h2 id="branch-create-title">{t('branches.newBranch')}</h2>
             {error && <p className="error-text">{error}</p>}
-            <label>
-              {t('branches.code')}
-              <input
-                value={form.code}
-                onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-                required
-                maxLength={20}
-                autoComplete="off"
-              />
-            </label>
-            <label>
-              {t('branches.name')}
-              <input
-                value={form.name}
-                onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                required
-                maxLength={150}
-              />
-            </label>
-            <label>
-              {t('branches.city')}
-              <input
-                value={form.city}
-                onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
-                maxLength={100}
-              />
-            </label>
-            <label>
-              {t('branches.maxApprovalAmount')}
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={form.maxApprovalAmount}
-                onChange={(e) => setForm((f) => ({ ...f, maxApprovalAmount: e.target.value }))}
-                placeholder={t('branches.maxApprovalPlaceholder')}
-              />
-            </label>
-            <label>
-              {t('branches.currency')}
-              <select
-                value={form.maxApprovalCurrencyCode}
-                onChange={(e) =>
-                  setForm((f) => ({
-                    ...f,
-                    maxApprovalCurrencyCode: e.target.value as (typeof CURRENCIES)[number],
-                  }))
-                }
-                disabled={!form.maxApprovalAmount.trim()}
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {currencySymbol(c)} ({c})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
-              />
-              <span>{t('branches.active')}</span>
-            </label>
+            <div className="form-row form-row-2">
+              <label>
+                {t('branches.code')}
+                <input
+                  value={form.code}
+                  onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
+                  required
+                  maxLength={20}
+                  autoComplete="off"
+                />
+              </label>
+              <label>
+                {t('branches.name')}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  required
+                  maxLength={150}
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('branches.city')}
+                <input
+                  value={form.city}
+                  onChange={(e) => setForm((f) => ({ ...f, city: e.target.value }))}
+                  maxLength={100}
+                />
+              </label>
+              <label>
+                {t('branches.maxApprovalAmount')}
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={form.maxApprovalAmount}
+                  onChange={(e) => setForm((f) => ({ ...f, maxApprovalAmount: e.target.value }))}
+                  placeholder={t('branches.maxApprovalPlaceholder')}
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('branches.currency')}
+                <select
+                  value={form.maxApprovalCurrencyCode}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      maxApprovalCurrencyCode: e.target.value as (typeof CURRENCIES)[number],
+                    }))
+                  }
+                  disabled={!form.maxApprovalAmount.trim()}
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c} value={c}>
+                      {currencySymbol(c)} ({c})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={form.isActive}
+                  onChange={(e) => setForm((f) => ({ ...f, isActive: e.target.checked }))}
+                />
+                <span>{t('branches.active')}</span>
+              </label>
+            </div>
             <div className="actions-cell">
               <button type="submit" className="btn success" disabled={creating}>
                 {creating ? t('common.loading') : t('branches.create')}
@@ -314,65 +320,71 @@ export function BranchesPage() {
             if (e.target === e.currentTarget) closeEdit()
           }}
         >
-          <form className="staff-modal-panel form" onSubmit={onSaveEdit}>
+          <form className="staff-modal-panel wide form" onSubmit={onSaveEdit}>
             <h2 id="branch-edit-title">{t('branches.editBranch')}</h2>
             {error && <p className="error-text">{error}</p>}
-            <label>
-              {t('branches.code')}
-              <input
-                value={editing.code}
-                onChange={(e) => setEditing({ ...editing, code: e.target.value })}
-                required
-              />
-            </label>
-            <label>
-              {t('branches.name')}
-              <input
-                value={editing.name}
-                onChange={(e) => setEditing({ ...editing, name: e.target.value })}
-                required
-              />
-            </label>
-            <label>
-              {t('branches.city')}
-              <input
-                value={editing.city ?? ''}
-                onChange={(e) => setEditing({ ...editing, city: e.target.value })}
-              />
-            </label>
-            <label>
-              {t('branches.maxApprovalAmount')}
-              <input
-                type="number"
-                min={0}
-                step="0.01"
-                value={editMaxApproval}
-                onChange={(e) => setEditMaxApproval(e.target.value)}
-                placeholder={t('branches.maxApprovalPlaceholder')}
-              />
-            </label>
-            <label>
-              {t('branches.currency')}
-              <select
-                value={editCurrency}
-                onChange={(e) => setEditCurrency(e.target.value as (typeof CURRENCIES)[number])}
-                disabled={!editMaxApproval.trim()}
-              >
-                {CURRENCIES.map((c) => (
-                  <option key={c} value={c}>
-                    {currencySymbol(c)} ({c})
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={editing.isActive}
-                onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
-              />
-              <span>{t('branches.active')}</span>
-            </label>
+            <div className="form-row form-row-2">
+              <label>
+                {t('branches.code')}
+                <input
+                  value={editing.code}
+                  onChange={(e) => setEditing({ ...editing, code: e.target.value })}
+                  required
+                />
+              </label>
+              <label>
+                {t('branches.name')}
+                <input
+                  value={editing.name}
+                  onChange={(e) => setEditing({ ...editing, name: e.target.value })}
+                  required
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('branches.city')}
+                <input
+                  value={editing.city ?? ''}
+                  onChange={(e) => setEditing({ ...editing, city: e.target.value })}
+                />
+              </label>
+              <label>
+                {t('branches.maxApprovalAmount')}
+                <input
+                  type="number"
+                  min={0}
+                  step="0.01"
+                  value={editMaxApproval}
+                  onChange={(e) => setEditMaxApproval(e.target.value)}
+                  placeholder={t('branches.maxApprovalPlaceholder')}
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('branches.currency')}
+                <select
+                  value={editCurrency}
+                  onChange={(e) => setEditCurrency(e.target.value as (typeof CURRENCIES)[number])}
+                  disabled={!editMaxApproval.trim()}
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c} value={c}>
+                      {currencySymbol(c)} ({c})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={editing.isActive}
+                  onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
+                />
+                <span>{t('branches.active')}</span>
+              </label>
+            </div>
             <div className="actions-cell">
               <button type="submit" className="btn primary" disabled={savingEdit}>
                 {savingEdit ? t('common.loading') : t('common.save')}

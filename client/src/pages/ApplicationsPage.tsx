@@ -529,98 +529,104 @@ export function ApplicationsPage() {
               </button>
             </div>
             {error && <p className="error-text">{error}</p>}
-            <form className="form" onSubmit={onCreate}>
-              <label>
-                {t('applications.creditType')}
-                <select
-                  value={form.creditSubTypeId}
-                  onChange={(e) => onSubTypeChange(e.target.value)}
-                  required
-                >
-                  {subTypes.length === 0 && (
-                    <option value="">{t('common.empty')}</option>
-                  )}
-                  {subTypes.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.name} · {formatMoney(s.minAmount, s.currencyCode, i18n.language)} –{' '}
-                      {formatMoney(s.maxAmount, s.currencyCode, i18n.language)} · {s.minTermMonths}–
-                      {s.maxTermMonths} {t('applications.termUnit')} · %{s.interestRate}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {selectedSubType && (
-                <p className="muted form-rate-hint">
-                  {t('applications.interestRate')}: %{selectedSubType.interestRate}
-                </p>
-              )}
-              <label>
-                {t('applications.amount')}
-                <select
-                  value={form.requestedAmount}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, requestedAmount: e.target.value }))
-                  }
-                  required
-                >
-                  {(selectedSubType?.amountOptions ?? []).map((amount) => (
-                    <option key={amount} value={amount}>
-                      {formatMoney(amount, selectedSubType?.currencyCode, i18n.language)}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                {t('applications.term')}
-                <select
-                  value={form.requestedTermMonths}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, requestedTermMonths: e.target.value }))
-                  }
-                  required
-                >
-                  {(selectedSubType?.termOptions ?? []).map((term) => (
-                    <option key={term} value={term}>
-                      {term} {t('applications.termUnit')}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label>
-                {t('applications.monthlyIncome')}
-                {selectedSubType?.currencyCode
-                  ? ` (${currencySymbol(selectedSubType.currencyCode)})`
-                  : ''}
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min={1}
-                  step={1}
-                  required
-                  value={form.monthlyIncome}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, monthlyIncome: e.target.value }))
-                  }
-                  placeholder={t('applications.monthlyIncomeHint')}
-                />
-              </label>
-              <label>
-                {t('applications.existingDebt')}
-                {selectedSubType?.currencyCode
-                  ? ` (${currencySymbol(selectedSubType.currencyCode)})`
-                  : ''}
-                <input
-                  type="number"
-                  inputMode="decimal"
-                  min={0}
-                  step={1}
-                  value={form.existingDebtAmount}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, existingDebtAmount: e.target.value }))
-                  }
-                  placeholder={t('applications.existingDebtHint')}
-                />
-              </label>
+            <form className="form create-application-form" onSubmit={onCreate}>
+              <div className="form-row form-row-credit-type">
+                <label>
+                  {t('applications.creditType')}
+                  <select
+                    value={form.creditSubTypeId}
+                    onChange={(e) => onSubTypeChange(e.target.value)}
+                    required
+                  >
+                    {subTypes.length === 0 && (
+                      <option value="">{t('common.empty')}</option>
+                    )}
+                    {subTypes.map((s) => (
+                      <option key={s.id} value={s.id}>
+                        {s.name} · {formatMoney(s.minAmount, s.currencyCode, i18n.language)} –{' '}
+                        {formatMoney(s.maxAmount, s.currencyCode, i18n.language)} · {s.minTermMonths}–
+                        {s.maxTermMonths} {t('applications.termUnit')} · %{s.interestRate}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                {selectedSubType && (
+                  <p className="muted form-rate-hint">
+                    {t('applications.interestRate')}: %{selectedSubType.interestRate}
+                  </p>
+                )}
+              </div>
+              <div className="form-row form-row-2">
+                <label>
+                  {t('applications.amount')}
+                  <select
+                    value={form.requestedAmount}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, requestedAmount: e.target.value }))
+                    }
+                    required
+                  >
+                    {(selectedSubType?.amountOptions ?? []).map((amount) => (
+                      <option key={amount} value={amount}>
+                        {formatMoney(amount, selectedSubType?.currencyCode, i18n.language)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  {t('applications.term')}
+                  <select
+                    value={form.requestedTermMonths}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, requestedTermMonths: e.target.value }))
+                    }
+                    required
+                  >
+                    {(selectedSubType?.termOptions ?? []).map((term) => (
+                      <option key={term} value={term}>
+                        {term} {t('applications.termUnit')}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <div className="form-row form-row-2">
+                <label>
+                  {t('applications.monthlyIncome')}
+                  {selectedSubType?.currencyCode
+                    ? ` (${currencySymbol(selectedSubType.currencyCode)})`
+                    : ''}
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={1}
+                    step={1}
+                    required
+                    value={form.monthlyIncome}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, monthlyIncome: e.target.value }))
+                    }
+                    placeholder={t('applications.monthlyIncomeHint')}
+                  />
+                </label>
+                <label>
+                  {t('applications.existingDebt')}
+                  {selectedSubType?.currencyCode
+                    ? ` (${currencySymbol(selectedSubType.currencyCode)})`
+                    : ''}
+                  <input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    step={1}
+                    value={form.existingDebtAmount}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, existingDebtAmount: e.target.value }))
+                    }
+                    placeholder={t('applications.existingDebtHint')}
+                  />
+                </label>
+              </div>
               <label>
                 {t('applications.purpose')}
                 <input
@@ -634,35 +640,37 @@ export function ApplicationsPage() {
 
               <fieldset className="documents-upload create-documents">
                 <legend>{t('applications.documentsTitle')}</legend>
-                <p className="muted">{t('applications.createDocumentsHint')}</p>
-                <label>
-                  {t('applications.documentType')}
-                  <select
-                    value={createDocumentType}
-                    onChange={(e) =>
-                      setCreateDocumentType(e.target.value as CreditDocumentType)
-                    }
-                    disabled={creating}
-                  >
-                    <option value="IdentityDocument">
-                      {t('applications.documentTypes.IdentityDocument')}
-                    </option>
-                    <option value="IncomeProof">
-                      {t('applications.documentTypes.IncomeProof')}
-                    </option>
-                    <option value="Other">{t('applications.documentTypes.Other')}</option>
-                  </select>
-                </label>
-                <label>
-                  {t('applications.documentFile')}
-                  <FilePicker
-                    accept=".pdf,image/jpeg,image/png,application/pdf"
-                    multiple
-                    disabled={creating}
-                    files={createDocumentFiles}
-                    onFilesChange={setCreateDocumentFiles}
-                  />
-                </label>
+                <p className="muted create-documents-hint">{t('applications.createDocumentsHint')}</p>
+                <div className="form-row form-row-2">
+                  <label>
+                    {t('applications.documentType')}
+                    <select
+                      value={createDocumentType}
+                      onChange={(e) =>
+                        setCreateDocumentType(e.target.value as CreditDocumentType)
+                      }
+                      disabled={creating}
+                    >
+                      <option value="IdentityDocument">
+                        {t('applications.documentTypes.IdentityDocument')}
+                      </option>
+                      <option value="IncomeProof">
+                        {t('applications.documentTypes.IncomeProof')}
+                      </option>
+                      <option value="Other">{t('applications.documentTypes.Other')}</option>
+                    </select>
+                  </label>
+                  <label>
+                    {t('applications.documentFile')}
+                    <FilePicker
+                      accept=".pdf,image/jpeg,image/png,application/pdf"
+                      multiple
+                      disabled={creating}
+                      files={createDocumentFiles}
+                      onFilesChange={setCreateDocumentFiles}
+                    />
+                  </label>
+                </div>
               </fieldset>
 
               <div className="actions-cell">

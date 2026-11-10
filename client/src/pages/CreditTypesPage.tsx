@@ -193,9 +193,9 @@ export function CreditTypesPage() {
             <button
               type="button"
               className="btn primary"
-              onClick={() => setShowCreate((v) => !v)}
+              onClick={() => setShowCreate(true)}
             >
-              {showCreate ? t('common.cancel') : t('creditTypes.newType')}
+              {t('creditTypes.newType')}
             </button>
           )}
           {isSuperAdmin && (
@@ -333,117 +333,155 @@ export function CreditTypesPage() {
       )}
 
       {isManager && showCreate && (
-        <form className="panel form" onSubmit={onCreate}>
-          <h2>{t('creditTypes.newType')}</h2>
-          <label>
-            {t('creditTypes.name')}
-            <input
-              value={form.name}
-              onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-              required
-              maxLength={100}
-            />
-          </label>
-          <label>
-            {t('creditTypes.code')}
-            <input
-              value={form.code}
-              onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
-              required
-              maxLength={50}
-            />
-          </label>
-          <label>
-            {t('creditTypes.locale')}
-            <select
-              value={form.locale}
-              onChange={(e) => setForm((f) => ({ ...f, locale: e.target.value as LocaleCode }))}
-            >
-              {LOCALES.map((locale) => (
-                <option key={locale} value={locale}>
-                  {t(`locale.${locale}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('creditTypes.category')}
-            <select
-              value={form.category}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, category: e.target.value as CreditCategory }))
-              }
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {t(`category.${c}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('creditTypes.currency')}
-            <select
-              value={form.currencyCode}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  currencyCode: e.target.value as (typeof CURRENCIES)[number],
-                }))
-              }
-            >
-              {CURRENCIES.map((c) => (
-                <option key={c} value={c}>
-                  {currencySymbol(c)} ({c})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('creditTypes.risk')}
-            <select
-              value={form.riskLevel}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, riskLevel: e.target.value as CreditRiskLevel }))
-              }
-            >
-              {RISKS.map((r) => (
-                <option key={r} value={r}>
-                  {t(`risk.${r}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('creditTypes.description')}
-            <input
-              value={form.description}
-              onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              maxLength={500}
-            />
-          </label>
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={form.requiresCollateral}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, requiresCollateral: e.target.checked }))
-              }
-            />
-            {t('creditTypes.requiresCollateral')}
-          </label>
-          <label className="checkbox-row">
-            <input
-              type="checkbox"
-              checked={form.requiresGuarantor}
-              onChange={(e) => setForm((f) => ({ ...f, requiresGuarantor: e.target.checked }))}
-            />
-            {t('creditTypes.requiresGuarantor')}
-          </label>
-          <button type="submit" className="btn success" disabled={creating}>
-            {creating ? t('common.loading') : t('creditTypes.create')}
-          </button>
-        </form>
+        <div
+          className="staff-modal-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="credit-type-create-title"
+          onClick={(e) => {
+            if (e.target === e.currentTarget && !creating) setShowCreate(false)
+          }}
+        >
+          <form className="staff-modal-panel wide form" onSubmit={onCreate}>
+            <div className="staff-modal-header">
+              <h2 id="credit-type-create-title">{t('creditTypes.newType')}</h2>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setShowCreate(false)}
+                disabled={creating}
+              >
+                {t('common.close')}
+              </button>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('creditTypes.name')}
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                  required
+                  maxLength={100}
+                />
+              </label>
+              <label>
+                {t('creditTypes.code')}
+                <input
+                  value={form.code}
+                  onChange={(e) => setForm((f) => ({ ...f, code: e.target.value }))}
+                  required
+                  maxLength={50}
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('creditTypes.locale')}
+                <select
+                  value={form.locale}
+                  onChange={(e) => setForm((f) => ({ ...f, locale: e.target.value as LocaleCode }))}
+                >
+                  {LOCALES.map((locale) => (
+                    <option key={locale} value={locale}>
+                      {t(`locale.${locale}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                {t('creditTypes.category')}
+                <select
+                  value={form.category}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, category: e.target.value as CreditCategory }))
+                  }
+                >
+                  {CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {t(`category.${c}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('creditTypes.currency')}
+                <select
+                  value={form.currencyCode}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      currencyCode: e.target.value as (typeof CURRENCIES)[number],
+                    }))
+                  }
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c} value={c}>
+                      {currencySymbol(c)} ({c})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                {t('creditTypes.risk')}
+                <select
+                  value={form.riskLevel}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, riskLevel: e.target.value as CreditRiskLevel }))
+                  }
+                >
+                  {RISKS.map((r) => (
+                    <option key={r} value={r}>
+                      {t(`risk.${r}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <label className="form-row-full">
+              {t('creditTypes.description')}
+              <input
+                value={form.description}
+                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                maxLength={500}
+              />
+            </label>
+            <div className="form-row form-row-2">
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={form.requiresCollateral}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, requiresCollateral: e.target.checked }))
+                  }
+                />
+                {t('creditTypes.requiresCollateral')}
+              </label>
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={form.requiresGuarantor}
+                  onChange={(e) => setForm((f) => ({ ...f, requiresGuarantor: e.target.checked }))}
+                />
+                {t('creditTypes.requiresGuarantor')}
+              </label>
+            </div>
+            <div className="actions-cell">
+              <button type="submit" className="btn success" disabled={creating}>
+                {creating ? t('common.loading') : t('creditTypes.create')}
+              </button>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setShowCreate(false)}
+                disabled={creating}
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          </form>
+        </div>
       )}
 
       <div className="chip-row" role="tablist" aria-label={t('creditTypes.category')}>

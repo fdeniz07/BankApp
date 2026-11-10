@@ -269,108 +269,116 @@ export function ProfilePage() {
       {renderAvatar()}
 
       {(isStaff || staffProfile?.isStaff) && staffProfile && (
-        <form className="form create-panel" onSubmit={onSubmitStaff}>
-          <label>
-            {t('profile.academicTitle')}
-            <select
-              value={staffProfile.title || ''}
-              onChange={(e) =>
-                setStaffProfile({
-                  ...staffProfile,
-                  title: (e.target.value || null) as PersonTitle | null,
-                })
-              }
-            >
-              <option value="">{t('profile.titleUnset')}</option>
-              {TITLES.map((title) => (
-                <option key={title} value={title}>
-                  {t(`personTitle.${title}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('customers.gender')}
-            <select
-              value={staffProfile.gender || ''}
-              onChange={(e) =>
-                setStaffProfile({
-                  ...staffProfile,
-                  gender: (e.target.value || null) as Gender | null,
-                })
-              }
-            >
-              <option value="">{t('customers.genderUnset')}</option>
-              {GENDERS.map((g) => (
-                <option key={g} value={g}>
-                  {t(`gender.${g}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.firstName')}
-            <input
-              value={staffProfile.firstName || ''}
-              onChange={(e) => setStaffProfile({ ...staffProfile, firstName: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('profile.lastName')}
-            <input
-              value={staffProfile.lastName || ''}
-              onChange={(e) => setStaffProfile({ ...staffProfile, lastName: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={staffProfile.email}
-              onChange={(e) => setStaffProfile({ ...staffProfile, email: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.dateOfBirth')}
-            <input
-              type="date"
-              value={staffProfile.dateOfBirth || ''}
-              onChange={(e) =>
-                setStaffProfile({ ...staffProfile, dateOfBirth: e.target.value || null })
-              }
-            />
-          </label>
-          <label>
-            {t('profile.position')}
-            <select
-              value={staffProfile.position || ''}
-              onChange={(e) =>
-                setStaffProfile({
-                  ...staffProfile,
-                  position: (e.target.value || null) as StaffPosition | null,
-                })
-              }
-            >
-              <option value="">{t('profile.positionUnset')}</option>
-              {POSITIONS.map((p) => (
-                <option key={p} value={p}>
-                  {t(`staffPosition.${p}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.newPassword')}
-            <input
-              type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              minLength={6}
-              autoComplete="new-password"
-              placeholder={t('profile.newPasswordHint')}
-            />
-          </label>
+        <form className="form create-panel profile-form" onSubmit={onSubmitStaff}>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.academicTitle')}
+              <select
+                value={staffProfile.title || ''}
+                onChange={(e) =>
+                  setStaffProfile({
+                    ...staffProfile,
+                    title: (e.target.value || null) as PersonTitle | null,
+                  })
+                }
+              >
+                <option value="">{t('profile.titleUnset')}</option>
+                {TITLES.map((title) => (
+                  <option key={title} value={title}>
+                    {t(`personTitle.${title}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('customers.gender')}
+              <select
+                value={staffProfile.gender || ''}
+                onChange={(e) =>
+                  setStaffProfile({
+                    ...staffProfile,
+                    gender: (e.target.value || null) as Gender | null,
+                  })
+                }
+              >
+                <option value="">{t('customers.genderUnset')}</option>
+                {GENDERS.map((g) => (
+                  <option key={g} value={g}>
+                    {t(`gender.${g}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.firstName')}
+              <input
+                value={staffProfile.firstName || ''}
+                onChange={(e) => setStaffProfile({ ...staffProfile, firstName: e.target.value })}
+              />
+            </label>
+            <label>
+              {t('profile.lastName')}
+              <input
+                value={staffProfile.lastName || ''}
+                onChange={(e) => setStaffProfile({ ...staffProfile, lastName: e.target.value })}
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('login.email')}
+              <input
+                type="email"
+                value={staffProfile.email}
+                onChange={(e) => setStaffProfile({ ...staffProfile, email: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('profile.dateOfBirth')}
+              <input
+                type="date"
+                value={staffProfile.dateOfBirth || ''}
+                onChange={(e) =>
+                  setStaffProfile({ ...staffProfile, dateOfBirth: e.target.value || null })
+                }
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.position')}
+              <select
+                value={staffProfile.position || ''}
+                onChange={(e) =>
+                  setStaffProfile({
+                    ...staffProfile,
+                    position: (e.target.value || null) as StaffPosition | null,
+                  })
+                }
+              >
+                <option value="">{t('profile.positionUnset')}</option>
+                {POSITIONS.map((p) => (
+                  <option key={p} value={p}>
+                    {t(`staffPosition.${p}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label>
+              {t('profile.newPassword')}
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                minLength={6}
+                autoComplete="new-password"
+                placeholder={t('profile.newPasswordHint')}
+              />
+            </label>
+          </div>
           <div className="info-grid">
             <div>
               <dt>{t('profile.role')}</dt>
@@ -403,49 +411,55 @@ export function ProfilePage() {
       )}
 
       {!isStaff && individual && (
-        <form className="form create-panel" onSubmit={onSubmitCustomer}>
-          <label>
-            {t('customers.customerNumber')}
-            <input value={individual.customerNumber} readOnly disabled />
-          </label>
-          <label>
-            {t('customers.nationalId')}
-            <input value={individual.nationalId} readOnly disabled />
-          </label>
-          <label>
-            {t('profile.firstName')}
-            <input
-              value={individual.firstName}
-              onChange={(e) => setIndividual({ ...individual, firstName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.lastName')}
-            <input
-              value={individual.lastName}
-              onChange={(e) => setIndividual({ ...individual, lastName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={individual.email}
-              onChange={(e) => setIndividual({ ...individual, email: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.phone')}
-            <input
-              value={individual.phoneNumber}
-              onChange={(e) => setIndividual({ ...individual, phoneNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
+        <form className="form create-panel profile-form" onSubmit={onSubmitCustomer}>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.customerNumber')}
+              <input value={individual.customerNumber} readOnly disabled />
+            </label>
+            <label>
+              {t('customers.nationalId')}
+              <input value={individual.nationalId} readOnly disabled />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.firstName')}
+              <input
+                value={individual.firstName}
+                onChange={(e) => setIndividual({ ...individual, firstName: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('profile.lastName')}
+              <input
+                value={individual.lastName}
+                onChange={(e) => setIndividual({ ...individual, lastName: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('login.email')}
+              <input
+                type="email"
+                value={individual.email}
+                onChange={(e) => setIndividual({ ...individual, email: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('profile.phone')}
+              <input
+                value={individual.phoneNumber}
+                onChange={(e) => setIndividual({ ...individual, phoneNumber: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <label className="form-row-full">
             {t('profile.address')}
             <input
               value={individual.address}
@@ -453,53 +467,57 @@ export function ProfilePage() {
               required
             />
           </label>
-          <label>
-            {t('customers.dateOfBirth')}
-            <input
-              type="date"
-              value={individual.dateOfBirth?.slice(0, 10) || ''}
-              onChange={(e) =>
-                setIndividual({ ...individual, dateOfBirth: e.target.value || null })
-              }
-            />
-          </label>
-          <label>
-            {t('customers.gender')}
-            <select
-              value={individual.gender || ''}
-              onChange={(e) =>
-                setIndividual({
-                  ...individual,
-                  gender: e.target.value || null,
-                })
-              }
-            >
-              <option value="">{t('customers.genderUnset')}</option>
-              {GENDERS.map((g) => (
-                <option key={g} value={g}>
-                  {t(`gender.${g}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('customers.motherName')}
-            <input
-              value={individual.motherName || ''}
-              onChange={(e) =>
-                setIndividual({ ...individual, motherName: e.target.value || null })
-              }
-            />
-          </label>
-          <label>
-            {t('customers.fatherName')}
-            <input
-              value={individual.fatherName || ''}
-              onChange={(e) =>
-                setIndividual({ ...individual, fatherName: e.target.value || null })
-              }
-            />
-          </label>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.dateOfBirth')}
+              <input
+                type="date"
+                value={individual.dateOfBirth?.slice(0, 10) || ''}
+                onChange={(e) =>
+                  setIndividual({ ...individual, dateOfBirth: e.target.value || null })
+                }
+              />
+            </label>
+            <label>
+              {t('customers.gender')}
+              <select
+                value={individual.gender || ''}
+                onChange={(e) =>
+                  setIndividual({
+                    ...individual,
+                    gender: e.target.value || null,
+                  })
+                }
+              >
+                <option value="">{t('customers.genderUnset')}</option>
+                {GENDERS.map((g) => (
+                  <option key={g} value={g}>
+                    {t(`gender.${g}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.motherName')}
+              <input
+                value={individual.motherName || ''}
+                onChange={(e) =>
+                  setIndividual({ ...individual, motherName: e.target.value || null })
+                }
+              />
+            </label>
+            <label>
+              {t('customers.fatherName')}
+              <input
+                value={individual.fatherName || ''}
+                onChange={(e) =>
+                  setIndividual({ ...individual, fatherName: e.target.value || null })
+                }
+              />
+            </label>
+          </div>
           <button type="submit" className="btn" disabled={saving}>
             {saving ? t('common.loading') : t('common.save')}
           </button>
@@ -507,47 +525,61 @@ export function ProfilePage() {
       )}
 
       {!isStaff && corporate && (
-        <form className="form create-panel" onSubmit={onSubmitCustomer}>
-          <label>
-            {t('customers.customerNumber')}
-            <input value={corporate.customerNumber} readOnly disabled />
-          </label>
-          <label>
-            {t('profile.companyName')}
-            <input
-              value={corporate.companyName}
-              onChange={(e) => setCorporate({ ...corporate, companyName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.authorizedPerson')}
-            <input
-              value={corporate.authorizedPersonName}
-              onChange={(e) =>
-                setCorporate({ ...corporate, authorizedPersonName: e.target.value })
-              }
-              required
-            />
-          </label>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={corporate.email}
-              onChange={(e) => setCorporate({ ...corporate, email: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.phone')}
-            <input
-              value={corporate.phoneNumber}
-              onChange={(e) => setCorporate({ ...corporate, phoneNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
+        <form className="form create-panel profile-form" onSubmit={onSubmitCustomer}>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.customerNumber')}
+              <input value={corporate.customerNumber} readOnly disabled />
+            </label>
+            <label>
+              {t('profile.companyName')}
+              <input
+                value={corporate.companyName}
+                onChange={(e) => setCorporate({ ...corporate, companyName: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.authorizedPerson')}
+              <input
+                value={corporate.authorizedPersonName}
+                onChange={(e) =>
+                  setCorporate({ ...corporate, authorizedPersonName: e.target.value })
+                }
+                required
+              />
+            </label>
+            <label>
+              {t('login.email')}
+              <input
+                type="email"
+                value={corporate.email}
+                onChange={(e) => setCorporate({ ...corporate, email: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.phone')}
+              <input
+                value={corporate.phoneNumber}
+                onChange={(e) => setCorporate({ ...corporate, phoneNumber: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('customers.taxNumber')}
+              <input
+                value={corporate.taxNumber}
+                onChange={(e) => setCorporate({ ...corporate, taxNumber: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <label className="form-row-full">
             {t('profile.address')}
             <input
               value={corporate.address}
@@ -555,32 +587,26 @@ export function ProfilePage() {
               required
             />
           </label>
-          <label>
-            {t('customers.taxNumber')}
-            <input
-              value={corporate.taxNumber}
-              onChange={(e) => setCorporate({ ...corporate, taxNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('customers.taxOffice')}
-            <input
-              value={corporate.taxOffice}
-              onChange={(e) => setCorporate({ ...corporate, taxOffice: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('customers.companyRegistrationNumber')}
-            <input
-              value={corporate.companyRegistrationNumber}
-              onChange={(e) =>
-                setCorporate({ ...corporate, companyRegistrationNumber: e.target.value })
-              }
-              required
-            />
-          </label>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.taxOffice')}
+              <input
+                value={corporate.taxOffice}
+                onChange={(e) => setCorporate({ ...corporate, taxOffice: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('customers.companyRegistrationNumber')}
+              <input
+                value={corporate.companyRegistrationNumber}
+                onChange={(e) =>
+                  setCorporate({ ...corporate, companyRegistrationNumber: e.target.value })
+                }
+                required
+              />
+            </label>
+          </div>
           <button type="submit" className="btn" disabled={saving}>
             {saving ? t('common.loading') : t('common.save')}
           </button>

@@ -152,45 +152,61 @@ export function CustomerDetailPage() {
       {error && <p className="error-text">{error}</p>}
 
       {!loading && individual && (
-        <form className="form create-panel" onSubmit={onSave}>
-          <label>
-            {t('customers.customerNumber')}
-            <input value={individual.customerNumber} readOnly disabled />
-          </label>
-          <label>
-            {t('profile.firstName')}
-            <input
-              value={individual.firstName}
-              onChange={(e) => setIndividual({ ...individual, firstName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.lastName')}
-            <input
-              value={individual.lastName}
-              onChange={(e) => setIndividual({ ...individual, lastName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={individual.email}
-              onChange={(e) => setIndividual({ ...individual, email: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.phone')}
-            <input
-              value={individual.phoneNumber}
-              onChange={(e) => setIndividual({ ...individual, phoneNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
+        <form className="form create-panel profile-form" onSubmit={onSave}>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.customerNumber')}
+              <input value={individual.customerNumber} readOnly disabled />
+            </label>
+            <label>
+              {t('customers.nationalId')}
+              <input
+                value={individual.nationalId}
+                onChange={(e) => setIndividual({ ...individual, nationalId: e.target.value })}
+                required
+                minLength={11}
+                maxLength={11}
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.firstName')}
+              <input
+                value={individual.firstName}
+                onChange={(e) => setIndividual({ ...individual, firstName: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('profile.lastName')}
+              <input
+                value={individual.lastName}
+                onChange={(e) => setIndividual({ ...individual, lastName: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('login.email')}
+              <input
+                type="email"
+                value={individual.email}
+                onChange={(e) => setIndividual({ ...individual, email: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('profile.phone')}
+              <input
+                value={individual.phoneNumber}
+                onChange={(e) => setIndividual({ ...individual, phoneNumber: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <label className="form-row-full">
             {t('profile.address')}
             <input
               value={individual.address}
@@ -198,63 +214,57 @@ export function CustomerDetailPage() {
               required
             />
           </label>
-          <label>
-            {t('customers.nationalId')}
-            <input
-              value={individual.nationalId}
-              onChange={(e) => setIndividual({ ...individual, nationalId: e.target.value })}
-              required
-              minLength={11}
-              maxLength={11}
-            />
-          </label>
-          <label>
-            {t('customers.dateOfBirth')}
-            <input
-              type="date"
-              value={individual.dateOfBirth?.slice(0, 10) || ''}
-              onChange={(e) =>
-                setIndividual({ ...individual, dateOfBirth: e.target.value || null })
-              }
-            />
-          </label>
-          <label>
-            {t('customers.gender')}
-            <select
-              value={individual.gender || ''}
-              onChange={(e) =>
-                setIndividual({
-                  ...individual,
-                  gender: e.target.value || null,
-                })
-              }
-            >
-              <option value="">{t('customers.genderUnset')}</option>
-              {GENDERS.map((g) => (
-                <option key={g} value={g}>
-                  {t(`gender.${g}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('customers.motherName')}
-            <input
-              value={individual.motherName || ''}
-              onChange={(e) =>
-                setIndividual({ ...individual, motherName: e.target.value || null })
-              }
-            />
-          </label>
-          <label>
-            {t('customers.fatherName')}
-            <input
-              value={individual.fatherName || ''}
-              onChange={(e) =>
-                setIndividual({ ...individual, fatherName: e.target.value || null })
-              }
-            />
-          </label>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.dateOfBirth')}
+              <input
+                type="date"
+                value={individual.dateOfBirth?.slice(0, 10) || ''}
+                onChange={(e) =>
+                  setIndividual({ ...individual, dateOfBirth: e.target.value || null })
+                }
+              />
+            </label>
+            <label>
+              {t('customers.gender')}
+              <select
+                value={individual.gender || ''}
+                onChange={(e) =>
+                  setIndividual({
+                    ...individual,
+                    gender: e.target.value || null,
+                  })
+                }
+              >
+                <option value="">{t('customers.genderUnset')}</option>
+                {GENDERS.map((g) => (
+                  <option key={g} value={g}>
+                    {t(`gender.${g}`)}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.motherName')}
+              <input
+                value={individual.motherName || ''}
+                onChange={(e) =>
+                  setIndividual({ ...individual, motherName: e.target.value || null })
+                }
+              />
+            </label>
+            <label>
+              {t('customers.fatherName')}
+              <input
+                value={individual.fatherName || ''}
+                onChange={(e) =>
+                  setIndividual({ ...individual, fatherName: e.target.value || null })
+                }
+              />
+            </label>
+          </div>
           <label className="checkbox-row">
             <input
               type="checkbox"
@@ -293,47 +303,61 @@ export function CustomerDetailPage() {
       )}
 
       {!loading && corporate && (
-        <form className="form create-panel" onSubmit={onSave}>
-          <label>
-            {t('customers.customerNumber')}
-            <input value={corporate.customerNumber} readOnly disabled />
-          </label>
-          <label>
-            {t('profile.companyName')}
-            <input
-              value={corporate.companyName}
-              onChange={(e) => setCorporate({ ...corporate, companyName: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.authorizedPerson')}
-            <input
-              value={corporate.authorizedPersonName}
-              onChange={(e) =>
-                setCorporate({ ...corporate, authorizedPersonName: e.target.value })
-              }
-              required
-            />
-          </label>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={corporate.email}
-              onChange={(e) => setCorporate({ ...corporate, email: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.phone')}
-            <input
-              value={corporate.phoneNumber}
-              onChange={(e) => setCorporate({ ...corporate, phoneNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
+        <form className="form create-panel profile-form" onSubmit={onSave}>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.customerNumber')}
+              <input value={corporate.customerNumber} readOnly disabled />
+            </label>
+            <label>
+              {t('profile.companyName')}
+              <input
+                value={corporate.companyName}
+                onChange={(e) => setCorporate({ ...corporate, companyName: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.authorizedPerson')}
+              <input
+                value={corporate.authorizedPersonName}
+                onChange={(e) =>
+                  setCorporate({ ...corporate, authorizedPersonName: e.target.value })
+                }
+                required
+              />
+            </label>
+            <label>
+              {t('login.email')}
+              <input
+                type="email"
+                value={corporate.email}
+                onChange={(e) => setCorporate({ ...corporate, email: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('profile.phone')}
+              <input
+                value={corporate.phoneNumber}
+                onChange={(e) => setCorporate({ ...corporate, phoneNumber: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('customers.taxNumber')}
+              <input
+                value={corporate.taxNumber}
+                onChange={(e) => setCorporate({ ...corporate, taxNumber: e.target.value })}
+                required
+              />
+            </label>
+          </div>
+          <label className="form-row-full">
             {t('profile.address')}
             <input
               value={corporate.address}
@@ -341,43 +365,54 @@ export function CustomerDetailPage() {
               required
             />
           </label>
-          <label>
-            {t('customers.taxNumber')}
-            <input
-              value={corporate.taxNumber}
-              onChange={(e) => setCorporate({ ...corporate, taxNumber: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('customers.taxOffice')}
-            <input
-              value={corporate.taxOffice}
-              onChange={(e) => setCorporate({ ...corporate, taxOffice: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('customers.companyRegistrationNumber')}
-            <input
-              value={corporate.companyRegistrationNumber}
-              onChange={(e) =>
-                setCorporate({ ...corporate, companyRegistrationNumber: e.target.value })
-              }
-              required
-            />
-          </label>
-          <label>
-            {t('customers.companyEmail')}
-            <input
-              type="email"
-              value={corporate.companyEmail || ''}
-              onChange={(e) =>
-                setCorporate({ ...corporate, companyEmail: e.target.value || null })
-              }
-            />
-          </label>
-          <label>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.taxOffice')}
+              <input
+                value={corporate.taxOffice}
+                onChange={(e) => setCorporate({ ...corporate, taxOffice: e.target.value })}
+                required
+              />
+            </label>
+            <label>
+              {t('customers.companyRegistrationNumber')}
+              <input
+                value={corporate.companyRegistrationNumber}
+                onChange={(e) =>
+                  setCorporate({ ...corporate, companyRegistrationNumber: e.target.value })
+                }
+                required
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.companyEmail')}
+              <input
+                type="email"
+                value={corporate.companyEmail || ''}
+                onChange={(e) =>
+                  setCorporate({ ...corporate, companyEmail: e.target.value || null })
+                }
+              />
+            </label>
+            <label>
+              {t('customers.companyFoundationDate')}
+              <input
+                type="date"
+                value={corporate.companyFoundationDate?.slice(0, 10) || ''}
+                onChange={(e) =>
+                  setCorporate({
+                    ...corporate,
+                    companyFoundationDate: e.target.value
+                      ? `${e.target.value}T00:00:00.000Z`
+                      : null,
+                  })
+                }
+              />
+            </label>
+          </div>
+          <label className="form-row-full">
             {t('customers.companyAddress')}
             <input
               value={corporate.companyAddress || ''}
@@ -387,57 +422,46 @@ export function CustomerDetailPage() {
             />
           </label>
           <p className="muted">{t('customers.suggestHint')}</p>
-          <label>
-            {t('customers.companyType')}
-            <SuggestInput
-              id="detail-companyType"
-              value={corporate.companyType || ''}
-              options={catalog.companyTypes}
-              onChange={(v) => setCorporate({ ...corporate, companyType: v || null })}
-            />
-          </label>
-          <label>
-            {t('customers.companySector')}
-            <SuggestInput
-              id="detail-companySector"
-              value={corporate.companySector || ''}
-              options={catalog.companySectors}
-              onChange={(v) => setCorporate({ ...corporate, companySector: v || null })}
-            />
-          </label>
-          <label>
-            {t('customers.companyIndustry')}
-            <SuggestInput
-              id="detail-companyIndustry"
-              value={corporate.companyIndustry || ''}
-              options={catalog.companyIndustries}
-              onChange={(v) => setCorporate({ ...corporate, companyIndustry: v || null })}
-            />
-          </label>
-          <label>
-            {t('customers.companySubIndustry')}
-            <SuggestInput
-              id="detail-companySubIndustry"
-              value={corporate.companySubIndustry || ''}
-              options={catalog.companySubIndustries}
-              onChange={(v) => setCorporate({ ...corporate, companySubIndustry: v || null })}
-            />
-          </label>
-          <label>
-            {t('customers.companyFoundationDate')}
-            <input
-              type="date"
-              value={corporate.companyFoundationDate?.slice(0, 10) || ''}
-              onChange={(e) =>
-                setCorporate({
-                  ...corporate,
-                  companyFoundationDate: e.target.value
-                    ? `${e.target.value}T00:00:00.000Z`
-                    : null,
-                })
-              }
-            />
-          </label>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.companyType')}
+              <SuggestInput
+                id="detail-companyType"
+                value={corporate.companyType || ''}
+                options={catalog.companyTypes}
+                onChange={(v) => setCorporate({ ...corporate, companyType: v || null })}
+              />
+            </label>
+            <label>
+              {t('customers.companySector')}
+              <SuggestInput
+                id="detail-companySector"
+                value={corporate.companySector || ''}
+                options={catalog.companySectors}
+                onChange={(v) => setCorporate({ ...corporate, companySector: v || null })}
+              />
+            </label>
+          </div>
+          <div className="form-row form-row-2">
+            <label>
+              {t('customers.companyIndustry')}
+              <SuggestInput
+                id="detail-companyIndustry"
+                value={corporate.companyIndustry || ''}
+                options={catalog.companyIndustries}
+                onChange={(v) => setCorporate({ ...corporate, companyIndustry: v || null })}
+              />
+            </label>
+            <label>
+              {t('customers.companySubIndustry')}
+              <SuggestInput
+                id="detail-companySubIndustry"
+                value={corporate.companySubIndustry || ''}
+                options={catalog.companySubIndustries}
+                onChange={(v) => setCorporate({ ...corporate, companySubIndustry: v || null })}
+              />
+            </label>
+          </div>
           <label className="checkbox-row">
             <input
               type="checkbox"

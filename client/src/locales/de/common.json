@@ -14,6 +14,7 @@
     "staff": "Personal",
     "branches": "Filialen",
     "profile": "Profil",
+    "branch": "Filiale",
     "logout": "Abmelden"
   },
   "adminDashboard": {
@@ -48,7 +49,7 @@
   "staff": {
     "title": "Personalverwaltung",
     "managerOnly": "Diese Seite ist nur für Bankmanager.",
-    "hint": "Mitarbeiter Ihrer Filiale anlegen und aktualisieren. Andere Manager ändern und die Manager-Rolle zuweisen darf nur SuperAdmin. Filiale-/Text-/Rollenfilter nutzen Elasticsearch (SQL-Fallback).",
+    "hint": "Mitarbeiter Ihrer Filiale anlegen und aktualisieren. Andere Filialen sind sichtbar; Bearbeiten / Deaktivieren gilt nur in Ihrer Filiale. Andere Manager ändern und die Manager-Rolle zuweisen darf nur SuperAdmin. Filiale-/Text-/Rollenfilter nutzen Elasticsearch (SQL-Fallback).",
     "newStaff": "Neuer Mitarbeiter",
     "editStaff": "Mitarbeiter bearbeiten",
     "create": "Anlegen",
@@ -244,6 +245,7 @@
     "save": "Speichern",
     "edit": "Bearbeiten",
     "cancel": "Abbrechen",
+    "close": "Schließen",
     "actions": "Aktionen",
     "details": "Details",
     "yes": "Ja",
@@ -445,7 +447,13 @@
     "documentFile": "Datei",
     "documentUpload": "Hochladen",
     "documentDownload": "Herunterladen",
+    "documentPreview": "Vorschau",
+    "documentDelete": "Entfernen",
     "documentUploadSuccess": "Unterlage hochgeladen.",
+    "documentDeleteSuccess": "Unterlage entfernt.",
+    "confirmDeleteDocument": "Möchten Sie diese Unterlage wirklich entfernen?",
+    "documentPreviewTitle": "Unterlagenvorschau",
+    "documentPreviewUnavailable": "Dieser Dateityp kann nicht angezeigt werden; bitte herunterladen.",
     "documentTypes": {
       "IdentityDocument": "Ausweis",
       "IncomeProof": "Einkommensnachweis",
@@ -540,6 +548,7 @@
     "documentInvalidContent": "Dateiinhalt entspricht nicht dem angegebenen Typ.",
     "documentTypeInvalid": "Unterlagen-Typ ist ungültig.",
     "documentOnlyPending": "Unterlagen können nur bei ausstehendem Antrag hochgeladen werden.",
+    "documentOnlyPendingDelete": "Unterlagen können nur bei ausstehendem Antrag entfernt werden.",
     "documentMaxExceeded": "Höchstens 10 Unterlagen pro Antrag.",
     "documentNotFound": "Unterlage nicht gefunden.",
     "unauthorized": "Ihre Sitzung ist abgelaufen. Bitte erneut anmelden."

@@ -14,6 +14,7 @@
     "staff": "Personel",
     "branches": "Şubeler",
     "profile": "Profil",
+    "branch": "Şube",
     "logout": "Çıkış"
   },
   "adminDashboard": {
@@ -48,7 +49,7 @@
   "staff": {
     "title": "Personel yönetimi",
     "managerOnly": "Bu sayfa yalnızca banka yöneticileri içindir.",
-    "hint": "Şubenizdeki personeli oluşturun ve güncelleyin. Başka yöneticilere dokunma ve yönetici rolü atama yalnızca SuperAdmin’e açıktır. Şube / metin / rol filtreleri Elasticsearch (yoksa SQL) üzerinden çalışır.",
+    "hint": "Şubenizdeki personeli oluşturun ve güncelleyin. Başka şubeyi görebilirsiniz; düzenleme / pasifleştirme yalnız kendi şubenizde geçerlidir. Başka yöneticilere dokunma ve yönetici rolü atama yalnızca SuperAdmin’e açıktır. Şube / metin / rol filtreleri Elasticsearch (yoksa SQL) üzerinden çalışır.",
     "newStaff": "Yeni personel",
     "editStaff": "Personeli düzenle",
     "create": "Oluştur",
@@ -244,6 +245,7 @@
     "save": "Kaydet",
     "edit": "Düzenle",
     "cancel": "İptal",
+    "close": "Kapat",
     "actions": "İşlemler",
     "details": "Detay",
     "yes": "Evet",
@@ -445,7 +447,13 @@
     "documentFile": "Dosya",
     "documentUpload": "Yükle",
     "documentDownload": "İndir",
+    "documentPreview": "Önizle",
+    "documentDelete": "Kaldır",
     "documentUploadSuccess": "Evrak yüklendi.",
+    "documentDeleteSuccess": "Evrak kaldırıldı.",
+    "confirmDeleteDocument": "Bu evrakı kaldırmak istediğinize emin misiniz?",
+    "documentPreviewTitle": "Evrak önizleme",
+    "documentPreviewUnavailable": "Bu dosya türü önizlenemiyor; indirmeyi kullanın.",
     "documentTypes": {
       "IdentityDocument": "Kimlik",
       "IncomeProof": "Gelir belgesi",
@@ -540,6 +548,7 @@
     "documentInvalidContent": "Evrak içeriği beyan edilen türe uymuyor.",
     "documentTypeInvalid": "Evrak türü geçersiz.",
     "documentOnlyPending": "Evrak yalnızca beklemedeki başvuruya yüklenebilir.",
+    "documentOnlyPendingDelete": "Evrak yalnızca beklemedeki başvurudan kaldırılabilir.",
     "documentMaxExceeded": "Başvuru başına en fazla 10 evrak yüklenebilir.",
     "documentNotFound": "Evrak bulunamadı.",
     "unauthorized": "Oturum süreniz doldu. Lütfen yeniden giriş yapın."
