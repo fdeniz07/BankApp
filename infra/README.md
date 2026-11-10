@@ -84,10 +84,10 @@ Secrets and ports live in `infra/.env` (gitignored). Template: `infra/.env.examp
 | `VITE_API_BASE_URL` | Browser API URL baked into the client image at build time |
 | `PUBLIC_CLIENT_BASE_URL` | Client origin used in email-confirmation links |
 | `RABBITMQ_PORT` / `RABBITMQ_MANAGEMENT_PORT` | Host ports for AMQP / management UI |
-| `RABBITMQ_PASSWORD` | Mirrored into Vault seed only (Compose broker still uses `guest`) |
-| `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512) |
+| `RABBITMQ_USER` / `RABBITMQ_PASSWORD` | Broker `DEFAULT_USER`/`PASS` + Vault `secret/bankapp/messaging` (existing `rabbitmq-data` volume ignores credential changes until recreate) |
+| `TOKEN_SECURITY_KEY` | JWT signing key (≥ 64 bytes for HMAC-SHA512); seeded into `secret/bankapp/jwt` |
 | `VAULT_PORT` | Host port for Vault UI/API (default 8200) |
-| `VAULT_DEV_ROOT_TOKEN_ID` | Dev root token (lab only; not for production) |
+| `VAULT_DEV_ROOT_TOKEN_ID` | Dev **root** token for `vault-seed` / UI only — **not** injected into WebApi |
 | `OTEL_GRPC_PORT` / `OTEL_HTTP_PORT` | Host ports for OTLP (default 4317 / 4318) |
 | `PROMETHEUS_PORT` | Host port for Prometheus (default 9090) |
 | `GRAFANA_PORT` | Host port for Grafana (default **3001**, avoids client `:3000`) |
@@ -99,7 +99,7 @@ Inside Docker network, the API uses:
 - Redis: `redis:6379`
 - Seq: `http://seq`
 - RabbitMQ: `rabbitmq:5672`
-- Vault: `http://vault:8200` (Compose sets `Vault__Enabled=true`; JWT key from `secret/bankapp`)
+- Vault: `http://vault:8200` (Compose: `Vault__Enabled=true`, AppRole files on `vault-approle`, `FailClosed=true`; overlays JWT + SQL password + RabbitMQ)
 
 The React app runs in the browser, so it calls the host-mapped API (`VITE_API_BASE_URL`, default `http://localhost:8080`), not the Compose service name.
 
@@ -141,7 +141,19 @@ WebApi liveness (host): `http://localhost:8080/health` — no auth; does not pro
 
 ## HashiCorp Vault (lab)
 
-Dev-mode Vault for learning secret management. Compose WebApi enables Vault and overlays **JWT `SecurityKey`** from `secret/bankapp` (`jwt_security_key`). SQL/Redis/RabbitMQ connection settings still come from Compose env; if Vault is down, `TokenOptions__SecurityKey` from `.env` remains the fallback.
+Dev-mode Vault for learning secret management with a **prod-shaped** auth model:
+
+| Path | Contents | Who reads |
+|------|----------|-----------|
+| `secret/bankapp/jwt` | `jwt_security_key` (+ optional `jwt_security_key_previous`) | WebApi (AppRole) |
+| `secret/bankapp/database` | `mssql_sa_password` | WebApi (AppRole) |
+| `secret/bankapp/messaging` | `rabbitmq_username`, `rabbitmq_password` | WebApi (AppRole) |
+| `secret/bankapp/observability` | Grafana/Keycloak admin (+ optional social client secrets) | Operators / UI only — **denied** to WebApi policy |
+
+- **Root token** (`VAULT_DEV_ROOT_TOKEN_ID`): `vault-seed` + Vault UI bootstrap only — **not** given to WebApi.
+- **AppRole** `bankapp-webapi`: seed writes `role_id` / `secret_id` to Compose volume `bankapp-vault-approle`; WebApi logs in and overlays JWT + SQL connection `Password` + RabbitMQ credentials.
+- **FailClosed=true** on Compose WebApi: Vault/AppRole failure aborts startup (local `dotnet run` keeps `Vault:Enabled=false`).
+- SQL / RabbitMQ / Grafana / Keycloak **containers** still bootstrap from Compose `.env` (Vault Agent / CSI is out of scope for this lab).
 
 ```bash
 # start only Vault (+ one-shot seed)
@@ -153,13 +165,14 @@ docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --build
 
 1. Open http://localhost:8200
 2. Sign in with token = `VAULT_DEV_ROOT_TOKEN_ID` (default `bankapp-vault-root-token`)
-3. Browse KV path **`secret/bankapp`** — keys: `jwt_security_key`, `mssql_sa_password`, `rabbitmq_password`
+3. Browse KV paths under **`secret/bankapp/`** (`jwt`, `database`, `messaging`, `observability`)
 4. Seed script: [`scripts/vault-seed.sh`](scripts/vault-seed.sh) (also run by Compose `vault-seed`)
 
-Re-seed manually after Vault restart (dev data is ephemeral):
+Re-seed manually after Vault restart (dev data is ephemeral; re-mints AppRole `secret_id`):
 
 ```bash
 docker compose -f infra/docker-compose.yml --env-file infra/.env up vault-seed
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --force-recreate --no-deps webapi
 ```
 
 ## Caching / logging / observability
@@ -189,8 +202,8 @@ Local `dotnet run` keeps OTel **off** by default (`appsettings`); point `OpenTel
 ## Roadmap
 
 - GitHub Actions / ArgoCD / K8s; chatbot (see docs roadmap)
-- WebApi JWT overlay + dual-key rotate — **done** (`Vault__Enabled`, `secret/bankapp`)
-- Optional Raft HA lab — **done** (`docker-compose.vault-raft.yml`; still TLS/AppRole for prod)
+- WebApi JWT overlay + dual-key rotate — **done**
+- AppRole + split KV paths (jwt/database/messaging/observability) + FailClosed — **done**
+- Optional Raft HA lab — **done** (`docker-compose.vault-raft.yml`; still TLS for prod)
 - Keycloak dual JWT + SPA PKCE + social IdP script — **done**
 - Elasticsearch live search — **done** (learning 31)
-- More secret keys in Vault (SQL/RabbitMQ) for production-like labs — later

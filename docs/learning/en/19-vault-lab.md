@@ -6,38 +6,47 @@ Related: [06 JWT](06-jwt-rbac.md) · [24 Lab tools](24-lab-tools.md) · [09 Comp
 
 ## What is this?
 
-**Vault**: Secret storage. In the BankApp lab, Compose runs **dev-mode** Vault plus `vault-seed` → KV path `secret/bankapp`.  
-On WebApi startup, optionally reads the **JWT signing key** from Vault and overlays `TokenOptions:SecurityKey`.
+**Vault**: Secret storage. In the BankApp lab, Compose **dev-mode** Vault + `vault-seed` writes **split KV paths** and mints **AppRole** credentials.  
+WebApi does **not** use the root token; it logs in with AppRole and overlays JWT + SQL password + RabbitMQ credentials (`FailClosed=true` aborts startup on Vault failure).
 
-**Analogy:** Vault is the **safe room**; overlay is swapping the desk copy with the key from the safe; `.env` fallback is the drawer spare (lab only).
+**Analogy:** Vault is the **safe room**; AppRole is a **limited badge** (only certain lockers); root token is the master key (seed/UI only); observability path is the camera cabinet (badge denied).
 
 ```mermaid
 flowchart LR
-  V["Vault KV secret bankapp"] -->|"jwt_security_key"| W["WebApi startup"]
-  W -->|"overlay"| C["TokenOptions SecurityKey"]
-  C --> JWT["JWT sign validate"]
-  ENV["env fallback"] -.->|"Vault down"| C
+  seed["vault-seed root"] --> jwtPath["secret bankapp jwt"]
+  seed --> dbPath["secret bankapp database"]
+  seed --> mqPath["secret bankapp messaging"]
+  seed --> obsPath["secret bankapp observability"]
+  seed --> role["AppRole bankapp-webapi"]
+  role --> api["WebApi"]
+  api -->|"read"| jwtPath
+  api -->|"read"| dbPath
+  api -->|"read"| mqPath
+  obsPath -.->|"policy deny"| api
 ```
 
 ## Role in BankApp
 
-- Educational visibility of secrets in the lab UI.
-- With `Vault__Enabled=true` in Compose, the JWT key comes from Vault; if Vault is down, fallback is `.env` / `TokenOptions__SecurityKey`.
-- SQL connection string still comes from Compose env (kept simple); can be extended in a later slice.
+- Path-separated secrets visible in the lab UI.
+- Compose AppRole + `FailClosed=true`: overlay JWT, SQL `Password`, RabbitMQ user/password from Vault.
+- Observability admin secrets live in Vault; WebApi policy **cannot** read them.
+- SQL/Rabbit/Grafana/Keycloak **containers** still bootstrap from Compose `.env` (Vault Agent out of scope).
 
 ## When added?
 
-Compose lab earlier; **WebApi JWT overlay** in the security slice.
+Compose lab + JWT overlay earlier; **AppRole + split paths + FailClosed** in the security hardening slice.
 
 ## Core concepts
 
 | Concept | Meaning |
 |--------|--------|
 | **KV v2** | `secret/data/{path}` HTTP API |
-| **X-Vault-Token** | Token on the request header |
+| **AppRole** | `role_id` + `secret_id` → short-lived client token |
+| **Policy** | Which paths may be read/written — least privilege |
+| **FailClosed** | App will not start if Vault/AppRole fails |
 | **Overlay** | Overwrite config via `AddInMemoryCollection` |
 | **Dev mode** | Not production; no unseal/raft; ephemeral data |
-| **Root token** | Full access in the lab — anti-pattern in prod |
+| **Root token** | Bootstrap only — never injected into WebApi |
 
 ```mermaid
 sequenceDiagram
@@ -45,9 +54,11 @@ sequenceDiagram
   participant V as Vault
   participant API as WebApi
   participant User as User login
-  Seed->>V: write jwt_security_key
-  API->>V: KV GET at startup
-  V-->>API: current and optional previous
+  Seed->>V: write split KV and AppRole
+  API->>V: auth approle login
+  V-->>API: client_token
+  API->>V: KV GET jwt database messaging
+  V-->>API: secret data
   API->>API: AddInMemoryCollection overlay
   User->>API: request access token
   API->>User: JWT signed with current key
@@ -67,30 +78,22 @@ docker compose --env-file .env up vault-seed
 
 **Vault UI**
 
-1. Method: **Token** → paste `VAULT_DEV_ROOT_TOKEN_ID`.
-2. Secrets → KV → `secret` → `bankapp` (or the seed path).
-3. Read `jwt_security_key` (do not put the value in screenshots).
+1. Method: **Token** → paste `VAULT_DEV_ROOT_TOKEN_ID` (operators only).
+2. Secrets → KV → `secret` → `bankapp` → `jwt` / `database` / `messaging` / `observability`.
+3. Under `jwt`, read `jwt_security_key` (do not screenshot the value).
 
 ```powershell
-# Same secret via CLI (vault binary in container)
-docker compose --env-file .env exec vault vault kv get secret/bankapp
-# Expected: jwt_security_key row; error → seed did not run or wrong path
+docker compose --env-file .env exec vault vault kv get secret/bankapp/jwt
+docker compose --env-file .env exec vault vault kv get secret/bankapp/database
+docker compose --env-file .env exec vault vault kv get secret/bankapp/messaging
+docker compose --env-file .env exec vault vault kv get secret/bankapp/observability
 ```
 
 ```powershell
-# Vault status (seal info in dev mode)
 docker compose --env-file .env exec vault vault status
 
-# Was WebApi overlay applied?
 docker compose --env-file .env logs webapi | Select-String -Pattern "Vault"
-# Expected: "Vault overlay applied" or fallback warning
-```
-
-```powershell
-# Quick host check of UI / API
-curl -s -o NUL -w "%{http_code}`n" http://localhost:8200/ui/
-curl -s -H "X-Vault-Token: bankapp-vault-root-token" http://localhost:8200/v1/secret/data/bankapp
-# Replace token with your .env value; expect 200 + JSON data
+# Expected: "Vault overlay applied via AppRole"
 ```
 
 ### What to verify
@@ -98,30 +101,31 @@ curl -s -H "X-Vault-Token: bankapp-vault-root-token" http://localhost:8200/v1/se
 | Check | How | Good sign |
 |---------|-------|-------------|
 | Vault up | `compose ps vault` | healthy / Up |
-| Seed | `vault kv get secret/bankapp` | key populated |
-| Overlay | `logs webapi` + Vault | overlay applied |
-| Fallback | Stop Vault and restart WebApi | stays up with `.env` key (lab) |
+| Seed paths | `kv get` jwt/database/messaging/observability | populated |
+| AppRole files | WebApi `/vault-approle` | role_id + secret_id |
+| Overlay | `logs webapi` | AppRole overlay applied |
+| FailClosed | Vault down + WebApi recreate | WebApi does not stay healthy |
 
 ### Disaster / recovery (lab)
 
 | Situation | Path |
 |-------|-----|
-| UI “sealed” / empty (dev reset) | Restart dev Vault → **run seed again** (`up vault-seed`) |
-| kv get not found | Seed exit code / `logs vault-seed`; path `secret/bankapp` |
-| WebApi 500 JWT / signature | No overlay + wrong key length; `.env` `TOKEN_SECURITY_KEY` ≥ 64 bytes |
-| Forgot token | `infra/.env` → `VAULT_DEV_ROOT_TOKEN_ID` (also in example file) |
+| UI “sealed” / empty (dev reset) | Recreate Vault → **seed** → **webapi recreate** (new secret_id) |
+| kv get not found | `logs vault-seed`; path `secret/bankapp/jwt` etc. |
+| WebApi FailClosed loop | Did seed finish? Approle volume mounted? |
+| JWT / signature | `TOKEN_SECURITY_KEY` ≥ 64 bytes; jwt path populated |
+| Forgot root token | `infra/.env` → `VAULT_DEV_ROOT_TOKEN_ID` |
 
 ```powershell
-# Re-run seed (while Vault is up)
 docker compose --env-file .env up vault-seed
+docker compose --env-file .env up -d --force-recreate --no-deps webapi
 
-# Recreate Vault + seed (lab secrets refreshed)
 docker compose --env-file .env up -d --force-recreate vault
 docker compose --env-file .env up vault-seed
-docker compose --env-file .env up -d --force-recreate webapi
+docker compose --env-file .env up -d --force-recreate --no-deps webapi
 ```
 
-**Note / best practice:** Dev mode ≠ prod (Raft, policy, rotation). Do not paste root token into public issues. SQL/Rabbit still use Compose env — intentional simplification.
+**Note / best practice:** Dev mode ≠ prod (Raft, TLS, audit). Never put root token on WebApi. Containers still bootstrap from Compose `.env`.
 
 ## Secret rotation (lab dual-key) and Raft HA (optional Compose)
 
@@ -129,27 +133,26 @@ The daily BankApp stack uses **dev-mode** Vault (`:8200`). **JWT dual-key** live
 
 | Topic | Lab | Production |
 |------|--------------|----------|
-| **JWT rotation** | `jwt_security_key` + `jwt_security_key_previous`; WebApi signs=current, validates=both | Key id, short dual-key window, rolling restart |
+| **JWT rotation** | `secret/bankapp/jwt` dual-key; signs=current, validates=both | Key id, short dual-key window, rolling restart |
+| **Auth** | AppRole + narrow policy (Compose) | K8s Auth / AppRole / JWT auth + CSI / Agent |
 | **Raft / HA** | Optional 3-node Compose overlay | ≥3 node Raft, unseal, audit, TLS |
-| **Policy** | Root token | AppRole + narrow policy |
 
 ### Dual-key rotate (recommended lab)
 
 ```powershell
 cd infra
 
-# Active key → previous; write new active key (keep mssql/rabbit fields)
+# Updates only secret/bankapp/jwt (database/messaging untouched)
 docker compose --env-file .env exec `
   -e VAULT_TOKEN=bankapp-vault-root-token `
   vault /bin/sh /vault-rotate-jwt.sh
 
-# WebApi re-reads Vault overlay (--no-deps: do not re-run vault-seed overwrite)
 docker compose --env-file .env up -d --force-recreate --no-deps webapi
 ```
 
-**Check:** `vault kv get secret/bankapp` → `jwt_security_key` and `jwt_security_key_previous`; logs show `SecurityKey + Previous`.  
+**Check:** `vault kv get secret/bankapp/jwt` → both key fields; logs show `SecurityKey + Previous`.  
 Old (previous-signed) access tokens should still validate; new logins sign with current.  
-`vault-seed` no longer overwrites if secret exists (preserves rotation); still use `--no-deps` on recreate as a safe habit.
+`vault-seed` keeps existing jwt/database/messaging; observability may refresh from env each seed.
 
 Optional custom key:
 
@@ -201,11 +204,13 @@ docker compose -f docker-compose.vault-raft.yml exec -e VAULT_TOKEN=<ROOT> vault
 
 | Name | Role |
 |------|-----|
-| `VaultOptions` | Enabled, Address, Token, MountPath, SecretPath |
-| `ApplyVaultSecretsAsync` | HTTP GET KV → `jwt_security_key` (+ optional previous) → config overlay |
+| `VaultOptions` | Enabled, AppRole files, paths, FailClosed |
+| `ApplyVaultSecretsAsync` | AppRole login → KV jwt/database/messaging → overlay |
+| `VaultFailClosedException` | Abort startup when FailClosed=true |
 | `TokenOptions.SecurityKeyPrevious` | Dual-key validation window |
 | `TokenSigningKeyFactory` | Sign: current; validate: current + previous |
-| `vault-rotate-jwt.sh` | KV rotate (previous ← current) |
+| `vault-seed.sh` | Split KV + policy + AppRole credential files |
+| `vault-rotate-jwt.sh` | Dual-key rotate for `secret/bankapp/jwt` only |
 | `vault-raft-init.sh` | Raft leader init/unseal (optional HA) |
 | `Program.cs` | `await builder.Configuration.ApplyVaultSecretsAsync()` before DI |
 
@@ -229,8 +234,8 @@ infra/.env.example
 
 ## Mini flow
 
-vault-seed writes `jwt_security_key` → WebApi starts → overlay → JWT signed with current key.  
-Rotate script → previous + new current → WebApi recreate → old token validates with previous, new login with current.
+vault-seed writes split paths + AppRole → WebApi AppRole login → JWT/SQL/Rabbit overlay → JWT signed with current key.  
+Rotate → jwt path only → WebApi recreate → old token validates with previous.
 
 Screen (Vault UI — secrets; do not share tokens/values):
 
@@ -238,23 +243,25 @@ Screen (Vault UI — secrets; do not share tokens/values):
 
 ## Beginner lab
 
-1. `docker compose up -d vault` then `docker compose up vault-seed` — UI :8200 with token.
-2. `vault kv get secret/bankapp` — see `jwt_security_key` (do not share).
-3. Start WebApi — log `Vault overlay applied`.
-4. Login — valid JWT.
-5. Run rotate script, recreate WebApi — test old and new tokens.
+1. `docker compose up -d vault` → `up vault-seed` → UI :8200 with root token.
+2. `kv get secret/bankapp/jwt` (+ database/messaging/observability) — do not share values.
+3. Find `Vault overlay applied via AppRole` in WebApi logs.
+4. Log in → obtain a valid JWT.
+5. Run `vault-rotate-jwt.sh` → recreate WebApi → test dual-key window.
+6. (Advanced) Try reading `observability` with AppRole token → expect policy deny.
 
 ## Common mistakes
 
-- Mixing dev Vault with prod Raft  
-- Overwriting rotate with careless `vault-seed`  
+- Putting root token on WebApi env — Compose uses AppRole  
+- Not recreating WebApi after seed — stale/missing `secret_id`  
+- Mixing dev Vault with prod Raft — daily stack `:8200` is dev mode  
 - JWT key under 64 bytes  
-- Root token in screenshots  
+- Changing RabbitMQ password in `.env` without recreating `rabbitmq-data` volume  
 
 ## Where it helps
 
-- [ ] Vault healthy + seed path populated  
-- [ ] WebApi overlay or fallback log  
+- [ ] Four KV paths populated  
+- [ ] WebApi AppRole overlay log  
 - [ ] Login JWT valid  
-- [ ] Dual-key after rotate tested  
-- [ ] Commands tables when UI empty or JWT fails
+- [ ] Observability outside WebApi policy  
+- [ ] Dual-key after rotate tested

@@ -21,5 +21,6 @@ New / updated chapters are listed chronologically. Source of truth for dates is 
 | 2026-11-10 | Screenshot galleries + README: new captures (SuperAdmin/Keycloak/Kibana/Redis); fixed broken paths; learning `06`/`08`/`18`/`28`/`31`–`33` |
 | 2026-11-10 | Embedded screenshots in learning: `07` Seq, `18` Prom/Grafana, `22`/`29` letter template, `31` Kibana, `34` a11y (TR/EN/DE) |
 | 2026-11-10 | More embedded screenshots: `01`/`06`/`08`/`09`/`11`–`13`/`16`/`19`/`20`/`24`/`26`–`28`/`30`/`32`/`33` (+ DE mirrors); extras: dark theme, customer dashboard, SignalR, branch filter, add branch, approve dialog, credit types, payment schedule |
+| 2026-11-10 | Chapter `19` Vault: AppRole + split KV (`jwt`/`database`/`messaging`/`observability`) + FailClosed; WebApi no longer uses root token (TR/EN/DE) |
 
 Full TR history: [99-changelog-learning.md](../tr/99-changelog-learning.md)
