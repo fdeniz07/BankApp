@@ -35,9 +35,10 @@ flowchart TB
 | SuperAdmin | Herkes | Güncelle / aktif-pasif / yönetici rolü |
 | BankManager | Kendi hesabı | Profil alanları; **aktif-pasif ve IsManager değiştiremez** |
 | BankManager | Aynı şube, yönetici olmayan personel | Güncelle + aktif-pasif; **IsManager atayamaz** |
+| BankManager | Başka şube personeli | Liste **okunabilir**; Edit / Deactivate **gizli** (API 403) |
 | BankManager | Başka BankManager / SuperAdmin | **Yasak** |
 
-Create’te `IsManager=true` yalnızca SuperAdmin. UI: `StaffPage` aksiyonları + create checkbox aynı kurallara göre gizlenir.
+Create’te `IsManager=true` yalnızca SuperAdmin. UI: `StaffPage` aksiyonları + create checkbox aynı kurallara göre gizlenir; manager şube select kilitli. Navbar: personel/manager için `branchCode · branchName` chip (`AppLayout`).
 
 - `Customer.BranchId` / `CreditApplication.BranchId` (create’te müşteriden kopya).
 - JWT `branchId` claim; `IBranchAuthorizationService`.

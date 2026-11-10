@@ -27,6 +27,8 @@ export interface AuthUser {
   roles: string[]
   customerId?: string
   branchId?: string
+  branchCode?: string
+  branchName?: string
   customerCategory?: CustomerCategory
 }
 
@@ -34,6 +36,8 @@ interface ProfileOverride {
   displayName?: string
   customerCategory?: CustomerCategory
   profileImageUrl?: string
+  branchCode?: string
+  branchName?: string
 }
 
 function decodeBase64UrlUtf8(value: string): string {
@@ -166,6 +170,8 @@ export function getAuthUser(): AuthUser | null {
     roles,
     customerId,
     branchId,
+    branchCode: override?.branchCode || undefined,
+    branchName: override?.branchName || undefined,
     customerCategory: override?.customerCategory || customerCategory,
   }
 }

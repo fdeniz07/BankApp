@@ -103,6 +103,50 @@ public class BranchAuthorizationServiceTests
         _sut.ResolveListBranchFilter(other).Should().Be(other);
     }
 
+    [Fact]
+    public async Task Manager_CanManageStaffInOwnBranch()
+    {
+        Guid ownBranch = Guid.NewGuid();
+        _currentUser.SetupGet(c => c.IsSuperAdmin).Returns(false);
+        _currentUser.SetupGet(c => c.IsBankManager).Returns(true);
+        _currentUser.SetupGet(c => c.BranchId).Returns(ownBranch);
+        _currentUser.SetupGet(c => c.UserId).Returns(Guid.NewGuid());
+
+        ApplicationUser target = new() { Id = Guid.NewGuid(), BranchId = ownBranch };
+
+        await _sut.EnsureCanManageStaffUserAsync(target);
+    }
+
+    [Fact]
+    public async Task Manager_CannotManageStaffInOtherBranch()
+    {
+        Guid ownBranch = Guid.NewGuid();
+        Guid otherBranch = Guid.NewGuid();
+        _currentUser.SetupGet(c => c.IsSuperAdmin).Returns(false);
+        _currentUser.SetupGet(c => c.IsBankManager).Returns(true);
+        _currentUser.SetupGet(c => c.BranchId).Returns(ownBranch);
+        _currentUser.SetupGet(c => c.UserId).Returns(Guid.NewGuid());
+
+        ApplicationUser target = new() { Id = Guid.NewGuid(), BranchId = otherBranch };
+
+        Func<Task> act = () => _sut.EnsureCanManageStaffUserAsync(target);
+
+        await act.Should().ThrowAsync<AuthorizationException>();
+    }
+
+    [Fact]
+    public async Task SuperAdmin_CanManageStaffInAnyBranch()
+    {
+        _currentUser.SetupGet(c => c.IsSuperAdmin).Returns(true);
+        _currentUser.SetupGet(c => c.IsBankManager).Returns(true);
+        _currentUser.SetupGet(c => c.BranchId).Returns((Guid?)null);
+        _currentUser.SetupGet(c => c.UserId).Returns(Guid.NewGuid());
+
+        ApplicationUser target = new() { Id = Guid.NewGuid(), BranchId = Guid.NewGuid() };
+
+        await _sut.EnsureCanManageStaffUserAsync(target);
+    }
+
     private void SetupCustomer(Customer customer)
     {
         _customers

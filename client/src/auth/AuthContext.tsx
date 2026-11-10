@@ -90,12 +90,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // Prefer real names from profile; never overwrite JWT/login name with email.
           displayName: profileDisplayName || current.displayName,
           profileImageUrl: url ?? undefined,
+          branchId: mine.branchId ?? current.branchId,
+          branchCode: mine.branchCode ?? undefined,
+          branchName: mine.branchName ?? undefined,
         }
         const prev = readProfileOverride()
         saveProfileOverride({
           displayName: next.displayName,
           customerCategory: next.customerCategory ?? prev?.customerCategory,
           profileImageUrl: next.profileImageUrl,
+          branchCode: next.branchCode,
+          branchName: next.branchName,
         })
         return next
       })
@@ -163,6 +168,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         displayName: next.displayName,
         customerCategory: next.customerCategory,
         profileImageUrl: next.profileImageUrl,
+        branchCode: next.branchCode,
+        branchName: next.branchName,
       })
       return next
     })

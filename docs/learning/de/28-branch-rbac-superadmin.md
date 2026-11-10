@@ -37,9 +37,10 @@ flowchart TB
 | SuperAdmin | Alle | Aktualisieren / aktiv-inaktiv / Manager-Rolle |
 | BankManager | Eigenes Konto | Profilfelder; **aktiv-inaktiv und IsManager nicht änderbar** |
 | BankManager | Gleiche Filiale, kein Manager | Aktualisieren + aktiv-inaktiv; **IsManager nicht zuweisbar** |
+| BankManager | Personal anderer Filiale | Liste **lesbar**; Edit / Deaktivieren **ausgeblendet** (API 403) |
 | BankManager | Anderer BankManager / SuperAdmin | **Verboten** |
 
-Beim Anlegen gilt `IsManager=true` nur für SuperAdmin. UI: `StaffPage`-Aktionen und Create-Checkbox folgen denselben Regeln.
+Beim Anlegen gilt `IsManager=true` nur für SuperAdmin. UI: `StaffPage`-Aktionen und Create-Checkbox folgen denselben Regeln; Filial-Select für Manager gesperrt. Navbar: Personal/Manager zeigen `branchCode · branchName`-Chip (`AppLayout`).
 
 - `Customer.BranchId` / `CreditApplication.BranchId` (beim Create vom Kunden kopiert).
 - JWT-Claim `branchId`; `IBranchAuthorizationService`.

@@ -55,3 +55,5 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-10 | TR/EN/DE `12`–`15`, `17`–`19`, `21`–`22`: Benzetme, Yeni başlayan lab, Sık hatalar; ≥2 Mermaid (güvenli sözdizimi); `16`/`20` hariç |
 | 2026-11-10 | TR/EN/DE `23`–`31`, `33`–`34` (32 hariç): ≥2 Mermaid, Benzetme/Analogie, Yeni başlayan lab, Sık hatalar; Keycloak/a11y lab notları korundu |
 | 2026-11-10 | `16`/`20`/`32` bozuk Mermaid düzeltildi + beginner zenginleştirme; `tech-learning-library` kuralı: ≥2 görsel, lab, hatalar, Mermaid safety |
+| 2026-11-10 | `26` evrak: Pending silme + önizleme + UI hizalama notları (TR/EN/DE) |
+| 2026-11-10 | `28`: Manager personel UI yalnız kendi şube; navbar şube chip (TR/EN/DE) |

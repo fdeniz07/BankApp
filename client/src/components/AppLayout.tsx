@@ -11,6 +11,12 @@ export function AppLayout() {
   const { user, isStaff, isManager, isSuperAdmin, logout } = useAuth()
   useCreditApplicationRealtime()
   const initial = (user?.displayName || user?.email || '?').slice(0, 1).toUpperCase()
+  const branchLabel =
+    isStaff && (user?.branchCode || user?.branchName)
+      ? `${user?.branchCode ?? ''}${
+          user?.branchCode && user?.branchName ? ' · ' : ''
+        }${user?.branchName ?? ''}`
+      : null
 
   return (
     <div className="app-shell">
@@ -54,6 +60,11 @@ export function AppLayout() {
               ) : (
                 <span className="role-chip">
                   {user?.roles.map((r) => t(`roles.${r}`, { defaultValue: r })).join(', ')}
+                </span>
+              )}
+              {branchLabel && (
+                <span className="branch-chip" title={t('nav.branch')}>
+                  {branchLabel}
                 </span>
               )}
             </div>

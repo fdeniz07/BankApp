@@ -5,6 +5,7 @@ import { getBranches } from '../api/branchesApi'
 import { createStaffUser, getStaffUsers, updateStaffUser } from '../api/staffApi'
 import { resolveProfileImageUrl } from '../api/profileApi'
 import { useAuth } from '../auth/AuthContext'
+import { canModifyBranchResource } from '../auth/token'
 import { BranchFilter } from '../components/BranchFilter'
 import type {
   BranchListItem,
@@ -285,13 +286,15 @@ export function StaffPage() {
   function canEditTarget(item: StaffUserListItem) {
     if (isSuperAdmin) return true
     if (item.id === user?.userId) return true
-    return !item.isManager
+    if (item.isManager) return false
+    return canModifyBranchResource(user, item.branchId)
   }
 
   function canToggleActive(item: StaffUserListItem) {
     if (item.id === user?.userId) return false
     if (isSuperAdmin) return true
-    return !item.isManager
+    if (item.isManager) return false
+    return canModifyBranchResource(user, item.branchId)
   }
 
   function canToggleManager(item: StaffUserListItem) {
@@ -370,139 +373,148 @@ export function StaffPage() {
             if (e.target === e.currentTarget && !creating) setShowCreate(false)
           }}
         >
-          <form className="staff-modal-panel form" onSubmit={onCreate}>
-          <h2 id="staff-create-title">{t('staff.newStaff')}</h2>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={form.email}
-              onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-              required
-              autoComplete="off"
-            />
-          </label>
-          <label>
-            {t('login.password')}
-            <input
-              type="password"
-              value={form.password}
-              onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-              required
-              minLength={6}
-              autoComplete="new-password"
-            />
-          </label>
-          <label>
-            {t('profile.academicTitle')}
-            <select
-              value={form.title}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, title: (e.target.value || '') as '' | PersonTitle }))
-              }
-            >
-              <option value="">{t('profile.titleUnset')}</option>
-              {TITLES.map((title) => (
-                <option key={title} value={title}>
-                  {t(`personTitle.${title}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('customers.gender')}
-            <select
-              value={form.gender}
-              onChange={(e) =>
-                setForm((f) => ({ ...f, gender: (e.target.value || '') as '' | Gender }))
-              }
-            >
-              <option value="">{t('customers.genderUnset')}</option>
-              {GENDERS.map((g) => (
-                <option key={g} value={g}>
-                  {t(`gender.${g}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.firstName')}
-            <input
-              value={form.firstName}
-              onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-            />
-          </label>
-          <label>
-            {t('profile.lastName')}
-            <input
-              value={form.lastName}
-              onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-            />
-          </label>
-          <label>
-            {t('profile.dateOfBirth')}
-            <input
-              type="date"
-              value={form.dateOfBirth}
-              onChange={(e) => setForm((f) => ({ ...f, dateOfBirth: e.target.value }))}
-            />
-          </label>
-          <label>
-            {t('profile.position')}
-            <select
-              value={form.position}
-              onChange={(e) =>
-                setForm((f) => ({
-                  ...f,
-                  position: (e.target.value || '') as '' | StaffPosition,
-                }))
-              }
-            >
-              <option value="">{t('profile.positionUnset')}</option>
-              {POSITIONS.map((p) => (
-                <option key={p} value={p}>
-                  {t(`staffPosition.${p}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('staff.branch')}
-            <select
-              value={form.branchId || user?.branchId || ''}
-              onChange={(e) => setForm((f) => ({ ...f, branchId: e.target.value }))}
-            >
-              <option value="">{t('staff.branchUnset')}</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.code} — {b.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          {isSuperAdmin && (
-            <label className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={form.isManager}
-                onChange={(e) => setForm((f) => ({ ...f, isManager: e.target.checked }))}
-              />
-              {t('staff.isManager')}
+          <form className="staff-modal-panel wide form" onSubmit={onCreate}>
+            <h2 id="staff-create-title">{t('staff.newStaff')}</h2>
+            <div className="form-row form-row-2">
+              <label>
+                {t('login.email')}
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                  required
+                  autoComplete="off"
+                />
+              </label>
+              <label>
+                {t('login.password')}
+                <input
+                  type="password"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  required
+                  minLength={6}
+                  autoComplete="new-password"
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.academicTitle')}
+                <select
+                  value={form.title}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, title: (e.target.value || '') as '' | PersonTitle }))
+                  }
+                >
+                  <option value="">{t('profile.titleUnset')}</option>
+                  {TITLES.map((title) => (
+                    <option key={title} value={title}>
+                      {t(`personTitle.${title}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                {t('customers.gender')}
+                <select
+                  value={form.gender}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, gender: (e.target.value || '') as '' | Gender }))
+                  }
+                >
+                  <option value="">{t('customers.genderUnset')}</option>
+                  {GENDERS.map((g) => (
+                    <option key={g} value={g}>
+                      {t(`gender.${g}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.firstName')}
+                <input
+                  value={form.firstName}
+                  onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
+                />
+              </label>
+              <label>
+                {t('profile.lastName')}
+                <input
+                  value={form.lastName}
+                  onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.dateOfBirth')}
+                <input
+                  type="date"
+                  value={form.dateOfBirth}
+                  onChange={(e) => setForm((f) => ({ ...f, dateOfBirth: e.target.value }))}
+                />
+              </label>
+              <label>
+                {t('profile.position')}
+                <select
+                  value={form.position}
+                  onChange={(e) =>
+                    setForm((f) => ({
+                      ...f,
+                      position: (e.target.value || '') as '' | StaffPosition,
+                    }))
+                  }
+                >
+                  <option value="">{t('profile.positionUnset')}</option>
+                  {POSITIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {t(`staffPosition.${p}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <label className="form-row-full">
+              {t('staff.branch')}
+              <select
+                value={form.branchId || user?.branchId || ''}
+                onChange={(e) => setForm((f) => ({ ...f, branchId: e.target.value }))}
+                disabled={!isSuperAdmin}
+              >
+                <option value="">{t('staff.branchUnset')}</option>
+                {branches.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.code} — {b.name}
+                  </option>
+                ))}
+              </select>
             </label>
-          )}
-          <div className="actions-cell">
-            <button type="submit" className="btn success" disabled={creating}>
-              {creating ? t('common.loading') : t('staff.create')}
-            </button>
-            <button
-              type="button"
-              className="btn ghost"
-              onClick={() => setShowCreate(false)}
-              disabled={creating}
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
+            {isSuperAdmin && (
+              <label className="checkbox-row">
+                <input
+                  type="checkbox"
+                  checked={form.isManager}
+                  onChange={(e) => setForm((f) => ({ ...f, isManager: e.target.checked }))}
+                />
+                {t('staff.isManager')}
+              </label>
+            )}
+            <div className="actions-cell">
+              <button type="submit" className="btn success" disabled={creating}>
+                {creating ? t('common.loading') : t('staff.create')}
+              </button>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setShowCreate(false)}
+                disabled={creating}
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
           </form>
         </div>
       )}
@@ -517,155 +529,165 @@ export function StaffPage() {
             if (e.target === e.currentTarget && !savingEdit) setEditing(null)
           }}
         >
-          <form className="staff-modal-panel form" onSubmit={onSaveEdit}>
-          <h2 id="staff-edit-title">{t('staff.editStaff')}</h2>
-          <label>
-            {t('login.email')}
-            <input
-              type="email"
-              value={editing.email}
-              onChange={(e) => setEditing({ ...editing, email: e.target.value })}
-              required
-            />
-          </label>
-          <label>
-            {t('profile.academicTitle')}
-            <select
-              value={editing.title}
-              onChange={(e) =>
-                setEditing({
-                  ...editing,
-                  title: (e.target.value || '') as '' | PersonTitle,
-                })
-              }
-            >
-              <option value="">{t('profile.titleUnset')}</option>
-              {TITLES.map((title) => (
-                <option key={title} value={title}>
-                  {t(`personTitle.${title}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('customers.gender')}
-            <select
-              value={editing.gender}
-              onChange={(e) =>
-                setEditing({
-                  ...editing,
-                  gender: (e.target.value || '') as '' | Gender,
-                })
-              }
-            >
-              <option value="">{t('customers.genderUnset')}</option>
-              {GENDERS.map((g) => (
-                <option key={g} value={g}>
-                  {t(`gender.${g}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.firstName')}
-            <input
-              value={editing.firstName}
-              onChange={(e) => setEditing({ ...editing, firstName: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('profile.lastName')}
-            <input
-              value={editing.lastName}
-              onChange={(e) => setEditing({ ...editing, lastName: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('profile.dateOfBirth')}
-            <input
-              type="date"
-              value={editing.dateOfBirth}
-              onChange={(e) => setEditing({ ...editing, dateOfBirth: e.target.value })}
-            />
-          </label>
-          <label>
-            {t('profile.position')}
-            <select
-              value={editing.position}
-              onChange={(e) =>
-                setEditing({
-                  ...editing,
-                  position: (e.target.value || '') as '' | StaffPosition,
-                })
-              }
-            >
-              <option value="">{t('profile.positionUnset')}</option>
-              {POSITIONS.map((p) => (
-                <option key={p} value={p}>
-                  {t(`staffPosition.${p}`)}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.branch')}
-            <select
-              value={editing.branchId}
-              onChange={(e) => setEditing({ ...editing, branchId: e.target.value })}
-            >
-              <option value="">{t('profile.branchUnset')}</option>
-              {branches.map((b) => (
-                <option key={b.id} value={b.id}>
-                  {b.code} · {b.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label>
-            {t('profile.newPassword')}
-            <input
-              type="password"
-              value={editing.newPassword}
-              onChange={(e) => setEditing({ ...editing, newPassword: e.target.value })}
-              minLength={6}
-              autoComplete="new-password"
-              placeholder={t('profile.newPasswordHint')}
-            />
-          </label>
-          {editing.id !== user?.userId &&
-            (isSuperAdmin || !editing.isManager) && (
+          <form className="staff-modal-panel wide form" onSubmit={onSaveEdit}>
+            <h2 id="staff-edit-title">{t('staff.editStaff')}</h2>
+            <label className="form-row-full">
+              {t('login.email')}
+              <input
+                type="email"
+                value={editing.email}
+                onChange={(e) => setEditing({ ...editing, email: e.target.value })}
+                required
+              />
+            </label>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.academicTitle')}
+                <select
+                  value={editing.title}
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      title: (e.target.value || '') as '' | PersonTitle,
+                    })
+                  }
+                >
+                  <option value="">{t('profile.titleUnset')}</option>
+                  {TITLES.map((title) => (
+                    <option key={title} value={title}>
+                      {t(`personTitle.${title}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                {t('customers.gender')}
+                <select
+                  value={editing.gender}
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      gender: (e.target.value || '') as '' | Gender,
+                    })
+                  }
+                >
+                  <option value="">{t('customers.genderUnset')}</option>
+                  {GENDERS.map((g) => (
+                    <option key={g} value={g}>
+                      {t(`gender.${g}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.firstName')}
+                <input
+                  value={editing.firstName}
+                  onChange={(e) => setEditing({ ...editing, firstName: e.target.value })}
+                />
+              </label>
+              <label>
+                {t('profile.lastName')}
+                <input
+                  value={editing.lastName}
+                  onChange={(e) => setEditing({ ...editing, lastName: e.target.value })}
+                />
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.dateOfBirth')}
+                <input
+                  type="date"
+                  value={editing.dateOfBirth}
+                  onChange={(e) => setEditing({ ...editing, dateOfBirth: e.target.value })}
+                />
+              </label>
+              <label>
+                {t('profile.position')}
+                <select
+                  value={editing.position}
+                  onChange={(e) =>
+                    setEditing({
+                      ...editing,
+                      position: (e.target.value || '') as '' | StaffPosition,
+                    })
+                  }
+                >
+                  <option value="">{t('profile.positionUnset')}</option>
+                  {POSITIONS.map((p) => (
+                    <option key={p} value={p}>
+                      {t(`staffPosition.${p}`)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <div className="form-row form-row-2">
+              <label>
+                {t('profile.branch')}
+                <select
+                  value={editing.branchId}
+                  onChange={(e) => setEditing({ ...editing, branchId: e.target.value })}
+                  disabled={!isSuperAdmin}
+                >
+                  <option value="">{t('profile.branchUnset')}</option>
+                  {branches.map((b) => (
+                    <option key={b.id} value={b.id}>
+                      {b.code} · {b.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                {t('profile.newPassword')}
+                <input
+                  type="password"
+                  value={editing.newPassword}
+                  onChange={(e) => setEditing({ ...editing, newPassword: e.target.value })}
+                  minLength={6}
+                  autoComplete="new-password"
+                  placeholder={t('profile.newPasswordHint')}
+                />
+              </label>
+            </div>
+            {editing.id !== user?.userId &&
+              (isSuperAdmin ||
+                (!editing.isManager && canModifyBranchResource(user, editing.branchId))) && (
+                <label className="checkbox-row">
+                  <input
+                    type="checkbox"
+                    checked={editing.isActive}
+                    onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
+                  />
+                  {t('staff.active')}
+                </label>
+              )}
+            {isSuperAdmin && editing.id !== user?.userId && (
               <label className="checkbox-row">
                 <input
                   type="checkbox"
-                  checked={editing.isActive}
-                  onChange={(e) => setEditing({ ...editing, isActive: e.target.checked })}
+                  checked={editing.isManager}
+                  onChange={(e) => setEditing({ ...editing, isManager: e.target.checked })}
                 />
-                {t('staff.active')}
+                {t('staff.isManager')}
               </label>
             )}
-          {isSuperAdmin && editing.id !== user?.userId && (
-            <label className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={editing.isManager}
-                onChange={(e) => setEditing({ ...editing, isManager: e.target.checked })}
-              />
-              {t('staff.isManager')}
-            </label>
-          )}
-          <div className="actions-cell">
-            <button type="submit" className="btn success" disabled={savingEdit}>
-              {savingEdit ? t('common.loading') : t('common.save')}
-            </button>
-            <button
-              type="button"
-              className="btn ghost"
-              onClick={() => setEditing(null)}
-              disabled={savingEdit}
-            >
-              {t('common.cancel')}
-            </button>
-          </div>
+            <div className="actions-cell">
+              <button type="submit" className="btn success" disabled={savingEdit}>
+                {savingEdit ? t('common.loading') : t('common.save')}
+              </button>
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => setEditing(null)}
+                disabled={savingEdit}
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
           </form>
         </div>
       )}

@@ -16,5 +16,7 @@ New / updated chapters are listed chronologically. Source of truth for dates is 
 | 2026-11-10 | Chapters `01`–`11` (TR/EN/DE): 2+ Mermaid, analogy, Beginner lab, Common mistakes, Where it helps |
 | 2026-11-10 | TR/EN/DE enrich `12`–`15`, `17`–`19`, `21`–`22`: analogy, beginner lab, common mistakes; ≥2 Mermaid (safe syntax); skip `16`/`20` |
 | 2026-11-10 | TR/EN/DE enrich `23`–`31`, `33`–`34` (skip `32`): 2+ Mermaid, analogy, Beginner lab, Common mistakes; Keycloak/a11y lab accuracy preserved |
+| 2026-11-10 | Chapter `26`: Pending document delete + preview notes (TR/EN/DE) |
+| 2026-11-10 | Chapter `28`: Manager staff UI own-branch only; navbar branch chip (TR/EN/DE) |
 
 Full TR history: [99-changelog-learning.md](../tr/99-changelog-learning.md)

@@ -38,9 +38,10 @@ flowchart TB
 | SuperAdmin | Everyone | Update / active-inactive / manager role |
 | BankManager | Own account | Profile fields; **cannot change active-inactive or IsManager** |
 | BankManager | Same branch, non-manager staff | Update + active-inactive; **cannot assign IsManager** |
+| BankManager | Other-branch staff | List **readable**; Edit / Deactivate **hidden** (API 403) |
 | BankManager | Another BankManager / SuperAdmin | **Forbidden** |
 
-On create, `IsManager=true` only for SuperAdmin. UI: `StaffPage` actions + create checkbox follow the same rules.
+On create, `IsManager=true` only for SuperAdmin. UI: `StaffPage` actions + create checkbox follow the same rules; manager branch select is locked. Navbar: staff/manager show a `branchCode · branchName` chip (`AppLayout`).
 
 - `Customer.BranchId` / `CreditApplication.BranchId` (copied from customer on create).
 - JWT `branchId` claim; `IBranchAuthorizationService`.
