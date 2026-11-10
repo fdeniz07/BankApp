@@ -1,11 +1,11 @@
-# Technology & architecture learning guide
+﻿# Technology & architecture learning guide
 
 [Türkçe](tech-learning.tr.md) · [Deutsch](tech-learning.de.md)
 
 **Goal:** Grow BankApp as a product while learning *why* each piece of the stack exists.  
 **Related:** [roadmap.en.md](roadmap.en.md) · [architecture-notes.en.md](architecture-notes.en.md) · [README.md](../README.md)
 
-> **Beginner deep-dive (commands, classes, packages, build order):** [learning/00-index.tr.md](learning/00-index.tr.md) (Turkish library; kept up to date until the project ends).
+> **Beginner deep-dive (commands, classes, packages, build order):** [learning/en/00-index.md](learning/en/00-index.md) (EN chapters 01–09; later chapters still link to TR until mirrored) · [TR index](learning/tr/00-index.md) · [DE index](learning/de/00-index.md).
 
 Not a dump of “what we installed” — each item covers **what / why here / benefits / trade-offs / repo example**.
 
@@ -122,7 +122,7 @@ Input rules before handlers; DTO mapping in feature `Profiles`; named enums inst
 
 ### JWT + RBAC
 
-Roles: Customer, BankStaff, BankManager, SuperAdmin. Keycloak lab: dual JWT + SPA PKCE ([33](learning/33-keycloak-lab.tr.md)).
+Roles: Customer, BankStaff, BankManager, SuperAdmin. Keycloak lab: dual JWT + SPA PKCE ([33](learning/tr/33-keycloak-lab.md)).
 
 ### Serilog → Seq + ProblemDetails
 
@@ -138,7 +138,7 @@ Structured logs for local investigation; consistent API errors for the client.
 | **RabbitMQ** | `email-confirmation`, `domain-events`, `decision-letter` (lab decision email → Seq) |
 | **SignalR** | Hub `/hubs/credit-applications` after Outbox consume |
 | **OpenTelemetry** | OTLP traces + metrics → collector → Tempo / Prometheus / Grafana `:3001` |
-| **Vault (lab)** | Dev mode + JWT overlay (dual-key rotate); optional Raft overlay ([19](learning/19-vault-lab.tr.md)) |
+| **Vault (lab)** | Dev mode + JWT overlay (dual-key rotate); optional Raft overlay ([19](learning/tr/19-vault-lab.md)) |
 | **Docker Compose** | Full local stack with healthchecks — `infra/docker-compose.yml` |
 
 **Client hook:** `client/src/realtime/useCreditApplicationRealtime.ts`  

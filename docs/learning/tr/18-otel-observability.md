@@ -1,0 +1,84 @@
+﻿# 18 — OpenTelemetry, Prometheus, Grafana
+
+[← Önceki](17-modular-monolith.md) · [İçindekiler](00-index.md) · [Sonraki →](19-vault-lab.md)
+
+## Bu nedir?
+
+**OpenTelemetry (OTel)**: Uygulamadan **trace / metric / (log köprüleri)** toplama standardı.  
+**Prometheus**: Metric scrape / saklama.  
+**Grafana**: Dashboard UI. Lab’de **Tempo** trace backend olarak kullanılır.  
+**Seq** log için kalır (ayrı bölüm).
+
+```mermaid
+flowchart LR
+  API[WebApi OTLP] --> COL[otel-collector]
+  COL --> PROM[Prometheus]
+  COL --> TEMPO[Tempo]
+  PROM --> GRAF[Grafana :3001]
+  TEMPO --> GRAF
+```
+
+## Bu projede ne işe yarar?
+
+WebApi OTLP ile collector’a gönderir → Prometheus / Tempo → Grafana `:3001` ile bakarsın.
+
+## Ne zaman eklendi?
+
+**Faz 6** (OTel dilimi).
+
+## Temel kavramlar
+
+| Kavram | Anlamı |
+|--------|--------|
+| **Trace / Span** | İstek yolculuğu ve adımları |
+| **Metric** | Sayaç / histogram (HTTP süresi vb.) |
+| **OTLP** | OTel export protokolü |
+| **Collector** | Aracı (alır, işler, dağıtır) |
+
+## Komutlar
+
+```powershell
+cd infra
+docker compose --env-file .env up -d otel-collector prometheus grafana tempo
+
+# Grafana http://localhost:3001  → admin / admin
+# Prometheus http://localhost:9090
+# OTLP (uygulama → collector) localhost:4317
+
+docker compose --env-file .env ps otel-collector tempo prometheus grafana
+curl -s http://localhost:9090/-/ready
+curl -s -o NUL -w "%{http_code}`n" http://localhost:3001/api/health
+```
+
+Grafana’da hızlı tur:
+
+1. Birkaç API isteği at (Scalar / client; `/health` genelde trace dışı).
+2. **Dashboards → BankApp → BankApp HTTP (OTel)**.
+3. **Explore → Tempo** → service `bankapp-webapi`.
+4. **Explore → Prometheus** → örn. `up` veya HTTP duration metrikleri.
+5. Seq’te aynı isteğin `TraceId` alanına bak.
+
+Detaylı lab araç notları: [24 — Lab tools](24-lab-tools.md).
+
+## Sınıflar, metotlar, paketler
+
+| Paket | Rol |
+|-------|-----|
+| `OpenTelemetry.Extensions.Hosting` | Host |
+| `OpenTelemetry.Instrumentation.AspNetCore` / `Http` / `Runtime` | Otomatik span/metric |
+| `OpenTelemetry.Exporter.OpenTelemetryProtocol` | OTLP export |
+
+Kayıt: WebApi DI / `Program` veya extension metodları.
+
+## Repoda nerede?
+
+```
+src/WebApi/… OpenTelemetry setup
+infra/docker-compose.yml
+infra/otel/ (varsa collector config)
+docs/assets/screenshots/en/Metrics on Grafana.png
+```
+
+## Mini akış
+
+HTTP istek → AspNetCore instrumentation span → OTLP collector → Tempo/Prometheus → Grafana’da grafik.

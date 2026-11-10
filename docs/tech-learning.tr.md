@@ -1,11 +1,11 @@
-# Teknoloji ve mimari öğrenme rehberi
+﻿# Teknoloji ve mimari öğrenme rehberi
 
 [English](tech-learning.en.md) · [Deutsch](tech-learning.de.md)
 
 **Amaç:** BankApp’i geliştirirken hem ürünü ilerletmek hem de modern bir tech stack’i *neden* kullanıldığını anlayarak öğrenmek.  
 **İlişkili:** [roadmap.tr.md](roadmap.tr.md) · [architecture-notes.tr.md](architecture-notes.tr.md) · [README.tr.md](../README.tr.md)
 
-> **Sıfırdan / komut / sınıf / paket derinliği:** [learning/00-index.tr.md](learning/00-index.tr.md) (inşa sırasına göre MD kitaplığı; proje bitene kadar güncellenir).
+> **Sıfırdan / komut / sınıf / paket derinliği:** [learning/tr/00-index.md](learning/tr/00-index.md) · [EN](learning/en/00-index.md) · [DE](learning/de/00-index.md) (EN/DE şu an `01`–`09`; sonrası TR).
 
 Bu belge “ne kurduk?” listesi değil; her madde için **ne / neden burada / avantaj / trade-off / repoda örnek** verir.
 
@@ -132,7 +132,7 @@ Kredi durumu / kategori gibi değerler **isim** ile API’de; int magic number y
 
 ### JWT + RBAC
 
-Roller: Customer, BankStaff, BankManager, SuperAdmin. Claim’lerle endpoint yetkisi. Keycloak lab: dual JWT + SPA PKCE ([33](learning/33-keycloak-lab.tr.md)).
+Roller: Customer, BankStaff, BankManager, SuperAdmin. Claim’lerle endpoint yetkisi. Keycloak lab: dual JWT + SPA PKCE ([33](learning/tr/33-keycloak-lab.md)).
 
 **Öğrenim ipucu:** Önce “kim ne yapabilir?” matrisini çiz, sonra attribute/policy ekle.
 
@@ -158,7 +158,7 @@ Kuyruklar: `email-confirmation`, `domain-events`, `decision-letter`. Async iş; 
 
 ### Karar mektubu e-posta (lab)
 
-Onay/red sonrası müşteriye notes gövdesi: domain-events consumer → `IDecisionLetterPublisher` → `decision-letter` → Seq log (SMTP yok). Ayrıntı: [learning/22-decision-letter-email.tr.md](learning/22-decision-letter-email.tr.md).
+Onay/red sonrası müşteriye notes gövdesi: domain-events consumer → `IDecisionLetterPublisher` → `decision-letter` → Seq log (SMTP yok). Ayrıntı: [learning/tr/22-decision-letter-email.md](learning/tr/22-decision-letter-email.md).
 
 ### SignalR
 
@@ -184,7 +184,7 @@ Seq: yapısal log (+ TraceId/SpanId)
 
 ### HashiCorp Vault (lab)
 
-Compose **dev** mode + `secret/bankapp` seed. WebApi startup’ta JWT key overlay (dual-key rotate). Opsiyonel Raft overlay: [19](learning/19-vault-lab.tr.md).
+Compose **dev** mode + `secret/bankapp` seed. WebApi startup’ta JWT key overlay (dual-key rotate). Opsiyonel Raft overlay: [19](learning/tr/19-vault-lab.md).
 
 ### Docker Compose
 
@@ -256,7 +256,7 @@ Bu tek akışta CQRS, domain event, outbox, saga, idempotency ve SignalR bir ara
 
 ## 8) Lab araçları (DX)
 
-Compose URL’leri yetmezse: kurulum, Compose DNS, dikkat ve best practice için → [learning/24-lab-tools.tr.md](learning/24-lab-tools.tr.md).
+Compose URL’leri yetmezse: kurulum, Compose DNS, dikkat ve best practice için → [learning/tr/24-lab-tools.md](learning/tr/24-lab-tools.md).
 
 ## 9) İleride (roadmap)
 

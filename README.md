@@ -1,4 +1,4 @@
-# BankApp
+﻿# BankApp
 
 [Türkçe README](README.tr.md) · [Deutsche README](README.de.md)
 
@@ -7,7 +7,7 @@ Backend: **.NET 10** Clean Architecture + CQRS (MediatR), **Modular Monolith** (
 Frontend: **React (Vite + TypeScript)** with **TR / EN / DE** i18n and live credit notifications (SignalR).  
 Local stack: **Docker Compose** (SQL Server, Redis, Seq, RabbitMQ, Vault lab, Keycloak lab, ELK, WebApi, client).
 
-**Docs:** [Roadmap](docs/roadmap.en.md) · [Tech learning](docs/tech-learning.en.md) · [Learning library (TR)](docs/learning/00-index.tr.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
+**Docs:** [Roadmap](docs/roadmap.en.md) · [Tech learning](docs/tech-learning.en.md) · [Learning library](docs/learning/README.md) · [Architecture notes](docs/architecture-notes.en.md) · [History](docs/history.en.md) · [Changelog](docs/changelog.en.md) · [Test notes](docs/test-notes.en.md) · [Infra](infra/README.md)
 
 ---
 
@@ -359,7 +359,7 @@ Interactive details: Scalar UI.
 
 ## Lab tools
 
-How to watch the stack (Scalar, Seq, Redis Insight, RabbitMQ, Grafana, Vault, Keycloak, Kibana, SQL, Docker) — setup, Compose DNS, cautions, best practices → **[docs/learning/24-lab-tools.tr.md](docs/learning/24-lab-tools.tr.md)** (Turkish chapter; URLs match this README).
+How to watch the stack (Scalar, Seq, Redis Insight, RabbitMQ, Grafana, Vault, Keycloak, Kibana, SQL, Docker) — setup, Compose DNS, cautions, best practices → **[docs/learning/tr/24-lab-tools.md](docs/learning/tr/24-lab-tools.md)** (Turkish chapter; URLs match this README).
 
 Short debug chain: Scalar request → Redis Insight / RabbitMQ → Seq logs → (optional) Grafana traces.
 

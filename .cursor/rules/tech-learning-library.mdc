@@ -7,17 +7,18 @@ alwaysApply: true
 
 ## Location
 
-- Index: [docs/learning/00-index.tr.md](docs/learning/00-index.tr.md)
-- Chapters: `docs/learning/*.tr.md` (Turkish primary; EN/DE later if requested)
+- Hub: [docs/learning/README.md](docs/learning/README.md)
+- Index (TR): [docs/learning/tr/00-index.md](docs/learning/tr/00-index.md)
+- Chapters: `docs/learning/tr/*.md` (source of truth); mirrors in `docs/learning/en/` and `docs/learning/de/`
 - Overview pointer: [docs/tech-learning.tr.md](docs/tech-learning.tr.md)
 
 ## When to update
 
 After **every explicitly approved** feature or infra change that introduces or meaningfully changes a technology, library, pattern, CLI command, or key class:
 
-1. Update the matching chapter under `docs/learning/`, or add a new numbered chapter if none fits.
-2. Update `docs/learning/00-index.tr.md` (table of contents + Faz order).
-3. Append a short line to `docs/learning/99-changelog-learning.tr.md`.
+1. Update the matching chapter under `docs/learning/tr/` (and EN/DE mirrors when they exist), or add a new numbered chapter if none fits.
+2. Update `docs/learning/tr/00-index.md` (table of contents + Faz order); sync `en/` / `de/` indexes when mirroring.
+3. Append a short line to `docs/learning/tr/99-changelog-learning.md` (and EN/DE changelogs if present).
 4. Keep chronology aligned with [docs/history.tr.md](docs/history.tr.md) / roadmap.
 
 Do **not** skip the library update for “small” tech changes (new NuGet package, new Compose service, new CI step, new client lib).
@@ -26,22 +27,23 @@ Do **not** skip the library update for “small” tech changes (new NuGet packa
 
 Each chapter must stay beginner-friendly and include:
 
-1. **Bu nedir?** — plain-language definition  
-2. **Bu projede ne işe yarar?** — BankApp role  
-3. **Ne zaman eklendi?** — Faz / approximate order  
-4. **Temel kavramlar** — vocabulary a junior needs  
-5. **Komutlar** — real CLI examples; **above/beside each block** explain what it does, what to verify afterward, and important flags  
-6. **Sınıflar, metotlar, paketler** — concrete names from this repo  
-7. **Repoda nerede?** — paths  
-8. **Mini akış** — short end-to-end story  
-9. **Where useful** — health checklist + lab “disaster / recovery” paths (least destructive first; mark `-v` / volume deletes clearly)
+1. **Bu nedir?** / EN **What is this?** / DE **Was ist das?** — plain-language definition  
+2. **Bu projede ne işe yarar?** / **Role in BankApp** / **Rolle in BankApp**  
+3. **Ne zaman eklendi?** / **When added?** / **Wann hinzugefügt?** — Faz / approximate order  
+4. **Temel kavramlar** / **Core concepts** / **Grundbegriffe**  
+5. **Komutlar** / **Commands** / **Befehle** — real CLI examples; **above/beside each block** explain what it does, what to verify afterward, and important flags  
+6. **Sınıflar, metotlar, paketler** / **Classes, methods, packages** / **Klassen, Methoden, Pakete**  
+7. **Repoda nerede?** / **Where in the repo?** / **Wo im Repo?**  
+8. **Mini akış** / **Mini flow** / **Mini-Ablauf** — short end-to-end story  
+9. **Nerede işe yarar?** / **Where it helps** / **Wo hilft es?** — health checklist + lab disaster / recovery paths (least destructive first; mark `-v` / volume deletes clearly)
+10. **Görseller** — at least one Mermaid diagram and/or existing screenshot link per chapter when it clarifies architecture or flow (prefer Mermaid over heavy binary assets)
 
 ## Scope rules
 
 - Prefer depth for technologies **already used** in the repo; do not invent unused stacks.
 - Prefer annotated, copy-pasteable commands over bare lists; include common ops (ps, logs, recreate) and recovery when the chapter is infra/tooling.
 - Link to code with repo-relative paths; do not paste huge source dumps.
-- Turkish first. Mirror EN/DE only when the user asks.
+- Turkish (`docs/learning/tr/`) is source of truth; keep `en/` and `de/` folder mirrors in sync when multilingual docs are maintained.
 - Still obey approval-gates: propose doc file list before first creation of a **new** chapter file if the user’s request did not already approve the learning library work.
 
 ## Relationship to other docs

@@ -1,11 +1,11 @@
-# Technologie- & Architektur-Lernleitfaden
+﻿# Technologie- & Architektur-Lernleitfaden
 
 [Türkçe](tech-learning.tr.md) · [English](tech-learning.en.md)
 
 **Ziel:** BankApp als Produkt weiterbauen und gleichzeitig verstehen, *warum* der Stack so gewählt ist.  
 **Verwandt:** [roadmap.de.md](roadmap.de.md) · [architecture-notes.de.md](architecture-notes.de.md) · [README.de.md](../README.de.md)
 
-> **Einsteiger-Tiefenwissen (Befehle, Klassen, Pakete, Baureihenfolge):** [learning/00-index.tr.md](learning/00-index.tr.md) (türkische Bibliothek; wird bis Projektende gepflegt).
+> **Einsteiger-Tiefenwissen (Befehle, Klassen, Pakete, Baureihenfolge):** [learning/de/00-index.md](learning/de/00-index.md) (DE-Kapitel 01–09; spätere Kapitel vorerst TR) · [TR-Index](learning/tr/00-index.md) · [EN-Index](learning/en/00-index.md).
 
 Kein Installationskatalog — jeder Punkt: **Was / Warum hier / Vorteil / Trade-off / Repo-Beispiel**.
 
@@ -120,7 +120,7 @@ Eingaberegeln, DTO-Mapping, benannte Enums statt Magic Numbers.
 
 ### JWT + RBAC
 
-Rollen: Customer, BankStaff, BankManager, SuperAdmin. Keycloak-Lab: Dual-JWT + SPA-PKCE ([33](learning/33-keycloak-lab.tr.md)).
+Rollen: Customer, BankStaff, BankManager, SuperAdmin. Keycloak-Lab: Dual-JWT + SPA-PKCE ([33](learning/tr/33-keycloak-lab.md)).
 
 ### Serilog → Seq + ProblemDetails
 
@@ -136,7 +136,7 @@ Strukturierte Logs lokal; einheitliche API-Fehler für den Client.
 | **RabbitMQ** | `email-confirmation`, `domain-events`, `decision-letter` (Lab-Entscheidungsmail → Seq) |
 | **SignalR** | Hub `/hubs/credit-applications` nach Outbox-Consume |
 | **OpenTelemetry** | OTLP Traces + Metrics → Collector → Tempo / Prometheus / Grafana `:3001` |
-| **Vault (Lab)** | Dev-Mode + JWT-Overlay (Dual-Key-Rotate); optionales Raft-Overlay ([19](learning/19-vault-lab.tr.md)) |
+| **Vault (Lab)** | Dev-Mode + JWT-Overlay (Dual-Key-Rotate); optionales Raft-Overlay ([19](learning/tr/19-vault-lab.md)) |
 | **Docker Compose** | Kompletter Lokalstack — `infra/docker-compose.yml` |
 
 **Client:** `client/src/realtime/useCreditApplicationRealtime.ts`  

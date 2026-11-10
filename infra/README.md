@@ -1,4 +1,4 @@
-# Infrastructure (local)
+﻿# Infrastructure (local)
 
 Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafana/Prometheus/OpenTelemetry).
 
@@ -13,7 +13,7 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 | Redis | `localhost:6379` | volume `bankapp-redis-data`; Compose **healthcheck** |
 | Redis Insight | http://localhost:5540 | official UI; add DB **host `redis`**, port **6379** (no password); volume `bankapp-redis-insight-data` |
 
-Lab tooling guide (setup / cautions / best practices): [docs/learning/24-lab-tools.tr.md](../docs/learning/24-lab-tools.tr.md).
+Lab tooling guide (setup / cautions / best practices): [docs/learning/tr/24-lab-tools.md](../docs/learning/tr/24-lab-tools.md).
 | RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation + domain-events queues; volume `bankapp-rabbitmq-data`; **healthcheck** |
 | Vault | http://localhost:8200 | **dev mode** lab; root token from `.env`; `vault-seed` writes `secret/bankapp`; WebApi JWT overlay |
 | Vault Raft (optional) | http://localhost:8210 (+8211/8212) | `docker-compose.vault-raft.yml` — see learning 19; daily stack keeps `:8200` |
