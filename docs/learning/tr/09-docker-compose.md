@@ -129,7 +129,7 @@ docker compose --env-file .env down
 | Konteynerler | `compose ps` | `healthy` / `Up` |
 | API canlı | `http://localhost:8080/health` | 200, liveness |
 | SQL hazır | `ps` içinde sql healthy; ADS `localhost,11433` | Bağlantı açılır |
-| Redis | `docker compose exec redis redis-cli ping` | `PONG` |
+| Redis | `docker compose exec redis redis-cli -a $REDIS_PASSWORD ping` | `PONG` |
 | Log akışı | Seq UI / `logs webapi` | Seed/login satırları |
 | Kuyruk | RabbitMQ UI `:15672` | Consumer bağlı |
 | Metrik scrape | Prometheus Targets | `otel-collector` UP |
@@ -160,9 +160,11 @@ docker compose --env-file .env down -v
 
 ```powershell
 # Konteyner içinde teşhis (örnekler)
-docker compose --env-file .env exec redis redis-cli ping
+docker compose --env-file .env exec redis redis-cli -a change-me-redis ping
 docker compose --env-file .env exec webapi printenv ASPNETCORE_ENVIRONMENT
 ```
+
+Günlük smoke (repo kökü): `powershell -File infra/scripts/lab-daily-check.ps1` — ayrıntı [24 — Lab tools](24-lab-tools.md).
 
 İzleme araçları ve debug zinciri: [24 — Lab tools](24-lab-tools.md).
 
@@ -181,6 +183,7 @@ Burada “sınıf” yok; önemli dosyalar:
 infra/docker-compose.yml
 infra/.env.example
 infra/README.md
+infra/scripts/lab-daily-check.ps1
 ```
 
 ## Mini akış

@@ -246,6 +246,7 @@ Screen (Vault UI — secrets; do not share tokens/values):
 
 ## Beginner lab
 
+0. (Daily) `powershell -File infra/scripts/lab-daily-check.ps1` — includes AppRole observability deny smoke.
 1. `docker compose up -d vault` → `up vault-seed` → UI :8200 with root token.
 2. `kv get secret/bankapp/jwt` (+ database/messaging/cache/observability) — do not share values.
 3. Find `Vault overlay applied via AppRole` in WebApi logs.

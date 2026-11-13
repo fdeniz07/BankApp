@@ -70,3 +70,7 @@ Discussion notes: [architecture-notes.en.md](architecture-notes.en.md)
 - [x] Keycloak social IdP lab script (Google/GitHub; off without secrets)
 - [x] Vault JWT dual-key lab rotation (`jwt_security_key_previous` + rotate script)
 - [x] Vault Raft HA lab overlay (`docker-compose.vault-raft.yml` + init script; ports 8210+)
+- [x] Vault AppRole + split KV (`jwt` / `database` / `messaging` / `cache` / `observability`); no root token on WebApi; `FailClosed`
+- [x] Redis `requirepass` + Vault `secret/bankapp/cache` → WebApi connection overlay (`Redis=True` in logs)
+- [x] Daily lab smoke: `infra/scripts/lab-daily-check.ps1` (+ Redis auth / Vault policy / ES index checks)
+- [x] Learning library: Vault ch.19 + Redis 08 + ELK 31 sync; screenshot embeds for chapters 02–25 (TR/EN/DE)

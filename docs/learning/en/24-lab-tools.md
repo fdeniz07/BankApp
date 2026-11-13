@@ -81,6 +81,41 @@ sequenceDiagram
 
 ---
 
+## Daily lab smoke (`lab-daily-check.ps1`)
+
+Repeatable **~10 min** check while the stack is up: health, Redis auth, Vault overlay/policy, ELK indices, integration tests (`Vault:Enabled=false` — same as CI).
+
+**Analogy:** Pre-flight checklist — same steps daily to catch small regressions early.
+
+```mermaid
+flowchart LR
+  S["lab-daily-check.ps1"] --> H["WebApi /health"]
+  S --> R["redis-cli PING auth"]
+  S --> V["Vault AppRole deny obs"]
+  S --> E["ES bankapp-logs indices"]
+  S --> T["dotnet integration tests"]
+```
+
+From repo root (PowerShell 5+ or `pwsh`):
+
+```powershell
+powershell -NoProfile -File infra/scripts/lab-daily-check.ps1
+```
+
+| Step | Expected |
+|------|----------|
+| `compose ps` (vault, sql, redis, elasticsearch, webapi) | Up / healthy |
+| `GET /health` | HTTP 200 |
+| `redis-cli -a $REDIS_PASSWORD ping` | `PONG` |
+| WebApi log | `Vault overlay … Redis=True` (increase log `--tail` if stack ran for days) |
+| AppRole `kv get …/observability` | **403 / permission denied** |
+| `/_cat/indices/bankapp-logs*` | At least one daily index (warning OK on cold stack) |
+| `WebApi.IntegrationTests` | All green |
+
+After Vault recreate: run `vault-seed` → recreate `webapi`. Details: `infra/README.md` → **Daily lab checklist**.
+
+---
+
 ## Tool by tool: setup, use, cautions, best practice
 
 ### 1) Scalar (API trials)
@@ -206,14 +241,15 @@ Prometheus UI (http://localhost:9090): **Status → Targets** → `otel-collecto
 
 CLI, overlay logs, recovery: **[19 — Vault lab](19-vault-lab.md)**.
 
-**Setup:** http://localhost:8200 → Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` → KV `secret/bankapp`.
+**Setup:** http://localhost:8200 → Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (operators only) → KV `secret/bankapp` paths `jwt` / `database` / `messaging` / `cache` / `observability`.
 
 ```powershell
 cd infra
 docker compose --env-file .env up -d vault
 docker compose --env-file .env up vault-seed
-docker compose --env-file .env exec vault vault kv get secret/bankapp
-# WebApi: logs | Select-String Vault  → overlay applied / fallback
+docker compose --env-file .env exec vault vault kv get secret/bankapp/jwt
+# WebApi: logs | Select-String Vault  → overlay applied; Redis=True
+# Policy smoke: infra/scripts/lab-daily-check.ps1 (AppRole observability deny)
 ```
 
 **Cautions:** Dev mode ≠ prod. Do not screenshot root token.
@@ -291,8 +327,9 @@ cd infra
 copy .env.example .env   # once
 docker compose --env-file .env up -d --build
 
-# Redis CLI (Insight alternative)
-docker compose exec redis redis-cli KEYS "BankApp:*"
+# Redis CLI (requirepass — .env REDIS_PASSWORD)
+docker compose --env-file .env exec redis redis-cli -a change-me-redis ping
+docker compose --env-file .env exec redis redis-cli -a change-me-redis KEYS "BankApp:*"
 ```
 
 | Service | Lab credential |
@@ -301,7 +338,8 @@ docker compose exec redis redis-cli KEYS "BankApp:*"
 | RabbitMQ | `guest` / `guest` |
 | Vault | Token `bankapp-vault-root-token` (or `.env`) |
 | SQL | `sa` / `MSSQL_SA_PASSWORD` |
-| Redis / Seq / Prometheus | Usually no auth in lab |
+| Redis | `REDIS_PASSWORD` (`.env` / Vault `cache`) |
+| Seq / Prometheus | Usually no auth in lab |
 
 ## Classes, methods, packages
 
@@ -320,6 +358,7 @@ Mostly **ops / DX**. Code links:
 infra/docker-compose.yml
 infra/.env.example
 infra/README.md
+infra/scripts/lab-daily-check.ps1
 README*.md                 # API summary / URL table
 docs/learning/en/07…19, 23    # Per-service depth
 docs/learning/en/08-redis.md  # Insight connection note
@@ -345,6 +384,7 @@ Screens (lab tool slice):
 
 ## Beginner lab
 
+0. (Daily) `powershell -File infra/scripts/lab-daily-check.ps1` → health + Redis + Vault deny + tests green.
 1. `cd infra` → `docker compose --env-file .env up -d --build` → check `ps` healthy.
 2. Scalar login → `GET /api/CreditTypes` → 200.
 3. Redis Insight connect `redis://redis:6379` → see `BankApp:` keys.

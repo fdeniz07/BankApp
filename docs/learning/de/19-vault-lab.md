@@ -211,6 +211,7 @@ Bildschirm (Vault UI — Secrets; Tokens/Werte nicht teilen):
 
 ## Einsteiger-Lab
 
+0. (Täglich) `powershell -File infra/scripts/lab-daily-check.ps1` — inkl. AppRole-Observability-Deny-Smoke.
 1. Vault + seed → UI :8200 mit Root-Token.
 2. `kv get secret/bankapp/jwt` (+ database/messaging/cache/observability).
 3. WebApi-Log: `Vault overlay applied via AppRole`.

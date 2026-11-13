@@ -69,6 +69,44 @@ sequenceDiagram
 
 ---
 
+## Günlük lab smoke (`lab-daily-check.ps1`)
+
+Stack ayaktayken **~10 dk** tekrarlanabilir kontrol: health, Redis auth, Vault overlay/policy, ELK indeksleri, integration test (Vault kapalı — CI ile aynı).
+
+**Benzetme:** Uçağın kalkış öncesi checklist’i — her gün aynı sıra, küçük kırılmaları erken yakalar.
+
+```mermaid
+flowchart LR
+  S["lab-daily-check.ps1"] --> H["WebApi /health"]
+  S --> R["redis-cli PING auth"]
+  S --> V["Vault AppRole deny obs"]
+  S --> E["ES bankapp-logs indices"]
+  S --> T["dotnet integration tests"]
+```
+
+Repodan (PowerShell 5+ veya `pwsh`):
+
+```powershell
+# Repo kökünden
+powershell -NoProfile -File infra/scripts/lab-daily-check.ps1
+```
+
+Script ne yapar?
+
+| Adım | Beklenen |
+|------|----------|
+| `compose ps` (vault, sql, redis, elasticsearch, webapi) | Up / healthy |
+| `GET /health` | HTTP 200 |
+| `redis-cli -a $REDIS_PASSWORD ping` | `PONG` |
+| WebApi log | `Vault overlay … Redis=True` (son loglarda yoksa stack uzun süredir ayaktaysa `--tail` artır) |
+| AppRole token ile `kv get …/observability` | **403 / permission denied** (dar policy) |
+| `/_cat/indices/bankapp-logs*` | En az bir günlük index (soğuk stack’te uyarı normal) |
+| `WebApi.IntegrationTests` | Tüm testler geçer (`Vault:Enabled=false`) |
+
+Vault yenilendiyse script sonunda hatırlatma: `vault-seed` → `webapi` recreate. Ayrıntılı tablo: `infra/README.md` → **Daily lab checklist**.
+
+---
+
 ## Araç araç: kurulum, kullanım, dikkat, best practice
 
 ### 1) Scalar (API denemesi)
@@ -194,14 +232,15 @@ Prometheus UI (http://localhost:9090): **Status → Targets** → `otel-collecto
 
 Ayrıntılı CLI, overlay log, kurtarma: **[19 — Vault lab](19-vault-lab.md)**.
 
-**Kurulum:** http://localhost:8200 → Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` → KV `secret/bankapp`.
+**Kurulum:** http://localhost:8200 → Method **Token** = `VAULT_DEV_ROOT_TOKEN_ID` (yalnız operatör) → KV `secret/bankapp` altında `jwt` / `database` / `messaging` / `cache` / `observability`.
 
 ```powershell
 cd infra
 docker compose --env-file .env up -d vault
 docker compose --env-file .env up vault-seed
-docker compose --env-file .env exec vault vault kv get secret/bankapp
-# WebApi: logs | Select-String Vault  → overlay applied / fallback
+docker compose --env-file .env exec vault vault kv get secret/bankapp/jwt
+# WebApi: logs | Select-String Vault  → overlay applied; Redis=True
+# Policy smoke: infra/scripts/lab-daily-check.ps1 (AppRole observability deny)
 ```
 
 **Dikkat:** Dev mode ≠ prod. Root token’ı ekran görüntüsüne koyma.
@@ -279,8 +318,9 @@ cd infra
 copy .env.example .env   # bir kez
 docker compose --env-file .env up -d --build
 
-# Redis CLI (Insight alternatifi)
-docker compose exec redis redis-cli KEYS "BankApp:*"
+# Redis CLI (requirepass — .env REDIS_PASSWORD)
+docker compose --env-file .env exec redis redis-cli -a change-me-redis ping
+docker compose --env-file .env exec redis redis-cli -a change-me-redis KEYS "BankApp:*"
 ```
 
 | Servis | Lab kimlik |
@@ -289,7 +329,8 @@ docker compose exec redis redis-cli KEYS "BankApp:*"
 | RabbitMQ | `guest` / `guest` |
 | Vault | Token `bankapp-vault-root-token` (veya `.env`) |
 | SQL | `sa` / `MSSQL_SA_PASSWORD` |
-| Redis / Seq / Prometheus | Lab’de genelde auth yok |
+| Redis | `REDIS_PASSWORD` (`.env` / Vault `cache`) |
+| Seq / Prometheus | Lab’de genelde auth yok |
 
 ## Sınıflar, metotlar, paketler
 
@@ -308,6 +349,7 @@ Bu bölüm çoğunlukla **ops / DX**. Kod tarafı bağlantılar:
 infra/docker-compose.yml
 infra/.env.example
 infra/README.md
+infra/scripts/lab-daily-check.ps1
 README*.md                 # API özeti / URL tablosu
 docs/learning/07…19, 23    # Servis başına derinlik
 docs/learning/tr/08-redis.md  # Insight bağlantı notu
@@ -333,6 +375,7 @@ Ekranlar (lab araçlarından bir kesit):
 
 ## Yeni başlayan lab
 
+0. (Günlük) `powershell -File infra/scripts/lab-daily-check.ps1` → health + Redis + Vault deny + test yeşil.
 1. `cd infra` → `docker compose --env-file .env up -d --build` → `ps` ile healthy kontrol.
 2. Scalar’da login → `GET /api/CreditTypes` → 200.
 3. Redis Insight’ta `redis://redis:6379` ile bağlan → `BankApp:` prefix’li key gör.

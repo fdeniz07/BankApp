@@ -129,7 +129,7 @@ Example URLs: WebApi `:8080`, client `:3000`, Seq `:5341`, Grafana `:3001`, Prom
 | Containers | `compose ps` | `healthy` / `Up` |
 | API alive | `http://localhost:8080/health` | 200, liveness |
 | SQL ready | sql healthy in `ps`; SSMS `localhost,11433` | Connection opens |
-| Redis | `docker compose exec redis redis-cli ping` | `PONG` |
+| Redis | `docker compose exec redis redis-cli -a $REDIS_PASSWORD ping` | `PONG` |
 | Log flow | Seq UI / `logs webapi` | Seed/login lines |
 | Queue | RabbitMQ UI `:15672` | Consumer connected |
 | Metric scrape | Prometheus Targets | `otel-collector` UP |
@@ -160,9 +160,11 @@ docker compose --env-file .env down -v
 
 ```powershell
 # In-container diagnostics (examples)
-docker compose --env-file .env exec redis redis-cli ping
+docker compose --env-file .env exec redis redis-cli -a change-me-redis ping
 docker compose --env-file .env exec webapi printenv ASPNETCORE_ENVIRONMENT
 ```
+
+Daily smoke (repo root): `powershell -File infra/scripts/lab-daily-check.ps1` — details in [24 — Lab tools](24-lab-tools.md).
 
 Monitoring tools and debug chain: [24 — Lab tools](24-lab-tools.md).
 
@@ -181,6 +183,7 @@ No “classes” here; important files:
 infra/docker-compose.yml
 infra/.env.example
 infra/README.md
+infra/scripts/lab-daily-check.ps1
 ```
 
 ## Mini flow

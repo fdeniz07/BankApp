@@ -77,6 +77,41 @@ sequenceDiagram
 
 ---
 
+## Täglicher Lab-Smoke (`lab-daily-check.ps1`)
+
+Wiederholbarer **~10-Minuten-Check** bei laufendem Stack: Health, Redis-Auth, Vault-Overlay/Policy, ELK-Indizes, Integrationstests (`Vault:Enabled=false` — wie CI).
+
+**Analogie:** Pre-flight-Checkliste — täglich dieselben Schritte, um kleine Regressionen früh zu sehen.
+
+```mermaid
+flowchart LR
+  S["lab-daily-check.ps1"] --> H["WebApi /health"]
+  S --> R["redis-cli PING auth"]
+  S --> V["Vault AppRole deny obs"]
+  S --> E["ES bankapp-logs indices"]
+  S --> T["dotnet integration tests"]
+```
+
+Vom Repo-Root (PowerShell 5+ oder `pwsh`):
+
+```powershell
+powershell -NoProfile -File infra/scripts/lab-daily-check.ps1
+```
+
+| Schritt | Erwartet |
+|---------|----------|
+| `compose ps` (vault, sql, redis, elasticsearch, webapi) | Up / healthy |
+| `GET /health` | HTTP 200 |
+| `redis-cli -a $REDIS_PASSWORD ping` | `PONG` |
+| WebApi-Log | `Vault overlay … Redis=True` |
+| AppRole `kv get …/observability` | **403 / permission denied** |
+| `/_cat/indices/bankapp-logs*` | Mind. ein Tages-Index |
+| `WebApi.IntegrationTests` | Alle grün |
+
+Nach Vault-Neustart: `vault-seed` → `webapi` recreate. Details: `infra/README.md` → **Daily lab checklist**.
+
+---
+
 ## Tool für Tool
 
 ### 1) Scalar (API testen)
@@ -166,7 +201,9 @@ Details: **[19 — Vault lab](19-vault-lab.md)**.
 cd infra
 docker compose --env-file .env up -d vault
 docker compose --env-file .env up vault-seed
-docker compose --env-file .env exec vault vault kv get secret/bankapp
+docker compose --env-file .env exec vault vault kv get secret/bankapp/jwt
+# WebApi-Log: Vault overlay; Redis=True
+# Policy-Smoke: infra/scripts/lab-daily-check.ps1
 ```
 
 ---
@@ -217,7 +254,8 @@ docker compose --env-file .env down
 cd infra
 copy .env.example .env
 docker compose --env-file .env up -d --build
-docker compose exec redis redis-cli KEYS "BankApp:*"
+docker compose --env-file .env exec redis redis-cli -a change-me-redis ping
+docker compose --env-file .env exec redis redis-cli -a change-me-redis KEYS "BankApp:*"
 ```
 
 | Service | Lab-Login |
@@ -226,7 +264,8 @@ docker compose exec redis redis-cli KEYS "BankApp:*"
 | RabbitMQ | `guest` / `guest` |
 | Vault | Token aus `.env` |
 | SQL | `sa` / `MSSQL_SA_PASSWORD` |
-| Redis / Seq / Prometheus | meist ohne Auth |
+| Redis | `REDIS_PASSWORD` (`.env` / Vault `cache`) |
+| Seq / Prometheus | meist ohne Auth |
 
 ## Klassen, Methoden, Pakete
 
@@ -245,6 +284,7 @@ Ops/DX; Codebezug:
 infra/docker-compose.yml
 infra/.env.example
 infra/README.md
+infra/scripts/lab-daily-check.ps1
 README*.md
 docs/learning/de/07…19, 23
 docs/learning/de/08-redis.md

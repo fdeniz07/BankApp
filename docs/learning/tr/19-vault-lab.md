@@ -259,6 +259,7 @@ Ekran (Vault UI — secrets; token/değerleri paylaşma):
 
 ## Yeni başlayan lab
 
+0. (Günlük) `powershell -File infra/scripts/lab-daily-check.ps1` — adım 6’daki policy deny otomatik kontrol edilir.
 1. `docker compose up -d vault` → `up vault-seed` → UI :8200 root token ile giriş.
 2. `kv get secret/bankapp/jwt` (+ database/messaging/cache/observability) — değerleri paylaşma.
 3. WebApi logda `Vault overlay applied via AppRole` ara.

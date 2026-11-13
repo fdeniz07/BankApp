@@ -78,3 +78,7 @@ Ayrıntılı tartışma: [architecture-notes.tr.md](architecture-notes.tr.md)
 - [x] Keycloak sosyal IdP lab script (Google/GitHub; secret yoksa kapalı)
 - [x] Vault JWT dual-key lab rotasyonu (`jwt_security_key_previous` + `vault-rotate-jwt.sh`)
 - [x] Vault Raft HA lab overlay (`docker-compose.vault-raft.yml` + init script; port 8210+)
+- [x] Vault AppRole + ayrılmış KV (`jwt` / `database` / `messaging` / `cache` / `observability`); WebApi root token yok; `FailClosed`
+- [x] Redis `requirepass` + Vault `secret/bankapp/cache` → WebApi connection overlay (`Redis=True` log)
+- [x] Günlük lab smoke: `infra/scripts/lab-daily-check.ps1` (+ Redis auth / Vault policy / ES index kontrolleri)
+- [x] Öğrenme kütüphanesi: Vault-19 + Redis-08 + ELK-31 senkron; bölüm 02–25 screenshot gömme (TR/EN/DE)
