@@ -1,4 +1,4 @@
-﻿# 23 — Rate limiting (ASP.NET Core)
+# 23 — Rate limiting (ASP.NET Core)
 
 [← Önceki](22-decision-letter-email.md) · [İçindekiler](00-index.md) · [Sonraki →](24-lab-tools.md)
 
@@ -134,6 +134,10 @@ src/WebApi/appsettings.Development.json    # lab gevşek overlay
 ## Mini akış
 
 İstek → RateLimiter middleware → policy (auth/write/fixed) sayacı (ortam config’inden) → izin varsa action; yoksa 429.
+
+Ekran (auth endpoint — login):
+
+<img src="../../assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login" width="720" />
 
 ## Yeni başlayan lab
 

@@ -83,6 +83,10 @@ docs/architecture-notes.tr.md
 
 New branch feature → which context? → CQRS under that module’s `Features` → controller in same module → tests beside the module.
 
+Screen (modules in one Compose stack):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker" width="720" />
+
 ## Beginner lab
 
 1. Browse four folders under `src/Application/Modules/`.

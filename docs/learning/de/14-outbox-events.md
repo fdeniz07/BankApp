@@ -63,6 +63,10 @@ dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --filter "O
 
 SaveChanges → Dispatcher → RabbitMQ → Consumer → Saga + SignalR.
 
+Bildschirm (RabbitMQ):
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ" width="720" />
+
 ## Einsteiger-Lab
 
 Approve im UI → Rabbit `domain-events` Ready sinkt → SQL `ProcessedOnUtc` gesetzt → Toast sichtbar.

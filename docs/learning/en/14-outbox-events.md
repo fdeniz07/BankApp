@@ -126,6 +126,10 @@ src/WebApi/Modules/Notification/Messaging/DomainEventsConsumerHostedService.cs
 
 Handler SaveChanges (aggregate + outbox) → Dispatcher publish → RabbitMQ `domain-events` → Consumer → ProcessManager + SignalR `NotifyAsync` (+ decision-letter branch).
 
+Screen (RabbitMQ queues):
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ" width="720" />
+
 ## Beginner lab
 
 1. `docker compose up -d sqlserver rabbitmq webapi client`

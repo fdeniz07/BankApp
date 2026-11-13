@@ -46,6 +46,10 @@ dotnet build BankApp.slnx
 
 Feature → richtiges Modul → CQRS unter `Features` → Controller im selben Modul.
 
+Bildschirm (Compose):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker" width="720" />
+
 ## Einsteiger-Lab
 
 Vier Modulordner ansehen → Credit-Controller → `NotificationHostModule` → `dotnet build`.

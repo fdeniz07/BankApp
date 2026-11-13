@@ -34,6 +34,8 @@ Im BankApp-Lab nutzt ELK **fünf Aufgaben**:
 
 **Seq wurde nicht entfernt.** Seq ist schnelles Lab-UX für strukturierte .NET-Logs; ELK ist Suchmaschine + Kibana. Beide laufen parallel.
 
+**Sicherheit (Lab):** In Compose bleibt `xpack.security.enabled=false`. Optionales `elasticsearch_password` liegt in Vault unter `secret/bankapp/observability`; Produktion mit TLS/Rollen ist ein späterer Slice.
+
 ## Rolle in BankApp
 
 - Antragsliste: Suche beim Tippen (`searchText`, ~300 ms Debounce)

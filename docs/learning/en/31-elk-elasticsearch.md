@@ -22,6 +22,8 @@ In the BankApp lab, ELK serves **five jobs**:
 
 **Seq was not removed.** Seq is fast lab UX for .NET structured logs; ELK is the search engine + Kibana. Both run side by side.
 
+**Security (lab):** Compose keeps Elasticsearch `xpack.security.enabled=false`. Optional `elasticsearch_password` lives in Vault `secret/bankapp/observability`; production TLS + roles are a later slice.
+
 **Analogy:** Seq = quick diary; Elasticsearch = library catalogue; Kibana = catalogue terminal.
 
 ```mermaid

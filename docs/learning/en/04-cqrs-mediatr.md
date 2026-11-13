@@ -95,6 +95,10 @@ src/WebApi/Modules/**/Controllers/
 → Authorization → Validation → Logging → Handler  
 → Response DTO.
 
+Screen (approve flow UI):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%201.png" alt="Approve UI" width="720" />
+
 ## Beginner lab
 
 1. Open a controller under `src/WebApi/Modules` → confirm `IMediator` injection.

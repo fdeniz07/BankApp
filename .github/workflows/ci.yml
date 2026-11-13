@@ -36,6 +36,7 @@ jobs:
       - name: Unit tests
         run: dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --configuration Release --no-build --verbosity normal
 
+      # CustomWebApplicationFactory sets Vault:Enabled=false — no Vault in CI.
       - name: Integration tests
         run: dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj --configuration Release --no-build --verbosity normal
 

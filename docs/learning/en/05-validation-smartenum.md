@@ -77,6 +77,10 @@ src/WebApi  # SmartEnum JSON converter registration
 Request arrives → `RequestValidationBehavior` finds validator → rule fails → `ValidationException` → ProblemDetails 400.  
 On success, flow continues to the handler; status is compared with `CreditApplicationStatus.Pending`.
 
+Screen (register form):
+
+<img src="../../assets/screenshots/en/Register%20Page.png" alt="Register page" width="720" />
+
 ## Beginner lab
 
 1. Open `CreateCreditApplicationRequestValidator` → read `RuleFor` examples.

@@ -1,4 +1,4 @@
-﻿# 04 — CQRS ve MediatR
+# 04 — CQRS ve MediatR
 
 [← Önceki](03-ef-core-sql.md) · [İçindekiler](00-index.md) · [Sonraki →](05-validation-smartenum.md)
 
@@ -94,6 +94,10 @@ src/WebApi/Modules/**/Controllers/
 → Controller `mediator.Send(new Approve…Request { … })`  
 → Authorization → Validation → Logging → Handler  
 → Response DTO.
+
+Ekran (onay akışı UI):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%201.png" alt="CQRS onay UI" width="720" />
 
 ## Yeni başlayan lab
 

@@ -22,5 +22,6 @@ Neue / aktualisierte Kapitel chronologisch. Datumsquelle oft der TR-Changelog; E
 | 2026-11-10 | Eingebettete Screenshots: `07` Seq, `18` Prom/Grafana, `22`/`29` Briefvorlage, `31` Kibana, `34` a11y (TR/EN/DE) |
 | 2026-11-10 | Weitere eingebettete Screenshots: `01`/`06`/`08`/`09`/`11`–`13`/`16`/`19`/`20`/`24`/`26`–`28`/`30`/`32`/`33` (+ DE-Spiegel); Extra: Dark Theme, Kunden-Dashboard, SignalR, Filialfilter, neue Filiale, Genehmigungsdialog, Kreditarten, Zahlungsplan |
 | 2026-11-10 | Kapitel `19` Vault: AppRole + Split-KV (`jwt`/`database`/`messaging`/`observability`) + FailClosed; WebApi ohne Root-Token (TR/EN/DE) |
+| 2026-11-13 | Redis requirepass + Vault `secret/bankapp/cache`; Daily-Lab-Skript; Kapitel `02`–`25` Screenshots; `08`/`31` Sicherheitsnotizen; CI-Vault-Kommentar |
 
 Vollständige TR-Historie: [99-changelog-learning.md](../tr/99-changelog-learning.md)

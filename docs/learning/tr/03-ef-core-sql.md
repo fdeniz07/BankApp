@@ -1,4 +1,4 @@
-﻿# 03 — EF Core ve SQL Server
+# 03 — EF Core ve SQL Server
 
 [← Önceki](02-clean-architecture.md) · [İçindekiler](00-index.md) · [Sonraki →](04-cqrs-mediatr.md)
 
@@ -90,6 +90,10 @@ infra/docker-compose.yml   # sqlserver servisi
 ## Mini akış
 
 Handler `ICreditApplicationRepository.GetAsync(...)` çağırır → EF SQL üretir → satır belleğe gelir → `Approve(...)` → `UpdateAsync` → `SaveChangesAsync` transaction commit.
+
+Ekran (Compose — SQL container):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker container listesi" width="720" />
 
 ## Yeni başlayan lab
 

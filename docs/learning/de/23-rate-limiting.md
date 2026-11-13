@@ -132,6 +132,10 @@ src/WebApi/appsettings.Development.json
 
 Request → RateLimiter → Policy-Zähler (aus Config) → erlaubt → Action; sonst 429.
 
+Bildschirm (Login):
+
+<img src="../../assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login" width="720" />
+
 ## Einstiegs-Lab
 
 1. Stack unter `infra` starten; `printenv ASPNETCORE_ENVIRONMENT` → `Development`.

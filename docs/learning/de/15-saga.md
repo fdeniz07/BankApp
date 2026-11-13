@@ -45,6 +45,10 @@ dotnet test tests/Application.UnitTests/Application.UnitTests.csproj --filter "S
 
 Events treiben Zustandsübergänge; Tests sichern Happy Path.
 
+Bildschirm (Genehmigen):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%202.png" alt="Genehmigen/Ablehnen" width="720" />
+
 ## Einsteiger-Lab
 
 Neue Bewerbung → SQL State `Submitted` → Approve → State wechselt → `dotnet test --filter Saga`.

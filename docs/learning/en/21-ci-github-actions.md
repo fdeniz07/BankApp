@@ -107,6 +107,10 @@ gh run view <id> --log-failed
 
 `git push` → Actions runs → fail → `gh run view --log-failed` → fix → green.
 
+Screen (API docs — same contract CI builds):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar" width="720" />
+
 ## Beginner lab
 
 1. Branch → tiny change → push → open Actions tab.

@@ -1,4 +1,4 @@
-﻿# 02 — Clean Architecture
+# 02 — Clean Architecture
 
 [← Önceki](01-dotnet-csharp.md) · [İçindekiler](00-index.md) · [Sonraki →](03-ef-core-sql.md)
 
@@ -90,6 +90,10 @@ src/Core/
 ## Mini akış
 
 **Onay butonu** → `WebApi` controller → `Application` handler → `Domain` aggregate metodu → `Persistence` `SaveChanges` → (ileride) Outbox / SignalR.
+
+Ekran (örnek):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API" width="720" />
 
 ## Yeni başlayan lab
 

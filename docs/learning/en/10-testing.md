@@ -97,6 +97,10 @@ tests/WebApi.IntegrationTests/Infrastructure/CustomWebApplicationFactory.cs
 
 `dotnet restore` → `dotnet build` → unit tests → integration tests → (parallel) client `npm` build.
 
+Screen (lab stack):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker" width="720" />
+
 ## Beginner lab
 
 1. `dotnet test tests/Application.UnitTests` — quick green suite.

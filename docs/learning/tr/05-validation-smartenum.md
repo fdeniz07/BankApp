@@ -1,4 +1,4 @@
-﻿# 05 — FluentValidation ve SmartEnum
+# 05 — FluentValidation ve SmartEnum
 
 [← Önceki](04-cqrs-mediatr.md) · [İçindekiler](00-index.md) · [Sonraki →](06-jwt-rbac.md)
 
@@ -76,6 +76,10 @@ src/WebApi  # SmartEnum JSON converter kaydı
 
 İstek gelir → `RequestValidationBehavior` validator bulur → kural fail → `ValidationException` → ProblemDetails 400.  
 Başarılıysa handler’a geçilir; status karşılaştırması `CreditApplicationStatus.Pending` ile yapılır.
+
+Ekran (kayıt formu doğrulama):
+
+<img src="../../assets/screenshots/en/Register%20Page.png" alt="Kayıt sayfası" width="720" />
 
 ## Yeni başlayan lab
 

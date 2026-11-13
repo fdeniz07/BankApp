@@ -1,4 +1,4 @@
-﻿# 25 — Karar mektubu SMS (lab)
+# 25 — Karar mektubu SMS (lab)
 
 [← Önceki](24-lab-tools.md) · [İçindekiler](00-index.md) · [Sonraki →](26-credit-application-documents.md)
 
@@ -102,6 +102,10 @@ tests/.../DecisionSmsRequestedTests.cs
 ## Mini akış
 
 Staff onaylar → Outbox → `domain-events` → SignalR + decision-letter e-posta + **decision-letter-sms** → consumer Seq’e `To` / `Body` yazar.
+
+Ekran (Seq log):
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq" width="720" />
 
 ## Yeni başlayan lab
 

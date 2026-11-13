@@ -63,7 +63,7 @@ docker compose --env-file .env up -d redis redis-insight
 docker compose exec redis redis-cli KEYS "*"
 ```
 
-Tarayıcı: `http://localhost:5540` → **Add Redis database** → Host **`redis`**, Port **`6379`**, şifre yok.  
+Tarayıcı: `http://localhost:5540` → **Add Redis database** → Host **`redis`**, Port **`6379`**, şifre = `REDIS_PASSWORD` (`.env` / Vault `secret/bankapp/cache`).  
 (`localhost` Insight konteynerinden Redis’e gitmez; Compose servis adı kullanılır.)
 
 Ekran (Redis Insight):

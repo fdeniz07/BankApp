@@ -134,6 +134,10 @@ src/WebApi/appsettings.Development.json    # relaxed lab overlay
 
 Request → RateLimiter middleware → policy (auth/write/fixed) counter (from environment config) → permit → action; else 429.
 
+Screen (auth — login):
+
+<img src="../../assets/screenshots/en/Login%20Page%20and%20Privacy.png" alt="Login" width="720" />
+
 ## Beginner lab
 
 1. Stack up under `infra`; confirm `printenv ASPNETCORE_ENVIRONMENT` → `Development`.

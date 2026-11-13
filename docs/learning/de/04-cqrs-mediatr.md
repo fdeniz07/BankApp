@@ -95,6 +95,10 @@ src/WebApi/Modules/**/Controllers/
 → Authorization → Validation → Logging → Handler  
 → Response-DTO.
 
+Bildschirm (Genehmigen-UI):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%201.png" alt="Genehmigen" width="720" />
+
 ## Einstiegs-Lab
 
 1. Controller unter `src/WebApi/Modules` — `IMediator` prüfen.

@@ -1,4 +1,4 @@
-﻿# 10 — Testler (xUnit, Moq, Integration)
+# 10 — Testler (xUnit, Moq, Integration)
 
 [← Önceki](09-docker-compose.md) · [İçindekiler](00-index.md) · [Sonraki →](11-react-vite.md)
 
@@ -96,6 +96,10 @@ tests/WebApi.IntegrationTests/Infrastructure/CustomWebApplicationFactory.cs
 ## Mini akış (CI)
 
 `dotnet restore` → `dotnet build` → unit test → integration test → (paralel) client `npm` build.
+
+Ekran (lab stack):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Compose container'ları" width="720" />
 
 ## Yeni başlayan lab
 

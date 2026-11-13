@@ -86,6 +86,10 @@ tests/Application.UnitTests/…Saga…
 
 Created → `Submitted` → Approved → `Decided` → onboarding stub → `Completed`. Reject also reaches `Decided` (not approved).
 
+Screen (approve trigger):
+
+<img src="../../assets/screenshots/en/Bank%20Employee/Bank%20Employee%20Page%20-%20Approving-Rejecting%20Credit%202.png" alt="Approve/reject" width="720" />
+
 ## Beginner lab
 
 1. Create application → SQL saga row `Submitted`.

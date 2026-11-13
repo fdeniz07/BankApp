@@ -91,6 +91,10 @@ infra/docker-compose.yml   # sqlserver-Dienst
 
 Handler ruft `ICreditApplicationRepository.GetAsync(...)` auf → EF erzeugt SQL → Zeile wird geladen → `Approve(...)` → `UpdateAsync` → `SaveChangesAsync` committet die Transaktion.
 
+Bildschirm (Compose — SQL):
+
+<img src="../../assets/screenshots/en/Containers%20on%20Docker.png" alt="Docker" width="720" />
+
 ## Einstiegs-Lab
 
 1. SQL in Compose healthy (`infra`, `compose ps`).

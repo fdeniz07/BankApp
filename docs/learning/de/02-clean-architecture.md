@@ -93,6 +93,10 @@ src/Core/
 
 **Genehmigen-Button** → `WebApi` Controller → `Application` Handler → `Domain` Aggregate-Methode → `Persistence` `SaveChanges` → (später) Outbox / SignalR.
 
+Bildschirm (Beispiel):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar API" width="720" />
+
 ## Einstiegs-Lab
 
 1. `src/Domain/Domain.csproj` — **keine** Referenz auf `WebApi`.

@@ -1,4 +1,4 @@
-﻿# 17 — Modular Monolith
+# 17 — Modular Monolith
 
 [← Önceki](16-signalr.md) · [İçindekiler](00-index.md) · [Sonraki →](18-otel-observability.md)
 
@@ -22,7 +22,9 @@ flowchart TB
 
 ## Bu projede ne işe yarar?
 
-Modüller: **Identity**, **Customers**, **Credit**, **Notification** — hem `Application/Modules` hem `WebApi/Modules`. Yeni özellik eklerken “hangi iş dili?” sorusu klasör seçimini belirler.
+Modüller: **Identity**, **Customers**, **Credit**, **Notification** — hem `Application/Modules` hem `WebApi/Modules`. şube özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
+
+## Yeni başlayan labözellik eklerken “hangi iş dili?” sorusu klasör seçimini belirler.
 
 ## Ne zaman eklendi?
 
@@ -56,7 +58,9 @@ Yapısal bir pattern; doğrulama:
 dotnet build BankApp.slnx
 ```
 
-Yeni feature eklerken doğru modül klasörüne koy (`Credit` mi `Identity` mi?). Mimari notlar:
+şube özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
+
+## Yeni başlayan labfeature eklerken doğru modül klasörüne koy (`Credit` mi `Identity` mi?). Mimari notlar:
 
 ```powershell
 # Repodaki kararlar (okuma)
@@ -88,9 +92,13 @@ docs/architecture-notes.tr.md
 
 ## Mini akış
 
-Yeni “şube” özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
+şube özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
 
-## Yeni başlayan lab
+## Yeni başlayan lab“şube” özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
+
+## şube özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
+
+## Yeni başlayan labbaşlayan lab
 
 1. `src/Application/Modules/` altında dört modül klasörünü gez.
 2. `src/WebApi/Modules/Credit/` içinde bir controller aç — hangi MediatR komutlarını çağırdığına bak.
@@ -107,7 +115,9 @@ Yeni “şube” özelliği → hangi context? (Customers vs Credit branch kural
 
 ## Nerede işe yarar?
 
-- [ ] Yeni feature doğru `Modules/{Name}/Features` altında  
+- [ ] şube özelliği → hangi context? (Customers vs Credit branch kuralları) → o modülün `Features` altına CQRS dosyaları → WebApi controller aynı modülde → testler modül klasöründe.
+
+## Yeni başlayan labfeature doğru `Modules/{Name}/Features` altında  
 - [ ] `dotnet build BankApp.slnx` hatasız  
 - [ ] Controller ince, handler kalın (CQRS)  
 - [ ] Notification mesajlaşma Credit’dan kopuk modülde

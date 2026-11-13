@@ -1,4 +1,4 @@
-﻿# 14 — Domain Events ve Transactional Outbox
+# 14 — Domain Events ve Transactional Outbox
 
 [← Önceki](13-rabbitmq.md) · [İçindekiler](00-index.md) · [Sonraki →](15-saga.md)
 
@@ -126,6 +126,10 @@ src/WebApi/Modules/Notification/Messaging/DomainEventsConsumerHostedService.cs
 ## Mini akış
 
 Handler SaveChanges (aggregate + outbox) → Dispatcher publish → RabbitMQ `domain-events` → Consumer → ProcessManager + SignalR `NotifyAsync` (+ decision-letter publish branch).
+
+Ekran (RabbitMQ kuyrukları):
+
+<img src="../../assets/screenshots/en/Queues%20on%20RabbitMQ.png" alt="RabbitMQ" width="720" />
 
 ## Yeni başlayan lab
 

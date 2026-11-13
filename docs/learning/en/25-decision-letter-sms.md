@@ -102,6 +102,10 @@ tests/.../DecisionSmsRequestedTests.cs
 
 Staff approves → Outbox → `domain-events` → SignalR + decision-letter e-mail + **decision-letter-sms** → consumer writes `To` / `Body` to Seq.
 
+Screen (Seq log):
+
+<img src="../../assets/screenshots/en/Logs%20on%20Seq.png" alt="Seq" width="720" />
+
 ## Beginner lab
 
 1. RabbitMQ UI: queue `decision-letter-sms` listed.

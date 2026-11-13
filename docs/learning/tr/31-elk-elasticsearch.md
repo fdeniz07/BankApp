@@ -22,6 +22,8 @@ BankApp lab’de ELK **beş iş** için kullanılır:
 
 **Seq silinmedi.** Seq .NET yapısal log için hızlı lab UX’tir; ELK ise arama motoru + Kibana’dır. İkisi yan yana çalışır.
 
+**Güvenlik (lab):** Compose’ta Elasticsearch `xpack.security.enabled=false` (basit lab). Operatör notları ve isteğe bağlı `elasticsearch_password` Vault’ta `secret/bankapp/observability` altında; prod’da TLS + kullanıcı/rol ayrı dilim.
+
 **Benzetme:** Seq = günlük defter (hızlı bak); Elasticsearch = kütüphane kataloğu (milyon kayıtta arama); Kibana = katalog odası ekranı.
 
 ```mermaid

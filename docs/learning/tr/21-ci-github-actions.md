@@ -1,4 +1,4 @@
-﻿# 21 — GitHub Actions CI
+# 21 — GitHub Actions CI
 
 [← Önceki](20-pdf-export.md) · [İçindekiler](00-index.md) · [Sonraki →](22-decision-letter-email.md)
 
@@ -110,6 +110,10 @@ Actions (Node 24 runtime — v4 Node 20 deprecation uyarısını temizler):
 ## Mini akış
 
 `git push` → Actions tetiklenir → NU1605 / test fail varsa kırmızı → `gh run view … --log-failed` → düzelt → tekrar push → yeşil.
+
+Ekran (CI aynı stack'i doğrular — API dokümantasyonu):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar" width="720" />
 
 ## Yeni başlayan lab
 

@@ -16,19 +16,21 @@ flowchart LR
   seed["vault-seed root"] --> jwtPath["secret bankapp jwt"]
   seed --> dbPath["secret bankapp database"]
   seed --> mqPath["secret bankapp messaging"]
+  seed --> cachePath["secret bankapp cache"]
   seed --> obsPath["secret bankapp observability"]
   seed --> role["AppRole bankapp-webapi"]
   role --> api["WebApi"]
   api -->|"read"| jwtPath
   api -->|"read"| dbPath
   api -->|"read"| mqPath
+  api -->|"read"| cachePath
   obsPath -.->|"policy deny"| api
 ```
 
 ## Bu projede ne işe yarar?
 
 - Secret’ların path bazlı ayrılması + UI’da görülmesi (eğitim).
-- Compose’ta AppRole + `FailClosed=true`: JWT, SQL `Password`, RabbitMQ user/password Vault’tan overlay.
+- Compose’ta AppRole + `FailClosed=true`: JWT, SQL `Password`, RabbitMQ ve Redis Vault’tan overlay.
 - Observability admin secret’ları Vault’ta durur; WebApi policy **okuyamaz**.
 - SQL/Rabbit/Grafana/Keycloak **konteynerleri** hâlâ Compose `.env` ile ayağa kalkar (Vault Agent kapsam dışı).
 
@@ -57,7 +59,7 @@ sequenceDiagram
   Seed->>V: split KV + AppRole yaz
   API->>V: auth approle login
   V-->>API: client_token
-  API->>V: KV GET jwt database messaging
+  API->>V: KV GET jwt database messaging cache
   V-->>API: secret data
   API->>API: AddInMemoryCollection overlay
   User->>API: access token iste
@@ -79,7 +81,7 @@ docker compose --env-file .env up vault-seed
 **Vault UI**
 
 1. Method: **Token** → yapıştır `VAULT_DEV_ROOT_TOKEN_ID` (yalnız operatör).
-2. Secrets → KV → `secret` → `bankapp` → `jwt` / `database` / `messaging` / `observability`.
+2. Secrets → KV → `secret` → `bankapp` → `jwt` / `database` / `messaging` / `cache` / `observability`.
 3. `jwt` altında `jwt_security_key` alanını oku (değeri ekran görüntüsüne koyma).
 
 ```powershell
@@ -87,6 +89,7 @@ docker compose --env-file .env up vault-seed
 docker compose --env-file .env exec vault vault kv get secret/bankapp/jwt
 docker compose --env-file .env exec vault vault kv get secret/bankapp/database
 docker compose --env-file .env exec vault vault kv get secret/bankapp/messaging
+docker compose --env-file .env exec vault vault kv get secret/bankapp/cache
 docker compose --env-file .env exec vault vault kv get secret/bankapp/observability
 ```
 
@@ -111,7 +114,7 @@ $secretId = docker compose --env-file .env exec -T webapi cat /vault-approle/sec
 | Kontrol | Nasıl | İyi görünüm |
 |---------|-------|-------------|
 | Vault up | `compose ps vault` | healthy / Up |
-| Seed paths | `kv get` jwt/database/messaging/observability | dolu |
+| Seed paths | `kv get` jwt/database/messaging/cache/observability | dolu |
 | AppRole files | volume / WebApi `/vault-approle` | role_id + secret_id |
 | Overlay | `logs webapi` | AppRole overlay applied |
 | FailClosed | Vault down + WebApi recreate | WebApi ayağa kalkmaz / restart |
@@ -218,7 +221,7 @@ docker compose -f docker-compose.vault-raft.yml exec -e VAULT_TOKEN=<ROOT> vault
 | İsim | Rol |
 |------|-----|
 | `VaultOptions` | Enabled, AppRole files, path’ler, FailClosed |
-| `ApplyVaultSecretsAsync` | AppRole login → KV jwt/database/messaging → overlay |
+| `ApplyVaultSecretsAsync` | AppRole login → KV jwt/database/messaging/cache → overlay |
 | `VaultFailClosedException` | FailClosed=true iken startup abort |
 | `TokenOptions.SecurityKeyPrevious` | Dual-key validation window |
 | `TokenSigningKeyFactory` | İmza: current; doğrulama: current + previous |
@@ -247,7 +250,7 @@ infra/.env.example
 
 ## Mini akış
 
-vault-seed split path + AppRole yazar → WebApi AppRole login → JWT/SQL/Rabbit overlay → JWT imza current key ile.  
+vault-seed split path + AppRole yazar → WebApi AppRole login → JWT/SQL/Rabbit/Redis overlay → JWT imza current key ile.  
 Rotate → yalnız jwt path → WebApi recreate → eski token previous ile doğrulanır.
 
 Ekran (Vault UI — secrets; token/değerleri paylaşma):
@@ -257,7 +260,7 @@ Ekran (Vault UI — secrets; token/değerleri paylaşma):
 ## Yeni başlayan lab
 
 1. `docker compose up -d vault` → `up vault-seed` → UI :8200 root token ile giriş.
-2. `kv get secret/bankapp/jwt` (+ database/messaging/observability) — değerleri paylaşma.
+2. `kv get secret/bankapp/jwt` (+ database/messaging/cache/observability) — değerleri paylaşma.
 3. WebApi logda `Vault overlay applied via AppRole` ara.
 4. Login ol → geçerli JWT al.
 5. `vault-rotate-jwt.sh` → WebApi recreate → dual-key penceresini test et.

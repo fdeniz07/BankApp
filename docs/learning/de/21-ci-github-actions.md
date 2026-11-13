@@ -59,6 +59,10 @@ gh run view <id> --log-failed
 
 Push → CI → bei Rot Logs lesen → fixen → grün.
 
+Bildschirm (Scalar — gleicher API-Vertrag wie CI):
+
+<img src="../../assets/screenshots/en/Api%20Documents%20with%20Scalar.png" alt="Scalar" width="720" />
+
 ## Einsteiger-Lab
 
 Branch pushen → Actions beobachten → absichtlich Client-Fehler → zurückrollen → lokal gleiche Befehle.

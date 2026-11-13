@@ -1,4 +1,4 @@
-﻿# 15 — Saga / Process Manager
+# 15 — Saga / Process Manager
 
 [← Önceki](14-outbox-events.md) · [İçindekiler](00-index.md) · [Sonraki →](16-signalr.md)
 
@@ -87,7 +87,9 @@ tests/Application.UnitTests/…Saga…
 
 ## Mini akış
 
-Created event → saga “Submitted” → Approved event → `Decided` → onboarding stub → `Completed` (testlerle sabitlenmiş mutlu yol). Reject event’i de `Decided`’a götürür (onaylı değil).
+Submitted → Approved event → `Decided` → onboarding stub → `Completed` (testlerle sabitlenmiş mutlu yol). Reject event’i de `Decided`’a götürür (onaylı değil).
+
+## Yeni başlayan lab“Submitted” → Approved event → `Decided` → onboarding stub → `Completed` (testlerle sabitlenmiş mutlu yol). Reject event’i de `Decided`’a götürür (onaylı değil).
 
 ## Yeni başlayan lab
 
