@@ -61,13 +61,15 @@ flowchart TB
 
 ## Commands
 
+**Credentials (lab):** Compose `RABBITMQ_USER` / `RABBITMQ_PASSWORD` bootstrap the broker (`rabbitmq-data` volume). WebApi reads `secret/bankapp/messaging` via Vault AppRole overlay — keep `.env` aligned with seed; password changes may need volume recreate ([19 Vault](19-vault-lab.md)).
+
 ```powershell
 cd infra
 
 # Broker + Management UI
 docker compose --env-file .env up -d rabbitmq
 # Check: compose ps → rabbitmq healthy
-# UI: http://localhost:15672  → guest / guest
+# UI: http://localhost:15672  → RABBITMQ_USER / RABBITMQ_PASSWORD (.env; default guest/guest)
 ```
 
 ```powershell

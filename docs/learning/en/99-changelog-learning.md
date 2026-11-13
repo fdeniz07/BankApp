@@ -24,5 +24,6 @@ New / updated chapters are listed chronologically. Source of truth for dates is 
 | 2026-11-10 | Chapter `19` Vault: AppRole + split KV (`jwt`/`database`/`messaging`/`observability`) + FailClosed; WebApi no longer uses root token (TR/EN/DE) |
 | 2026-11-13 | Redis requirepass + Vault `secret/bankapp/cache`; daily lab script; learning chapters `02`–`25` screenshot embeds; chapters `08`/`31` security notes; CI Vault comment |
 | 2026-11-13 | Chapters `09`/`24` + learning README: `lab-daily-check` smoke; Redis auth commands; `history` TR/EN/DE update |
+| 2026-11-13 | `00-index` security lab rows; `13` Vault messaging; `21` CI `bash -n` vault scripts |
 
 Full TR history: [99-changelog-learning.md](../tr/99-changelog-learning.md)

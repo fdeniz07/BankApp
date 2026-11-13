@@ -51,7 +51,8 @@ Ayrıca: [English](../en/00-index.md) · [Deutsch](../de/00-index.md)
 | 6 | SignalR | [16](16-signalr.md) |
 | 6 | Modular Monolith | [17](17-modular-monolith.md) |
 | 6 | OpenTelemetry / Grafana / Prometheus | [18](18-otel-observability.md) |
-| Lab | HashiCorp Vault (+ JWT overlay, dual-key, opsiyonel Raft) | [19](19-vault-lab.md) |
+| Lab | HashiCorp Vault (AppRole, split KV, `cache`, FailClosed; JWT dual-key; opsiyonel Raft) | [19](19-vault-lab.md) |
+| Lab / Security | Redis `requirepass` + Vault cache; günlük `lab-daily-check.ps1` | [08](08-redis.md) · [24](24-lab-tools.md) |
 | UX | QuestPDF / ödeme planı export | [20](20-pdf-export.md) |
 | DevOps | GitHub Actions CI | [21](21-ci-github-actions.md) |
 | Notification | Karar mektubu e-posta (lab) | [22](22-decision-letter-email.md) |
@@ -83,9 +84,12 @@ dotnet build BankApp.slnx
 # Unit + integration test
 dotnet test BankApp.slnx
 
+# Günlük lab smoke (stack ayaktayken, repo kökü)
+powershell -NoProfile -File infra/scripts/lab-daily-check.ps1
+
 # Compose lab (infra klasöründen)
 cd infra
-docker compose up -d --build
+docker compose --env-file .env up -d --build
 
 # React istemci (client klasöründen)
 cd client

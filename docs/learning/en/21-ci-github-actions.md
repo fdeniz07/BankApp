@@ -50,6 +50,7 @@ flowchart LR
     R["restore"] --> B["build Release"]
     B --> U["unit tests"]
     U --> I["integration tests"]
+    I --> V["bash -n vault scripts"]
   end
   subgraph client["Job client"]
     N["npm ci"] --> NB["npm run build"]
@@ -67,6 +68,10 @@ dotnet restore BankApp.slnx
 dotnet build BankApp.slnx --configuration Release --no-restore
 dotnet test tests/Application.UnitTests/Application.UnitTests.csproj -c Release --no-build
 dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj -c Release --no-build
+
+# CI: Vault lab script syntax (no Vault/Compose run)
+bash -n infra/scripts/vault-seed.sh
+bash -n infra/scripts/vault-rotate-jwt.sh
 
 cd client
 npm ci

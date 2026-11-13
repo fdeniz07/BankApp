@@ -63,3 +63,4 @@ Yeni / güncellenen bölümler burada kronolojik tutulur.
 | 2026-11-10 | `19` Vault: AppRole + split KV (`jwt`/`database`/`messaging`/`observability`) + FailClosed; WebApi root token kaldırıldı (TR/EN/DE) |
 | 2026-11-13 | Redis `requirepass` + Vault `secret/bankapp/cache`; günlük lab scripti; bölüm `02`–`25` (eksik) screenshot gömme; `08`/`31` güvenlik notları; CI Vault yorumu |
 | 2026-11-13 | `09`/`24` + learning README: `lab-daily-check` smoke; Redis auth komutları; history TR/EN/DE güncellemesi |
+| 2026-11-13 | `00-index` güvenlik lab satırları; `13` Vault messaging; `21` CI `bash -n` vault scriptleri |

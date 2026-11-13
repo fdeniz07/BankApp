@@ -61,13 +61,15 @@ flowchart TB
 
 ## Komutlar
 
+**Kimlik bilgisi (lab):** Compose `RABBITMQ_USER` / `RABBITMQ_PASSWORD` broker’ı ilk kurulumda yazar (`rabbitmq-data` volume). WebApi bağlantısı Vault `secret/bankapp/messaging` üzerinden AppRole overlay ile okunur — `.env` ile seed uyumlu olmalı; şifre değişince volume recreate gerekebilir ([19 Vault](19-vault-lab.md)).
+
 ```powershell
 cd infra
 
 # Broker + Management UI
 docker compose --env-file .env up -d rabbitmq
 # Kontrol: compose ps → rabbitmq healthy
-# UI: http://localhost:15672  → guest / guest
+# UI: http://localhost:15672  → RABBITMQ_USER / RABBITMQ_PASSWORD (.env; varsayılan guest/guest)
 ```
 
 ```powershell

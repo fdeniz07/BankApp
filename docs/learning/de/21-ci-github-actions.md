@@ -41,6 +41,9 @@ flowchart LR
 dotnet restore BankApp.slnx
 dotnet build BankApp.slnx -c Release --no-restore
 dotnet test tests/Application.UnitTests/Application.UnitTests.csproj -c Release --no-build
+dotnet test tests/WebApi.IntegrationTests/WebApi.IntegrationTests.csproj -c Release --no-build
+bash -n infra/scripts/vault-seed.sh
+bash -n infra/scripts/vault-rotate-jwt.sh
 cd client
 npm ci
 npm run build
