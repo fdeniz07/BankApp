@@ -101,11 +101,18 @@ services:
     container_name: bankapp-redis
     ports:
       - "6379:6379"
+    environment:
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-change-me-redis}"
     volumes:
       - redis-data:/data
-    command: ["redis-server", "--appendonly", "yes"]
+    command:
+      [
+        "sh",
+        "-c",
+        "redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""
+      ]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD-SHELL", "redis-cli -a \"$$REDIS_PASSWORD\" ping | grep -q PONG"]
       interval: 10s
       timeout: 3s
       retries: 8
@@ -262,6 +269,8 @@ services:
       TOKEN_SECURITY_KEY: "${TOKEN_SECURITY_KEY}"
       RABBITMQ_USER: "${RABBITMQ_USER:-guest}"
       RABBITMQ_PASSWORD: "${RABBITMQ_PASSWORD:-guest}"
+      REDIS_PASSWORD: "${REDIS_PASSWORD:-change-me-redis}"
+      ELASTICSEARCH_PASSWORD: "${ELASTICSEARCH_PASSWORD:-}"
       GRAFANA_ADMIN_USER: "${GRAFANA_ADMIN_USER:-admin}"
       GRAFANA_ADMIN_PASSWORD: "${GRAFANA_ADMIN_PASSWORD:-admin}"
       KEYCLOAK_ADMIN_USER: "${KEYCLOAK_ADMIN_USER:-admin}"
@@ -311,7 +320,7 @@ services:
       Database__RunMigrations: "true"
       Database__RunSeed: "true"
       ConnectionStrings__BankingConnectionString: "Data Source=sqlserver,1433;Initial Catalog=BankAppDb;User ID=sa;Password=${MSSQL_SA_PASSWORD};Connect Timeout=30;Encrypt=False;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False;Command Timeout=30"
-      Redis__ConnectionString: "redis:6379"
+      Redis__ConnectionString: "redis:6379,password=${REDIS_PASSWORD:-change-me-redis}"
       Seq__ServerUrl: "http://seq"
       RabbitMq__Enabled: "true"
       RabbitMq__HostName: "rabbitmq"
@@ -332,6 +341,7 @@ services:
       Vault__JwtSecretPath: "bankapp/jwt"
       Vault__DatabaseSecretPath: "bankapp/database"
       Vault__MessagingSecretPath: "bankapp/messaging"
+      Vault__CacheSecretPath: "bankapp/cache"
       Vault__RoleIdFile: "/vault-approle/role_id"
       Vault__SecretIdFile: "/vault-approle/secret_id"
       Vault__FailClosed: "true"

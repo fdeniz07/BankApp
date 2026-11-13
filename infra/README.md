@@ -7,15 +7,13 @@ Full local stack for later CI/CD (GitHub Actions → ArgoCD/Kubernetes → Grafa
 | Service | Host URL | Notes |
 |---------|----------|--------|
 | Seq | http://localhost:5341 | volume `bankapp-seq-data`; Compose **healthcheck**; primary .NET log UX |
-| Elasticsearch | http://localhost:9200 | credit search + log indexes; volume `bankapp-elasticsearch-data` |
+| Elasticsearch | http://localhost:9200 | lab: `xpack.security.enabled=false`; prod password notes in Vault `observability` |
 | Logstash | host `:8081` (HTTP) / `:50000` (TCP) | Serilog → ES pipeline; see learning 31 |
 | Kibana | http://localhost:5601 | Discover / data views for `bankapp-logs-*` |
-| Redis | `localhost:6379` | volume `bankapp-redis-data`; Compose **healthcheck** |
-| Redis Insight | http://localhost:5540 | official UI; add DB **host `redis`**, port **6379** (no password); volume `bankapp-redis-insight-data` |
-
-Lab tooling guide (setup / cautions / best practices): [docs/learning/tr/24-lab-tools.md](../docs/learning/tr/24-lab-tools.md).
+| Redis | `localhost:6379` | `requirepass` from `REDIS_PASSWORD`; Vault `secret/bankapp/cache`; volume `bankapp-redis-data` |
+| Redis Insight | http://localhost:5540 | host **`redis`**, port **6379**, password = `REDIS_PASSWORD`; volume `bankapp-redis-insight-data` |
 | RabbitMQ | `localhost:5672` / UI `:15672` | email-confirmation + domain-events queues; volume `bankapp-rabbitmq-data`; **healthcheck** |
-| Vault | http://localhost:8200 | **dev mode** lab; root token from `.env`; `vault-seed` writes `secret/bankapp`; WebApi JWT overlay |
+| Vault | http://localhost:8200 | dev mode; AppRole + split KV; see [Vault section](#hashicorp-vault-lab) |
 | Vault Raft (optional) | http://localhost:8210 (+8211/8212) | `docker-compose.vault-raft.yml` — see learning 19; daily stack keeps `:8200` |
 | Keycloak | http://localhost:8180 | Realm `bankapp` import; SPA PKCE + dual JWT on WebApi |
 | SQL Server | `localhost,11433` | Compose service `bankapp-sql`; **external** volume `sqlserver-2025-data`; **healthcheck** |
@@ -148,10 +146,13 @@ Dev-mode Vault for learning secret management with a **prod-shaped** auth model:
 | `secret/bankapp/jwt` | `jwt_security_key` (+ optional `jwt_security_key_previous`) | WebApi (AppRole) |
 | `secret/bankapp/database` | `mssql_sa_password` | WebApi (AppRole) |
 | `secret/bankapp/messaging` | `rabbitmq_username`, `rabbitmq_password` | WebApi (AppRole) |
-| `secret/bankapp/observability` | Grafana/Keycloak admin (+ optional social client secrets) | Operators / UI only — **denied** to WebApi policy |
+| `secret/bankapp/cache` | `redis_password` | WebApi (AppRole) |
+| `secret/bankapp/observability` | Grafana/Keycloak admin, ES lab flags (+ optional `elasticsearch_password`) | Operators / UI only — **denied** to WebApi policy |
+
+Lab tooling: [docs/learning/tr/24-lab-tools.md](../docs/learning/tr/24-lab-tools.md).
 
 - **Root token** (`VAULT_DEV_ROOT_TOKEN_ID`): `vault-seed` + Vault UI bootstrap only — **not** given to WebApi.
-- **AppRole** `bankapp-webapi`: seed writes `role_id` / `secret_id` to Compose volume `bankapp-vault-approle`; WebApi logs in and overlays JWT + SQL connection `Password` + RabbitMQ credentials.
+- **AppRole** `bankapp-webapi`: seed writes `role_id` / `secret_id` to Compose volume `bankapp-vault-approle`; WebApi overlays JWT + SQL + RabbitMQ + Redis from Vault.
 - **FailClosed=true** on Compose WebApi: Vault/AppRole failure aborts startup (local `dotnet run` keeps `Vault:Enabled=false`).
 - SQL / RabbitMQ / Grafana / Keycloak **containers** still bootstrap from Compose `.env` (Vault Agent / CSI is out of scope for this lab).
 
@@ -165,7 +166,7 @@ docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --build
 
 1. Open http://localhost:8200
 2. Sign in with token = `VAULT_DEV_ROOT_TOKEN_ID` (default `bankapp-vault-root-token`)
-3. Browse KV paths under **`secret/bankapp/`** (`jwt`, `database`, `messaging`, `observability`)
+3. Browse KV paths under **`secret/bankapp/`** (`jwt`, `database`, `messaging`, `cache`, `observability`)
 4. Seed script: [`scripts/vault-seed.sh`](scripts/vault-seed.sh) (also run by Compose `vault-seed`)
 
 Re-seed manually after Vault restart (dev data is ephemeral; re-mints AppRole `secret_id`):
@@ -199,11 +200,31 @@ Seq stays for structured logs (complement, not replacement)
 
 Local `dotnet run` keeps OTel **off** by default (`appsettings`); point `OpenTelemetry:OtlpEndpoint` at `http://localhost:4317` and set `Enabled: true` if the collector is running.
 
+## Daily lab checklist (~10 min)
+
+From repo root (PowerShell):
+
+```powershell
+pwsh -File infra/scripts/lab-daily-check.ps1
+```
+
+Manual habits:
+
+| Step | Command / action |
+|------|------------------|
+| Stack status | `docker compose -f infra/docker-compose.yml --env-file infra/.env ps` |
+| Health | `http://localhost:8080/health` → 200 |
+| Vault after restart | `up vault-seed` → `--no-deps webapi` recreate |
+| WebApi overlay | logs contain `Vault overlay applied via AppRole` |
+| Tests (no Vault) | `dotnet test tests/WebApi.IntegrationTests` (CI uses same; `Vault:Enabled=false`) |
+| JWT rotate (weekly lab) | `vault-rotate-jwt.sh` + WebApi recreate |
+
 ## Roadmap
 
 - GitHub Actions / ArgoCD / K8s; chatbot (see docs roadmap)
 - WebApi JWT overlay + dual-key rotate — **done**
-- AppRole + split KV paths (jwt/database/messaging/observability) + FailClosed — **done**
+- AppRole + split KV paths (jwt/database/messaging/cache/observability) + FailClosed — **done**
+- Redis `requirepass` + Vault cache path — **done** (lab)
 - Optional Raft HA lab — **done** (`docker-compose.vault-raft.yml`; still TLS for prod)
 - Keycloak dual JWT + SPA PKCE + social IdP script — **done**
 - Elasticsearch live search — **done** (learning 31)

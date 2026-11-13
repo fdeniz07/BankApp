@@ -4,6 +4,7 @@
 #   secret/bankapp/jwt           — JWT HMAC keys (WebApi)
 #   secret/bankapp/database      — SQL SA password (WebApi)
 #   secret/bankapp/messaging     — RabbitMQ credentials (WebApi)
+#   secret/bankapp/cache         — Redis password (WebApi)
 #   secret/bankapp/observability — Grafana/Keycloak admin (operators only; WebApi policy denies)
 #
 # Writes AppRole credentials to APPROLE_DIR (Compose volume shared with WebApi).
@@ -22,6 +23,8 @@ JWT_KEY="${TOKEN_SECURITY_KEY:-change-me-jwt-key}"
 SQL_PASSWORD="${MSSQL_SA_PASSWORD:-change-me-sql}"
 RMQ_USER="${RABBITMQ_USER:-guest}"
 RMQ_PASSWORD="${RABBITMQ_PASSWORD:-guest}"
+REDIS_PASSWORD="${REDIS_PASSWORD:-change-me-redis}"
+ELASTICSEARCH_PASSWORD="${ELASTICSEARCH_PASSWORD:-}"
 GRAFANA_USER="${GRAFANA_ADMIN_USER:-admin}"
 GRAFANA_PASSWORD="${GRAFANA_ADMIN_PASSWORD:-admin}"
 KEYCLOAK_USER="${KEYCLOAK_ADMIN_USER:-admin}"
@@ -63,6 +66,12 @@ path "secret/data/bankapp/messaging" {
   capabilities = ["read"]
 }
 path "secret/metadata/bankapp/messaging" {
+  capabilities = ["read"]
+}
+path "secret/data/bankapp/cache" {
+  capabilities = ["read"]
+}
+path "secret/metadata/bankapp/cache" {
   capabilities = ["read"]
 }
 EOF
@@ -143,9 +152,22 @@ ensure_messaging() {
   echo "Seeded secret/bankapp/messaging."
 }
 
+ensure_cache() {
+  if vault kv get secret/bankapp/cache >/dev/null 2>&1; then
+    echo "secret/bankapp/cache already present — keep."
+    return
+  fi
+  vault kv put secret/bankapp/cache \
+    redis_password="${REDIS_PASSWORD}"
+  echo "Seeded secret/bankapp/cache."
+}
+
 ensure_observability() {
   # Observability may be re-seeded from env each run (admin lab passwords).
-  OBS_ARGS="grafana_admin_user=${GRAFANA_USER} grafana_admin_password=${GRAFANA_PASSWORD} keycloak_admin_user=${KEYCLOAK_USER} keycloak_admin_password=${KEYCLOAK_PASSWORD}"
+  OBS_ARGS="grafana_admin_user=${GRAFANA_USER} grafana_admin_password=${GRAFANA_PASSWORD} keycloak_admin_user=${KEYCLOAK_USER} keycloak_admin_password=${KEYCLOAK_PASSWORD} elasticsearch_lab_xpack_enabled=false"
+  if [ -n "${ELASTICSEARCH_PASSWORD}" ]; then
+    OBS_ARGS="${OBS_ARGS} elasticsearch_password=${ELASTICSEARCH_PASSWORD}"
+  fi
   if [ -n "${GOOGLE_CLIENT_SECRET}" ]; then
     OBS_ARGS="${OBS_ARGS} keycloak_google_client_secret=${GOOGLE_CLIENT_SECRET}"
   fi
@@ -160,6 +182,7 @@ ensure_observability() {
 ensure_jwt
 ensure_database
 ensure_messaging
+ensure_cache
 ensure_observability
 
 echo "Vault seed complete (split paths + AppRole ${ROLE_NAME})."

@@ -69,6 +69,7 @@ public static class VaultConfigurationExtensions
         string jwtPath = FirstNonEmpty(vault.JwtSecretPath, vault.SecretPath, "bankapp/jwt");
         string databasePath = vault.DatabaseSecretPath.Trim('/');
         string messagingPath = vault.MessagingSecretPath.Trim('/');
+        string cachePath = vault.CacheSecretPath.Trim('/');
 
         Dictionary<string, string?> overlay = new(StringComparer.OrdinalIgnoreCase);
 
@@ -112,13 +113,27 @@ public static class VaultConfigurationExtensions
             ApplyMessagingOverlay(mqData.Value, overlay);
         }
 
+        if (!string.IsNullOrWhiteSpace(cachePath))
+        {
+            JsonElement? cacheData = await ReadKvDataAsync(
+                vault.Address, mount, cachePath, clientToken, cancellationToken);
+            if (cacheData is null)
+            {
+                FailOrWarn(vault, $"Vault read failed for {mount}/data/{cachePath}.");
+                return;
+            }
+
+            ApplyCacheOverlay(configuration, cacheData.Value, overlay);
+        }
+
         configuration.AddInMemoryCollection(overlay!);
 
         Log.Information(
-            "Vault overlay applied via AppRole/token (JWT{Previous}, SQL password patch={Sql}, RabbitMq={Mq}).",
+            "Vault overlay applied via AppRole/token (JWT{Previous}, SQL={Sql}, RabbitMq={Mq}, Redis={Redis}).",
             overlay.ContainsKey("TokenOptions:SecurityKeyPrevious") ? " + Previous" : string.Empty,
             overlay.ContainsKey("ConnectionStrings:BankingConnectionString"),
-            overlay.ContainsKey("RabbitMq:Password") || overlay.ContainsKey("RabbitMq:UserName"));
+            overlay.ContainsKey("RabbitMq:Password") || overlay.ContainsKey("RabbitMq:UserName"),
+            overlay.ContainsKey("Redis:ConnectionString"));
     }
 
     private static void FailOrWarn(VaultOptions vault, string message)
@@ -304,6 +319,39 @@ public static class VaultConfigurationExtensions
             if (!string.IsNullOrWhiteSpace(password))
                 overlay["RabbitMq:Password"] = password;
         }
+    }
+
+    private static void ApplyCacheOverlay(
+        IConfiguration configuration,
+        JsonElement data,
+        Dictionary<string, string?> overlay)
+    {
+        if (!data.TryGetProperty("redis_password", out JsonElement pwdEl))
+            return;
+
+        string? password = pwdEl.GetString();
+        if (string.IsNullOrWhiteSpace(password))
+            return;
+
+        string? current = configuration["Redis:ConnectionString"];
+        if (string.IsNullOrWhiteSpace(current))
+            current = "redis:6379";
+
+        overlay["Redis:ConnectionString"] = PatchRedisConnectionStringPassword(current, password);
+    }
+
+    internal static string PatchRedisConnectionStringPassword(string connectionString, string password)
+    {
+        string trimmed = connectionString.Trim();
+        if (trimmed.Contains("password=", StringComparison.OrdinalIgnoreCase))
+        {
+            return Regex.Replace(
+                trimmed,
+                "(?i)password=[^,]*",
+                $"password={password}");
+        }
+
+        return trimmed + (trimmed.EndsWith(',') ? string.Empty : ",") + $"password={password}";
     }
 
     internal static string PatchConnectionStringPassword(string connectionString, string password)

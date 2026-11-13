@@ -39,6 +39,9 @@ public sealed class VaultOptions
     /// <summary>KV path for messaging credentials, e.g. bankapp/messaging.</summary>
     public string MessagingSecretPath { get; set; } = "bankapp/messaging";
 
+    /// <summary>KV path for cache (Redis) credentials, e.g. bankapp/cache.</summary>
+    public string CacheSecretPath { get; set; } = "bankapp/cache";
+
     /// <summary>
     /// Legacy single path (flat secret/bankapp). Used only if JwtSecretPath is empty.
     /// </summary>
