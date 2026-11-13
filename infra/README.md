@@ -215,7 +215,10 @@ Manual habits:
 | Stack status | `docker compose -f infra/docker-compose.yml --env-file infra/.env ps` |
 | Health | `http://localhost:8080/health` → 200 |
 | Vault after restart | `up vault-seed` → `--no-deps webapi` recreate |
-| WebApi overlay | logs contain `Vault overlay applied via AppRole` |
+| WebApi overlay | logs contain `Vault overlay applied via AppRole` and `Redis=True` |
+| Redis auth | script runs `redis-cli -a $REDIS_PASSWORD ping` → PONG |
+| Vault least privilege | AppRole `kv get observability` → denied |
+| ELK indices | `_cat/indices/bankapp-logs*` on `:9200` (warn if empty) |
 | Tests (no Vault) | `dotnet test tests/WebApi.IntegrationTests` (CI uses same; `Vault:Enabled=false`) |
 | JWT rotate (weekly lab) | `vault-rotate-jwt.sh` + WebApi recreate |
 
